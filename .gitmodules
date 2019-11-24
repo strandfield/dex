@@ -1,0 +1,3 @@
+[submodule "dependencies/liquid"]
+	path = dependencies/liquid
+	url = https://github.com/bandicode/liquid.git
