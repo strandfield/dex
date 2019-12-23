@@ -3,7 +3,7 @@
 ###### dom
 ##################################################################
 
-set(DOM_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../dom" CACHE PATH "Provide the directory of the dom library")
+set(DOM_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dom" CACHE PATH "Provide the directory of the dom library")
 
 if ("${DOM_PROJECT_DIR}" STREQUAL "")
   message(FATAL_ERROR "The directory of the dom project must be specified")  

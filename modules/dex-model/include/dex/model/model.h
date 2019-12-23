@@ -11,6 +11,8 @@
 
 #include "dex/model/manual.h"
 
+#include <cxx/program.h>
+
 namespace dex
 {
 

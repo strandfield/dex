@@ -4,3 +4,6 @@
 [submodule "dependencies/typeset"]
 	path = dependencies/typeset
 	url = https://github.com/bandicode/typeset.git
+[submodule "dependencies/dom"]
+	path = dependencies/dom
+	url = https://github.com/bandicode/dom.git
