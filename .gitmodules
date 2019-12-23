@@ -1,3 +1,6 @@
 [submodule "dependencies/liquid"]
 	path = dependencies/liquid
 	url = https://github.com/bandicode/liquid.git
+[submodule "dependencies/typeset"]
+	path = dependencies/typeset
+	url = https://github.com/bandicode/typeset.git
