@@ -5,12 +5,14 @@ find_package(Qt5Core)
 ###### dex-output library
 ##################################################################
 
+set(CMAKE_AUTORCC ON)
+
 file(GLOB_RECURSE DEXOUTPUT_LIBRARY_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE DEXOUTPUT_LIBRARY_HDR_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/dex/*.h)
 
 list(FILTER DEXOUTPUT_LIBRARY_SRC_FILES EXCLUDE REGEX "main.cpp")
 
-add_library(dex-output SHARED ${DEXOUTPUT_LIBRARY_HDR_FILES} ${DEXOUTPUT_LIBRARY_SRC_FILES})
+add_library(dex-output SHARED ${DEXOUTPUT_LIBRARY_HDR_FILES} ${DEXOUTPUT_LIBRARY_SRC_FILES} "resources/resources.qrc")
 target_compile_definitions(dex-output PRIVATE -DDEX_OUTPUT_BUILD_LIB)
 target_include_directories(dex-output PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(dex-output PUBLIC "${LIQUID_PROJECT_DIR}/include")

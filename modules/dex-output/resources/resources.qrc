@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/">
+    <file>templates/markdown/class.md</file>
+  </qresource>
+</RCC>

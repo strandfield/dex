@@ -267,6 +267,10 @@ ParserMachine::ParserMachine()
     m_state{State::Idle},
     m_program{}
 {
+#if defined(Q_OS_WIN)
+  m_lexer.catcodes()[static_cast<size_t>('\r')] = tex::parsing::CharCategory::Ignored;
+#endif // defined(Q_OS_WIN)
+
   m_program = std::make_shared<cxx::Program>();
 
   for (const tex::parsing::Macro& m : DexFormat.macros())

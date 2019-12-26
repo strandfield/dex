@@ -8,6 +8,7 @@
 
 #include "dex/input/parser-machine.h"
 #include "dex/output/json-export.h"
+#include "dex/output/markdown-export.h"
 
 #include <json-toolkit/stringify.h>
 
@@ -126,6 +127,11 @@ void Dex::write_output(const std::shared_ptr<cxx::Program>& prog, const QString&
       throw std::runtime_error{ "Could not open output file" };
 
     file.write(QByteArray::fromStdString(json::stringify(obj)));
+  }
+  else if (info.suffix() == "md")
+  {
+    dex::MarkdownExport md_export;
+    md_export.dump(prog, info.dir());
   }
   else
   {

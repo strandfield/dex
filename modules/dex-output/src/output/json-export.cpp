@@ -18,6 +18,19 @@
 namespace dex
 {
 
+static std::string to_string(cxx::AccessSpecifier as)
+{
+  switch (as)
+  {
+  case cxx::AccessSpecifier::PRIVATE:
+    return "private";
+  case cxx::AccessSpecifier::PROTECTED:
+    return "protected";
+  default:
+    return "public";
+  }
+}
+
 json::Json JsonExport::serialize(const cxx::Program& prog)
 {
   return serialize_namespace(*prog.globalNamespace());
@@ -65,7 +78,9 @@ json::Json JsonExport::serialize_class(const cxx::Class& cla)
     json::Array list;
     for (const auto& m : cla.members())
     {
-      list.push(serialize_entity(*m.first));
+      json::Object member = serialize_entity(*m.first).toObject();
+      member["accessibility"] = to_string(m.second);
+      list.push(member);
     }
 
     result["members"] = list;
@@ -229,7 +244,7 @@ void JsonExport::write_documentation(json::Object& obj, const std::shared_ptr<cx
 
 void JsonExport::write_documentation(json::Object& obj, const cxx::Documentation& doc)
 {
-  obj["doc"] = serialize_documentation(doc);
+  obj["documentation"] = serialize_documentation(doc);
 }
 
 void JsonExport::write_entity_documentation(json::Object& obj, const EntityDocumentation& doc)
