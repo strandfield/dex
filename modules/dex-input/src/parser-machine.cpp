@@ -8,6 +8,8 @@
 #include "dex/input/parser-mode.h"
 #include "dex/input/program-mode.h"
 
+#include "dex/common/file-utils.h"
+
 #include <QDebug>
 #include <QFile>
 
@@ -29,16 +31,6 @@ void send_token(tex::parsing::Token&& tok, C& c, Components& ... rest)
     send_token(tex::parsing::read(c.output()), rest...);
 }
 
-static std::string read_all(const QFileInfo& info)
-{
-  QFile file{ info.absoluteFilePath() };
-
-  if (!file.open(QIODevice::ReadOnly))
-    throw std::runtime_error{ "Could not open file" };
-
-  return file.readAll().toStdString();
-}
-
 InputStream::InputStream()
   : m_block_delimiters{ "/*!", "*/" }
 {
@@ -58,7 +50,7 @@ InputStream::InputStream(const QFileInfo& file)
   : m_block_delimiters{ "/*!", "*/" }
 {
   Document d;
-  d.content = read_all(file);
+  d.content = file_utils::read_all(file.absoluteFilePath().toStdString());
   d.file_path = file.filePath().toStdString();
   m_documents.push(d);
 }
@@ -79,7 +71,7 @@ void InputStream::inject(std::string content)
 void InputStream::inject(const QFileInfo& file)
 {
   Document d;
-  d.content = read_all(file);
+  d.content = file_utils::read_all(file.absoluteFilePath().toStdString());
   d.file_path = file.filePath().toStdString();
   m_documents.push(d);
 }
@@ -248,7 +240,7 @@ InputStream& InputStream::operator=(const QFileInfo& file)
   m_documents = std::stack<Document>();
 
   Document document;
-  document.content = read_all(file);
+  document.content = file_utils::read_all(file.absoluteFilePath().toStdString());
   document.file_path = file.filePath().toStdString();
   m_documents.push(document);
 

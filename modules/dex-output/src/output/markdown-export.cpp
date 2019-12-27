@@ -8,6 +8,8 @@
 
 #include "dex/model/since.h"
 
+#include "dex/common/file-utils.h"
+
 #include <cxx/class.h>
 #include <cxx/documentation.h>
 #include <cxx/function.h>
@@ -19,17 +21,6 @@
 
 namespace dex
 {
-
-// TODO: refactor duplicates
-static std::string read_all(const QFileInfo& info)
-{
-  QFile file{ info.absoluteFilePath() };
-
-  if (!file.open(QIODevice::ReadOnly))
-    throw std::runtime_error{ "Could not open file" };
-
-  return file.readAll().toStdString();
-}
 
 struct JsonMarkdownUrlAnnotator : JsonUrlAnnotator
 {
@@ -46,7 +37,7 @@ struct JsonMarkdownUrlAnnotator : JsonUrlAnnotator
 
 MarkdownExport::MarkdownExport()
 {
-  std::string tmplt = read_all(QFileInfo{ ":/templates/markdown/class.md" });
+  std::string tmplt = file_utils::read_all(":/templates/markdown/class.md");
   templates().class_template = liquid::parse(tmplt);
 }
 

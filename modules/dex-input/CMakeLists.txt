@@ -18,6 +18,7 @@ target_include_directories(dex-input PUBLIC "${LIQUID_PROJECT_DIR}/json-toolkit/
 target_include_directories(dex-input PUBLIC "${TYPESET_PROJECT_DIR}/include")
 target_link_libraries(dex-input Qt5::Core)
 target_link_libraries(dex-input dex-model)
+target_link_libraries(dex-input dex-common)
 target_link_libraries(dex-input typeset)
 
 foreach(_source IN ITEMS ${DEXINPUT_LIBRARY_HDR_FILES} ${DEXINPUT_LIBRARY_SRC_FILES})

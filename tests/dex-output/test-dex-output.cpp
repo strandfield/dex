@@ -6,6 +6,8 @@
 
 #include "dex/model/since.h"
 
+#include "dex/common/file-utils.h"
+
 #include "dex/output/json-annotator.h"
 #include "dex/output/json-export.h"
 #include "dex/output/markdown-export.h"
@@ -22,17 +24,6 @@
 #include <json-toolkit/stringify.h>
 
 #include <iostream>
-
-// TODO: refactor duplicated block
-static std::string read_all(const QFileInfo& info)
-{
-  QFile file{ info.absoluteFilePath() };
-
-  if (!file.open(QIODevice::ReadOnly))
-    throw std::runtime_error{ "Could not open file" };
-
-  return file.readAll().toStdString();
-}
 
 static std::shared_ptr<dom::Paragraph> make_par(const std::string& str)
 {
@@ -169,7 +160,7 @@ void TestDexOutput::markdownExport()
 
     md_export.dump(prog, QDir::current());
 
-    std::string content = read_all(QFileInfo{ "classes/vector.md" });
+    std::string content = dex::file_utils::read_all("classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n**Brief:** sequence container that encapsulates dynamic size arrays\n\n"
