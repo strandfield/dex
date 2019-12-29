@@ -5,6 +5,7 @@
 #include "dex/input/conditional-evaluator.h"
 
 #include "dex/input/parser-machine.h"
+#include "dex/input/parser-errors.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -66,8 +67,8 @@ void ConditionalEvaluator::write(tex::parsing::Token&& tok)
   case State::WaitingTestNextChar:
   {
     if (tok.isControlSequence())
-      throw std::runtime_error{ "Unexpected control sequence" };
-
+      throw UnexpectedControlSequence{ tok.controlSequence() };
+    
     m_registers.br = inputStream().peekChar() == tok.characterToken().value;
 
     m_state = State::Idle;

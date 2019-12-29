@@ -8,6 +8,8 @@
 #include "dex/output/json-export.h"
 #include "dex/output/json-visitor.h"
 
+#include "dex/common/errors.h"
+
 #include <cxx/class.h>
 #include <cxx/documentation.h>
 #include <cxx/function.h>
@@ -155,13 +157,13 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
     const bool success = QDir().mkpath(fileinfo.dir().absolutePath());
 
     if (!success)
-      throw std::runtime_error{ "Could not create output directory" };
+      throw IOException{ fileinfo.dir().absolutePath().toStdString(), "could not create directory" };
   }
 
   QFile file{ fileinfo.absoluteFilePath() };
 
   if (!file.open(QIODevice::WriteOnly))
-    throw std::runtime_error{ "Could not open output file for writing" };
+    throw IOException{ fileinfo.absoluteFilePath().toStdString(), "could not open file for writing" };
 
   file.write(output.data());
 

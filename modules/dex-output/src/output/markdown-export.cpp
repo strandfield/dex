@@ -72,7 +72,8 @@ std::string MarkdownExport::stringify(const json::Json& val)
   if (obj["type"] == dom::Paragraph::TypeId)
     return stringify_paragraph(obj);
 
-  throw std::runtime_error{ "Not implemented" };
+  assert(("Not implemented", false));
+  return {};
 }
 
 json::Json MarkdownExport::applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args)

@@ -5,10 +5,13 @@
 #include "dex/input/program-mode.h"
 
 #include "dex/input/parser-machine.h"
+#include "dex/input/parser-errors.h"
 
 #include "dex/model/class-documentation.h"
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
+
+#include "dex/common/logging.h"
 
 #include <cxx/documentation.h>
 #include <cxx/function.h>
@@ -75,7 +78,7 @@ ProgramMode::CS ProgramMode::parseCs(const std::string& str) const
   auto it = csmap().find(str);
 
   if (it == csmap().end())
-    throw std::runtime_error{ "Unknown control sequence" };
+    throw UnknownControlSequence{ str };
 
   return it->second;
 }
@@ -107,13 +110,16 @@ void ProgramMode::write_idle(tex::parsing::Token&& tok)
   if (tok.isCharacterToken())
   {
     if (tok.characterToken().category != tex::parsing::CharCategory::Space)
-      throw std::runtime_error{ "Unexpected character" };
+    {
+      LOG_WARNING << "Non-space character ignored";
+      return;
+    }
   }
 
   auto it = csmap().find(tok.controlSequence());
 
   if (it == csmap().end())
-    throw std::runtime_error{ "Unknown control sequence" };
+    throw UnknownControlSequence{ tok.controlSequence() };
 
   CS cs = it->second;
 
@@ -128,7 +134,7 @@ void ProgramMode::write_idle(tex::parsing::Token&& tok)
   case CS::NAMESPACE:
     return cs_namespace();
   default:
-    throw std::runtime_error{ "Unexpected control sequence" };
+    throw UnexpectedControlSequence{ tok.controlSequence() };
   }
 }
 
@@ -143,7 +149,7 @@ void ProgramMode::cs_par()
 void ProgramMode::cs_class()
 {
   if (currentFrame().node->type() == cxx::Function::TypeId)
-    throw std::runtime_error{ "Invalid use of \\class in function block" };
+    throw BadControlSequence{ "class" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
   const auto class_name = std::get<std::string>(machine().caller().arguments().front());
@@ -164,7 +170,7 @@ void ProgramMode::cs_class()
   }
   else
   {
-    throw std::runtime_error{ "Invalid use of \\class" };
+    throw BadControlSequence{ "class" };
   }
 
   m_state.frames.push_back(State::Frame{ State::Class, new_class });
@@ -173,7 +179,7 @@ void ProgramMode::cs_class()
 void ProgramMode::cs_endclass()
 {
   if (!currentFrame().node->is<cxx::Class>())
-    throw std::runtime_error{ "Bad use of \\endclass" };
+    throw BadControlSequence{ "endclass" };
 
   exitFrame();
 }
@@ -181,7 +187,7 @@ void ProgramMode::cs_endclass()
 void ProgramMode::cs_fn()
 {
   if (currentFrame().node->type() == cxx::Function::TypeId)
-    throw std::runtime_error{ "Invalid use of \\function in function block" };
+    throw BadControlSequence{ "function" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
   const auto fn_signature = std::get<std::string>(machine().caller().arguments().front());
@@ -202,7 +208,7 @@ void ProgramMode::cs_fn()
   }
   else
   {
-    throw std::runtime_error{ "Invalid use of \\function" };
+    throw BadControlSequence{ "function" };
   }
 
   m_state.frames.push_back(State::Frame{ State::Function, new_fn });
@@ -211,7 +217,7 @@ void ProgramMode::cs_fn()
 void ProgramMode::cs_endfn()
 {
   if (!currentFrame().node->is<cxx::Function>())
-    throw std::runtime_error{ "Bad use of \\endfunction" };
+    throw BadControlSequence{ "endfunction" };
 
   exitFrame();
 }
@@ -219,7 +225,7 @@ void ProgramMode::cs_endfn()
 void ProgramMode::cs_namespace()
 {
   if (!currentFrame().node->is<cxx::Namespace>())
-    throw std::runtime_error{ "Invalid use of \\namespace" };
+    throw BadControlSequence{ "namespace" };
 
   auto parent_ns = std::dynamic_pointer_cast<cxx::Namespace>(currentFrame().node);
   const auto ns_name = std::get<std::string>(machine().caller().arguments().front());
@@ -236,7 +242,7 @@ void ProgramMode::cs_namespace()
 void ProgramMode::cs_endnamespace()
 {
   if (!currentFrame().node->is<cxx::Namespace>())
-    throw std::runtime_error{ "Bad use of \\endnamespace" };
+    throw BadControlSequence{ "endnamespace" };
 
   exitFrame();
 }
@@ -280,7 +286,7 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
     case CS::RETURNS:
       return cs_returns();
     default:
-      throw std::runtime_error{ "Unexpected control sequence" };
+      throw UnexpectedControlSequence{ tok.controlSequence() };
     }
   }
 }
@@ -330,7 +336,7 @@ void ProgramMode::cs_param()
   State::Frame& f = currentFrame();
 
   if (f.type != State::Function)
-    throw std::runtime_error{ "Invalid use of \\param command" };
+    throw BadControlSequence{ "param" };
 
   std::string text = std::get<std::string>(funCall().arguments().front());
 
@@ -344,7 +350,7 @@ void ProgramMode::cs_returns()
   State::Frame& f = currentFrame();
 
   if (f.type != State::Function)
-    throw std::runtime_error{ "Invalid use of \\returns command" };
+    throw BadControlSequence{ "returns" };
 
   std::string text = std::get<std::string>(funCall().arguments().front());
 
@@ -356,7 +362,7 @@ void ProgramMode::cs_returns()
 
 void ProgramMode::childFinished(ParserMode& mode)
 {
-  throw std::runtime_error{ "Not implemented" };
+  assert(("Not implemented", false));
 }
 
 void ProgramMode::beginFile()

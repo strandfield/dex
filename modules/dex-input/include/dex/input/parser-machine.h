@@ -11,6 +11,7 @@
 
 #include "dex/input/conditional-evaluator.h"
 #include "dex/input/function-caller.h"
+#include "dex/input/parser-errors.h"
 
 #include <cxx/program.h>
 
@@ -53,6 +54,7 @@ public:
   bool seekBlock();
   bool isInsideBlock() const;
   bool atBlockEnd() const;
+  void seekBlockEnd();
   void exitBlock();
 
   struct Document
@@ -129,6 +131,10 @@ public:
 
   void resume();
   void advance();
+
+  bool recover();
+
+  void reset();
 
   const std::shared_ptr<cxx::Program>& output() const;
 

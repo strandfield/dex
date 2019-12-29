@@ -36,7 +36,6 @@ bool ParserMode::done() const
 void ParserMode::childFinished(ParserMode& mode)
 {
   assert(("invalid call to ParserMode::childFinished()", false));
-  throw std::runtime_error{"invalid call to ParserMode::childFinished()"};
 }
 
 const std::shared_ptr<dom::Node>& ParserMode::output() const

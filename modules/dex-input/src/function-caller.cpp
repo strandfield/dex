@@ -5,6 +5,9 @@
 #include "dex/input/function-caller.h"
 
 #include "dex/input/parser-machine.h"
+#include "dex/input/parser-errors.h"
+
+#include "dex/common/logging.h"
 
 #include <cassert>
 #include <set>
@@ -86,7 +89,7 @@ void FunctionCaller::write(tex::parsing::Token&& tok)
       }
       else
       {
-        throw std::runtime_error{ "Unexpected control sequence" };
+        throw UnexpectedControlSequence{ tok.controlSequence() };
       }
     }
     else
@@ -98,7 +101,7 @@ void FunctionCaller::write(tex::parsing::Token&& tok)
   else if(state() == State::WaitingForCallCs)
   {
     if (!tok.isControlSequence())
-      throw std::runtime_error{ "Expected cs name after \\c@all" };
+      throw ExpectedControlSequence{ "c@ll" };
    
     Task call_task;
     call_task.type = Call;
@@ -248,7 +251,7 @@ void FunctionCaller::finishCurrentTask()
 void FunctionCaller::work(tex::parsing::Token&& tok)
 {
   if (tok.isControlSequence())
-    throw std::runtime_error{ "Unexpected control sequence" };
+    throw UnexpectedControlSequence{ tok.controlSequence() };
 
   switch (m_tasks.front().type)
   {
@@ -405,7 +408,10 @@ void FunctionCaller::parse_options(tex::parsing::Token&& tok)
 FunctionCaller::Argument FunctionCaller::parse(std::string&& str)
 {
   if (str.empty())
-    throw std::runtime_error{ "Value cannot be empty" };
+  {
+    LOG_WARNING << "Empty value of key in command option";
+    return std::move(str);
+  }
 
   const bool all_digits = std::all_of(str.begin(), str.end(), [](char c) {
     return c >= '0' && c <= '9';

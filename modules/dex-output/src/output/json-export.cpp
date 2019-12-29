@@ -44,8 +44,9 @@ json::Json JsonExport::serialize_entity(const cxx::Entity& e)
     return serialize_class(static_cast<const cxx::Class&>(e));
   else if (e.is<cxx::Function>())
     return serialize_function(static_cast<const cxx::Function&>(e));
-  else
-    throw std::runtime_error{ "JsonExport could not serialize entity (not recognized)" };
+  
+  assert(("Not implemented", false));
+  return nullptr;
 }
 
 json::Json JsonExport::serialize_namespace(const cxx::Namespace& ns)
@@ -157,8 +158,9 @@ json::Json JsonExport::serialize_documentation(const cxx::Documentation& doc)
     return serialize_documentation(static_cast<const FunctionDocumentation&>(doc));
   else if (doc.is<NamespaceDocumentation>())
     return serialize_documentation(static_cast<const NamespaceDocumentation&>(doc));
-  else
-    throw std::runtime_error{ "Unknown piece of documentation" };
+
+  assert(("Not implemented", false));
+  return nullptr;
 }
 
 json::Json JsonExport::serialize_documentation(const ClassDocumentation& doc)
@@ -211,10 +213,9 @@ json::Json JsonExport::serialize_documentation_node(const dom::Node& docnode)
   {
     return serialize_paragraph(static_cast<const dom::Paragraph&>(docnode));
   }
-  else
-  {
-    throw std::runtime_error{ "JsonExport: unknown dom::Node" };
-  }
+
+  assert(("Not implemented", false));
+  return nullptr;
 }
 
 void JsonExport::write_entity_info(json::Object& obj, const cxx::Entity& e)

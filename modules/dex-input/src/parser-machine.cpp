@@ -7,6 +7,7 @@
 #include "dex/input/format.h"
 #include "dex/input/parser-mode.h"
 #include "dex/input/program-mode.h"
+#include "dex/input/parser-errors.h"
 
 #include "dex/common/file-utils.h"
 
@@ -156,6 +157,12 @@ bool InputStream::isInsideBlock() const
 bool InputStream::atBlockEnd() const
 {
   return peek(static_cast<int>(m_block_delimiters.second.length())) == m_block_delimiters.second;
+}
+
+void InputStream::seekBlockEnd()
+{
+  while (!atEnd() && !atBlockEnd())
+    readChar();
 }
 
 void InputStream::exitBlock()
@@ -377,87 +384,152 @@ void ParserMachine::resume()
 
 void ParserMachine::advance()
 {
-  switch (state())
+  try
   {
-  case State::BeginFile:
-  {
-    beginFile();
-    m_state = State::SeekBlock;
-  }
-  break;
-  case State::SeekBlock:
-  {
-    if (inputStream().seekBlock())
+    switch (state())
     {
-      beginBlock();
-      m_state = State::ReadChar;
-    }
-    else
+    case State::BeginFile:
     {
-      m_state = State::EndFile;
-    }
-  }
-  break;
-  case State::ReadChar:
-  {
-    if (inputStream().atBlockEnd())
-    {
-      inputStream().exitBlock();
-      endBlock();
+      beginFile();
       m_state = State::SeekBlock;
     }
-    else
-    {
-      m_lexer.write(inputStream().readChar());
-      m_state = m_lexer.output().empty() ? State::ReadChar : State::ReadToken;
-    }
-  }
-  break;
-  case State::ReadToken:
-  {
-    if (!m_lexer.output().empty())
-    {
-      m_preprocessor.write(tex::parsing::read(m_lexer.output()));
-      m_state = State::SendToken;
-    }
-    else
-    {
-      m_state = State::ReadChar;
-    }
-  }
-  break;
-  case State::Preprocess:
-  {
-    m_preprocessor.advance();
-
-    if (!m_preprocessor.output().empty())
-      m_state = State::SendToken;
-    else if (!m_preprocessor.input().empty())
-      m_state = State::Preprocess;
-    else
-      m_state = State::ReadChar;
-  }
-  break;
-  case State::SendToken:
-  {
-    while (sendTokens());
-
-    if (!m_preprocessor.input().empty())
-      m_state = State::Preprocess;
-    else
-      m_state = State::ReadToken;
-  }
-  break;
-  case State::EndFile:
-  {
-    endFile();
-    m_inputstream.clear();
-    m_state = State::Idle;
-  }
-  break;
-  default:
     break;
+    case State::SeekBlock:
+    {
+      if (inputStream().seekBlock())
+      {
+        beginBlock();
+        m_state = State::ReadChar;
+      }
+      else
+      {
+        m_state = State::EndFile;
+      }
+    }
+    break;
+    case State::ReadChar:
+    {
+      if (inputStream().atBlockEnd())
+      {
+        inputStream().exitBlock();
+        endBlock();
+        m_state = State::SeekBlock;
+      }
+      else
+      {
+        m_lexer.write(inputStream().readChar());
+        m_state = m_lexer.output().empty() ? State::ReadChar : State::ReadToken;
+      }
+    }
+    break;
+    case State::ReadToken:
+    {
+      if (!m_lexer.output().empty())
+      {
+        m_preprocessor.write(tex::parsing::read(m_lexer.output()));
+        m_state = State::SendToken;
+      }
+      else
+      {
+        m_state = State::ReadChar;
+      }
+    }
+    break;
+    case State::Preprocess:
+    {
+      m_preprocessor.advance();
+
+      if (!m_preprocessor.output().empty())
+        m_state = State::SendToken;
+      else if (!m_preprocessor.input().empty())
+        m_state = State::Preprocess;
+      else
+        m_state = State::ReadChar;
+    }
+    break;
+    case State::SendToken:
+    {
+      while (sendTokens());
+
+      if (!m_preprocessor.input().empty())
+        m_state = State::Preprocess;
+      else
+        m_state = State::ReadToken;
+    }
+    break;
+    case State::EndFile:
+    {
+      endFile();
+      m_inputstream.clear();
+      m_state = State::Idle;
+    }
+    break;
+    default:
+      break;
+    }
   }
+  catch (ParserException& ex)
+  {
+    const InputStream::Document& doc = m_inputstream.currentDocument();
+    ex.setSourceLocation(doc.file_path, doc.line, doc.column);
+    throw;
+  }
+}
+
+bool ParserMachine::recover()
+{
+  /* TODO: robustify this function */
+
+  if (inputStream().isInsideBlock())
+  {
+    inputStream().seekBlockEnd();
+
+    if (inputStream().atEnd())
+      return false;
+
+    inputStream().exitBlock();
+
+    currentMode().endBlock();
+  }
+
+  m_state = State::SeekBlock;
+
+  m_lexer.output().clear();
+  m_preprocessor.input().clear();
+  m_preprocessor.output().clear();
+  m_condeval.output().clear();
+  m_caller.output().clear();
+
+  while (m_modes.size() > 1)
+  {
+    m_modes.pop_back();
+  }
+
+  return true;
+}
+
+void ParserMachine::reset()
+{
+  /* TODO: robustify this function */
+
+  if (inputStream().isInsideBlock())
+  {
+    currentMode().endBlock();
+    currentMode().endFile();
+  }
+
+  m_state = State::Idle;
+
+  m_inputstream.clear();
+  m_lexer.output().clear();
+  m_preprocessor.input().clear();
+  m_preprocessor.output().clear();
+  m_condeval.output().clear();
+  m_caller.output().clear();
+
+  m_modes.clear();
+
+  m_modes.push_back(std::make_unique<ProgramMode>(*this));
 }
 
 const std::shared_ptr<cxx::Program>& ParserMachine::output() const

@@ -5,6 +5,7 @@
 #include "dex/app/dex.h"
 
 #include "dex/app/command-line-parser.h"
+#include "dex/app/message-handler.h"
 
 #include "dex/input/parser-machine.h"
 #include "dex/output/json-export.h"
@@ -26,6 +27,8 @@ Dex::Dex(int argc, char* argv[])
   setApplicationVersion("0.0.0");
 
   m_suffixes << "cxx" << "cpp" << "h" << "hpp";
+
+  dex::log::install_message_handler(&dex::app_message_handler);
 }
 
 int Dex::exec()
@@ -64,7 +67,16 @@ void Dex::process(const QStringList& inputs, QString output)
   if (!inputs.empty())
   {
     for (const auto& i : inputs)
-      feed(parser, i);
+    {
+      try
+      {
+        feed(parser, i);
+      }
+      catch (const IOException& ex)
+      {
+        LOG_ERROR << ex;
+      }
+    }
   }
   else
   {
@@ -82,7 +94,7 @@ void Dex::feed(ParserMachine& parser, const QString& input)
   QFileInfo info{ input };
 
   if (!info.exists())
-    throw std::runtime_error{ "Invalid input" };
+    throw IOException{ input.toStdString(), "input file does not exist" };
 
   if (info.isDir())
   {
@@ -91,7 +103,19 @@ void Dex::feed(ParserMachine& parser, const QString& input)
   }
   else
   {
-    parser.process(info);
+    try
+    {
+      parser.process(info);
+    }
+    catch (const ParserException& ex)
+    {
+      LOG_ERROR << ex;
+
+      const bool success = parser.recover();
+
+      if (!success)
+        parser.reset();
+    }
   }
 }
 
@@ -124,7 +148,7 @@ void Dex::write_output(const std::shared_ptr<cxx::Program>& prog, const QString&
     QFile file{ name };
     
     if (!file.open(QIODevice::WriteOnly))
-      throw std::runtime_error{ "Could not open output file" };
+      throw IOException{ name.toStdString(), "could not open file for writing" };
 
     file.write(QByteArray::fromStdString(json::stringify(obj)));
   }
