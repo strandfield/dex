@@ -1,0 +1,58 @@
+
+language: cpp
+
+before_install:
+  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
+  - sudo apt-get update -qq
+  - sudo apt-get install qt5-default qttools5-dev-tools
+
+before_script:
+  - qmake -v
+  - mkdir build
+  - cd build
+
+matrix:
+  include:
+  - os: linux
+    dist: xenial
+    env:
+      - TEST="Clang 7.0"
+    compiler: clang
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-xenial-7
+        packages:
+          - libc++-7-dev
+          - libc++abi-7-dev
+    script:
+      - cmake ..
+      - make
+      - cd tests
+      - ./dex-input/TEST_dex_input
+      - ./dex-output/TEST_dex_output
+  - os: linux
+    env:
+      - TEST="GCC 8 (coverage)"
+      - CC=gcc-8
+      - CXX=g++-8
+    compiler: gcc-8
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - gcc-8
+          - g++-8
+    script:
+      - cmake -DENABLE_COVERAGE=ON ..
+      - make
+      - cd tests
+      - ./dex-input/TEST_dex_input
+      - ./dex-output/TEST_dex_output
+      - cd ..
+      - cd ..
+      - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-8 10
+      - gcov --version
+      - bash <(curl -s https://codecov.io/bash)
