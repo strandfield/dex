@@ -10,6 +10,7 @@
 #include <json-toolkit/json.h>
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 namespace dex
@@ -60,20 +61,29 @@ private:
   json::Json m_mssg;
 };
 
+typedef std::shared_ptr<Logger> LoggerInstance;
+
+template<typename T>
+Logger& operator<<(const LoggerInstance& logger, T&& data)
+{
+    (*logger) << std::forward<T>(data);
+    return *logger;
+}
+
 namespace log
 {
 
-DEX_COMMON_API Logger out();
-DEX_COMMON_API Logger out(std::string file, int line);
+DEX_COMMON_API LoggerInstance out();
+DEX_COMMON_API LoggerInstance out(std::string file, int line);
 
-DEX_COMMON_API Logger error();
-DEX_COMMON_API Logger error(std::string file, int line);
+DEX_COMMON_API LoggerInstance error();
+DEX_COMMON_API LoggerInstance error(std::string file, int line);
 
-DEX_COMMON_API Logger info();
-DEX_COMMON_API Logger info(std::string file, int line);
+DEX_COMMON_API LoggerInstance info();
+DEX_COMMON_API LoggerInstance info(std::string file, int line);
 
-DEX_COMMON_API Logger warning();
-DEX_COMMON_API Logger warning(std::string file, int line);
+DEX_COMMON_API LoggerInstance warning();
+DEX_COMMON_API LoggerInstance warning(std::string file, int line);
 
 typedef void(*MessageHandler)(Severity, Logger&, const json::Json&);
 

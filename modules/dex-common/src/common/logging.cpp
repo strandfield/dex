@@ -12,44 +12,44 @@ namespace log
 
 static MessageHandler m_static_message_handler = nullptr;
 
-Logger out()
+LoggerInstance out()
 {
-  return Logger{ Output };
+  return std::make_shared<Logger>(Output);
 }
 
-Logger out(std::string file, int line)
+LoggerInstance out(std::string file, int line)
 {
-  return Logger{ Output, std::move(file), line };
+  return std::make_shared<Logger>(Output, std::move(file), line);
 }
 
-Logger error()
+LoggerInstance error()
 {
-  return Logger{ Error };
+  return std::make_shared<Logger>(Error);
 }
 
-Logger error(std::string file, int line)
+LoggerInstance error(std::string file, int line)
 {
-  return Logger{ Error, std::move(file), line };
+  return std::make_shared<Logger>(Error, std::move(file), line);
 }
 
-Logger info()
+LoggerInstance info()
 {
-  return Logger{ Info };
+  return std::make_shared<Logger>(Info);
 }
 
-Logger info(std::string file, int line)
+LoggerInstance info(std::string file, int line)
 {
-  return Logger{ Info, std::move(file), line };
+  return std::make_shared<Logger>(Info, std::move(file), line);
 }
 
-Logger warning()
+LoggerInstance warning()
 {
-  return Logger{ Warning };
+  return std::make_shared<Logger>(Warning);
 }
 
-Logger warning(std::string file, int line)
+LoggerInstance warning(std::string file, int line)
 {
-  return Logger{ Warning, std::move(file), line };
+  return std::make_shared<Logger>(Warning, std::move(file), line);
 }
 
 MessageHandler message_handler()

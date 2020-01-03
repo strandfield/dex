@@ -14,6 +14,12 @@ target_include_directories(dex-common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/includ
 target_link_libraries(dex-common Qt5::Core)
 target_include_directories(dex-common PUBLIC "${LIQUID_PROJECT_DIR}/json-toolkit/include")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    message("GCC compiler: linking to stdc++fs")
+    #add_compile_options("-lstdc++fs")
+    target_link_libraries(dex-common stdc++fs)
+endif()
+
 foreach(_source IN ITEMS ${DEXCOMMON_LIBRARY_HDR_FILES} ${DEXCOMMON_LIBRARY_SRC_FILES})
     get_filename_component(_source_path "${_source}" PATH)
     file(RELATIVE_PATH _source_path_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source_path}")
