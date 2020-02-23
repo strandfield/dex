@@ -9,6 +9,7 @@
 
 #include "dex/model/since.h"
 
+#include <dom/node.h>
 #include <cxx/documentation.h>
 
 #include <optional>

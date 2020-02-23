@@ -26,6 +26,8 @@ public:
   int exec();
 
 protected:
+  std::string libClangVersion() const;
+
   void process(const QStringList& inputs, QString output);
 
   void feed(ParserMachine& parser, const QString& input);

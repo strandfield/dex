@@ -18,6 +18,7 @@ struct CommandLineParserResult
   {
     HelpRequested,
     VersionRequested,
+    ClangVersionRequested,
     Work,
     ParseError,
   };

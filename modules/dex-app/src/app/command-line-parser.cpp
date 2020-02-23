@@ -12,6 +12,8 @@ CommandLineParser::CommandLineParser()
   addHelpOption();
   addVersionOption();
 
+  addOption({ "clang-version", "Prints the version of clang if available."});
+
   addOption({ "i", "Input (file / directory)", "input" });
   addOption({ "o", "Output", "output" });
 }
@@ -34,6 +36,10 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
   else if (isSet("version"))
   {
     result.status = CommandLineParserResult::VersionRequested;
+  }
+  else if (isSet("clang-version"))
+  {
+    result.status = CommandLineParserResult::ClangVersionRequested;
   }
   else
   {

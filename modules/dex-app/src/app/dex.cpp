@@ -11,6 +11,8 @@
 #include "dex/output/json-export.h"
 #include "dex/output/markdown-export.h"
 
+#include <cxx/parsers/libclang-parser.h>
+
 #include <json-toolkit/stringify.h>
 
 #include <QDir>
@@ -52,12 +54,31 @@ int Dex::exec()
   {
     std::cout << Dex::applicationVersion().toStdString() << std::endl;
   }
+  else if (result.status == CommandLineParserResult::ClangVersionRequested)
+  {
+    std::cout << Dex::libClangVersion() << std::endl;
+  }
   else if (result.status == CommandLineParserResult::Work)
   {
     process(result.inputs, result.output);
   }
 
   return 0;
+}
+
+std::string Dex::libClangVersion() const
+{
+  try
+  {
+    cxx::parsers::LibClangParser parser;
+    CXVersion ver = parser.version();
+
+    return std::to_string(ver.Major) + "." + std::to_string(ver.Minor) + "." + std::to_string(ver.Subminor);
+  }
+  catch (const cxx::parsers::LibClangParserError&)
+  {
+    return "libclang could not be found";
+  }
 }
 
 void Dex::process(const QStringList& inputs, QString output)

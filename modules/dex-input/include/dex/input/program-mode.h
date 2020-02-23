@@ -55,7 +55,7 @@ public:
       FrameType type;
       FrameSubType subtype;
 
-      std::shared_ptr<dom::Node> node;
+      std::shared_ptr<cxx::Node> node;
       std::shared_ptr<DocumentWriter> writer;
       std::variant<std::monostate> data;
     };

@@ -16,6 +16,7 @@
 #include <cxx/namespace.h>
 #include <cxx/program.h>
 
+#include <dom/paragraph.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
 
