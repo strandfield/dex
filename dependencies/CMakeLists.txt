@@ -16,9 +16,11 @@ file(GLOB_RECURSE DYNLIB_HDR_FILES
 )
 add_library(dynlib STATIC ${DYNLIB_HDR_FILES} ${DYNLIB_SRC_FILES})
 target_include_directories(dynlib PUBLIC "${DYNLIB_PROJECT_DIR}/include")
+target_compile_definitions(dynlib PUBLIC -DDYNLIB_STATIC_LINKING)
 
 if (NOT WIN32)
   target_link_libraries(dynlib ${CMAKE_DL_LIBS})
+  set_property(TARGET dynlib PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
 foreach(_source IN ITEMS ${DYNLIB_HDR_FILES} ${DYNLIB_SRC_FILES})
@@ -27,8 +29,6 @@ foreach(_source IN ITEMS ${DYNLIB_HDR_FILES} ${DYNLIB_SRC_FILES})
     string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
     source_group("${_group_path}" FILES "${_source}")
 endforeach()
-
-target_compile_definitions(dynlib PUBLIC -DDYNLIB_STATIC_LINKING)
 
 ##################################################################
 ###### cxxast
