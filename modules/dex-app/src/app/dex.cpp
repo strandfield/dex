@@ -107,7 +107,7 @@ void Dex::process(const QStringList& inputs, QString output)
   if (output.isEmpty())
     output = "dex-output.json";
 
-  write_output(parser.output(), output);
+  write_output(parser.output()->getOrCreateProgram(), output);
 }
 
 void Dex::feed(ParserMachine& parser, const QString& input)

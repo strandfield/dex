@@ -193,9 +193,11 @@ void TestDexInput::parserMachineClass()
 
   parser.process(QFileInfo{ "test.cpp" });
 
-  QVERIFY(parser.output()->globalNamespace()->entities().size() > 0);
-  QVERIFY(parser.output()->globalNamespace()->entities().front()->is<cxx::Class>());
-  auto vec = std::static_pointer_cast<cxx::Class>(parser.output()->globalNamespace()->entities().front());
+  std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  QVERIFY(ns->entities().size() > 0);
+  QVERIFY(ns->entities().front()->is<cxx::Class>());
+  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
   QVERIFY(vec->name() == "vector");
   QVERIFY(vec->documentation()->is<dex::ClassDocumentation>());
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
@@ -234,9 +236,11 @@ void TestDexInput::parserMachineFunction()
 
   parser.process(QFileInfo{ "test.cpp" });
 
-  QVERIFY(parser.output()->globalNamespace()->entities().size() > 0);
-  QVERIFY(parser.output()->globalNamespace()->entities().front()->is<cxx::Function>());
-  auto getenv = std::static_pointer_cast<cxx::Function>(parser.output()->globalNamespace()->entities().front());
+  std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  QVERIFY(ns->entities().size() > 0);
+  QVERIFY(ns->entities().front()->is<cxx::Function>());
+  auto getenv = std::static_pointer_cast<cxx::Function>(ns->entities().front());
   QVERIFY(getenv->name() == "char* getenv(const char* env_var);");
   QVERIFY(getenv->documentation()->is<dex::FunctionDocumentation>());
   auto doc = std::static_pointer_cast<dex::FunctionDocumentation>(getenv->documentation());

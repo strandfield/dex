@@ -44,7 +44,7 @@ ProgramMode::ProgramMode(ParserMachine& machine)
   : ParserMode(machine)
 {
   m_state.frames.emplace_back(State::Idle);
-  m_state.frames.back().node = machine.output()->globalNamespace();
+  m_state.frames.back().node = machine.output()->getOrCreateProgram()->globalNamespace();
 }
 
 ProgramMode::State& ProgramMode::state()
@@ -400,7 +400,7 @@ void ProgramMode::exitFrame()
 {
   State::Frame& f = m_state.frames.back();
 
-  if (dynamic_cast<const cxx::Entity*>(f.node.get()))
+  if (f.node->isEntity())
   {
     auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
     f.writer->end();

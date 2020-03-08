@@ -264,13 +264,13 @@ ParserMachine::ParserMachine()
     m_caller{*this},
     m_modes{},
     m_state{State::Idle},
-    m_program{}
+    m_model{}
 {
 #if defined(Q_OS_WIN)
   m_lexer.catcodes()[static_cast<size_t>('\r')] = tex::parsing::CharCategory::Ignored;
 #endif // defined(Q_OS_WIN)
 
-  m_program = std::make_shared<cxx::Program>();
+  m_model = std::make_shared<Model>();
 
   for (const tex::parsing::Macro& m : DexFormat.macros())
   {
@@ -532,9 +532,9 @@ void ParserMachine::reset()
   m_modes.push_back(std::make_unique<ProgramMode>(*this));
 }
 
-const std::shared_ptr<cxx::Program>& ParserMachine::output() const
+const std::shared_ptr<Model>& ParserMachine::output() const
 {
-  return m_program;
+  return m_model;
 }
 
 void ParserMachine::processFile(const std::string& path)

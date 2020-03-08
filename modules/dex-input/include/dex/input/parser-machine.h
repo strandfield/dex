@@ -136,7 +136,7 @@ public:
 
   void reset();
 
-  const std::shared_ptr<cxx::Program>& output() const;
+  const std::shared_ptr<Model>& output() const;
 
 protected:
 
@@ -163,7 +163,7 @@ private:
   dex::FunctionCaller m_caller;
   std::vector<std::unique_ptr<ParserMode>> m_modes;
   State m_state = State::Idle;
-  std::shared_ptr<cxx::Program> m_program;
+  std::shared_ptr<Model> m_model;
 };
 
 } // namespace dex
