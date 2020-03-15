@@ -44,7 +44,7 @@ template<typename F>
 class State
 {
 public:
-  typedef typename F frame_t;
+  typedef F frame_t;
   typedef typename F::frame_type_t frame_type_t;
   typedef typename F::frame_subtype_t frame_subtype_t;
 
