@@ -9,6 +9,8 @@
 
 #include "dex/input/document-writer.h"
 
+#include "dex/common/state.h"
+
 #include <cxx/class.h>
 
 #include <map>
@@ -24,44 +26,29 @@ class DEX_INPUT_API ProgramMode : public ParserMode
 public:
   explicit ProgramMode(ParserMachine& machine);
 
-  struct State
+  enum class FrameType
   {
-    State() = default;
-    State(const State&) = delete;
-    State(State&&) = default;
-
-    enum FrameType
-    {
-      Idle,
-      Class,
-      Namespace,
-      Function,
-    };
-
-    enum FrameSubType
-    {
-      FST_None = 0,
-    };
-
-    struct Frame
-    {
-      Frame(const Frame&) = delete;
-      Frame(Frame&& f) = default;
-      ~Frame() = default;
-
-      explicit Frame(FrameType ft);
-      Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent);
-
-      FrameType type;
-      FrameSubType subtype;
-
-      std::shared_ptr<cxx::Node> node;
-      std::shared_ptr<DocumentWriter> writer;
-      std::variant<std::monostate> data;
-    };
-
-    std::vector<Frame> frames;
+    Idle,
+    Class,
+    Namespace,
+    Function,
   };
+
+  struct Frame : state::Frame<FrameType>
+  {
+    Frame(const Frame&) = delete;
+    Frame(Frame&& f) = default;
+    ~Frame() = default;
+
+    explicit Frame(FrameType ft);
+    Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent);
+
+    std::shared_ptr<cxx::Node> node;
+    std::shared_ptr<DocumentWriter> writer;
+    std::variant<std::monostate> data;
+  };
+
+  using State = state::State<Frame>;
   
   State& state();
 
@@ -96,7 +83,7 @@ public:
   void endBlock() override;
 
 protected:
-  State::Frame& currentFrame();
+  Frame& currentFrame();
   void exitFrame();
 
   CS parseCs(const std::string& str) const;

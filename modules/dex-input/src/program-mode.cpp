@@ -25,16 +25,14 @@ static EntityDocumentation& doc(const std::shared_ptr<cxx::Documentation>& d)
   return *static_cast<EntityDocumentation*>(d.get());
 }
 
-ProgramMode::State::Frame::Frame(FrameType ft)
-  : type(ft),
-    subtype(FST_None)
+ProgramMode::Frame::Frame(FrameType ft)
+  : state::Frame<FrameType>(ft)
 {
 
 }
 
-ProgramMode::State::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
-  : type(ft),
-  subtype(FST_None)
+ProgramMode::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
+  : state::Frame<FrameType>(ft)
 {
   node = cxxent;
   writer = std::make_shared<DocumentWriter>();
@@ -43,8 +41,8 @@ ProgramMode::State::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxe
 ProgramMode::ProgramMode(ParserMachine& machine)
   : ParserMode(machine)
 {
-  m_state.frames.emplace_back(State::Idle);
-  m_state.frames.back().node = machine.output()->getOrCreateProgram()->globalNamespace();
+  m_state.enter<FrameType::Idle>();
+  m_state.current().node = machine.output()->getOrCreateProgram()->globalNamespace();
 }
 
 ProgramMode::State& ProgramMode::state()
@@ -87,12 +85,12 @@ bool ProgramMode::write(tex::parsing::Token&& tok)
 {
   switch (currentFrame().type)
   {
-  case State::Idle:
+  case FrameType::Idle:
     write_idle(std::move(tok));
     break;
-  case State::Class:
-  case State::Function:
-  case State::Namespace:
+  case FrameType::Class:
+  case FrameType::Function:
+  case FrameType::Namespace:
     write_entity(std::move(tok));
     break;
   }
@@ -140,7 +138,7 @@ void ProgramMode::write_idle(tex::parsing::Token&& tok)
 
 void ProgramMode::cs_par()
 {
-  State::Frame& f = currentFrame();
+  Frame& f = currentFrame();
 
   if (f.writer && f.writer->isWritingParagraph())
     f.writer->end();
@@ -173,7 +171,7 @@ void ProgramMode::cs_class()
     throw BadControlSequence{ "class" };
   }
 
-  m_state.frames.push_back(State::Frame{ State::Class, new_class });
+  m_state.enter<FrameType::Class>(new_class);
 }
 
 void ProgramMode::cs_endclass()
@@ -211,7 +209,7 @@ void ProgramMode::cs_fn()
     throw BadControlSequence{ "function" };
   }
 
-  m_state.frames.push_back(State::Frame{ State::Function, new_fn });
+  m_state.enter<FrameType::Function>(new_fn);
 }
 
 void ProgramMode::cs_endfn()
@@ -236,7 +234,7 @@ void ProgramMode::cs_namespace()
 
   parent_ns->entities().push_back(new_namespace);
 
-  m_state.frames.push_back(State::Frame{ State::Namespace, new_namespace });
+  m_state.enter<FrameType::Namespace>(new_namespace);
 }
 
 void ProgramMode::cs_endnamespace()
@@ -321,21 +319,21 @@ void ProgramMode::cs_beginsince()
 {
   std::string version = std::get<std::string>(machine().caller().options().at(""));
 
-  State::Frame& f = currentFrame();
+  Frame& f = currentFrame();
   f.writer->beginSinceBlock(std::move(version));
 }
 
 void ProgramMode::cs_endsince()
 {
-  State::Frame& f = currentFrame();
+  Frame& f = currentFrame();
   f.writer->endSinceBlock();
 }
 
 void ProgramMode::cs_param()
 {
-  State::Frame& f = currentFrame();
+  Frame& f = currentFrame();
 
-  if (f.type != State::Function)
+  if (f.type != FrameType::Function)
     throw BadControlSequence{ "param" };
 
   std::string text = std::get<std::string>(funCall().arguments().front());
@@ -347,9 +345,9 @@ void ProgramMode::cs_param()
 
 void ProgramMode::cs_returns()
 {
-  State::Frame& f = currentFrame();
+  Frame& f = currentFrame();
 
-  if (f.type != State::Function)
+  if (f.type != FrameType::Function)
     throw BadControlSequence{ "returns" };
 
   std::string text = std::get<std::string>(funCall().arguments().front());
@@ -372,7 +370,7 @@ void ProgramMode::beginFile()
 
 void ProgramMode::endFile()
 {
-  while (m_state.frames.size() > 1)
+  while (m_state.depth() > 1)
   {
     exitFrame();
   }
@@ -385,20 +383,20 @@ void ProgramMode::beginBlock()
 
 void ProgramMode::endBlock()
 {
-  while (m_state.frames.back().node->is<cxx::Function>())
+  while (m_state.current().node->is<cxx::Function>())
   {
     exitFrame();
   }
 }
 
-ProgramMode::State::Frame& ProgramMode::currentFrame()
+ProgramMode::Frame& ProgramMode::currentFrame()
 {
-  return m_state.frames.back();
+  return m_state.current();
 }
 
 void ProgramMode::exitFrame()
 {
-  State::Frame& f = m_state.frames.back();
+  Frame& f = m_state.current();
 
   if (f.node->isEntity())
   {
@@ -408,7 +406,7 @@ void ProgramMode::exitFrame()
     doc(ent->documentation()).description() = std::move(f.writer->output());
   }
 
-  m_state.frames.pop_back();
+  m_state.leave();
 }
 
 } // namespace dex

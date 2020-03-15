@@ -20,16 +20,15 @@ inline static bool is_space(char c)
   return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
-DocumentWriter::State::Frame::Frame(FrameType ft)
-  : type(ft),
-  subtype(FST_None)
+DocumentWriter::Frame::Frame(FrameType ft)
+  : state::Frame<FrameType>(ft)
 {
 
 }
 
 DocumentWriter::DocumentWriter()
 {
-  m_state.frames.emplace_back(State::Idle);
+  m_state.enter<FrameType::Idle>();
 }
 
 void DocumentWriter::begin()
@@ -136,7 +135,7 @@ void DocumentWriter::startParagraph()
     throw std::runtime_error{ "Already writing a paragraph" };
 
   auto par = std::make_shared<dom::Paragraph>();
-  m_state.frames.push_back(State::Frame{ State::WritingParagraph });
+  m_state.enter<FrameType::WritingParagraph>();
   currentFrame().data = par;
 }
 
@@ -152,17 +151,17 @@ void DocumentWriter::endParagraph()
   }
 
   m_nodes.push_back(par);
-  m_state.frames.pop_back();
+  m_state.leave();
 }
 
-DocumentWriter::State::Frame& DocumentWriter::currentFrame()
+DocumentWriter::Frame& DocumentWriter::currentFrame()
 {
-  return m_state.frames.back();
+  return m_state.current();
 }
 
 bool DocumentWriter::isWritingParagraph()
 {
-  return currentFrame().type == State::WritingParagraph;
+  return currentFrame().type == FrameType::WritingParagraph;
 }
 
 dom::Paragraph& DocumentWriter::currentParagraph()

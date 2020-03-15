@@ -7,6 +7,8 @@
 
 #include "dex/dex-input.h"
 
+#include "dex/common/state.h"
+
 #include <dom/paragraph.h>
 
 #include <optional>
@@ -20,38 +22,27 @@ class DEX_INPUT_API DocumentWriter
 public:
   explicit DocumentWriter();
 
-  struct State
+  enum class FrameType
   {
-    State() = default;
-    State(const State&) = delete;
-    State(State&&) = default;
+    Idle,
+    WritingParagraph,
+  };
 
-    enum FrameType
-    {
-      Idle,
-      WritingParagraph,
-    };
+  struct Frame : state::Frame<FrameType>
+  {
+    Frame(const Frame&) = delete;
+    Frame(Frame&& f) = default;
+    ~Frame() = default;
 
-    enum FrameSubType
-    {
-      FST_None = 0,
-    };
+    explicit Frame(FrameType ft);
 
-    struct Frame
-    {
-      Frame(const Frame&) = delete;
-      Frame(Frame&& f) = default;
-      ~Frame() = default;
+    std::variant<std::monostate, std::shared_ptr<dom::Paragraph>> data;
+  };
 
-      explicit Frame(FrameType ft);
+  struct State : public state::State<Frame>
+  {
+    using state::State<Frame>::State;
 
-      FrameType type;
-      FrameSubType subtype;
-
-      std::variant<std::monostate, std::shared_ptr<dom::Paragraph>> data;
-    };
-
-    std::vector<Frame> frames;
     std::optional<std::string> since;
   };
   
@@ -76,7 +67,7 @@ public:
   std::vector<std::shared_ptr<dom::Node>>& output();
 
 protected:
-  State::Frame& currentFrame();
+  Frame& currentFrame();
 
   dom::Paragraph& currentParagraph();
 
