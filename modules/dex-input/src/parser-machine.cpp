@@ -272,7 +272,7 @@ ParserMachine::ParserMachine()
 
   m_model = std::make_shared<Model>();
 
-  for (const tex::parsing::Macro& m : DexFormat.macros())
+  for (const tex::parsing::Macro& m : tex::parsing::Format::load(DexFormat))
   {
     m_preprocessor.define(m);
   }
