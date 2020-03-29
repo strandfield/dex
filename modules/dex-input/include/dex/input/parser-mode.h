@@ -29,7 +29,6 @@ public:
   explicit ParserMode(ParserMachine& machine, ParserMode* parent = nullptr);
 
   ParserMachine& machine() const;
-  FunctionCall& call() const;
   ParserMode* parent() const;
 
   bool done() const;
@@ -40,6 +39,7 @@ public:
   virtual void endBlock() = 0;
 
   virtual bool write(tex::parsing::Token&& tok) = 0;
+  virtual bool handle(const FunctionCall& call) = 0;
 
   virtual void childFinished(ParserMode& mode);
 

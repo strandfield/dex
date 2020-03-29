@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -61,46 +61,46 @@ void TestDexInput::argumentParsing()
   write_cs(parser, "p@rseint", "c@ll", "f@@");
   write_chars(parser, "123 ");
 
-  QVERIFY(parser.output().size() == 1);
-  QVERIFY(parser.output().front().controlSequence() == "f@@");
+  QVERIFY(parser.hasPendingCall());
+  QVERIFY(parser.call().function == "f@@");
   QVERIFY(parser.call().arguments.size() == 1);
   QVERIFY(std::holds_alternative<int>(parser.call().arguments.front()));
   QVERIFY(std::get<int>(parser.call().arguments.front()) == 123);
 
-  parser.output().clear();
+  parser.clearPendingCall();
     
   write_cs(parser, "p@rsebool", "p@rseword", "c@ll", "b@r");
   write_chars(parser, "1 hello ");
 
-  QVERIFY(parser.output().size() == 1);
-  QVERIFY(parser.output().front().controlSequence() == "b@r");
+  QVERIFY(parser.hasPendingCall());
+  QVERIFY(parser.call().function == "b@r");
   QVERIFY(parser.call().arguments.size() == 2);
   QVERIFY(std::holds_alternative<bool>(parser.call().arguments.front()));
   QVERIFY(std::get<bool>(parser.call().arguments.front()));
   QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.back()));
   QVERIFY(std::get<std::string>(parser.call().arguments.back()) == "hello");
 
-  parser.output().clear();
+  parser.clearPendingCall();
 
   write_cs(parser, "p@rseword", "p@rseline", "c@ll", "p@r@m");
   write_chars(parser, "there General Kenobi!");
   parser.write(tex::parsing::CharacterToken{ '\n', tex::parsing::CharCategory::Active });
 
-  QVERIFY(parser.output().size() == 1);
-  QVERIFY(parser.output().front().controlSequence() == "p@r@m");
+  QVERIFY(parser.hasPendingCall());
+  QVERIFY(parser.call().function == "p@r@m");
   QVERIFY(parser.call().arguments.size() == 2);
   QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.front()));
   QVERIFY(std::get<std::string>(parser.call().arguments.front()) == "there");
   QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.back()));
   QVERIFY(std::get<std::string>(parser.call().arguments.back()) == "General Kenobi!");
 
-  parser.output().clear();
+  parser.clearPendingCall();
 
   write_cs(parser, "p@rseoptions", "c@ll", "@pts");
   write_chars(parser, "[standalone, key=value]");
 
-  QVERIFY(parser.output().size() == 1);
-  QVERIFY(parser.output().front().controlSequence() == "@pts");
+  QVERIFY(parser.hasPendingCall());
+  QVERIFY(parser.call().function == "@pts");
   QVERIFY(parser.call().arguments.empty());
   QVERIFY(parser.call().options.size() == 2);
   QVERIFY(std::get<std::string>(parser.call().options.at("")) == "standalone");

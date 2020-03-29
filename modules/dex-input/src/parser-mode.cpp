@@ -25,11 +25,6 @@ ParserMachine& ParserMode::machine() const
   return m_machine;
 }
 
-FunctionCall& ParserMode::call() const
-{
-  return machine().call();
-}
-
 ParserMode* ParserMode::parent() const
 {
   return m_parent;

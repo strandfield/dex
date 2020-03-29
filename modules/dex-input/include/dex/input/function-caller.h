@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -75,6 +75,9 @@ public:
   typedef std::variant<bool, int, double, std::string> Argument;
   typedef std::map<std::string, Argument> Options;
 
+  bool hasPendingCall() const;
+  void clearPendingCall();
+
   std::vector<tex::parsing::Token>& output();
 
 protected:
@@ -103,6 +106,7 @@ private:
   State m_state;
   std::vector<Task> m_tasks;
   bool m_clear_results;
+  bool m_pending_call;
   std::vector<tex::parsing::Token> m_output;
 };
 
@@ -114,6 +118,16 @@ namespace dex
 inline FunctionCaller::State& FunctionCaller::state()
 {
   return m_state;
+}
+
+inline bool FunctionCaller::hasPendingCall() const
+{
+  return m_pending_call;
+}
+
+inline void FunctionCaller::clearPendingCall()
+{
+  m_pending_call = false;
 }
 
 inline std::vector<tex::parsing::Token>& FunctionCaller::output()

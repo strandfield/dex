@@ -1,10 +1,11 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
 #include "dex/input/function-caller.h"
 
 #include "dex/input/parser-machine.h"
+#include "dex/input/parser-mode.h"
 #include "dex/input/parser-errors.h"
 
 #include "dex/common/logging.h"
@@ -19,8 +20,9 @@ namespace dex
 FunctionCaller::FunctionCaller(ParserMachine& machine)
   : m_machine{ machine },
   m_call{ machine.call() },
-  m_state{State::Idle},
-  m_clear_results{false}
+  m_state{ State::Idle },
+  m_clear_results{ false },
+  m_pending_call{ false }
 {
 
 }
@@ -174,7 +176,9 @@ void FunctionCaller::startTask(Task& t)
   break;
   case Call:
   {
-    m_output.push_back(tex::parsing::Token{ t.buffer });
+    m_call.function = t.buffer;
+    //m_output.push_back(tex::parsing::Token{ t.buffer });
+    m_pending_call = true;
     finishCurrentTask();
   }
   break;
@@ -244,7 +248,6 @@ void FunctionCaller::finishCurrentTask()
   finishTask(currentTask());
   m_tasks.erase(m_tasks.begin());
   
-
   if (m_tasks.empty())
   {
     m_state = State::Idle;

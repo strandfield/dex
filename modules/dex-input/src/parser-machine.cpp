@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -358,6 +358,19 @@ bool ParserMachine::sendTokens()
   tex::parsing::Token t = tex::parsing::read(m_preprocessor.output());
 
   send_token(std::move(t), m_condeval, m_caller);
+
+  if (m_caller.hasPendingCall())
+  {
+    m_modes.back()->handle(m_caller.call());
+    m_caller.clearPendingCall();
+
+    if (m_modes.back()->done())
+    {
+      std::unique_ptr<ParserMode> mode{ std::move(m_modes.back()) };
+      m_modes.pop_back();
+      m_modes.back()->childFinished(*mode);
+    }
+  }
 
   if (m_caller.output().empty())
     return !m_preprocessor.output().empty();

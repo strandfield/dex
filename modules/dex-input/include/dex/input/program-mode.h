@@ -75,6 +75,8 @@ public:
   static const std::map<std::string, CS>& csmap();
   
   bool write(tex::parsing::Token&& tok) override;
+  bool handle(const FunctionCall& call) override;
+
   void childFinished(ParserMode& mode) override;
 
   void beginFile() override;
@@ -93,19 +95,19 @@ protected:
 
   void cs_par();
 
-  void cs_class();
+  void fn_class(const FunctionCall& call);
   void cs_endclass();
-  void cs_fn();
+  void fn_fn(const FunctionCall& call);
   void cs_endfn();
-  void cs_namespace();
+  void fn_namespace(const FunctionCall& call);
   void cs_endnamespace();
 
-  void cs_brief();
-  void cs_since();
-  void cs_beginsince();
+  void fn_brief(const FunctionCall& call);
+  void fn_since(const FunctionCall& call);
+  void fn_beginsince(const FunctionCall& call);
   void cs_endsince();
-  void cs_param();
-  void cs_returns();
+  void fn_param(const FunctionCall& call);
+  void fn_returns(const FunctionCall& call);
 
 private:
   State m_state;

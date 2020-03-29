@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -99,6 +99,44 @@ bool ProgramMode::write(tex::parsing::Token&& tok)
   return done();
 }
 
+bool ProgramMode::handle(const FunctionCall& call)
+{
+  if (call.function == "cl@ss")
+  {
+    fn_class(call);
+  }
+  else if (call.function == "functi@n")
+  {
+    fn_fn(call);
+  }
+  else if (call.function == "n@mesp@ce")
+  {
+    fn_fn(call);
+  }
+  else if (call.function == "@brief")
+  {
+    fn_brief(call);
+  }
+  else if (call.function == "@since")
+  {
+    fn_since(call);
+  }
+  else if (call.function == "p@r@m")
+  {
+    fn_param(call);
+  }
+  else if (call.function == "beginsince")
+  {
+    fn_beginsince(call);
+  }
+  else if (call.function == "@returns")
+  {
+    fn_returns(call);
+  }
+
+  return done();
+}
+
 void ProgramMode::write_idle(tex::parsing::Token&& tok)
 {
   if (tok.isCharacterToken())
@@ -121,12 +159,6 @@ void ProgramMode::write_idle(tex::parsing::Token&& tok)
   {
   case CS::PAR:
     return;
-  case CS::CLASS:
-    return cs_class();
-  case CS::FN:
-    return cs_fn();
-  case CS::NAMESPACE:
-    return cs_namespace();
   default:
     throw UnexpectedControlSequence{ tok.controlSequence() };
   }
@@ -140,13 +172,13 @@ void ProgramMode::cs_par()
     f.writer->end();
 }
 
-void ProgramMode::cs_class()
+void ProgramMode::fn_class(const FunctionCall& call)
 {
   if (currentFrame().node->type() == cxx::Function::TypeId)
     throw BadControlSequence{ "class" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  const auto class_name = std::get<std::string>(call().arguments.front());
+  const auto class_name = std::get<std::string>(call.arguments.front());
 
   auto new_class = std::make_shared<cxx::Class>(class_name, parent);
   new_class->setDocumentation(std::make_shared<ClassDocumentation>());
@@ -178,13 +210,13 @@ void ProgramMode::cs_endclass()
   exitFrame();
 }
 
-void ProgramMode::cs_fn()
+void ProgramMode::fn_fn(const FunctionCall& call)
 {
   if (currentFrame().node->type() == cxx::Function::TypeId)
     throw BadControlSequence{ "function" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  const auto fn_signature = std::get<std::string>(call().arguments.front());
+  const auto fn_signature = std::get<std::string>(call.arguments.front());
 
   auto new_fn = std::make_shared<cxx::Function>(fn_signature, parent);
   new_fn->setDocumentation(std::make_shared<FunctionDocumentation>());
@@ -216,13 +248,13 @@ void ProgramMode::cs_endfn()
   exitFrame();
 }
 
-void ProgramMode::cs_namespace()
+void ProgramMode::fn_namespace(const FunctionCall& call)
 {
   if (!currentFrame().node->is<cxx::Namespace>())
     throw BadControlSequence{ "namespace" };
 
   auto parent_ns = std::dynamic_pointer_cast<cxx::Namespace>(currentFrame().node);
-  const auto ns_name = std::get<std::string>(call().arguments.front());
+  const auto ns_name = std::get<std::string>(call.arguments.front());
 
   auto new_namespace = std::make_shared<cxx::Namespace>(ns_name, parent_ns);
   new_namespace->setDocumentation(std::make_shared<NamespaceDocumentation>());
@@ -255,65 +287,49 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
     {
     case CS::PAR:
       return cs_par();
-    case CS::FN:
-      return cs_fn();
     case CS::ENDFN:
       return cs_endfn();
-    case CS::CLASS:
-      return cs_class();
     case CS::ENDCLASS:
       return cs_endclass();
-    case CS::NAMESPACE:
-      return cs_namespace();
     case CS::ENDNAMESPACE:
       return cs_endnamespace();
-    case CS::BRIEF:
-      return cs_brief();
-    case CS::SINCE:
-      return cs_since();
-    case CS::BEGINSINCE:
-      return cs_beginsince();
     case CS::ENDSINCE:
       return cs_endsince();
-    case CS::PARAM:
-      return cs_param();
-    case CS::RETURNS:
-      return cs_returns();
     default:
       throw UnexpectedControlSequence{ tok.controlSequence() };
     }
   }
 }
 
-void ProgramMode::cs_brief()
+void ProgramMode::fn_brief(const FunctionCall& call)
 {
-  std::string text = std::get<std::string>(call().arguments.front());
+  std::string text = std::get<std::string>(call.arguments.front());
 
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
   doc(entity->documentation()).brief() = std::move(text);
 }
 
-void ProgramMode::cs_since()
+void ProgramMode::fn_since(const FunctionCall& call)
 {
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
 
-  if (call().options.empty())
+  if (call.options.empty())
   {
-    std::string version = std::get<std::string>(call().arguments.front());
+    std::string version = std::get<std::string>(call.arguments.front());
     doc(entity->documentation()).since() = dex::Since{ version };
   }
   else
   {
-    std::string version = std::get<std::string>(call().options.at(""));
-    const std::string& text = std::get<std::string>(call().arguments.front());
+    std::string version = std::get<std::string>(call.options.at(""));
+    const std::string& text = std::get<std::string>(call.arguments.front());
 
     currentFrame().writer->paragraph().writeSince(std::move(version), text);
   }
 }
 
-void ProgramMode::cs_beginsince()
+void ProgramMode::fn_beginsince(const FunctionCall& call)
 {
-  std::string version = std::get<std::string>(call().options.at(""));
+  std::string version = std::get<std::string>(call.options.at(""));
 
   Frame& f = currentFrame();
   f.writer->beginSinceBlock(std::move(version));
@@ -325,28 +341,28 @@ void ProgramMode::cs_endsince()
   f.writer->endSinceBlock();
 }
 
-void ProgramMode::cs_param()
+void ProgramMode::fn_param(const FunctionCall& call)
 {
   Frame& f = currentFrame();
 
   if (f.type != FrameType::Function)
     throw BadControlSequence{ "param" };
 
-  std::string text = std::get<std::string>(call().arguments.front());
+  std::string text = std::get<std::string>(call.arguments.front());
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
   doc->parameters().push_back(std::move(text));
 }
 
-void ProgramMode::cs_returns()
+void ProgramMode::fn_returns(const FunctionCall& call)
 {
   Frame& f = currentFrame();
 
   if (f.type != FrameType::Function)
     throw BadControlSequence{ "returns" };
 
-  std::string text = std::get<std::string>(call().arguments.front());
+  std::string text = std::get<std::string>(call.arguments.front());
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
