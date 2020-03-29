@@ -7,6 +7,8 @@
 
 #include "dex/dex-input.h"
 
+#include "dex/input/functional.h"
+
 #include <tex/token.h>
 
 #include <map>
@@ -24,6 +26,7 @@ public:
   explicit FunctionCaller(ParserMachine& machine);
 
   ParserMachine& machine() const;
+  FunctionCall& call() const;
 
   enum TaskType
   {
@@ -72,9 +75,6 @@ public:
   typedef std::variant<bool, int, double, std::string> Argument;
   typedef std::map<std::string, Argument> Options;
 
-  std::vector<Argument>& arguments();
-  Options& options();
-
   std::vector<tex::parsing::Token>& output();
 
 protected:
@@ -99,11 +99,10 @@ protected:
 
 private:
   ParserMachine& m_machine;
+  FunctionCall& m_call;
   State m_state;
   std::vector<Task> m_tasks;
   bool m_clear_results;
-  std::vector<Argument> m_arguments;
-  Options m_options;
   std::vector<tex::parsing::Token> m_output;
 };
 
@@ -115,16 +114,6 @@ namespace dex
 inline FunctionCaller::State& FunctionCaller::state()
 {
   return m_state;
-}
-
-inline std::vector<FunctionCaller::Argument>& FunctionCaller::arguments()
-{
-  return m_arguments;
-}
-
-inline FunctionCaller::Options& FunctionCaller::options()
-{
-  return m_options;
 }
 
 inline std::vector<tex::parsing::Token>& FunctionCaller::output()

@@ -63,9 +63,9 @@ void TestDexInput::argumentParsing()
 
   QVERIFY(parser.output().size() == 1);
   QVERIFY(parser.output().front().controlSequence() == "f@@");
-  QVERIFY(parser.arguments().size() == 1);
-  QVERIFY(std::holds_alternative<int>(parser.arguments().front()));
-  QVERIFY(std::get<int>(parser.arguments().front()) == 123);
+  QVERIFY(parser.call().arguments.size() == 1);
+  QVERIFY(std::holds_alternative<int>(parser.call().arguments.front()));
+  QVERIFY(std::get<int>(parser.call().arguments.front()) == 123);
 
   parser.output().clear();
     
@@ -74,11 +74,11 @@ void TestDexInput::argumentParsing()
 
   QVERIFY(parser.output().size() == 1);
   QVERIFY(parser.output().front().controlSequence() == "b@r");
-  QVERIFY(parser.arguments().size() == 2);
-  QVERIFY(std::holds_alternative<bool>(parser.arguments().front()));
-  QVERIFY(std::get<bool>(parser.arguments().front()));
-  QVERIFY(std::holds_alternative<std::string>(parser.arguments().back()));
-  QVERIFY(std::get<std::string>(parser.arguments().back()) == "hello");
+  QVERIFY(parser.call().arguments.size() == 2);
+  QVERIFY(std::holds_alternative<bool>(parser.call().arguments.front()));
+  QVERIFY(std::get<bool>(parser.call().arguments.front()));
+  QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.back()));
+  QVERIFY(std::get<std::string>(parser.call().arguments.back()) == "hello");
 
   parser.output().clear();
 
@@ -88,11 +88,11 @@ void TestDexInput::argumentParsing()
 
   QVERIFY(parser.output().size() == 1);
   QVERIFY(parser.output().front().controlSequence() == "p@r@m");
-  QVERIFY(parser.arguments().size() == 2);
-  QVERIFY(std::holds_alternative<std::string>(parser.arguments().front()));
-  QVERIFY(std::get<std::string>(parser.arguments().front()) == "there");
-  QVERIFY(std::holds_alternative<std::string>(parser.arguments().back()));
-  QVERIFY(std::get<std::string>(parser.arguments().back()) == "General Kenobi!");
+  QVERIFY(parser.call().arguments.size() == 2);
+  QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.front()));
+  QVERIFY(std::get<std::string>(parser.call().arguments.front()) == "there");
+  QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.back()));
+  QVERIFY(std::get<std::string>(parser.call().arguments.back()) == "General Kenobi!");
 
   parser.output().clear();
 
@@ -101,10 +101,10 @@ void TestDexInput::argumentParsing()
 
   QVERIFY(parser.output().size() == 1);
   QVERIFY(parser.output().front().controlSequence() == "@pts");
-  QVERIFY(parser.arguments().empty());
-  QVERIFY(parser.options().size() == 2);
-  QVERIFY(std::get<std::string>(parser.options().at("")) == "standalone");
-  QVERIFY(std::get<std::string>(parser.options().at("key")) == "value");
+  QVERIFY(parser.call().arguments.empty());
+  QVERIFY(parser.call().options.size() == 2);
+  QVERIFY(std::get<std::string>(parser.call().options.at("")) == "standalone");
+  QVERIFY(std::get<std::string>(parser.call().options.at("key")) == "value");
 }
 
 void TestDexInput::conditionalEvaluator()

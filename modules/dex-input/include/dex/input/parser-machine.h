@@ -124,6 +124,7 @@ public:
 
   tex::parsing::Preprocessor& preprocessor();
 
+  dex::FunctionCall& call();
   dex::FunctionCaller& caller();
 
   const std::vector<std::unique_ptr<ParserMode>>& modes() const;
@@ -155,6 +156,7 @@ protected:
 
 private:
   tex::parsing::Registers m_registers;
+  dex::FunctionCall m_call;
   std::stack<tex::parsing::Lexer::CatCodeTable> m_lexercatcodes;
   InputStream m_inputstream;
   tex::parsing::Lexer m_lexer;
@@ -165,6 +167,16 @@ private:
   State m_state = State::Idle;
   std::shared_ptr<Model> m_model;
 };
+
+} // namespace dex
+
+namespace dex
+{
+
+inline dex::FunctionCall& ParserMachine::call()
+{
+  return m_call;
+}
 
 } // namespace dex
 

@@ -99,11 +99,6 @@ bool ProgramMode::write(tex::parsing::Token&& tok)
   return done();
 }
 
-FunctionCaller& ProgramMode::funCall()
-{
-  return machine().caller();
-}
-
 void ProgramMode::write_idle(tex::parsing::Token&& tok)
 {
   if (tok.isCharacterToken())
@@ -151,7 +146,7 @@ void ProgramMode::cs_class()
     throw BadControlSequence{ "class" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  const auto class_name = std::get<std::string>(machine().caller().arguments().front());
+  const auto class_name = std::get<std::string>(call().arguments.front());
 
   auto new_class = std::make_shared<cxx::Class>(class_name, parent);
   new_class->setDocumentation(std::make_shared<ClassDocumentation>());
@@ -189,7 +184,7 @@ void ProgramMode::cs_fn()
     throw BadControlSequence{ "function" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  const auto fn_signature = std::get<std::string>(machine().caller().arguments().front());
+  const auto fn_signature = std::get<std::string>(call().arguments.front());
 
   auto new_fn = std::make_shared<cxx::Function>(fn_signature, parent);
   new_fn->setDocumentation(std::make_shared<FunctionDocumentation>());
@@ -227,7 +222,7 @@ void ProgramMode::cs_namespace()
     throw BadControlSequence{ "namespace" };
 
   auto parent_ns = std::dynamic_pointer_cast<cxx::Namespace>(currentFrame().node);
-  const auto ns_name = std::get<std::string>(machine().caller().arguments().front());
+  const auto ns_name = std::get<std::string>(call().arguments.front());
 
   auto new_namespace = std::make_shared<cxx::Namespace>(ns_name, parent_ns);
   new_namespace->setDocumentation(std::make_shared<NamespaceDocumentation>());
@@ -292,7 +287,7 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
 
 void ProgramMode::cs_brief()
 {
-  std::string text = std::get<std::string>(machine().caller().arguments().front());
+  std::string text = std::get<std::string>(call().arguments.front());
 
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
   doc(entity->documentation()).brief() = std::move(text);
@@ -302,15 +297,15 @@ void ProgramMode::cs_since()
 {
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
 
-  if (machine().caller().options().empty())
+  if (call().options.empty())
   {
-    std::string version = std::get<std::string>(machine().caller().arguments().front());
+    std::string version = std::get<std::string>(call().arguments.front());
     doc(entity->documentation()).since() = dex::Since{ version };
   }
   else
   {
-    std::string version = std::get<std::string>(machine().caller().options().at(""));
-    const std::string& text = std::get<std::string>(machine().caller().arguments().front());
+    std::string version = std::get<std::string>(call().options.at(""));
+    const std::string& text = std::get<std::string>(call().arguments.front());
 
     currentFrame().writer->paragraph().writeSince(std::move(version), text);
   }
@@ -318,7 +313,7 @@ void ProgramMode::cs_since()
 
 void ProgramMode::cs_beginsince()
 {
-  std::string version = std::get<std::string>(machine().caller().options().at(""));
+  std::string version = std::get<std::string>(call().options.at(""));
 
   Frame& f = currentFrame();
   f.writer->beginSinceBlock(std::move(version));
@@ -337,7 +332,7 @@ void ProgramMode::cs_param()
   if (f.type != FrameType::Function)
     throw BadControlSequence{ "param" };
 
-  std::string text = std::get<std::string>(funCall().arguments().front());
+  std::string text = std::get<std::string>(call().arguments.front());
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
@@ -351,7 +346,7 @@ void ProgramMode::cs_returns()
   if (f.type != FrameType::Function)
     throw BadControlSequence{ "returns" };
 
-  std::string text = std::get<std::string>(funCall().arguments().front());
+  std::string text = std::get<std::string>(call().arguments.front());
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());

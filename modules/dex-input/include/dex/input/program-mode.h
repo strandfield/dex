@@ -88,8 +88,6 @@ protected:
 
   CS parseCs(const std::string& str) const;
 
-  FunctionCaller& funCall();
-
   void write_idle(tex::parsing::Token&& tok);
   void write_entity(tex::parsing::Token&& tok);
 

@@ -9,6 +9,8 @@
 
 #include "dex/model/model.h"
 
+#include "dex/input/functional.h"
+
 #include <tex/token.h>
 
 namespace dex
@@ -27,6 +29,7 @@ public:
   explicit ParserMode(ParserMachine& machine, ParserMode* parent = nullptr);
 
   ParserMachine& machine() const;
+  FunctionCall& call() const;
   ParserMode* parent() const;
 
   bool done() const;

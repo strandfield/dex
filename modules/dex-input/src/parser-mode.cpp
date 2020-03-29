@@ -4,6 +4,8 @@
 
 #include "dex/input/parser-mode.h"
 
+#include "dex/input/parser-machine.h"
+
 #include <cassert>
 #include <stdexcept>
 
@@ -21,6 +23,11 @@ ParserMode::ParserMode(ParserMachine& machine, ParserMode* parent)
 ParserMachine& ParserMode::machine() const
 {
   return m_machine;
+}
+
+FunctionCall& ParserMode::call() const
+{
+  return machine().call();
 }
 
 ParserMode* ParserMode::parent() const

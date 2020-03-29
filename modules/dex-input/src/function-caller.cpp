@@ -17,7 +17,8 @@ namespace dex
 {
 
 FunctionCaller::FunctionCaller(ParserMachine& machine)
-  : m_machine{machine},
+  : m_machine{ machine },
+  m_call{ machine.call() },
   m_state{State::Idle},
   m_clear_results{false}
 {
@@ -27,6 +28,11 @@ FunctionCaller::FunctionCaller(ParserMachine& machine)
 ParserMachine& FunctionCaller::machine() const
 {
   return m_machine;
+}
+
+FunctionCall& FunctionCaller::call() const
+{
+  return m_call;
 }
 
 void FunctionCaller::write(tex::parsing::Token&& tok)
@@ -137,8 +143,9 @@ void FunctionCaller::startWorking()
 
   if (m_clear_results)
   {
-    m_arguments.clear();
-    m_options.clear();
+    m_call.function.clear();
+    m_call.arguments.clear();
+    m_call.options.clear();
     m_clear_results = false;
   }
 }
@@ -183,23 +190,23 @@ void FunctionCaller::finishTask(Task& t)
   case ParseBool:
   {
     const int n = std::stoi(t.buffer);
-    m_arguments.emplace_back(static_cast<bool>(n));
+    m_call.arguments.emplace_back(static_cast<bool>(n));
   }
   break;
   case ParseInt:
   {
     const int n = std::stoi(t.buffer);
-    m_arguments.emplace_back(n);
+    m_call.arguments.emplace_back(n);
   }
   break;
   case ParseWord:
   {
-    m_arguments.emplace_back(std::move(t.buffer));
+    m_call.arguments.emplace_back(std::move(t.buffer));
   }
   break;
   case ParseLongWord:
   {
-    m_arguments.emplace_back(std::move(t.buffer));
+    m_call.arguments.emplace_back(std::move(t.buffer));
     machine().lexer().catcodes()[static_cast<int>('\n')] = tex::parsing::CharCategory::EndOfLine;
   }
   break;
@@ -366,12 +373,12 @@ void FunctionCaller::parse_options(tex::parsing::Token&& tok)
   {
     if (c == ',')
     {
-      m_options[""] = parse(std::move(t.key_buffer));
+      m_call.options[""] = parse(std::move(t.key_buffer));
       t.progress = TP_WaitKeyOrRightBracket;
     }
     else if (c == ']')
     {
-      m_options[""] = parse(std::move(t.key_buffer));
+      m_call.options[""] = parse(std::move(t.key_buffer));
       finishCurrentTask();
     }
     else if (c == '=')
@@ -388,12 +395,12 @@ void FunctionCaller::parse_options(tex::parsing::Token&& tok)
   {
     if (c == ',')
     {
-      m_options[t.key_buffer] = parse(std::move(t.buffer));
+      m_call.options[t.key_buffer] = parse(std::move(t.buffer));
       t.progress = TP_WaitKeyOrRightBracket;
     }
     else if (c == ']')
     {
-      m_options[t.key_buffer] = parse(std::move(t.buffer));
+      m_call.options[t.key_buffer] = parse(std::move(t.buffer));
       finishCurrentTask();
     }
     else
