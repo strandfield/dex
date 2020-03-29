@@ -106,6 +106,16 @@ void TestDexInput::argumentParsing()
   QVERIFY(parser.call().options.size() == 2);
   QVERIFY(std::get<std::string>(parser.call().options.at("")) == "standalone");
   QVERIFY(std::get<std::string>(parser.call().options.at("key")) == "value");
+
+  parser.clearPendingCall();
+
+  write_cs(parser, "p@rseword", "c@ll", "im@ge");
+  write_chars(parser, "{test-image.jpg}");
+
+  QVERIFY(parser.hasPendingCall());
+  QVERIFY(parser.call().function == "im@ge");
+  QVERIFY(parser.call().arguments.size() == 1);
+  QVERIFY(std::get<std::string>(parser.call().arguments.at(0)) == "test-image.jpg");
 }
 
 void TestDexInput::conditionalEvaluator()

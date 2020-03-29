@@ -308,16 +308,41 @@ void FunctionCaller::parse_int(tex::parsing::Token&& tok)
 
 void FunctionCaller::parse_word(tex::parsing::Token&& tok)
 {
-  // TODO: add punctuator list
-  if (tok.characterToken().category == tex::parsing::CharCategory::Space
-    || tok.characterToken().value == '.' || tok.characterToken().value == ',' 
-    || tok.characterToken().value == ':')
+  if (currentTask().buffer.empty() && currentTask().progress == TP_GatheringChars)
   {
-    return finishCurrentTask();
+    if (tok.characterToken().value == '{')
+    {
+      currentTask().progress = TP_GatheringCharsUntilRightBrace;
+    }
+    else
+    {
+      char c = tok.characterToken().value;
+      currentTask().buffer.push_back(c);
+    }
   }
+  else
+  {
+    if (currentTask().progress == TP_GatheringCharsUntilRightBrace)
+    {
+      if (tok.characterToken().value == '}')
+        return finishCurrentTask();
+      else
+        currentTask().buffer.push_back(tok.characterToken().value);
+    }
+    else
+    {
+      // TODO: add punctuator list
+      if (tok.characterToken().category == tex::parsing::CharCategory::Space
+        || tok.characterToken().value == '.' || tok.characterToken().value == ','
+        || tok.characterToken().value == ':')
+      {
+        return finishCurrentTask();
+      }
 
-  char c = tok.characterToken().value;
-  currentTask().buffer.push_back(c);
+      char c = tok.characterToken().value;
+      currentTask().buffer.push_back(c);
+    }
+  }
 }
 
 void FunctionCaller::parse_longword(tex::parsing::Token&& tok)

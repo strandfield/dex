@@ -44,6 +44,7 @@ public:
     TP_NotStarted = 0,
     /* Parsing bool, int, word */
     TP_GatheringChars,
+    TP_GatheringCharsUntilRightBrace,
     /* Parsing options */
     TP_WaitLeftBracket,
     TP_WaitKeyOrRightBracket,
