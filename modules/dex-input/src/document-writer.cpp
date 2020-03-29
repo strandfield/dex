@@ -10,6 +10,8 @@
 #include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-errors.h"
 
+#include <dom/image.h>
+
 #include <cassert>
 #include <stdexcept>
 
@@ -82,17 +84,22 @@ bool DocumentWriter::handle(const FunctionCall& call)
       return list().handle(call);
     }
   }
-  else if (isWritingParagraph())
-  {
-    return paragraph().handle(call);
-  }
-  else if (isWritingList())
-  {
-    return list().handle(call);
-  }
   else
   {
-    return false;
+    if ((isWritingParagraph() || isWritingList()) && m_writer->handle(call))
+      return true;
+
+    if (isWritingList() || isWritingParagraph())
+      finish();
+
+    if (call.function == Functions::IMAGE)
+    {
+      std::string src = call.arg<std::string>(0);
+      auto img = std::make_shared<dom::Image>(std::move(src));
+      img->height = call.opt<int>("height", img->height);
+      img->width = call.opt<int>("width", img->width);
+      m_nodes.push_back(img);
+    }
   }
 }
 

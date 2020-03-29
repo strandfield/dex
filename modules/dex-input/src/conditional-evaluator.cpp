@@ -7,6 +7,8 @@
 #include "dex/input/parser-machine.h"
 #include "dex/input/parser-errors.h"
 
+#include <tex/lexer.h>
+
 #include <cassert>
 #include <stdexcept>
 
@@ -14,14 +16,15 @@ namespace dex
 {
 
 ConditionalEvaluator::ConditionalEvaluator(ParserMachine& machine)
-  : ConditionalEvaluator{machine.registers(), machine.inputStream()}
+  : ConditionalEvaluator{machine.registers(), machine.inputStream(), machine.lexer()}
 {
 
 }
 
-ConditionalEvaluator::ConditionalEvaluator(tex::parsing::Registers& registers, InputStream& is)
+ConditionalEvaluator::ConditionalEvaluator(tex::parsing::Registers& registers, InputStream& is, tex::parsing::Lexer& lex)
   : m_registers{ registers }, 
     m_inputstream { is },
+    m_lexer{lex},
     m_state{ State::Idle }
 {
 
@@ -30,6 +33,11 @@ ConditionalEvaluator::ConditionalEvaluator(tex::parsing::Registers& registers, I
 InputStream& ConditionalEvaluator::inputStream()
 {
   return m_inputstream;
+}
+
+tex::parsing::Lexer& ConditionalEvaluator::lexer()
+{
+  return m_lexer;
 }
 
 ConditionalEvaluator::State& ConditionalEvaluator::state()
@@ -68,8 +76,11 @@ void ConditionalEvaluator::write(tex::parsing::Token&& tok)
   {
     if (tok.isControlSequence())
       throw UnexpectedControlSequence{ tok.controlSequence() };
-    
-    m_registers.br = inputStream().peekChar() == tok.characterToken().value;
+
+    if(lexer().output().empty())
+      m_registers.br = inputStream().peekChar() == tok.characterToken().value;
+    else
+      m_registers.br = lexer().output().front().isCharacterToken() && lexer().output().front().characterToken().value == tok.characterToken().value;
 
     m_state = State::Idle;
   }

@@ -34,68 +34,79 @@ const char* fmt_src =
   ""
   "% Document"
   ""
-  "\\def\\list{"
+  "\\def\\image{"
   "  \\@ifnextchar[{" // 25
-  "    \\def\\@afteroptions{"
-  "      \\c@ll\\@list"
+  "    \\def\\@fteroptions{"
+  "      \\p@rseword\\c@ll\\@image"
   "    }"
   "    \\p@rseoptions"
   "  }{" // 30
-  "    \\c@ll\\@list"
+  "    \\p@rseword\\c@ll\\@image"
   "  }"
   "}"
   ""
-  "\\def\\li{" // 35
+  "\\def\\list{" // 35
   "  \\@ifnextchar[{"
-  "    \\def\\@afteroptions{"
-  "      \\c@ll\\@li"
+  "    \\def\\@fteroptions{"
+  "      \\c@ll\\@list"
   "    }"
   "    \\p@rseoptions" // 40
   "  }{"
-  "    \\c@ll\\@li"
+  "    \\c@ll\\@list"
   "  }"
   "}"
   "" // 45
+  "\\def\\li{"
+  "  \\@ifnextchar[{"
+  "    \\def\\@fteroptions{"
+  "      \\c@ll\\@li"
+  "    }" // 50
+  "    \\p@rseoptions"
+  "  }{"
+  "    \\c@ll\\@li"
+  "  }"
+  "}" // 55
+  ""
   "% Dex"
   ""
   "\\def\\class{"
-  "  \\p@rseline\\c@ll\\cl@ss"
-  "}" // 50
+  "  \\p@rseline\\c@ll\\cl@ss" // 60
+  "}"
   ""
   "\\def\\namespace{"
   "  \\p@rseline\\c@ll\\n@mesp@ce"
-  "}"
-  "" // 55
+  "}" // 65
+  ""
   "\\def\\fn{"
   "  \\p@rseline\\c@ll\\functi@n"
   "}"
-  ""
-  "\\def\\brief{" // 60
+  "" // 70
+  "\\def\\brief{"
   "  \\p@rseline\\c@ll\\@brief"
   "}"
   ""
-  "\\def\\param{"
-  "  \\p@rseline\\c@ll\\p@r@m" // 65
+  "\\def\\param{" // 75
+  "  \\p@rseline\\c@ll\\p@r@m"
   "}"
   ""
   "\\def\\returns{"
-  "  \\p@rseline\\c@ll\\@returns"
-  "}" // 70
+  "  \\p@rseline\\c@ll\\@returns" // 80
+  "}"
   ""
   "\\def\\since{"
   "  \\@ifnextchar[{"
-  "    \\def\\@afteroptions{"
-  "      \\@ifleftbrace{" // 75
+  "    \\def\\@fteroptions{" // 85
+  "      \\@ifleftbrace{"
   "        \\p@rseword\\c@ll\\@since"
   "      }{"
   "        \\beginsince"
-  "      }"
-  "    }" // 80
+  "      }" // 90
+  "    }"
   "    \\p@rseoptions"
   "  }{"
   "    \\p@rseline\\c@ll\\@since"
-  "  }"
-  "}" // 85
+  "  }" // 95
+  "}"
   ""
 ;
 
@@ -125,68 +136,79 @@ const char* fmt_bytecode =
   ""
   ">:"
   ""
-  "d4r"
+  "d5r"
   ">2c;tt" // 25
-  ">4c3c=t"
-  ">6c4c5"
+  ">4c3c<t"
+  ">6c9c4c6"
   ">4t"
   ">4c<"
   ">2tt" // 30
-  ">4c4c5"
+  ">4c9c4c6"
   ">2t"
   "s"
   ""
-  "d2r" // 35
+  "d4r" // 35
   ">2c;tt"
-  ">4c3c=t"
-  ">6c4c3"
+  ">4c3c<t"
+  ">6c4c5"
   ">4t"
   ">4c<" // 40
   ">2tt"
-  ">4c4c3"
+  ">4c4c5"
   ">2t"
   "s"
   "" // 45
+  "d2r"
+  ">2c;tt"
+  ">4c3c<t"
+  ">6c4c3"
+  ">4t" // 50
+  ">4c<"
+  ">2tt"
+  ">4c4c3"
+  ">2t"
+  "s" // 55
+  ""
   ">5"
   ""
   "d5r"
-  ">2c9c4c5"
-  "s" // 50
+  ">2c9c4c5" // 60
+  "s"
   ""
   "d9r"
   ">2c9c4c9"
-  "s"
-  "" // 55
+  "s" // 65
+  ""
   "d2r"
   ">2c9c4c8"
   "s"
-  ""
-  "d5r" // 60
+  "" // 70
+  "d5r"
   ">2c9c4c6"
   "s"
   ""
-  "d5r"
-  ">2c9c4c5" // 65
+  "d5r" // 75
+  ">2c9c4c5"
   "s"
   ""
   "d7r"
-  ">2c9c4c8"
-  "s" // 70
+  ">2c9c4c8" // 80
+  "s"
   ""
   "d5r"
   ">2c;tt"
-  ">4c3c=t"
-  ">6c<t" // 75
+  ">4c3c<t" // 85
+  ">6c<t"
   ">8c9c4c6"
   ">6tt"
   ">8c:"
-  ">6t"
-  ">4t" // 80
+  ">6t" // 90
+  ">4t"
   ">4c<"
   ">2tt"
   ">4c9c4c6"
-  ">2t"
-  "s" // 85
+  ">2t" // 95
+  "s"
   ""
   "e";
 

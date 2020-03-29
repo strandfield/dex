@@ -12,6 +12,14 @@
 
 #include <vector>
 
+namespace tex
+{
+namespace parsing
+{
+class Lexer;
+} // namespace parsing
+} // namespace tex
+
 namespace dex
 {
 
@@ -22,9 +30,10 @@ class DEX_INPUT_API ConditionalEvaluator
 {
 public:
   explicit ConditionalEvaluator(ParserMachine& machine);
-  ConditionalEvaluator(tex::parsing::Registers& registers, InputStream& is);
+  ConditionalEvaluator(tex::parsing::Registers& registers, InputStream& is, tex::parsing::Lexer& lex);
 
   InputStream& inputStream();
+  tex::parsing::Lexer& lexer();
 
   enum class State
   {
@@ -41,6 +50,7 @@ public:
 private:
   tex::parsing::Registers& m_registers;
   InputStream& m_inputstream;
+  tex::parsing::Lexer& m_lexer;
   State m_state;
   std::vector<tex::parsing::Token> m_output;
 };

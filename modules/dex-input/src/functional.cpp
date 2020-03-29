@@ -22,6 +22,8 @@ const std::string Functions::ENDSINCE = "endsince";
 const std::string Functions::PARAM = "p@r@m";
 const std::string Functions::RETURNS = "@returns";
 
+const std::string Functions::IMAGE = "@image";
+
 const std::string Functions::LIST = "@list";
 const std::string Functions::ENDLIST = "endlist";
 const std::string Functions::LI = "@li";

@@ -25,6 +25,12 @@ struct FunctionCall
   std::vector<Argument> arguments;
   Options options;
 
+  template<typename T>
+  const T& arg(size_t index) const
+  {
+    return std::get<T>(arguments.at(index));
+  }
+
   Argument opt(const std::string& key, Argument default_value) const
   {
     auto it = options.find(key);
@@ -55,6 +61,8 @@ struct DEX_INPUT_API Functions
   static const std::string ENDSINCE;
   static const std::string PARAM;
   static const std::string RETURNS;
+
+  static const std::string IMAGE;
 
   static const std::string LIST;
   static const std::string ENDLIST;

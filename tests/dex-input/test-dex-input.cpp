@@ -18,6 +18,7 @@
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 
+#include <dom/image.h>
 #include <dom/list.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
@@ -122,7 +123,8 @@ void TestDexInput::conditionalEvaluator()
 {
   tex::parsing::Registers registers;
   dex::InputStream istream;
-  dex::ConditionalEvaluator parser{ registers, istream };
+  tex::parsing::Lexer lexer;
+  dex::ConditionalEvaluator parser{ registers, istream, lexer };
 
   istream.inject("{[");
 
@@ -218,6 +220,52 @@ void TestDexInput::documentWriterList()
 
   par = std::static_pointer_cast<dom::Paragraph>(list->items.back()->content.front());
   QVERIFY(par->text() == "Number 2");
+}
+
+void TestDexInput::parserMachineImage()
+{
+  dex::ParserMachine parser;
+
+  QFile file{ "test.cpp" };
+  QVERIFY(file.open(QIODevice::WriteOnly));
+
+  file.write(
+    "/*!\n"
+    " * \\class vector\n"
+    " *\n"
+    " * This is a first paragraph.\n"
+    " * \\image[width=66]{test.png}\n"
+    " * This is a second paragraph.\n"
+    " */\n"
+  );
+
+  file.close();
+
+  parser.process(QFileInfo{ "test.cpp" });
+
+  QFile::remove("test.cpp");
+
+  std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  QVERIFY(ns->entities().size() > 0);
+  QVERIFY(ns->entities().front()->is<cxx::Class>());
+  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
+  QVERIFY(vec->documentation()->is<dex::ClassDocumentation>());
+  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
+  QVERIFY(doc->description().size() == 3);
+
+  QVERIFY(doc->description().at(0)->is<dom::Paragraph>());
+  auto par = std::static_pointer_cast<dom::Paragraph>(doc->description().at(0));
+  QVERIFY(par->text() == "This is a first paragraph. ");
+
+  QVERIFY(doc->description().at(1)->is<dom::Image>());
+  auto img = std::static_pointer_cast<dom::Image>(doc->description().at(1));
+  QVERIFY(img->src == "test.png");
+  QVERIFY(img->width == 66);
+
+  QVERIFY(doc->description().at(2)->is<dom::Paragraph>());
+  par = std::static_pointer_cast<dom::Paragraph>(doc->description().at(2));
+  QVERIFY(par->text() == "This is a second paragraph. ");
 }
 
 void TestDexInput::parserMachineList()
