@@ -20,6 +20,7 @@
 namespace dex
 {
 
+class ContentWriter;
 class ListWriter;
 class ParagraphWriter;
 
@@ -28,32 +29,14 @@ class DEX_INPUT_API DocumentWriter
 public:
   explicit DocumentWriter();
 
-  enum class FrameType
+  enum class State
   {
     Idle,
     WritingParagraph,
     WritingList,
   };
 
-  struct Frame : state::Frame<FrameType>
-  {
-    Frame(const Frame&) = delete;
-    Frame(Frame&& f) = default;
-    ~Frame() = default;
-
-    explicit Frame(FrameType ft);
-
-    std::variant<std::monostate, std::shared_ptr<ParagraphWriter>, std::shared_ptr<ListWriter>> data;
-  };
-
-  struct State : public state::State<Frame>
-  {
-    using state::State<Frame>::State;
-
-    std::optional<std::string> since;
-  };
-  
-  State& state();
+  State state() const;
 
   void write(char c);
   void write(const std::string& str);
@@ -83,13 +66,12 @@ public:
   dom::Content& output();
 
 protected:
-  Frame& currentFrame();
-  const Frame& currentFrame() const;
-
   dom::Paragraph& currentParagraph();
 
 private:
-  State m_state;
+  State m_state = State::Idle;
+  std::shared_ptr<ContentWriter> m_writer;
+  std::optional<std::string> m_since;
   std::vector<std::shared_ptr<dom::Node>> m_nodes;
 };
 
@@ -98,7 +80,7 @@ private:
 namespace dex
 {
 
-inline DocumentWriter::State& DocumentWriter::state()
+inline DocumentWriter::State DocumentWriter::state() const
 {
   return m_state;
 }

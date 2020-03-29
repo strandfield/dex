@@ -16,15 +16,10 @@
 namespace dex
 {
 
-DocumentWriter::Frame::Frame(FrameType ft)
-  : state::Frame<FrameType>(ft)
-{
-
-}
-
 DocumentWriter::DocumentWriter()
+  : m_state(State::Idle)
 {
-  m_state.enter<FrameType::Idle>();
+
 }
 
 void DocumentWriter::write(char c)
@@ -103,23 +98,23 @@ bool DocumentWriter::handle(const FunctionCall& call)
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
 {
-  if (state().since.has_value())
+  if(m_since.has_value())
     throw std::runtime_error{ "Cannot have nested since block" };
 
   if (isWritingParagraph())
     endParagraph();
 
-  state().since = version;
+  m_since = version;
 }
 
 void DocumentWriter::endSinceBlock()
 {
-  assert(state().since.has_value());
+  assert(m_since.has_value());
 
   if (isWritingParagraph())
     endParagraph();
 
-  state().since.reset();
+  m_since.reset();
 }
 
 void DocumentWriter::write(const std::shared_ptr<dom::Node>& node)
@@ -135,8 +130,8 @@ void DocumentWriter::startParagraph()
   if (isWritingParagraph())
     throw std::runtime_error{ "Already writing a paragraph" };
 
-  m_state.enter<FrameType::WritingParagraph>();
-  currentFrame().data = std::make_shared<ParagraphWriter>();
+  m_state = State::WritingParagraph;
+  m_writer = std::make_shared<ParagraphWriter>();
 }
 
 void DocumentWriter::endParagraph()
@@ -146,13 +141,14 @@ void DocumentWriter::endParagraph()
   paragraph().finish();
   auto par = paragraph().output();
 
-  if (m_state.since.has_value())
+  if (m_since.has_value())
   {
-    par->add<dex::Since>(dom::ParagraphRange(*par), m_state.since.value());
+    par->add<dex::Since>(dom::ParagraphRange(*par), m_since.value());
   }
 
   m_nodes.push_back(par);
-  m_state.leave();
+  m_state = State::Idle;
+  m_writer = nullptr;
 }
 
 void DocumentWriter::startList()
@@ -160,8 +156,8 @@ void DocumentWriter::startList()
   if (isWritingParagraph())
     endParagraph();
 
-  m_state.enter<FrameType::WritingList>();
-  currentFrame().data = std::make_shared<ListWriter>();
+  m_state = State::WritingList;
+  m_writer = std::make_shared<ListWriter>();
 }
 
 void DocumentWriter::endList()
@@ -171,13 +167,14 @@ void DocumentWriter::endList()
   list().finish();
   auto l = list().output();
 
-  if (m_state.since.has_value())
+  if (m_since.has_value())
   {
     // TODO: handle since
   }
 
   m_nodes.push_back(l);
-  m_state.leave();
+  m_state = State::Idle;
+  m_writer = nullptr;
 }
 
 void DocumentWriter::finish()
@@ -188,41 +185,31 @@ void DocumentWriter::finish()
     endList();
 }
 
-DocumentWriter::Frame& DocumentWriter::currentFrame()
-{
-  return m_state.current();
-}
-
-const DocumentWriter::Frame& DocumentWriter::currentFrame() const
-{
-  return m_state.current();
-}
-
 bool DocumentWriter::isIdle() const
 {
-  return currentFrame().type == FrameType::Idle;
+  return m_state == State::Idle;
 }
 
 bool DocumentWriter::isWritingParagraph() const
 {
-  return currentFrame().type == FrameType::WritingParagraph;
+  return m_state == State::WritingParagraph;
 }
 
 ParagraphWriter& DocumentWriter::paragraph()
 {
   assert(isWritingParagraph());
-  return *(std::get<std::shared_ptr<ParagraphWriter>>(currentFrame().data));
+  return *static_cast<ParagraphWriter*>(m_writer.get());
 }
 
 bool DocumentWriter::isWritingList() const
 {
-  return currentFrame().type == FrameType::WritingList;
+  return m_state == State::WritingList;
 }
 
 ListWriter& DocumentWriter::list()
 {
   assert(isWritingList());
-  return *(std::get<std::shared_ptr<ListWriter>>(currentFrame().data));
+  return *static_cast<ListWriter*>(m_writer.get());
 }
 
 dom::Paragraph& DocumentWriter::currentParagraph()
