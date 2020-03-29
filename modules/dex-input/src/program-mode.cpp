@@ -54,19 +54,19 @@ ProgramMode::State& ProgramMode::state()
 const std::map<std::string, ProgramMode::CS>& ProgramMode::csmap()
 {
   static std::map<std::string, CS> static_instance = { 
-    {"par", CS::PAR},
-    {"cl@ss", CS::CLASS},
-    {"endclass", CS::ENDCLASS},
-    {"functi@n", CS::FN},
-    {"endfn", CS::ENDFN},
-    {"n@mesp@ce", CS::NAMESPACE},
-    {"endnamespace", CS::ENDNAMESPACE},
-    {"@brief", CS::BRIEF},
-    {"@since", CS::SINCE},
-    {"beginsince", CS::BEGINSINCE},
-    {"endsince", CS::ENDSINCE},
-    {"p@r@m", CS::PARAM},
-    {"@returns", CS::RETURNS},
+    {Functions::PAR , CS::PAR},
+    {Functions::CLASS, CS::CLASS},
+    {Functions::ENDCLASS, CS::ENDCLASS},
+    {Functions::FUNCTION , CS::FN},
+    {Functions::ENDFN, CS::ENDFN},
+    {Functions::NAMESPACE, CS::NAMESPACE},
+    {Functions::ENDNAMESPACE , CS::ENDNAMESPACE},
+    {Functions::BRIEF, CS::BRIEF},
+    {Functions::SINCE, CS::SINCE},
+    {Functions::BEGINSINCE, CS::BEGINSINCE},
+    {Functions::ENDSINCE, CS::ENDSINCE},
+    {Functions::PARAM, CS::PARAM},
+    {Functions::RETURNS, CS::RETURNS},
   };
 
   return static_instance;
@@ -101,35 +101,35 @@ bool ProgramMode::write(tex::parsing::Token&& tok)
 
 bool ProgramMode::handle(const FunctionCall& call)
 {
-  if (call.function == "cl@ss")
+  if (call.function == Functions::CLASS)
   {
     fn_class(call);
   }
-  else if (call.function == "functi@n")
+  else if (call.function == Functions::FUNCTION)
   {
     fn_fn(call);
   }
-  else if (call.function == "n@mesp@ce")
+  else if (call.function == Functions::NAMESPACE)
   {
-    fn_fn(call);
+    fn_namespace(call);
   }
-  else if (call.function == "@brief")
+  else if (call.function == Functions::BRIEF)
   {
     fn_brief(call);
   }
-  else if (call.function == "@since")
+  else if (call.function == Functions::SINCE)
   {
     fn_since(call);
   }
-  else if (call.function == "p@r@m")
+  else if (call.function == Functions::PARAM)
   {
     fn_param(call);
   }
-  else if (call.function == "beginsince")
+  else if (call.function == Functions::BEGINSINCE)
   {
     fn_beginsince(call);
   }
-  else if (call.function == "@returns")
+  else if (call.function == Functions::RETURNS)
   {
     fn_returns(call);
   }
@@ -205,7 +205,7 @@ void ProgramMode::fn_class(const FunctionCall& call)
 void ProgramMode::cs_endclass()
 {
   if (!currentFrame().node->is<cxx::Class>())
-    throw BadControlSequence{ "endclass" };
+    throw BadControlSequence{ Functions::ENDCLASS };
 
   exitFrame();
 }

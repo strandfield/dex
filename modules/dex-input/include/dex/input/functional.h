@@ -25,6 +25,23 @@ struct FunctionCall
   Options options;
 };
 
+struct Functions
+{
+  static const std::string PAR;
+  static const std::string CLASS;
+  static const std::string ENDCLASS;
+  static const std::string FUNCTION;
+  static const std::string ENDFN;
+  static const std::string NAMESPACE;
+  static const std::string ENDNAMESPACE;
+  static const std::string BRIEF;
+  static const std::string SINCE;
+  static const std::string BEGINSINCE;
+  static const std::string ENDSINCE;
+  static const std::string PARAM;
+  static const std::string RETURNS;
+};
+
 } // namespace dex
 
 #endif // DEX_INPUT_FUNCTIONAL_H

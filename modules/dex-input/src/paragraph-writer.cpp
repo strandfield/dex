@@ -34,7 +34,7 @@ void ParagraphWriter::write(const std::string& str)
 
 void ParagraphWriter::handle(const FunctionCall& call)
 {
-  if (call.function == "@since")
+  if (call.function == Functions::SINCE)
   {
     std::string version = std::get<std::string>(call.options.at(""));
     const std::string& text = std::get<std::string>(call.arguments.front());

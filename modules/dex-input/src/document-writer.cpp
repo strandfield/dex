@@ -58,11 +58,11 @@ void DocumentWriter::write(const std::string& str)
 
 void DocumentWriter::handle(const FunctionCall& call)
 {
-  if (call.function == "@since")
+  if (call.function == Functions::SINCE)
   {
     paragraph().handle(call);
   }
-  else if (call.function == "beginsince")
+  else if (call.function == Functions::BEGINSINCE)
   {
     std::string version = std::get<std::string>(call.options.at(""));
     beginSinceBlock(std::move(version));
