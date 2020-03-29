@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -55,6 +55,7 @@ public:
   void begin();
   void write(char c);
   void write(const std::string& str);
+  void handle(const FunctionCall& call);
   void end();
 
   bool isWritingParagraph();

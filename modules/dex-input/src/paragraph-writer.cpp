@@ -6,6 +6,8 @@
 
 #include "dex/model/since.h"
 
+#include "dex/input/parser-errors.h"
+
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
 
@@ -28,6 +30,21 @@ void ParagraphWriter::write(char c)
 void ParagraphWriter::write(const std::string& str)
 {
   output()->addText(str);
+}
+
+void ParagraphWriter::handle(const FunctionCall& call)
+{
+  if (call.function == "@since")
+  {
+    std::string version = std::get<std::string>(call.options.at(""));
+    const std::string& text = std::get<std::string>(call.arguments.front());
+
+    writeSince(version, text);
+  }
+  else
+  {
+    throw BadControlSequence{ call.function };
+  }
 }
 
 void ParagraphWriter::writeLink(std::string url, const std::string& text)

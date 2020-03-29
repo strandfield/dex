@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -7,6 +7,7 @@
 #include "dex/model/since.h"
 
 #include "dex/input/paragraph-writer.h"
+#include "dex/input/parser-errors.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -53,6 +54,23 @@ void DocumentWriter::write(const std::string& str)
     startParagraph();
 
   currentParagraph().addText(str);
+}
+
+void DocumentWriter::handle(const FunctionCall& call)
+{
+  if (call.function == "@since")
+  {
+    paragraph().handle(call);
+  }
+  else if (call.function == "beginsince")
+  {
+    std::string version = std::get<std::string>(call.options.at(""));
+    beginSinceBlock(std::move(version));
+  }
+  else
+  {
+    throw BadControlSequence{ call.function };
+  }
 }
 
 void DocumentWriter::end()

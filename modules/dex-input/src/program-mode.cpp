@@ -315,24 +315,20 @@ void ProgramMode::fn_since(const FunctionCall& call)
 
   if (call.options.empty())
   {
+    // e.g. \since 5.12
     std::string version = std::get<std::string>(call.arguments.front());
     doc(entity->documentation()).since() = dex::Since{ version };
   }
   else
   {
-    std::string version = std::get<std::string>(call.options.at(""));
-    const std::string& text = std::get<std::string>(call.arguments.front());
-
-    currentFrame().writer->paragraph().writeSince(std::move(version), text);
+    currentFrame().writer->handle(call);
   }
 }
 
 void ProgramMode::fn_beginsince(const FunctionCall& call)
 {
-  std::string version = std::get<std::string>(call.options.at(""));
-
   Frame& f = currentFrame();
-  f.writer->beginSinceBlock(std::move(version));
+  f.writer->handle(call);
 }
 
 void ProgramMode::cs_endsince()
