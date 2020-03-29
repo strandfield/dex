@@ -4,6 +4,7 @@
 
 #include "dex/input/program-mode.h"
 
+#include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-machine.h"
 #include "dex/input/parser-errors.h"
 
@@ -311,7 +312,7 @@ void ProgramMode::cs_since()
     std::string version = std::get<std::string>(machine().caller().options().at(""));
     const std::string& text = std::get<std::string>(machine().caller().arguments().front());
 
-    currentFrame().writer->writeSince(std::move(version), text);
+    currentFrame().writer->paragraph().writeSince(std::move(version), text);
   }
 }
 

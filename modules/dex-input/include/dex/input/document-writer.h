@@ -9,6 +9,8 @@
 
 #include "dex/common/state.h"
 
+#include "dex/input/content-writer.h"
+
 #include <dom/paragraph.h>
 
 #include <optional>
@@ -16,6 +18,8 @@
 
 namespace dex
 {
+
+class ParagraphWriter;
 
 class DEX_INPUT_API DocumentWriter
 {
@@ -36,7 +40,7 @@ public:
 
     explicit Frame(FrameType ft);
 
-    std::variant<std::monostate, std::shared_ptr<dom::Paragraph>> data;
+    std::variant<std::monostate, std::shared_ptr<ParagraphWriter>> data;
   };
 
   struct State : public state::State<Frame>
@@ -54,17 +58,14 @@ public:
   void end();
 
   bool isWritingParagraph();
-
-  void writeLink(std::string url, const std::string& text);
-  void writeStyledText(std::string style, const std::string& text);
+  ParagraphWriter& paragraph();
 
   void beginSinceBlock(const std::string& version);
   void endSinceBlock();
-  void writeSince(const std::string& version, const std::string& text);
   
-  void add(const std::shared_ptr<dom::Node>& node);
+  void write(const std::shared_ptr<dom::Node>& node);
 
-  std::vector<std::shared_ptr<dom::Node>>& output();
+  dom::Content& output();
 
 protected:
   Frame& currentFrame();
@@ -89,7 +90,7 @@ inline DocumentWriter::State& DocumentWriter::state()
   return m_state;
 }
 
-inline std::vector<std::shared_ptr<dom::Node>>& DocumentWriter::output()
+inline dom::Content& DocumentWriter::output()
 {
   return m_nodes;
 }

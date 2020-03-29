@@ -6,6 +6,7 @@
 
 #include "dex/model/model.h"
 
+#include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-machine.h"
 
 #include "dex/input/function-caller.h"
@@ -141,13 +142,13 @@ void TestDexInput::documentWriter()
   dex::DocumentWriter writer;
 
   writer.begin();
-  writer.writeStyledText("code", "std::vector");
+  writer.paragraph().writeStyledText("code", "std::vector");
   writer.write(" is a sequence container that encapsulates dynamic size arrays");
   writer.write('.');
 
   writer.beginSinceBlock("C++03");
   writer.write("The elements are stored contiguously, ");
-  writer.writeLink("#more", "...");
+  writer.paragraph().writeLink("#more", "...");
   writer.endSinceBlock();
 
   writer.end();

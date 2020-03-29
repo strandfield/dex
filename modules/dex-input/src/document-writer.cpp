@@ -6,8 +6,7 @@
 
 #include "dex/model/since.h"
 
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
+#include "dex/input/paragraph-writer.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -62,32 +61,6 @@ void DocumentWriter::end()
     endParagraph();
 }
 
-void DocumentWriter::writeLink(std::string url, const std::string& text)
-{
-  if (!isWritingParagraph())
-    startParagraph();
-
-  dom::Paragraph& par = currentParagraph();
-  size_t start = par.length();
-  par.addText(text);
-
-  auto link = std::make_shared<dom::Link>(dom::ParagraphRange(par, start, par.length()), std::move(url));
-  currentParagraph().addMetaData(link);
-}
-
-void DocumentWriter::writeStyledText(std::string style_name, const std::string& text)
-{
-  if (!isWritingParagraph())
-    startParagraph();
-
-  dom::Paragraph& par = currentParagraph();
-  size_t start = par.length();
-  par.addText(std::move(text));
-
-  auto style = std::make_shared<dom::TextStyle>(dom::ParagraphRange(par, start, par.length()), std::move(style_name));
-  currentParagraph().addMetaData(style);
-}
-
 void DocumentWriter::beginSinceBlock(const std::string& version)
 {
   if (state().since.has_value())
@@ -109,19 +82,7 @@ void DocumentWriter::endSinceBlock()
   state().since.reset();
 }
 
-void DocumentWriter::writeSince(const std::string& version, const std::string& text)
-{
-  if (!isWritingParagraph())
-    startParagraph();
-
-  dom::Paragraph& par = currentParagraph();
-  size_t start = par.length();
-  par.addText(text);
-
-  currentParagraph().add<dex::Since>(dom::ParagraphRange(par, start, par.length()), version);
-}
-
-void DocumentWriter::add(const std::shared_ptr<dom::Node>& node)
+void DocumentWriter::write(const std::shared_ptr<dom::Node>& node)
 {
   if (isWritingParagraph())
     endParagraph();
@@ -134,16 +95,16 @@ void DocumentWriter::startParagraph()
   if (isWritingParagraph())
     throw std::runtime_error{ "Already writing a paragraph" };
 
-  auto par = std::make_shared<dom::Paragraph>();
   m_state.enter<FrameType::WritingParagraph>();
-  currentFrame().data = par;
+  currentFrame().data = std::make_shared<ParagraphWriter>();
 }
 
 void DocumentWriter::endParagraph()
 {
   assert(isWritingParagraph());
 
-  auto par = std::get<std::shared_ptr<dom::Paragraph>>(currentFrame().data);
+  paragraph().finish();
+  auto par = paragraph().output();
 
   if (m_state.since.has_value())
   {
@@ -164,9 +125,15 @@ bool DocumentWriter::isWritingParagraph()
   return currentFrame().type == FrameType::WritingParagraph;
 }
 
+ParagraphWriter& DocumentWriter::paragraph()
+{
+  assert(isWritingParagraph());
+  return *(std::get<std::shared_ptr<ParagraphWriter>>(currentFrame().data));
+}
+
 dom::Paragraph& DocumentWriter::currentParagraph()
 {
-  return *std::get<std::shared_ptr<dom::Paragraph>>(currentFrame().data);
+  return *(paragraph().output());
 }
 
 } // namespace dex
