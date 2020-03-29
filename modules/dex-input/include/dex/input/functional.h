@@ -9,6 +9,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -23,11 +24,25 @@ struct FunctionCall
   std::string function;
   std::vector<Argument> arguments;
   Options options;
+
+  Argument opt(const std::string& key, Argument default_value) const
+  {
+    auto it = options.find(key);
+    return it == options.end() ? default_value : it->second;
+  }
+
+  template<typename T, typename = decltype(std::get<T>(std::declval<Argument>()))>
+  T opt(const std::string& key, T default_value) const
+  {
+    auto it = options.find(key);
+    return it == options.end() ? default_value : std::get<T>(it->second);
+  }
 };
 
-struct Functions
+struct DEX_INPUT_API Functions
 {
   static const std::string PAR;
+
   static const std::string CLASS;
   static const std::string ENDCLASS;
   static const std::string FUNCTION;
@@ -40,6 +55,10 @@ struct Functions
   static const std::string ENDSINCE;
   static const std::string PARAM;
   static const std::string RETURNS;
+
+  static const std::string LIST;
+  static const std::string ENDLIST;
+  static const std::string LI;
 };
 
 } // namespace dex

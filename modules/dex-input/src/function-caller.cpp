@@ -140,9 +140,6 @@ void FunctionCaller::startWorking()
 {
   assert(!m_tasks.empty());
 
-  m_state = State::Working;
-  startTask(m_tasks.front());
-
   if (m_clear_results)
   {
     m_call.function.clear();
@@ -150,6 +147,9 @@ void FunctionCaller::startWorking()
     m_call.options.clear();
     m_clear_results = false;
   }
+
+  m_state = State::Working;
+  startTask(m_tasks.front());
 }
 
 void FunctionCaller::startTask(Task& t)

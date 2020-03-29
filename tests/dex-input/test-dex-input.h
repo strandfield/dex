@@ -13,7 +13,9 @@ public:
 private Q_SLOTS:
   void argumentParsing();
   void conditionalEvaluator();
-  void documentWriter();
+  void documentWriterParagraph();
+  void documentWriterList();
+  void parserMachineList();
   void parserMachineClass();
   void parserMachineFunction();
 };

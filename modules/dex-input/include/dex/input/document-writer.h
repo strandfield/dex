@@ -11,6 +11,7 @@
 
 #include "dex/input/content-writer.h"
 
+#include <dom/content.h>
 #include <dom/paragraph.h>
 
 #include <optional>
@@ -19,6 +20,7 @@
 namespace dex
 {
 
+class ListWriter;
 class ParagraphWriter;
 
 class DEX_INPUT_API DocumentWriter
@@ -30,6 +32,7 @@ public:
   {
     Idle,
     WritingParagraph,
+    WritingList,
   };
 
   struct Frame : state::Frame<FrameType>
@@ -40,7 +43,7 @@ public:
 
     explicit Frame(FrameType ft);
 
-    std::variant<std::monostate, std::shared_ptr<ParagraphWriter>> data;
+    std::variant<std::monostate, std::shared_ptr<ParagraphWriter>, std::shared_ptr<ListWriter>> data;
   };
 
   struct State : public state::State<Frame>
@@ -52,29 +55,38 @@ public:
   
   State& state();
 
-  void begin();
   void write(char c);
   void write(const std::string& str);
   void handle(const FunctionCall& call);
-  void end();
 
-  bool isWritingParagraph();
+  bool isIdle() const;
+
+  bool isWritingParagraph() const;
   ParagraphWriter& paragraph();
+
+  bool isWritingList() const;
+  ListWriter& list();
 
   void beginSinceBlock(const std::string& version);
   void endSinceBlock();
   
+  void startParagraph();
+  void endParagraph();
+
+  void startList();
+  void endList();
+
+  void finish();
+
   void write(const std::shared_ptr<dom::Node>& node);
 
   dom::Content& output();
 
 protected:
   Frame& currentFrame();
+  const Frame& currentFrame() const;
 
   dom::Paragraph& currentParagraph();
-
-  void startParagraph();
-  void endParagraph();
 
 private:
   State m_state;

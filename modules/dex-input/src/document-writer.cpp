@@ -6,6 +6,7 @@
 
 #include "dex/model/since.h"
 
+#include "dex/input/list-writer.h"
 #include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-errors.h"
 
@@ -14,11 +15,6 @@
 
 namespace dex
 {
-
-inline static bool is_space(char c)
-{
-  return c == ' ' || c == '\t' || c == '\r' || c == '\n';
-}
 
 DocumentWriter::Frame::Frame(FrameType ft)
   : state::Frame<FrameType>(ft)
@@ -31,52 +27,71 @@ DocumentWriter::DocumentWriter()
   m_state.enter<FrameType::Idle>();
 }
 
-void DocumentWriter::begin()
-{
-  if (!isWritingParagraph())
-    startParagraph();
-}
-
 void DocumentWriter::write(char c)
 {
-  if (!isWritingParagraph() && is_space(c))
-    return;
+  if (isIdle())
+  {
+    if (is_space(c))
+      return;
 
-  if (!isWritingParagraph())
     startParagraph();
+    paragraph().write(c);
+  }
+  else if (isWritingParagraph())
+  {
+    paragraph().write(c);
 
-  currentParagraph().addChar(c);
+  }
+  else if (isWritingList())
+  {
+    list().write(c);
+  }
 }
 
 void DocumentWriter::write(const std::string& str)
 {
-  if (!isWritingParagraph())
-    startParagraph();
-
-  currentParagraph().addText(str);
+  if (isWritingParagraph())
+  {
+    paragraph().write(str);
+  }
+  else
+  {
+    for (char c : str)
+      write(c);
+  }
 }
 
 void DocumentWriter::handle(const FunctionCall& call)
 {
-  if (call.function == Functions::SINCE)
-  {
-    paragraph().handle(call);
-  }
-  else if (call.function == Functions::BEGINSINCE)
+  if (call.function == Functions::BEGINSINCE)
   {
     std::string version = std::get<std::string>(call.options.at(""));
     beginSinceBlock(std::move(version));
+  }
+  else if (call.function == Functions::LIST)
+  {
+    if (isIdle() || isWritingParagraph())
+    {
+      startList();
+    }
+    else
+    {
+      assert(isWritingList());
+      list().handle(call);
+    }
+  }
+  else if (isWritingParagraph())
+  {
+    paragraph().handle(call);
+  }
+  else if (isWritingList())
+  {
+    list().handle(call);
   }
   else
   {
     throw BadControlSequence{ call.function };
   }
-}
-
-void DocumentWriter::end()
-{
-  if (isWritingParagraph())
-    endParagraph();
 }
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
@@ -133,12 +148,55 @@ void DocumentWriter::endParagraph()
   m_state.leave();
 }
 
+void DocumentWriter::startList()
+{
+  if (isWritingParagraph())
+    endParagraph();
+
+  m_state.enter<FrameType::WritingList>();
+  currentFrame().data = std::make_shared<ListWriter>();
+}
+
+void DocumentWriter::endList()
+{
+  assert(isWritingList());
+
+  list().finish();
+  auto l = list().output();
+
+  if (m_state.since.has_value())
+  {
+    // TODO: handle since
+  }
+
+  m_nodes.push_back(l);
+  m_state.leave();
+}
+
+void DocumentWriter::finish()
+{
+  if (isWritingParagraph())
+    endParagraph();
+  else if (isWritingList())
+    endList();
+}
+
 DocumentWriter::Frame& DocumentWriter::currentFrame()
 {
   return m_state.current();
 }
 
-bool DocumentWriter::isWritingParagraph()
+const DocumentWriter::Frame& DocumentWriter::currentFrame() const
+{
+  return m_state.current();
+}
+
+bool DocumentWriter::isIdle() const
+{
+  return currentFrame().type == FrameType::Idle;
+}
+
+bool DocumentWriter::isWritingParagraph() const
 {
   return currentFrame().type == FrameType::WritingParagraph;
 }
@@ -147,6 +205,17 @@ ParagraphWriter& DocumentWriter::paragraph()
 {
   assert(isWritingParagraph());
   return *(std::get<std::shared_ptr<ParagraphWriter>>(currentFrame().data));
+}
+
+bool DocumentWriter::isWritingList() const
+{
+  return currentFrame().type == FrameType::WritingList;
+}
+
+ListWriter& DocumentWriter::list()
+{
+  assert(isWritingList());
+  return *(std::get<std::shared_ptr<ListWriter>>(currentFrame().data));
 }
 
 dom::Paragraph& DocumentWriter::currentParagraph()

@@ -18,6 +18,7 @@
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 
+#include <dom/list.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
 
@@ -137,21 +138,21 @@ void TestDexInput::conditionalEvaluator()
   QVERIFY(registers.br);
 }
 
-void TestDexInput::documentWriter()
+void TestDexInput::documentWriterParagraph()
 {
   dex::DocumentWriter writer;
 
-  writer.begin();
+  writer.startParagraph();
+
   writer.paragraph().writeStyledText("code", "std::vector");
   writer.write(" is a sequence container that encapsulates dynamic size arrays");
   writer.write('.');
+  writer.endParagraph();
 
   writer.beginSinceBlock("C++03");
   writer.write("The elements are stored contiguously, ");
   writer.paragraph().writeLink("#more", "...");
   writer.endSinceBlock();
-
-  writer.end();
 
   QVERIFY(writer.output().size() == 2);
 
@@ -171,6 +172,94 @@ void TestDexInput::documentWriter()
   QVERIFY(par->metadata().front()->range().text() == "The elements are stored contiguously, ...");
   QVERIFY(par->metadata().back()->is<dom::Link>());
   QVERIFY(par->metadata().back()->range().text() == "...");
+}
+
+void TestDexInput::documentWriterList()
+{
+  auto li = []() -> dex::FunctionCall {
+    dex::FunctionCall ret;
+    ret.function = dex::Functions::LI;
+    return ret;
+  };
+
+  dex::DocumentWriter writer;
+
+  writer.startList();
+  writer.handle(li());
+  writer.write("List item number 1");
+  writer.handle(li());
+  writer.write("Number 2");
+  writer.endList();
+
+  QVERIFY(writer.output().size() == 1);
+  QVERIFY(writer.output().at(0)->is<dom::List>());
+
+  auto list = std::static_pointer_cast<dom::List>(writer.output().at(0));
+
+  QVERIFY(list->items.size() == 2);
+
+  QVERIFY(list->items.front()->content.size() == 1);
+  QVERIFY(list->items.back()->content.size() == 1);
+
+  QVERIFY(list->items.front()->content.front()->is<dom::Paragraph>());
+
+  auto par = std::static_pointer_cast<dom::Paragraph>(list->items.front()->content.front());
+  QVERIFY(par->text() == "List item number 1");
+
+  par = std::static_pointer_cast<dom::Paragraph>(list->items.back()->content.front());
+  QVERIFY(par->text() == "Number 2");
+}
+
+void TestDexInput::parserMachineList()
+{
+  dex::ParserMachine parser;
+
+  QFile file{ "test.cpp" };
+  QVERIFY(file.open(QIODevice::WriteOnly));
+
+  file.write(
+    "/*!\n"
+    " * \\class vector\n"
+    " *\n"
+    " * \\list\n"
+    " *   \\li first item\n"
+    " *   \\li second item:\n"
+    " *     \\list\n"
+    " *       \\li nested item\n"
+    " *     \\endlist\n"
+    " * \\endlist\n"
+    " */\n"
+  );
+
+  file.close();
+
+  parser.process(QFileInfo{ "test.cpp" });
+
+  QFile::remove("test.cpp");
+
+  std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  QVERIFY(ns->entities().size() > 0);
+  QVERIFY(ns->entities().front()->is<cxx::Class>());
+  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
+  QVERIFY(vec->documentation()->is<dex::ClassDocumentation>());
+  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
+  QVERIFY(doc->description().size() == 1);
+  QVERIFY(doc->description().front()->is<dom::List>());
+
+  auto lst = std::static_pointer_cast<dom::List>(doc->description().front());
+  
+  QVERIFY(lst->items.size() == 2);
+  QVERIFY(lst->items.back()->content.size() == 2);
+  QVERIFY(lst->items.back()->content.back()->is<dom::List>());
+
+  lst = std::static_pointer_cast<dom::List>(lst->items.back()->content.back());
+  QVERIFY(lst->items.size() == 1);
+  QVERIFY(lst->items.front()->content.size() == 1);
+  QVERIFY(lst->items.front()->content.front()->is<dom::Paragraph>());
+
+  auto par = std::static_pointer_cast<dom::Paragraph>(lst->items.front()->content.front());
+  QVERIFY(par->text() == "nested item ");
 }
 
 void TestDexInput::parserMachineClass()

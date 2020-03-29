@@ -11,13 +11,13 @@
 
 #include <dom/paragraph.h>
 
-namespace dom
-{
-using Content = std::vector<std::shared_ptr<Node>>;
-} // namespace dom
-
 namespace dex
 {
+
+inline bool is_space(char c)
+{
+  return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
 
 class DEX_INPUT_API ContentWriter
 {
@@ -26,6 +26,7 @@ private:
 
 public:
   ContentWriter();
+  ContentWriter(const ContentWriter&) = delete;
   virtual ~ContentWriter();
 
   virtual void write(char c) = 0;
@@ -35,6 +36,8 @@ public:
   virtual void finish() = 0;
 
   std::shared_ptr<dom::Node> output() const;
+
+  ContentWriter& operator=(const ContentWriter&) = delete;
 
 protected:
   void setOutput(std::shared_ptr<dom::Node> out);

@@ -67,6 +67,7 @@ const std::map<std::string, ProgramMode::CS>& ProgramMode::csmap()
     {Functions::ENDSINCE, CS::ENDSINCE},
     {Functions::PARAM, CS::PARAM},
     {Functions::RETURNS, CS::RETURNS},
+    {Functions::ENDLIST, CS::ENDLIST},
   };
 
   return static_instance;
@@ -133,6 +134,18 @@ bool ProgramMode::handle(const FunctionCall& call)
   {
     fn_returns(call);
   }
+  else
+  {
+    Frame& f = currentFrame();
+    if (f.writer)
+    {
+      f.writer->handle(call);
+    }
+    else
+    {
+      throw BadControlSequence{ call.function };
+    }
+  }
 
   return done();
 }
@@ -169,7 +182,16 @@ void ProgramMode::cs_par()
   Frame& f = currentFrame();
 
   if (f.writer && f.writer->isWritingParagraph())
-    f.writer->end();
+    f.writer->endParagraph();
+}
+
+void ProgramMode::cs_endlist()
+{
+  Frame& f = currentFrame();
+
+  FunctionCall call;
+  call.function = Functions::ENDLIST;
+  f.writer->handle(call);
 }
 
 void ProgramMode::fn_class(const FunctionCall& call)
@@ -295,6 +317,8 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
       return cs_endnamespace();
     case CS::ENDSINCE:
       return cs_endsince();
+    case CS::ENDLIST:
+      return cs_endlist();
     default:
       throw UnexpectedControlSequence{ tok.controlSequence() };
     }
@@ -409,7 +433,7 @@ void ProgramMode::exitFrame()
   if (f.node->isEntity())
   {
     auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
-    f.writer->end();
+    f.writer->finish();
 
     doc(ent->documentation()).description() = std::move(f.writer->output());
   }
