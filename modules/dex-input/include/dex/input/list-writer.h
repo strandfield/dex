@@ -25,7 +25,7 @@ public:
   explicit ListWriter(const FunctionCall& call);
 
   void write(char c) override;
-  void handle(const FunctionCall& call) override;
+  bool handle(const FunctionCall& call) override;
   void finish() override;
 
   std::shared_ptr<dom::List> output() const;

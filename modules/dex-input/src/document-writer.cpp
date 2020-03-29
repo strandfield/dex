@@ -61,36 +61,43 @@ void DocumentWriter::write(const std::string& str)
   }
 }
 
-void DocumentWriter::handle(const FunctionCall& call)
+bool DocumentWriter::handle(const FunctionCall& call)
 {
   if (call.function == Functions::BEGINSINCE)
   {
     std::string version = std::get<std::string>(call.options.at(""));
     beginSinceBlock(std::move(version));
+    return true;
+  }
+  else if (call.function == Functions::ENDSINCE)
+  {
+    endSinceBlock();
+    return true;
   }
   else if (call.function == Functions::LIST)
   {
     if (isIdle() || isWritingParagraph())
     {
       startList();
+      return true;
     }
     else
     {
       assert(isWritingList());
-      list().handle(call);
+      return list().handle(call);
     }
   }
   else if (isWritingParagraph())
   {
-    paragraph().handle(call);
+    return paragraph().handle(call);
   }
   else if (isWritingList())
   {
-    list().handle(call);
+    return list().handle(call);
   }
   else
   {
-    throw BadControlSequence{ call.function };
+    return false;
   }
 }
 

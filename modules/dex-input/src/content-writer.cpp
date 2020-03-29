@@ -27,9 +27,9 @@ void ContentWriter::control(const std::string& cs)
   throw BadControlSequence{ cs };
 }
 
-void ContentWriter::handle(const FunctionCall& call)
+bool ContentWriter::handle(const FunctionCall& call)
 {
-  throw BadControlSequence{ call.function };
+  return false;
 }
 
 std::shared_ptr<dom::Node> ContentWriter::output() const

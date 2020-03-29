@@ -31,7 +31,7 @@ public:
 
   virtual void write(char c) = 0;
   virtual void control(const std::string& cs);
-  virtual void handle(const FunctionCall& call);
+  virtual bool handle(const FunctionCall& call);
 
   virtual void finish() = 0;
 

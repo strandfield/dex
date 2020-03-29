@@ -66,12 +66,8 @@ public:
     /* Metadata */
     BRIEF,
     SINCE,
-    BEGINSINCE,
-    ENDSINCE,
     PARAM,
     RETURNS,
-    /* TODO:remove this */
-    ENDLIST,
   };
 
   static const std::map<std::string, CS>& csmap();
@@ -106,13 +102,8 @@ protected:
 
   void fn_brief(const FunctionCall& call);
   void fn_since(const FunctionCall& call);
-  void fn_beginsince(const FunctionCall& call);
-  void cs_endsince();
   void fn_param(const FunctionCall& call);
   void fn_returns(const FunctionCall& call);
-
-  /* TODO: remove*/
-  void cs_endlist();
 
 private:
   State m_state;

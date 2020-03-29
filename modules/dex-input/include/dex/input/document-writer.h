@@ -57,7 +57,7 @@ public:
 
   void write(char c);
   void write(const std::string& str);
-  void handle(const FunctionCall& call);
+  bool handle(const FunctionCall& call);
 
   bool isIdle() const;
 

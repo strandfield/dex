@@ -32,7 +32,7 @@ void ParagraphWriter::write(const std::string& str)
   output()->addText(str);
 }
 
-void ParagraphWriter::handle(const FunctionCall& call)
+bool ParagraphWriter::handle(const FunctionCall& call)
 {
   if (call.function == Functions::SINCE)
   {
@@ -40,10 +40,12 @@ void ParagraphWriter::handle(const FunctionCall& call)
     const std::string& text = std::get<std::string>(call.arguments.front());
 
     writeSince(version, text);
+
+    return true;
   }
   else
   {
-    throw BadControlSequence{ call.function };
+    return false;
   }
 }
 

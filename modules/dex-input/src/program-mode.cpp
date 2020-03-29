@@ -63,11 +63,8 @@ const std::map<std::string, ProgramMode::CS>& ProgramMode::csmap()
     {Functions::ENDNAMESPACE , CS::ENDNAMESPACE},
     {Functions::BRIEF, CS::BRIEF},
     {Functions::SINCE, CS::SINCE},
-    {Functions::BEGINSINCE, CS::BEGINSINCE},
-    {Functions::ENDSINCE, CS::ENDSINCE},
     {Functions::PARAM, CS::PARAM},
     {Functions::RETURNS, CS::RETURNS},
-    {Functions::ENDLIST, CS::ENDLIST},
   };
 
   return static_instance;
@@ -126,10 +123,6 @@ bool ProgramMode::handle(const FunctionCall& call)
   {
     fn_param(call);
   }
-  else if (call.function == Functions::BEGINSINCE)
-  {
-    fn_beginsince(call);
-  }
   else if (call.function == Functions::RETURNS)
   {
     fn_returns(call);
@@ -137,14 +130,8 @@ bool ProgramMode::handle(const FunctionCall& call)
   else
   {
     Frame& f = currentFrame();
-    if (f.writer)
-    {
-      f.writer->handle(call);
-    }
-    else
-    {
+    if (!f.writer || !f.writer->handle(call))
       throw BadControlSequence{ call.function };
-    }
   }
 
   return done();
@@ -183,15 +170,6 @@ void ProgramMode::cs_par()
 
   if (f.writer && f.writer->isWritingParagraph())
     f.writer->endParagraph();
-}
-
-void ProgramMode::cs_endlist()
-{
-  Frame& f = currentFrame();
-
-  FunctionCall call;
-  call.function = Functions::ENDLIST;
-  f.writer->handle(call);
 }
 
 void ProgramMode::fn_class(const FunctionCall& call)
@@ -303,24 +281,36 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
   }
   else
   {
-    CS cs = parseCs(tok.controlSequence());
+    auto it = csmap().find(tok.controlSequence());
 
-    switch (cs)
+    if (it != csmap().end())
     {
-    case CS::PAR:
-      return cs_par();
-    case CS::ENDFN:
-      return cs_endfn();
-    case CS::ENDCLASS:
-      return cs_endclass();
-    case CS::ENDNAMESPACE:
-      return cs_endnamespace();
-    case CS::ENDSINCE:
-      return cs_endsince();
-    case CS::ENDLIST:
-      return cs_endlist();
-    default:
-      throw UnexpectedControlSequence{ tok.controlSequence() };
+      CS cs = it->second;
+
+      switch (cs)
+      {
+      case CS::PAR:
+        return cs_par();
+      case CS::ENDFN:
+        return cs_endfn();
+      case CS::ENDCLASS:
+        return cs_endclass();
+      case CS::ENDNAMESPACE:
+        return cs_endnamespace();
+      default:
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+      }
+    }
+    else
+    {
+      if(!currentFrame().writer)
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+
+      FunctionCall call;
+      call.function = tok.controlSequence();
+
+      if(!currentFrame().writer->handle(call))
+        throw UnexpectedControlSequence{ tok.controlSequence() };
     }
   }
 }
@@ -345,20 +335,9 @@ void ProgramMode::fn_since(const FunctionCall& call)
   }
   else
   {
-    currentFrame().writer->handle(call);
+    if (!currentFrame().writer->handle(call))
+      throw UnexpectedControlSequence{ call.function };
   }
-}
-
-void ProgramMode::fn_beginsince(const FunctionCall& call)
-{
-  Frame& f = currentFrame();
-  f.writer->handle(call);
-}
-
-void ProgramMode::cs_endsince()
-{
-  Frame& f = currentFrame();
-  f.writer->endSinceBlock();
 }
 
 void ProgramMode::fn_param(const FunctionCall& call)

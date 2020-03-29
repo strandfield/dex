@@ -45,50 +45,34 @@ void ListWriter::write(char c)
   m_doc_writer->write(c);
 }
 
-void ListWriter::handle(const FunctionCall& call)
+bool ListWriter::handle(const FunctionCall& call)
 {
+  if (m_doc_writer && m_doc_writer->handle(call))
+    return true;
+
   if (call.function == Functions::LI)
   {
-    if (m_doc_writer && m_doc_writer->isWritingList())
-    {
-      m_doc_writer->handle(call);
-    }
-    else
-    {
-      if (m_doc_writer)
-        finish();
+    if (m_doc_writer)
+      finish();
 
-      auto item = std::make_shared<dom::ListItem>();
+    auto item = std::make_shared<dom::ListItem>();
 
-      item->marker = call.opt<std::string>("marker", "");
-      item->value = call.opt<int>("value", item->value);
+    item->marker = call.opt<std::string>("marker", "");
+    item->value = call.opt<int>("value", item->value);
 
-      output()->items.push_back(item);
+    output()->items.push_back(item);
 
-      m_doc_writer = std::make_shared<DocumentWriter>();
-    }
+    m_doc_writer = std::make_shared<DocumentWriter>();
+    return true;
   }
   else if (call.function == Functions::ENDLIST)
   {
-    if (m_doc_writer && m_doc_writer->isWritingList())
-    {
-      m_doc_writer->handle(call);
-    }
-    else
-    {
-      finish();
-    }
+    finish();
+    return true;
   }
   else
   {
-    if (m_doc_writer)
-    {
-      m_doc_writer->handle(call);
-    }
-    else
-    {
-      throw BadControlSequence{ call.function };
-    }
+    return false;
   }
 }
 
