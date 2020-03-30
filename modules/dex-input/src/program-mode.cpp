@@ -9,12 +9,14 @@
 #include "dex/input/parser-errors.h"
 
 #include "dex/model/class-documentation.h"
+#include "dex/model/enum-documentation.h"
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
 
 #include "dex/common/logging.h"
 
 #include <cxx/documentation.h>
+#include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 
@@ -61,6 +63,10 @@ const std::map<std::string, ProgramMode::CS>& ProgramMode::csmap()
     {Functions::ENDFN, CS::ENDFN},
     {Functions::NAMESPACE, CS::NAMESPACE},
     {Functions::ENDNAMESPACE , CS::ENDNAMESPACE},
+    {Functions::ENUM, CS::ENUM},
+    {Functions::ENDENUM, CS::ENDENUM},
+    {Functions::ENUMVALUE, CS::ENUMVALUE},
+    {Functions::ENDENUMVALUE, CS::ENDENUMVALUE},
     {Functions::BRIEF, CS::BRIEF},
     {Functions::SINCE, CS::SINCE},
     {Functions::PARAM, CS::PARAM},
@@ -88,9 +94,13 @@ bool ProgramMode::write(tex::parsing::Token&& tok)
     write_idle(std::move(tok));
     break;
   case FrameType::Class:
+  case FrameType::Enum:
   case FrameType::Function:
   case FrameType::Namespace:
     write_entity(std::move(tok));
+    break;
+  case FrameType::EnumValue:
+    write_enumvalue(std::move(tok));
     break;
   }
 
@@ -110,6 +120,14 @@ bool ProgramMode::handle(const FunctionCall& call)
   else if (call.function == Functions::NAMESPACE)
   {
     fn_namespace(call);
+  }
+  else if (call.function == Functions::ENUM)
+  {
+    fn_enum(call);
+  }
+  else if (call.function == Functions::ENUMVALUE)
+  {
+    fn_enumvalue(call);
   }
   else if (call.function == Functions::BRIEF)
   {
@@ -273,6 +291,71 @@ void ProgramMode::cs_endnamespace()
   exitFrame();
 }
 
+void ProgramMode::fn_enum(const FunctionCall& call)
+{
+  if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
+    throw BadControlSequence{ "enum" };
+
+  auto parent_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  const std::string enum_name = call.arg<std::string>(0);
+
+  auto new_enum = std::make_shared<cxx::Enum>(enum_name, parent_entity);
+  new_enum->setDocumentation(std::make_shared<EnumDocumentation>());
+
+  if (parent_entity->is<cxx::Namespace>())
+  {
+    const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
+    ns->entities().push_back(new_enum);
+  }
+  else
+  {
+    const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
+    cla->members().push_back({ new_enum, cxx::AccessSpecifier::PUBLIC });
+  }
+
+  m_state.enter<FrameType::Enum>(new_enum);
+}
+
+void ProgramMode::cs_endenum()
+{
+  if (!currentFrame().node->is<cxx::Enum>())
+    throw BadControlSequence{ "endenum" };
+
+  exitFrame();
+}
+
+void ProgramMode::fn_enumvalue(const FunctionCall& call)
+{
+  if (!currentFrame().node->is<cxx::Enum>())
+    throw BadControlSequence{ "value" };
+
+  if (currentFrame().type == FrameType::EnumValue)
+    exitFrame();
+
+  const auto en = std::static_pointer_cast<cxx::Enum>(currentFrame().node);
+
+  const std::string name = call.arg<std::string>(0);
+  en->values().push_back(cxx::Enum::Value{ name });
+
+  EnumValueDocumentation doc;
+  doc.name = name;
+
+  // TODO: handle optional since clause
+
+  auto enum_doc = std::static_pointer_cast<EnumDocumentation>(en->documentation());
+  enum_doc->values().push_back(doc);
+
+  m_state.enter<FrameType::EnumValue>(en);
+}
+
+void ProgramMode::cs_endenumvalue()
+{
+  if (currentFrame().type != FrameType::EnumValue)
+    throw BadControlSequence{ "endenumvalue" };
+
+  exitFrame();
+}
+
 void ProgramMode::write_entity(tex::parsing::Token&& tok)
 {
   if (tok.isCharacterToken())
@@ -297,6 +380,10 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
         return cs_endclass();
       case CS::ENDNAMESPACE:
         return cs_endnamespace();
+    case CS::ENDENUM:
+      return cs_endenum();
+    case CS::ENDENUMVALUE:
+      return cs_endenumvalue();
       default:
         throw UnexpectedControlSequence{ tok.controlSequence() };
       }
@@ -310,6 +397,54 @@ void ProgramMode::write_entity(tex::parsing::Token&& tok)
       call.function = tok.controlSequence();
 
       if(!currentFrame().writer->handle(call))
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+    }
+  }
+}
+
+void ProgramMode::write_enumvalue(tex::parsing::Token&& tok)
+{
+  // @TODO: try to merge this with write_entity
+
+  if (tok.isCharacterToken())
+  {
+    currentFrame().writer->write(tok.characterToken().value);
+  }
+  else
+  {
+    auto it = csmap().find(tok.controlSequence());
+
+    if (it != csmap().end())
+    {
+      CS cs = it->second;
+
+      switch (cs)
+      {
+      case CS::PAR:
+        return cs_par();
+      case CS::ENDFN:
+        return cs_endfn();
+      case CS::ENDCLASS:
+        return cs_endclass();
+      case CS::ENDNAMESPACE:
+        return cs_endnamespace();
+      case CS::ENDENUM:
+        return cs_endenum();
+      case CS::ENDENUMVALUE:
+        return cs_endenumvalue();
+      default:
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+      }
+    }
+    else
+    {
+      if (!currentFrame().writer)
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+
+      FunctionCall call;
+      call.function = tok.controlSequence();
+
+      if (!currentFrame().writer->handle(call))
         throw UnexpectedControlSequence{ tok.controlSequence() };
     }
   }
@@ -409,7 +544,14 @@ void ProgramMode::exitFrame()
 {
   Frame& f = m_state.current();
 
-  if (f.node->isEntity())
+  if (f.type == FrameType::EnumValue)
+  {
+    auto en = std::static_pointer_cast<cxx::Enum>(f.node);
+    auto enum_doc = std::static_pointer_cast<EnumDocumentation>(en->documentation());
+    f.writer->finish();
+    enum_doc->values().back().description = std::move(f.writer->output());
+  }
+  else if (f.node->isEntity())
   {
     auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
     f.writer->finish();

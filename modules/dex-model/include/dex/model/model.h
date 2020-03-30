@@ -6,6 +6,7 @@
 #define DEX_MODEL_MODEL_H
 
 #include "dex/model/class-documentation.h"
+#include "dex/model/enum-documentation.h"
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
 

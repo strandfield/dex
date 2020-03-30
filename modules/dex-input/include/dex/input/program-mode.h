@@ -32,6 +32,8 @@ public:
     Class,
     Namespace,
     Function,
+    Enum,
+    EnumValue,
   };
 
   struct Frame : state::Frame<FrameType>
@@ -63,6 +65,10 @@ public:
     ENDFN,
     NAMESPACE,
     ENDNAMESPACE,
+    ENUM,
+    ENDENUM,
+    ENUMVALUE,
+    ENDENUMVALUE,
     /* Metadata */
     BRIEF,
     SINCE,
@@ -90,6 +96,7 @@ protected:
 
   void write_idle(tex::parsing::Token&& tok);
   void write_entity(tex::parsing::Token&& tok);
+  void write_enumvalue(tex::parsing::Token&& tok);
 
   void cs_par();
 
@@ -99,6 +106,10 @@ protected:
   void cs_endfn();
   void fn_namespace(const FunctionCall& call);
   void cs_endnamespace();
+  void fn_enum(const FunctionCall& call);
+  void cs_endenum();
+  void fn_enumvalue(const FunctionCall& call);
+  void cs_endenumvalue();
 
   void fn_brief(const FunctionCall& call);
   void fn_since(const FunctionCall& call);

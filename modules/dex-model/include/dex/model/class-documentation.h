@@ -7,8 +7,6 @@
 
 #include "dex/model/entity-documentation.h"
 
-#include <cxx/documentation.h>
-
 namespace dex
 {
 

@@ -55,6 +55,10 @@ struct DEX_INPUT_API Functions
   static const std::string ENDFN;
   static const std::string NAMESPACE;
   static const std::string ENDNAMESPACE;
+  static const std::string ENUM;
+  static const std::string ENDENUM;
+  static const std::string ENUMVALUE;
+  static const std::string ENDENUMVALUE;
   static const std::string BRIEF;
   static const std::string SINCE;
   static const std::string BEGINSINCE;

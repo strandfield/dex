@@ -15,6 +15,7 @@
 
 #include <cxx/class.h>
 #include <cxx/documentation.h>
+#include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 
@@ -406,4 +407,61 @@ void TestDexInput::parserMachineFunction()
   QVERIFY(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior. ");
 
   QFile::remove("test.cpp");
+}
+
+void TestDexInput::parserMachineEnum()
+{
+  dex::ParserMachine parser;
+
+  QFile file{ "test.cpp" };
+  QVERIFY(file.open(QIODevice::WriteOnly));
+
+  file.write(
+    "/*!\n"
+    " * \\enum Corner\n"
+    " * \\brief describes a corner\n"
+    " *\n"
+    " * This is not that useful.\n"
+    " *\n"
+    " * \\value TopLeft the top left corner\n"
+    " * \\value TopRight the top right corner\n"
+    " * \\value BottomLeft the bottom left corner\n"
+    " * \\value BottomRight the bottom right corner\n"
+    " */\n"
+  );
+
+  file.close();
+
+  parser.process(QFileInfo{ "test.cpp" });
+
+  QFile::remove("test.cpp");
+
+  std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  QVERIFY(ns->entities().size() > 0);
+  QVERIFY(ns->entities().front()->is<cxx::Enum>());
+  auto corner = std::static_pointer_cast<cxx::Enum>(ns->entities().front());
+  QVERIFY(corner->name() == "Corner");
+  QVERIFY(corner->values().size() == 4);
+  QVERIFY(corner->documentation()->is<dex::EnumDocumentation>());
+  auto doc = std::static_pointer_cast<dex::EnumDocumentation>(corner->documentation());
+  QVERIFY(doc->brief().value() == "describes a corner");
+  QVERIFY(doc->description().size() == 1);
+  QVERIFY(doc->description().front()->is<dom::Paragraph>());
+  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
+  QVERIFY(paragraph->text() == "This is not that useful. ");
+
+  dex::EnumValueDocumentation valdoc = doc->values().at(0);
+  QVERIFY(valdoc.name == "TopLeft");
+  QVERIFY(valdoc.description.size() == 1);
+  QVERIFY(valdoc.description.front()->is<dom::Paragraph>());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc.description.front());
+  QVERIFY(paragraph->text() == "the top left corner ");
+
+  valdoc = doc->values().at(3);
+  QVERIFY(valdoc.name == "BottomRight");
+  QVERIFY(valdoc.description.size() == 1);
+  QVERIFY(valdoc.description.front()->is<dom::Paragraph>());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc.description.front());
+  QVERIFY(paragraph->text() == "the bottom right corner ");
 }
