@@ -99,8 +99,12 @@ bool DocumentWriter::handle(const FunctionCall& call)
       img->height = call.opt<int>("height", img->height);
       img->width = call.opt<int>("width", img->width);
       m_nodes.push_back(img);
+
+      return true;
     }
   }
+
+  return false;
 }
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
