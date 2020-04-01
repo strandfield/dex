@@ -86,25 +86,71 @@ ProgramMode::CS ProgramMode::parseCs(const std::string& str) const
   return it->second;
 }
 
+inline static bool is_discardable(const tex::parsing::Token& tok)
+{
+  return (tok.isCharacterToken() && tok.characterToken().category == tex::parsing::CharCategory::Space)
+    || (tok.isControlSequence() && tok.controlSequence() == Functions::PAR);
+}
+
 bool ProgramMode::write(tex::parsing::Token&& tok)
 {
-  switch (currentFrame().type)
-  {
-  case FrameType::Idle:
-    write_idle(std::move(tok));
-    break;
-  case FrameType::Class:
-  case FrameType::Enum:
-  case FrameType::Function:
-  case FrameType::Namespace:
-    write_entity(std::move(tok));
-    break;
-  case FrameType::EnumValue:
-    write_enumvalue(std::move(tok));
-    break;
-  }
-
+  do_write(std::move(tok));
   return done();
+}
+
+void ProgramMode::do_write(tex::parsing::Token&& tok)
+{
+  if (currentFrame().type == FrameType::Idle && is_discardable(tok))
+    return;
+
+  if (tok.isCharacterToken())
+  {
+    if (currentFrame().type == FrameType::Idle)
+    {
+      LOG_WARNING << "Non-space character ignored";
+      return;
+    }
+
+    currentFrame().writer->write(tok.characterToken().value);
+  }
+  else
+  {
+    auto it = csmap().find(tok.controlSequence());
+
+    if (it != csmap().end())
+    {
+      CS cs = it->second;
+
+      switch (cs)
+      {
+      case CS::PAR:
+        return cs_par();
+      case CS::ENDFN:
+        return cs_endfn();
+      case CS::ENDCLASS:
+        return cs_endclass();
+      case CS::ENDNAMESPACE:
+        return cs_endnamespace();
+      case CS::ENDENUM:
+        return cs_endenum();
+      case CS::ENDENUMVALUE:
+        return cs_endenumvalue();
+      default:
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+      }
+    }
+    else
+    {
+      if (!currentFrame().writer)
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+
+      FunctionCall call;
+      call.function = tok.controlSequence();
+
+      if (!currentFrame().writer->handle(call))
+        throw UnexpectedControlSequence{ tok.controlSequence() };
+    }
+  }
 }
 
 bool ProgramMode::handle(const FunctionCall& call)
@@ -153,33 +199,6 @@ bool ProgramMode::handle(const FunctionCall& call)
   }
 
   return done();
-}
-
-void ProgramMode::write_idle(tex::parsing::Token&& tok)
-{
-  if (tok.isCharacterToken())
-  {
-    if (tok.characterToken().category != tex::parsing::CharCategory::Space)
-    {
-      LOG_WARNING << "Non-space character ignored";
-      return;
-    }
-  }
-
-  auto it = csmap().find(tok.controlSequence());
-
-  if (it == csmap().end())
-    throw UnknownControlSequence{ tok.controlSequence() };
-
-  CS cs = it->second;
-
-  switch (cs)
-  {
-  case CS::PAR:
-    return;
-  default:
-    throw UnexpectedControlSequence{ tok.controlSequence() };
-  }
 }
 
 void ProgramMode::cs_par()
@@ -354,100 +373,6 @@ void ProgramMode::cs_endenumvalue()
     throw BadControlSequence{ "endenumvalue" };
 
   exitFrame();
-}
-
-void ProgramMode::write_entity(tex::parsing::Token&& tok)
-{
-  if (tok.isCharacterToken())
-  {
-    currentFrame().writer->write(tok.characterToken().value);
-  }
-  else
-  {
-    auto it = csmap().find(tok.controlSequence());
-
-    if (it != csmap().end())
-    {
-      CS cs = it->second;
-
-      switch (cs)
-      {
-      case CS::PAR:
-        return cs_par();
-      case CS::ENDFN:
-        return cs_endfn();
-      case CS::ENDCLASS:
-        return cs_endclass();
-      case CS::ENDNAMESPACE:
-        return cs_endnamespace();
-    case CS::ENDENUM:
-      return cs_endenum();
-    case CS::ENDENUMVALUE:
-      return cs_endenumvalue();
-      default:
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-      }
-    }
-    else
-    {
-      if(!currentFrame().writer)
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-
-      FunctionCall call;
-      call.function = tok.controlSequence();
-
-      if(!currentFrame().writer->handle(call))
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-    }
-  }
-}
-
-void ProgramMode::write_enumvalue(tex::parsing::Token&& tok)
-{
-  // @TODO: try to merge this with write_entity
-
-  if (tok.isCharacterToken())
-  {
-    currentFrame().writer->write(tok.characterToken().value);
-  }
-  else
-  {
-    auto it = csmap().find(tok.controlSequence());
-
-    if (it != csmap().end())
-    {
-      CS cs = it->second;
-
-      switch (cs)
-      {
-      case CS::PAR:
-        return cs_par();
-      case CS::ENDFN:
-        return cs_endfn();
-      case CS::ENDCLASS:
-        return cs_endclass();
-      case CS::ENDNAMESPACE:
-        return cs_endnamespace();
-      case CS::ENDENUM:
-        return cs_endenum();
-      case CS::ENDENUMVALUE:
-        return cs_endenumvalue();
-      default:
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-      }
-    }
-    else
-    {
-      if (!currentFrame().writer)
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-
-      FunctionCall call;
-      call.function = tok.controlSequence();
-
-      if (!currentFrame().writer->handle(call))
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-    }
-  }
 }
 
 void ProgramMode::fn_brief(const FunctionCall& call)

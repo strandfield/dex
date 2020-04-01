@@ -47,7 +47,6 @@ public:
 
     std::shared_ptr<cxx::Node> node;
     std::shared_ptr<DocumentWriter> writer;
-    std::variant<std::monostate> data;
   };
 
   using State = state::State<Frame>;
@@ -94,9 +93,7 @@ protected:
 
   CS parseCs(const std::string& str) const;
 
-  void write_idle(tex::parsing::Token&& tok);
-  void write_entity(tex::parsing::Token&& tok);
-  void write_enumvalue(tex::parsing::Token&& tok);
+  void do_write(tex::parsing::Token&& tok);
 
   void cs_par();
 
