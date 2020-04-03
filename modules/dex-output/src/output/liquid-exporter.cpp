@@ -21,21 +21,39 @@
 namespace dex
 {
 
-struct ClassDumper : JsonVisitor
+static json::Json get(const Model::Path& path, const json::Json& val)
 {
-  LiquidExporter& exporter;
+  auto result = val;
 
-  ClassDumper(LiquidExporter& e)
-    : exporter{ e }
+  for (const auto& p : path)
   {
-
+    if (p.index != std::numeric_limits<size_t>::max())
+      result = result[p.name][p.index];
+    else
+      result = result[p.name];
   }
 
-  void visit_class(const cxx::Class& cla, json::Object& obj) override
+  return result;
+}
+
+struct ClassDumper : ModelVisitor
+{
+  LiquidExporter& exporter;
+  json::Object& serializedModel;
+
+  ClassDumper(LiquidExporter& e, json::Object& m)
+    : exporter{ e },
+    serializedModel{ m }
   {
+  }
+
+  void visit_class(const cxx::Class& cla) override
+  {
+    json::Object obj = get(path(), serializedModel).toObject();
+
     exporter.dump(cla, obj);
 
-    JsonVisitor::visit_class(cla, obj);
+    ModelVisitor::visit_class(cla);
   }
 };
 
@@ -72,10 +90,8 @@ void LiquidExporter::dumpClasses()
   if (!model()->program())
     return;
 
-  json::Object prog = m_serialized_model["program"].toObject();
-
-  ClassDumper dumper{ *this };
-  dumper.visit(*model()->program(), prog);
+  ClassDumper dumper{ *this, m_serialized_model };
+  dumper.visit(*model());
 }
 
 void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
