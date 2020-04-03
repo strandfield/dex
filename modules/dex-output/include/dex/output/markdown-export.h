@@ -30,12 +30,11 @@ protected:
   void postProcess(std::string& output) override;
 
 protected:
-  std::string stringify(const json::Json& val) override;
   json::Json applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) override;
 
 protected:
-  std::string stringify_array(const json::Array& list);
-  std::string stringify_paragraph(const json::Object& par);
+  std::string stringify_array(const json::Array& list) override;
+  std::string stringify_paragraph(const dom::Paragraph& par) override;
 };
 
 } // namespace dex

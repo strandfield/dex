@@ -61,22 +61,6 @@ void MarkdownExport::postProcess(std::string& output)
   LiquidExporter::simplify_empty_lines(output);
 }
 
-std::string MarkdownExport::stringify(const json::Json& val)
-{
-  if (!val.isObject() && !val.isArray())
-    return LiquidExporter::stringify(val);
-  else if (val.isArray())
-    return stringify_array(val.toArray());
-
-  json::Object obj = val.toObject();
-
-  if (obj["type"] == dom::Paragraph::TypeId)
-    return stringify_paragraph(obj);
-
-  assert(("Not implemented", false));
-  return {};
-}
-
 json::Json MarkdownExport::applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args)
 {
   return LiquidExporter::applyFilter(name, object, args);
@@ -95,10 +79,10 @@ std::string MarkdownExport::stringify_array(const json::Array& list)
   return result;
 }
 
-std::string MarkdownExport::stringify_paragraph(const json::Object& par)
+std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
 {
-  // TODO
-  return par["text"].toString();
+  // @TODO : stringify paragraph with formatting
+  return par.text();
 }
 
 } // namespace dex

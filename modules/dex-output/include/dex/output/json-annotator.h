@@ -24,6 +24,7 @@ public:
   static std::vector<std::variant<size_t, std::string>> parse(const std::string& path);
 
 protected:
+  void visit_domnode(const dom::Node& n, json::Object& obj) override;
   void visit_entity(const cxx::Entity& e, json::Object& obj) override;
 
 private:

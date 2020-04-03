@@ -14,6 +14,12 @@
 #include <variant>
 #include <vector>
 
+namespace dom
+{
+class List;
+class ListItem;
+} // namespace dom
+
 namespace cxx
 {
 class Entity;
@@ -37,10 +43,17 @@ public:
   const std::vector<std::variant<size_t, std::string>>& stack() const;
 
 protected:
+  virtual void visit_domnode(const dom::Node& n, json::Object& obj);
+  virtual void visit_domlist(const dom::List& l, json::Object& obj);
+  virtual void visit_domlistitem(const dom::ListItem& li, json::Object& obj);
+
   virtual void visit_entity(const cxx::Entity& e, json::Object& obj);
   virtual void visit_namespace(const cxx::Namespace& ns, json::Object& obj);
   virtual void visit_class(const cxx::Class& cla, json::Object& obj);
   virtual void visit_function(const cxx::Function& f, json::Object& obj);
+
+  virtual void visit_entitydocumentation(const EntityDocumentation& edoc, json::Object& obj);
+
 
 private:
   std::vector<std::variant<size_t, std::string>> m_stack;

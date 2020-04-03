@@ -88,6 +88,13 @@ struct ChildNodeGetter
       if (path.name == "items")
         return list->items.at(path.index);
     }
+    else if (node->is<dom::ListItem>())
+    {
+      auto listitem = std::static_pointer_cast<dom::ListItem>(node);
+
+      if (path.name == "content")
+        return listitem->content.at(path.index);
+    }
 
     throw std::runtime_error{ "Invalid model path" };
   }

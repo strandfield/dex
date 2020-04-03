@@ -18,6 +18,12 @@ void JsonAnnotator::annotate(const Model& model, json::Object& obj)
   visit(model, obj);
 }
 
+void JsonPathAnnotator::visit_domnode(const dom::Node& n, json::Object& obj)
+{
+  obj["_path"] = build_path();
+  JsonAnnotator::visit_domnode(n, obj);
+}
+
 void JsonPathAnnotator::visit_entity(const cxx::Entity& e, json::Object& obj)
 {
   obj["_path"] = build_path();

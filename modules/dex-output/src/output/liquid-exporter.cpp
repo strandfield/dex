@@ -21,83 +21,6 @@
 namespace dex
 {
 
-using TreeNode = std::variant<
-  std::shared_ptr<cxx::Entity>,
-  const std::vector<std::shared_ptr<cxx::Entity>>*,
-  const std::vector<std::pair<std::shared_ptr<cxx::Entity>, cxx::AccessSpecifier>>*>;
-
-
-static TreeNode get_child_node(const TreeNode& node, const std::string& child_name)
-{
-  if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(node))
-    throw std::runtime_error{ "Invalid json path" };
-
-  auto e = std::get<std::shared_ptr<cxx::Entity>>(node);
-
-  if (e->is<cxx::Namespace>())
-  {
-    auto ns = std::static_pointer_cast<cxx::Namespace>(e);
-
-    if (child_name == "entities")
-    {
-      return &(ns->entities());
-    }
-  }
-  else if (e->is<cxx::Class>())
-  {
-    auto cla = std::static_pointer_cast<cxx::Class>(e);
-
-    if (child_name == "members")
-    {
-      return &(cla->members());
-    }
-  }
-  else if (e->is<cxx::Function>())
-  {
-    /* no-op */
-  }
-  
-  throw std::runtime_error{ "Invalid json path" };
-}
-
-static TreeNode get_child_node(const TreeNode& node, size_t index)
-{
-  if (std::holds_alternative<std::shared_ptr<cxx::Entity>>(node))
-    throw std::runtime_error{ "Invalid json path" };
- 
-  if (std::holds_alternative<const std::vector<std::shared_ptr<cxx::Entity>>*>(node))
-  {
-    const std::vector<std::shared_ptr<cxx::Entity>>* vec =
-      std::get<const std::vector<std::shared_ptr<cxx::Entity>>*>(node);
-
-    return vec->at(index);
-  }
-  else
-  {
-    const std::vector<std::pair<std::shared_ptr<cxx::Entity>, cxx::AccessSpecifier>>* vec =
-      std::get<const std::vector<std::pair<std::shared_ptr<cxx::Entity>, cxx::AccessSpecifier>>*>(node);
-
-    return vec->at(index).first;
-  }
-}
-
-static json::Json get_child_node(const json::Json& node, const std::string& child_name)
-{
-  if (!node.isObject())
-    throw std::runtime_error{ "Invalid json path" };
-
-  return node[child_name];
-}
-
-static json::Json get_child_node(const json::Json& node, size_t index)
-{
-  if(!node.isArray())
-    throw std::runtime_error{ "Invalid json path" };
-
-  return node.at(static_cast<int>(index));
-}
-
-
 struct ClassDumper : JsonVisitor
 {
   LiquidExporter& exporter;
@@ -126,6 +49,21 @@ void LiquidExporter::render()
   dumpClasses();
 }
 
+Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
+{
+  Model::Path result;
+
+  for (const JsonPathElement& jspath_elem : jspath)
+  {
+    if (std::holds_alternative<size_t>(jspath_elem))
+      result.back().index = std::get<size_t>(jspath_elem);
+    else
+      result.push_back(Model::PathElement(std::get<std::string>(jspath_elem)));
+  }
+
+  return result;
+}
+
 void LiquidExporter::dumpClasses()
 {
   if (m_templates.class_template.nodes().empty())
@@ -150,8 +88,11 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
   const std::string url = obj["url"].toString();
 
   json::Object context;
-  context["prog"] = m_serialized_model["program"];
+  context["model"] = m_serialized_model;
   context["class"] = obj;
+
+  // @TODO: remove this 'prog' property
+  context["prog"] = m_serialized_model["program"];
 
   std::string output = liquid::Renderer::render(m_templates.class_template, context);
 
@@ -187,37 +128,39 @@ void LiquidExporter::setModel(std::shared_ptr<Model> model)
   path_annotator.annotate(*model, m_serialized_model);
 }
 
-std::shared_ptr<cxx::Entity> LiquidExporter::get(const JsonPath& path) const
+std::string LiquidExporter::stringify(const json::Json& val)
 {
-  TreeNode node = model()->program()->globalNamespace();
+  if (!val.isObject() && !val.isArray())
+    return Renderer::stringify(val);
+  else if (val.isArray())
+    return stringify_array(val.toArray());
 
-  for (const auto& p : path)
+  json::Object obj = val.toObject();
+
+  auto path_it = obj.data().find("_path");
+
+  if (path_it != obj.data().end())
   {
-    if (std::holds_alternative<size_t>(p))
-      node = get_child_node(node, std::get<size_t>(p));
-    else
-      node = get_child_node(node, std::get<std::string>(p));
+    std::vector<std::variant<size_t, std::string>> json_path = JsonPathAnnotator::parse(path_it->second.toString());
+    Model::Path model_path = convertToModelPath(json_path);
+    Model::Node model_node = model()->get(model_path);
+
+    if (std::holds_alternative<std::shared_ptr<dom::Node>>(model_node))
+    {
+      auto dom_node = std::get< std::shared_ptr<dom::Node>>(model_node);
+
+      if (dom_node->is<dom::Paragraph>())
+        return stringify_paragraph(*static_cast<const dom::Paragraph*>(dom_node.get()));
+    }
+  }
+  else
+  {
+    assert(("element has no path", false));
+    return {};
   }
 
-  if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(node))
-    throw std::runtime_error{ "Invalid json path" };
-
-  return std::get<std::shared_ptr<cxx::Entity>>(node);
-}
-
-json::Json LiquidExporter::get(const JsonPath& path, const json::Json& val)
-{
-  auto result = val;
-
-  for (const auto& p : path)
-  {
-    if (std::holds_alternative<size_t>(p))
-      result = get_child_node(result, std::get<size_t>(p));
-    else
-      result = get_child_node(result, std::get<std::string>(p));
-  }
-
-  return result;
+  assert(("Not implemented", false));
+  return {};
 }
 
 void LiquidExporter::postProcess(std::string& output)

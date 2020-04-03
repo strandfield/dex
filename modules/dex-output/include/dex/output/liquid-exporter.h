@@ -7,12 +7,19 @@
 
 #include "dex/dex-output.h"
 
+#include "dex/model/model.h"
+
 #include <liquid/renderer.h>
 
 #include <QDir>
 
 #include <variant>
 #include <vector>
+
+namespace dom
+{
+class Paragraph;
+} // namespace dom
 
 namespace cxx
 {
@@ -32,6 +39,8 @@ public:
 
   typedef std::variant<size_t, std::string> JsonPathElement;
   typedef std::vector<JsonPathElement> JsonPath;
+
+  static Model::Path convertToModelPath(const JsonPath& jspath);
 
   struct Templates
   {
@@ -58,13 +67,10 @@ protected:
   json::Object serializedModel() const;
 
 protected:
+  std::string stringify(const json::Json& val) override;
 
-  std::shared_ptr<cxx::Entity> get(const JsonPath& path) const;
-  static json::Json get(const JsonPath& path, const json::Json& val);
-
-protected:
-
-  virtual void postProcess(std::string& output);
+  virtual std::string stringify_array(const json::Array& list) = 0;
+  virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
 
 protected:
 
@@ -73,6 +79,10 @@ protected:
   static json::Array filter_by_field(const json::Array& list, const std::string& field, const std::string& value);
   static json::Array filter_by_type(const json::Array& list, const std::string& type);
   static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
+
+protected:
+
+  virtual void postProcess(std::string& output);
 
 private:
   QDir m_output_dir;
