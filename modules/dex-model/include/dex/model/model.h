@@ -14,6 +14,8 @@
 
 #include <cxx/program.h>
 
+#include <variant>
+
 namespace dex
 {
 
@@ -31,6 +33,21 @@ public:
 
   std::shared_ptr<cxx::Program> program() const;
   std::shared_ptr<cxx::Program> getOrCreateProgram();  
+
+  struct DEX_MODEL_API PathElement
+  {
+    std::string name;
+    size_t index = std::numeric_limits<size_t>::max();
+
+    PathElement(std::string n);
+    PathElement(std::string n, size_t i);
+  };
+
+  typedef std::vector<PathElement> Path;
+
+  typedef std::variant<std::shared_ptr<cxx::Program>, std::shared_ptr<cxx::Entity>, std::shared_ptr<cxx::Documentation>, std::shared_ptr<dom::Node>> Node;
+
+  Node get(const Path& path) const;
 };
 
 } // namespace dex

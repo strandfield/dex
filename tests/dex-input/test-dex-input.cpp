@@ -467,3 +467,45 @@ void TestDexInput::parserMachineEnum()
   paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
   QVERIFY(paragraph->text() == "the bottom right corner ");
 }
+
+void TestDexInput::modelPath()
+{
+  dex::ParserMachine parser;
+
+  QFile file{ "test.cpp" };
+  QVERIFY(file.open(QIODevice::WriteOnly));
+
+  file.write(
+    "/*!\n"
+    " * \\class vector\n"
+    " *\n"
+    " * \\list\n"
+    " *   \\li first item\n"
+    " *   \\li second item:\n"
+    " *     \\list\n"
+    " *       \\li nested item\n"
+    " *     \\endlist\n"
+    " * \\endlist\n"
+    " */\n"
+  );
+
+  file.close();
+
+  parser.process(QFileInfo{ "test.cpp" });
+
+  QFile::remove("test.cpp");
+
+  std::shared_ptr<dex::Model> model = parser.output();
+
+  dex::Model::Node model_node = model->get({ {"program"}, {"global_namespace"}, {"entities", 0}, {"documentation"}, {"description", 0}, {"items", 0} });
+
+  QVERIFY(std::holds_alternative<std::shared_ptr<dom::Node>>(model_node));
+
+  auto dom_node = std::get<std::shared_ptr<dom::Node>>(model_node);
+
+  QVERIFY(dom_node->is<dom::ListItem>());
+
+  auto list_item = std::static_pointer_cast<dom::ListItem>(dom_node);
+  auto par = std::static_pointer_cast<dom::Paragraph>(list_item->content.front());
+  QVERIFY(par->text() == "first item ");
+}
