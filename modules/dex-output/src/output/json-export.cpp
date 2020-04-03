@@ -173,13 +173,18 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
 
 json::Json JsonExport::serialize_documentation(const cxx::Documentation& doc)
 {
-  if (doc.is<ClassDocumentation>())
+  if (doc.is<cxx::MultilineComment>())
+    return nullptr;
+
+  const auto& entdoc = static_cast<const EntityDocumentation&>(doc);
+
+  if (entdoc.is<ClassDocumentation>())
     return serialize_documentation(static_cast<const ClassDocumentation&>(doc));
-  else if(doc.is<EnumDocumentation>())
+  else if(entdoc.is<EnumDocumentation>())
     return serialize_documentation(static_cast<const EnumDocumentation&>(doc));
-  else if (doc.is<FunctionDocumentation>())
+  else if (entdoc.is<FunctionDocumentation>())
     return serialize_documentation(static_cast<const FunctionDocumentation&>(doc));
-  else if (doc.is<NamespaceDocumentation>())
+  else if (entdoc.is<NamespaceDocumentation>())
     return serialize_documentation(static_cast<const NamespaceDocumentation&>(doc));
 
   assert(("Not implemented", false));
@@ -352,10 +357,40 @@ json::Json JsonExport::serialize_image(const dom::Image& img)
   return result;
 }
 
+static std::string to_string(cxx::NodeKind n)
+{
+  switch (n)
+  {
+  case cxx::NodeKind::Class:
+    return "class";
+  case cxx::NodeKind::Enum:
+    return "enum";
+  case cxx::NodeKind::EnumValue:
+    return "enum-value";
+  case cxx::NodeKind::Function:
+    return "function";
+  case cxx::NodeKind::FunctionParameter:
+    return "function-parameter";
+  case cxx::NodeKind::Namespace:
+    return "namespace";
+  case cxx::NodeKind::TemplateParameter:
+    return "template-parameter";
+  case cxx::NodeKind::TranslationUnit:
+    return "translation-unit";
+  case cxx::NodeKind::MultilineComment:
+    return "multiline-comment";
+  case cxx::NodeKind::Documentation:
+    return "documentation";
+  default:
+    assert(false);
+    return "";
+  }
+}
+
 void JsonExport::write_entity_info(json::Object& obj, const cxx::Entity& e)
 {
   obj["name"] = e.name();
-  obj["type"] = e.type();
+  obj["type"] = to_string(e.kind());
 }
 
 void JsonExport::write_location(json::Object& obj, const cxx::SourceLocation& loc)

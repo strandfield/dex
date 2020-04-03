@@ -211,7 +211,7 @@ void ProgramMode::cs_par()
 
 void ProgramMode::fn_class(const FunctionCall& call)
 {
-  if (currentFrame().node->type() == cxx::Function::TypeId)
+  if (currentFrame().node->is<cxx::Function>())
     throw BadControlSequence{ "class" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -249,7 +249,7 @@ void ProgramMode::cs_endclass()
 
 void ProgramMode::fn_fn(const FunctionCall& call)
 {
-  if (currentFrame().node->type() == cxx::Function::TypeId)
+  if (currentFrame().node->is<cxx::Function>())
     throw BadControlSequence{ "function" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);

@@ -29,6 +29,11 @@ public:
 
   explicit EntityDocumentation(const cxx::SourceLocation& loc);
 
+  virtual const std::string& type() const = 0;
+
+  template<typename T>
+  bool is() const;
+
   std::optional<std::string>& brief();
   const std::optional<std::string>& brief() const;
 
@@ -38,6 +43,18 @@ public:
   std::vector<std::shared_ptr<dom::Node>>& description();
   const std::vector<std::shared_ptr<dom::Node>>& description() const;
 };
+
+template<typename T>
+bool test_documentation_type(const EntityDocumentation& doc)
+{
+  return T::TypeId == doc.type();
+}
+
+template<typename T>
+inline bool EntityDocumentation::is() const
+{
+  return test_documentation_type<T>(*this);
+}
 
 } // namespace dex
 
