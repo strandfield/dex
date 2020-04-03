@@ -4,31 +4,12 @@
 
 #include "dex/output/json-annotator.h"
 
-#include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/function.h>
-#include <cxx/namespace.h>
-#include <cxx/program.h>
-
 namespace dex
 {
 
 void JsonAnnotator::annotate(const Model& model, json::Object& obj)
 {
   visit(model, obj);
-}
-
-void JsonPathAnnotator::visit_domnode(const dom::Node& n, json::Object& obj)
-{
-  obj["_path"] = build_path();
-  JsonAnnotator::visit_domnode(n, obj);
-}
-
-void JsonPathAnnotator::visit_entity(const cxx::Entity& e, json::Object& obj)
-{
-  obj["_path"] = build_path();
-
-  JsonAnnotator::visit_entity(e, obj);
 }
 
 inline static std::string next_token(const std::string& path, size_t index)
@@ -41,6 +22,28 @@ inline static std::string next_token(const std::string& path, size_t index)
 
   return std::string(path.begin() + start, path.begin() + index);
 }
+
+struct RAIIJsonPathAnnotatorContext
+{
+  std::vector<std::variant<size_t, std::string>>* stack;
+
+  RAIIJsonPathAnnotatorContext(std::vector<std::variant<size_t, std::string>>* s, size_t n)
+    : stack(s)
+  {
+    stack->push_back(n);
+  }
+
+  RAIIJsonPathAnnotatorContext(std::vector<std::variant<size_t, std::string>>* s, std::string name)
+    : stack(s)
+  {
+    stack->push_back(std::move(name));
+  }
+
+  ~RAIIJsonPathAnnotatorContext()
+  {
+    stack->pop_back();
+  }
+};
 
 std::vector<std::variant<size_t, std::string>> JsonPathAnnotator::parse(const std::string& path)
 {
@@ -72,23 +75,56 @@ std::vector<std::variant<size_t, std::string>> JsonPathAnnotator::parse(const st
   return result;
 }
 
+void JsonPathAnnotator::annotate(json::Object& obj)
+{
+  for (std::pair<const std::string, json::Json>& entry : obj.data())
+  {
+    RAIIJsonPathAnnotatorContext context{ &m_stack, entry.first };
+
+    visit(entry.second);
+  }
+}
+
+void JsonPathAnnotator::visit(json::Json val)
+{
+  if (val.isArray())
+  {
+    for (int i(0); i < val.length(); ++i)
+    {
+      RAIIJsonPathAnnotatorContext context{ &m_stack, static_cast<size_t>(i) };
+      visit(val[i]);
+    }
+  }
+  else if (val.isObject())
+  {
+    json::Object obj = val.toObject();
+    obj["_path"] = build_path();
+
+    for (std::pair<const std::string, json::Json>& entry : obj.data())
+    {
+      RAIIJsonPathAnnotatorContext context{ &m_stack, entry.first };
+      visit(entry.second);
+    }
+  }
+}
+
 std::string JsonPathAnnotator::build_path() const
 {
-  if (stack().empty())
+  if (m_stack.empty())
     return "$";
 
   std::string result = "$";
 
-  for (size_t i(0); i < stack().size(); ++i)
+  for (size_t i(0); i < m_stack.size(); ++i)
   {
-    if (std::holds_alternative<size_t>(stack().at(i)))
+    if (std::holds_alternative<size_t>(m_stack.at(i)))
     {
-      size_t index = std::get<size_t>(stack().at(i));
+      size_t index = std::get<size_t>(m_stack.at(i));
       result += "[" + std::to_string(index) + "]";
     }
     else
     {
-      const std::string& text = std::get<std::string>(stack().at(i));
+      const std::string& text = std::get<std::string>(m_stack.at(i));
       result += "." + text;
     }
   }

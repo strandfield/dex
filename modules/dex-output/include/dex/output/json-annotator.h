@@ -17,18 +17,22 @@ public:
   void annotate(const Model& model, json::Object& obj);
 };
 
-class DEX_OUTPUT_API JsonPathAnnotator : public JsonAnnotator
+class DEX_OUTPUT_API JsonPathAnnotator
 {
 public:
 
   static std::vector<std::variant<size_t, std::string>> parse(const std::string& path);
 
+  void annotate(json::Object& obj);
+
 protected:
-  void visit_domnode(const dom::Node& n, json::Object& obj) override;
-  void visit_entity(const cxx::Entity& e, json::Object& obj) override;
+  void visit(json::Json val);
 
 private:
   std::string build_path() const;
+
+private:
+  std::vector<std::variant<size_t, std::string>> m_stack;
 };
 
 } // namespace dex

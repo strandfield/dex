@@ -127,13 +127,13 @@ void TestDexOutput::jsonAnnotator()
     json::Object jexport = dex::JsonExport::serialize(*model).toObject();
 
     dex::JsonPathAnnotator annotator;
-    annotator.annotate(*model, jexport);
+    annotator.annotate(jexport);
 
     QVERIFY(jexport.data().size() == 1);
 
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 3);
+    QVERIFY(jexport.data().size() == 4);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
 
@@ -152,7 +152,7 @@ void TestDexOutput::jsonAnnotator()
     json::Object jexport = dex::JsonExport::serialize(*model);
 
     dex::JsonPathAnnotator annotator;
-    annotator.annotate(*model, jexport);
+    annotator.annotate(jexport);
 
     QVERIFY(jexport.data().size() == 1);
 
