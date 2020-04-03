@@ -107,7 +107,7 @@ void Dex::process(const QStringList& inputs, QString output)
   if (output.isEmpty())
     output = "dex-output.json";
 
-  write_output(parser.output()->getOrCreateProgram(), output);
+  write_output(parser.output(), output);
 }
 
 void Dex::feed(ParserMachine& parser, const QString& input)
@@ -158,13 +158,13 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
   }
 }
 
-void Dex::write_output(const std::shared_ptr<cxx::Program>& prog, const QString& name)
+void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name)
 {
   QFileInfo info{ name };
 
   if (info.suffix() == "json")
   {
-    auto obj = dex::JsonExport::serialize(*prog);
+    auto obj = dex::JsonExport::serialize(*model);
     
     QFile file{ name };
     
@@ -176,7 +176,7 @@ void Dex::write_output(const std::shared_ptr<cxx::Program>& prog, const QString&
   else if (info.suffix() == "md")
   {
     dex::MarkdownExport md_export;
-    md_export.dump(prog, info.dir());
+    md_export.dump(model, info.dir());
   }
   else
   {

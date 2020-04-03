@@ -33,7 +33,7 @@ protected:
   void feed(ParserMachine& parser, const QString& input);
   void feed(ParserMachine& parser, const QDir& input);
 
-  void write_output(const std::shared_ptr<cxx::Program>& prog, const QString& name);
+  void write_output(const std::shared_ptr<Model>& model, const QString& name);
   
 private:
   QStringList m_suffixes;
