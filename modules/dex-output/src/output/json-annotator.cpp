@@ -7,11 +7,6 @@
 namespace dex
 {
 
-void JsonAnnotator::annotate(const Model& model, json::Object& obj)
-{
-  visit(model, obj);
-}
-
 inline static std::string next_token(const std::string& path, size_t index)
 {
   auto is_delim = [](char c) { return c == '.' || c == '[' || c == ']';  };

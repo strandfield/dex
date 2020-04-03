@@ -6,7 +6,6 @@
 
 #include "dex/output/json-annotator.h"
 #include "dex/output/json-export.h"
-#include "dex/output/json-visitor.h"
 
 #include "dex/common/errors.h"
 

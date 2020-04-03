@@ -2,20 +2,19 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#ifndef DEX_OUTPUT_JSON_ANNOTATOR_H
-#define DEX_OUTPUT_JSON_ANNOTATOR_H
+#ifndef DEX_OUTPUT_JSON_PATHANNOTATOR_H
+#define DEX_OUTPUT_JSON_PATHANNOTATOR_H
 
-#include "dex/output/json-visitor.h"
+#include "dex/dex-output.h"
+
+#include "dex/model/model.h"
+
+#include <json-toolkit/json.h>
+
+#include <variant>
 
 namespace dex
 {
-
-class DEX_OUTPUT_API JsonAnnotator : public JsonVisitor
-{
-public:
-
-  void annotate(const Model& model, json::Object& obj);
-};
 
 class DEX_OUTPUT_API JsonPathAnnotator
 {
@@ -59,4 +58,4 @@ inline json::Json JsonPathAnnotator::get(const Model::Path& path, const json::Js
 
 } // namespace dex
 
-#endif // DEX_OUTPUT_JSON_ANNOTATOR_H
+#endif // DEX_OUTPUT_JSON_PATHANNOTATOR_H
