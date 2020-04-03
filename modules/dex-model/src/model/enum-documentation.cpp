@@ -8,20 +8,16 @@ namespace dex
 {
 
 const std::string EnumDocumentation::TypeId = "enum-documentation";
+const std::string EnumValueDocumentation::TypeId = "enum-value-documentation";
 
 const std::string& EnumDocumentation::type() const
 {
   return TypeId;
 }
 
-std::vector<EnumValueDocumentation>& EnumDocumentation::values()
+const std::string& EnumValueDocumentation::type() const
 {
-  return m_values;
-}
-
-const std::vector<EnumValueDocumentation>& EnumDocumentation::values() const
-{
-  return m_values;
+  return TypeId;
 }
 
 } // namespace dex

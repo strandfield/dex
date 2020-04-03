@@ -451,17 +451,19 @@ void TestDexInput::parserMachineEnum()
   auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
   QVERIFY(paragraph->text() == "This is not that useful. ");
 
-  dex::EnumValueDocumentation valdoc = doc->values().at(0);
-  QVERIFY(valdoc.name == "TopLeft");
-  QVERIFY(valdoc.description.size() == 1);
-  QVERIFY(valdoc.description.front()->is<dom::Paragraph>());
-  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc.description.front());
+  auto top_left = corner->values().at(0);
+  auto valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(top_left->documentation());
+  QVERIFY(top_left->name() == "TopLeft");
+  QVERIFY(valdoc->description().size() == 1);
+  QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
   QVERIFY(paragraph->text() == "the top left corner ");
 
-  valdoc = doc->values().at(3);
-  QVERIFY(valdoc.name == "BottomRight");
-  QVERIFY(valdoc.description.size() == 1);
-  QVERIFY(valdoc.description.front()->is<dom::Paragraph>());
-  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc.description.front());
+  auto bottom_right = corner->values().at(3);
+  valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(bottom_right->documentation());
+  QVERIFY(bottom_right->name() == "BottomRight");
+  QVERIFY(valdoc->description().size() == 1);
+  QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
   QVERIFY(paragraph->text() == "the bottom right corner ");
 }

@@ -16,26 +16,22 @@
 namespace dex
 {
 
-struct DEX_MODEL_API EnumValueDocumentation
+class DEX_MODEL_API EnumValueDocumentation : public EntityDocumentation
 {
-  std::string name;
+public:
   std::optional<int> value;
-  std::optional<Since> since;
-  dom::Content description;
+
+public:
+  static const std::string TypeId;
+  const std::string& type() const override;
 };
 
 class DEX_MODEL_API EnumDocumentation : public EntityDocumentation
 {
-private:
-  std::vector<EnumValueDocumentation> m_values;
-
 public:
 
   static const std::string TypeId;
   const std::string& type() const override;
-
-  std::vector<EnumValueDocumentation>& values();
-  const std::vector<EnumValueDocumentation>& values() const;
 };
 
 } // namespace dex

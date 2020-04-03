@@ -106,13 +106,30 @@ json::Json JsonExport::serialize_enum(const cxx::Enum& en)
   if (!en.values().empty())
   {
     json::Array list;
-    for (const cxx::Enum::Value& ev : en.values())
+
+    for (const std::shared_ptr<cxx::EnumValue>& ev : en.values())
     {
-      list.push(ev.name);
+      list.push(serialize_enumvalue(*ev));
     }
 
     result["values"] = list;
   }
+
+  return result;
+}
+
+json::Json JsonExport::serialize_enumvalue(const cxx::EnumValue& ev)
+{
+  json::Object result{};
+
+  write_entity_info(result, ev);
+
+  write_location(result, ev.location());
+
+  write_documentation(result, ev.documentation());
+
+  if (ev.value().empty())
+    result["value"] = ev.value();
 
   return result;
 }
@@ -183,31 +200,6 @@ json::Json JsonExport::serialize_documentation(const EnumDocumentation& doc)
   json::Object result{};
 
   write_entity_documentation(result, doc);
-
-  if (!doc.values().empty())
-  {
-    json::Array values_doc;
-
-    for (const EnumValueDocumentation& evdoc : doc.values())
-    {
-      json::Object evdoc_json{};
-
-      evdoc_json["name"] = evdoc.name;
-
-      if (!evdoc.description.empty())
-        evdoc_json["description"] = serialize_dom_content(evdoc.description);
-
-      if (evdoc.value.has_value())
-        evdoc_json["value"] = evdoc.value.value();
-
-      if (evdoc.since.has_value())
-        evdoc_json["since"] = evdoc.since.value().version();
-
-      values_doc.push(evdoc_json);
-    }
-
-    result["values"] = values_doc;
-  }
 
   return result;
 }

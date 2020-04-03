@@ -26,6 +26,7 @@ class Entity;
 class Class;
 class Documentation;
 class Enum;
+class EnumValue;
 class Function;
 class Namespace;
 class Program;
@@ -46,6 +47,7 @@ protected:
   static json::Json serialize_namespace(const cxx::Namespace& ns);
   static json::Json serialize_class(const cxx::Class& cla);
   static json::Json serialize_enum(const cxx::Enum& en);
+  static json::Json serialize_enumvalue(const cxx::EnumValue& ev);
   static json::Json serialize_function(const cxx::Function& f);
   static json::Json serialize_documentation(const cxx::Documentation& doc);
   static json::Json serialize_documentation(const ClassDocumentation& doc);

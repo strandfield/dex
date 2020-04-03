@@ -345,26 +345,23 @@ void ProgramMode::cs_endenum()
 
 void ProgramMode::fn_enumvalue(const FunctionCall& call)
 {
-  if (!currentFrame().node->is<cxx::Enum>())
-    throw BadControlSequence{ "value" };
-
   if (currentFrame().type == FrameType::EnumValue)
     exitFrame();
 
+  if (!currentFrame().node->is<cxx::Enum>())
+    throw BadControlSequence{ "value" };
+
   const auto en = std::static_pointer_cast<cxx::Enum>(currentFrame().node);
 
-  const std::string name = call.arg<std::string>(0);
-  en->values().push_back(cxx::Enum::Value{ name });
+  std::string name = call.arg<std::string>(0);
+  auto enum_value = std::make_shared<cxx::EnumValue>(std::move(name), en);
+  enum_value->setDocumentation(std::make_shared<EnumValueDocumentation>());
 
-  EnumValueDocumentation doc;
-  doc.name = name;
+  en->values().push_back(enum_value);
 
   // TODO: handle optional since clause
 
-  auto enum_doc = std::static_pointer_cast<EnumDocumentation>(en->documentation());
-  enum_doc->values().push_back(doc);
-
-  m_state.enter<FrameType::EnumValue>(en);
+  m_state.enter<FrameType::EnumValue>(enum_value);
 }
 
 void ProgramMode::cs_endenumvalue()
@@ -469,14 +466,7 @@ void ProgramMode::exitFrame()
 {
   Frame& f = m_state.current();
 
-  if (f.type == FrameType::EnumValue)
-  {
-    auto en = std::static_pointer_cast<cxx::Enum>(f.node);
-    auto enum_doc = std::static_pointer_cast<EnumDocumentation>(en->documentation());
-    f.writer->finish();
-    enum_doc->values().back().description = std::move(f.writer->output());
-  }
-  else if (f.node->isEntity())
+  if (f.node->isEntity())
   {
     auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
     f.writer->finish();
