@@ -23,6 +23,8 @@ public:
 
   static std::vector<std::variant<size_t, std::string>> parse(const std::string& path);
 
+  static json::Json get(const Model::Path& path, const json::Json& val);
+
   void annotate(json::Object& obj);
 
 protected:
@@ -34,6 +36,26 @@ private:
 private:
   std::vector<std::variant<size_t, std::string>> m_stack;
 };
+
+} // namespace dex
+
+namespace dex
+{
+
+inline json::Json JsonPathAnnotator::get(const Model::Path& path, const json::Json& val)
+{
+  auto result = val;
+
+  for (const auto& p : path)
+  {
+    if (p.index != std::numeric_limits<size_t>::max())
+      result = result[p.name][p.index];
+    else
+      result = result[p.name];
+  }
+
+  return result;
+}
 
 } // namespace dex
 

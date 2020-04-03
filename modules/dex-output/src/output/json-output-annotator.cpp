@@ -7,14 +7,24 @@
 namespace dex
 {
 
-void JsonUrlAnnotator::visit_entity(const cxx::Entity& e, json::Object& obj)
+void JsonUrlAnnotator::annotate(const Model& model, json::Object& obj)
+{
+  serialized_model = obj;
+  visit(model);
+}
+
+
+void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
 {
   std::string url = get_url(e);
 
   if (!url.empty())
+  {
+    json::Object obj = JsonPathAnnotator::get(path(), serialized_model).toObject();
     obj["url"] = url;
+  }
   
-  JsonAnnotator::visit_entity(e, obj);
+  ModelVisitor::visit_entity(e);
 }
 
 } // namespace dex

@@ -21,21 +21,6 @@
 namespace dex
 {
 
-static json::Json get(const Model::Path& path, const json::Json& val)
-{
-  auto result = val;
-
-  for (const auto& p : path)
-  {
-    if (p.index != std::numeric_limits<size_t>::max())
-      result = result[p.name][p.index];
-    else
-      result = result[p.name];
-  }
-
-  return result;
-}
-
 struct ClassDumper : ModelVisitor
 {
   LiquidExporter& exporter;
@@ -49,7 +34,7 @@ struct ClassDumper : ModelVisitor
 
   void visit_class(const cxx::Class& cla) override
   {
-    json::Object obj = get(path(), serializedModel).toObject();
+    json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
 
     exporter.dump(cla, obj);
 

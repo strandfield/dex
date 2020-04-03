@@ -7,13 +7,21 @@
 
 #include "dex/output/json-annotator.h"
 
+#include "dex/model/model-visitor.h"
+
 namespace dex
 {
 
-class DEX_OUTPUT_API JsonUrlAnnotator : public JsonAnnotator
+class DEX_OUTPUT_API JsonUrlAnnotator : public ModelVisitor
 {
+private:
+  json::Object serialized_model;
+
+public:
+  void annotate(const Model& model, json::Object& obj);
+
 protected:
-  void visit_entity(const cxx::Entity& e, json::Object& obj) override;
+  void visit_entity(const cxx::Entity& e) override;
 
 private:
   virtual std::string get_url(const cxx::Entity& e) const = 0;
