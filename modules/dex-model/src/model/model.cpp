@@ -59,7 +59,10 @@ struct ChildNodeGetter
     }
     else if (e->is<cxx::Function>())
     {
-      /* no-op */
+      auto fn = std::static_pointer_cast<cxx::Function>(e);
+
+      if (path.name == "parameters")
+        return fn->parameters().at(path.index);
     }
 
     throw std::runtime_error{ "Invalid model path" };
