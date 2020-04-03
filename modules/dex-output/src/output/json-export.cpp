@@ -8,10 +8,13 @@
 
 #include <cxx/class.h>
 #include <cxx/documentation.h>
+#include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 #include <cxx/program.h>
 
+#include <dom/image.h>
+#include <dom/list.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
 
@@ -90,6 +93,30 @@ json::Json JsonExport::serialize_class(const cxx::Class& cla)
   return result;
 }
 
+json::Json JsonExport::serialize_enum(const cxx::Enum& en)
+{
+  json::Object result{};
+
+  write_entity_info(result, en);
+
+  write_location(result, en.location());
+
+  write_documentation(result, en.documentation());
+
+  if (!en.values().empty())
+  {
+    json::Array list;
+    for (const cxx::Enum::Value& ev : en.values())
+    {
+      list.push(ev.name);
+    }
+
+    result["values"] = list;
+  }
+
+  return result;
+}
+
 json::Json JsonExport::serialize_function(const cxx::Function& f)
 {
   json::Object result{};
@@ -127,33 +154,12 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   return result;
 }
 
-json::Json JsonExport::serialize_paragraph(const dom::Paragraph& par)
-{
-  json::Json result;
-
-  result["type"] = par.type();
-
-  result["text"] = par.text();
-
-  if (!par.metadata().empty())
-  {
-    json::Array metadatas;
-
-    for (const auto& md : par.metadata())
-    {
-      metadatas.push(serialize_par_metadata(*md));
-    }
-
-    result["metadata"] = metadatas;
-  }
-
-  return result;
-}
-
 json::Json JsonExport::serialize_documentation(const cxx::Documentation& doc)
 {
   if (doc.is<ClassDocumentation>())
     return serialize_documentation(static_cast<const ClassDocumentation&>(doc));
+  else if(doc.is<EnumDocumentation>())
+    return serialize_documentation(static_cast<const EnumDocumentation&>(doc));
   else if (doc.is<FunctionDocumentation>())
     return serialize_documentation(static_cast<const FunctionDocumentation&>(doc));
   else if (doc.is<NamespaceDocumentation>())
@@ -168,6 +174,40 @@ json::Json JsonExport::serialize_documentation(const ClassDocumentation& doc)
   json::Object result{};
 
   write_entity_documentation(result, doc);
+
+  return result;
+}
+
+json::Json JsonExport::serialize_documentation(const EnumDocumentation& doc)
+{
+  json::Object result{};
+
+  write_entity_documentation(result, doc);
+
+  if (!doc.values().empty())
+  {
+    json::Array values_doc;
+
+    for (const EnumValueDocumentation& evdoc : doc.values())
+    {
+      json::Object evdoc_json{};
+
+      evdoc_json["name"] = evdoc.name;
+
+      if (!evdoc.description.empty())
+        evdoc_json["description"] = serialize_dom_content(evdoc.description);
+
+      if (evdoc.value.has_value())
+        evdoc_json["value"] = evdoc.value.value();
+
+      if (evdoc.since.has_value())
+        evdoc_json["since"] = evdoc.since.value().version();
+
+      values_doc.push(evdoc_json);
+    }
+
+    result["values"] = values_doc;
+  }
 
   return result;
 }
@@ -207,15 +247,117 @@ json::Json JsonExport::serialize_documentation(const NamespaceDocumentation& doc
   return result;
 }
 
+json::Array JsonExport::serialize_dom_content(const dom::Content& content)
+{
+  json::Array result;
+
+  for (const auto& node : content)
+  {
+    try
+    {
+      json::Json docnode = serialize_documentation_node(*node);
+      result.push(docnode);
+    }
+    catch (const std::runtime_error&)
+    {
+      // TODO: log ?
+    }
+  }
+
+  return result;
+}
+
 json::Json JsonExport::serialize_documentation_node(const dom::Node& docnode)
 {
   if (docnode.is<dom::Paragraph>())
   {
     return serialize_paragraph(static_cast<const dom::Paragraph&>(docnode));
   }
+  else if (docnode.is<dom::Image>())
+  {
+    return serialize_image(static_cast<const dom::Image&>(docnode));
+  }
+  else if (docnode.is<dom::List>())
+  {
+    return serialize_list(static_cast<const dom::List&>(docnode));
+  }
 
   assert(("Not implemented", false));
   return nullptr;
+}
+
+json::Json JsonExport::serialize_list(const dom::List& list)
+{
+  json::Json result;
+
+  if (!list.marker.empty())
+    result["marker"] = list.marker;
+
+  result["ordered"] = list.ordered;
+
+  if (list.ordered)
+    result["reversed"] = list.reversed;
+
+  json::Array items;
+
+  for (const auto& listitem : list.items)
+    items.push(serialize_listitem(*listitem));
+
+  result["items"] = items;
+
+  return result;
+}
+
+json::Json JsonExport::serialize_listitem(const dom::ListItem& listitem)
+{
+  json::Json result;
+
+  if (!listitem.marker.empty())
+    result["marker"] = listitem.marker;
+
+  if (listitem.value != -1)
+    result["value"] = listitem.value;
+
+  result["content"] = serialize_dom_content(listitem.content);
+
+  return result;
+}
+
+json::Json JsonExport::serialize_paragraph(const dom::Paragraph& par)
+{
+  json::Json result;
+
+  result["type"] = par.type();
+
+  result["text"] = par.text();
+
+  if (!par.metadata().empty())
+  {
+    json::Array metadatas;
+
+    for (const auto& md : par.metadata())
+    {
+      metadatas.push(serialize_par_metadata(*md));
+    }
+
+    result["metadata"] = metadatas;
+  }
+
+  return result;
+}
+
+json::Json JsonExport::serialize_image(const dom::Image& img)
+{
+  json::Json result{};
+  result["src"] = img.src;
+  
+  if (img.height != -1)
+    result["height"] = img.height;
+
+  if(img.width != -1)
+    result["width"] = img.width;
+
+  return result;
 }
 
 void JsonExport::write_entity_info(json::Object& obj, const cxx::Entity& e)
@@ -257,24 +399,7 @@ void JsonExport::write_entity_documentation(json::Object& obj, const EntityDocum
     obj["since"] = doc.since().value().version();
 
   if (!doc.description().empty())
-  {
-    json::Array docnodes;
-
-    for (const auto n : doc.description())
-    {
-      try
-      {
-        json::Json docnode = serialize_documentation_node(*n);
-        docnodes.push(docnode);
-      }
-      catch (const std::runtime_error&)
-      {
-        // TODO: log ?
-      }
-    }
-
-    obj["description"] = docnodes;
-  }
+    obj["description"] = serialize_dom_content(doc.description());
 }
 
 void JsonExport::write_entities(json::Object& obj, const std::vector<std::shared_ptr<cxx::Entity>>& list)
