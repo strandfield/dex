@@ -34,341 +34,6 @@ static std::string to_string(cxx::AccessSpecifier as)
   }
 }
 
-json::Object JsonExport::serialize(const Model& model)
-{
-  json::Object result;
-
-  if(model.program())
-    result["program"] = serialize(*model.program());
-
-  return result;
-}
-
-json::Json JsonExport::serialize(const cxx::Program& prog)
-{
-  json::Object result;
-  result["global_namespace"] = serialize_namespace(*prog.globalNamespace());
-  return result;
-}
-
-json::Json JsonExport::serialize_entity(const cxx::Entity& e)
-{
-  if (e.is<cxx::Namespace>())
-    return serialize_namespace(static_cast<const cxx::Namespace&>(e));
-  else if (e.is<cxx::Class>())
-    return serialize_class(static_cast<const cxx::Class&>(e));
-  else if (e.is<cxx::Function>())
-    return serialize_function(static_cast<const cxx::Function&>(e));
-  
-  assert(("Not implemented", false));
-  return nullptr;
-}
-
-json::Json JsonExport::serialize_namespace(const cxx::Namespace& ns)
-{
-  json::Object result{};
-  
-  write_entity_info(result, ns);
-
-  write_location(result, ns.location());
-
-  write_documentation(result, ns.documentation());
-
-  write_entities(result, ns.entities());
-
-  return result;
-}
-
-json::Json JsonExport::serialize_class(const cxx::Class& cla)
-{
-  json::Object result{};
-
-  write_entity_info(result, cla);
-
-  write_location(result, cla.location());
-
-  write_documentation(result, cla.documentation());
-
-  if (!cla.members().empty())
-  {
-    json::Array list;
-    for (const auto& m : cla.members())
-    {
-      json::Object member = serialize_entity(*m.first).toObject();
-      member["accessibility"] = to_string(m.second);
-      list.push(member);
-    }
-
-    result["members"] = list;
-  }
-
-  return result;
-}
-
-json::Json JsonExport::serialize_enum(const cxx::Enum& en)
-{
-  json::Object result{};
-
-  write_entity_info(result, en);
-
-  write_location(result, en.location());
-
-  write_documentation(result, en.documentation());
-
-  if (!en.values().empty())
-  {
-    json::Array list;
-
-    for (const std::shared_ptr<cxx::EnumValue>& ev : en.values())
-    {
-      list.push(serialize_enumvalue(*ev));
-    }
-
-    result["values"] = list;
-  }
-
-  return result;
-}
-
-json::Json JsonExport::serialize_enumvalue(const cxx::EnumValue& ev)
-{
-  json::Object result{};
-
-  write_entity_info(result, ev);
-
-  write_location(result, ev.location());
-
-  write_documentation(result, ev.documentation());
-
-  if (ev.value().empty())
-    result["value"] = ev.value();
-
-  return result;
-}
-
-json::Json JsonExport::serialize_function(const cxx::Function& f)
-{
-  json::Object result{};
-
-  write_entity_info(result, f);
-
-  write_location(result, f.location());
-
-  write_documentation(result, f.documentation());
-
-  return result;
-}
-
-static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
-{
-  json::Json result;
-
-  result["type"] = pmd.type();
-  result["begin"] = static_cast<int>(pmd.range().begin());
-  result["end"] = static_cast<int>(pmd.range().end());
-
-  if (pmd.is<dex::Since>())
-  {
-    result["version"] = pmd.get<dex::Since>().version();
-  }
-  else if (pmd.is<dom::TextStyle>())
-  {
-    result["style"] = static_cast<const dom::TextStyle&>(pmd).style();
-  }
-  else
-  {
-    // TODO: log or throw ?
-  }
-
-  return result;
-}
-
-json::Json JsonExport::serialize_documentation(const cxx::Documentation& doc)
-{
-  if (doc.is<cxx::MultilineComment>())
-    return nullptr;
-
-  const auto& entdoc = static_cast<const EntityDocumentation&>(doc);
-
-  if (entdoc.is<ClassDocumentation>())
-    return serialize_documentation(static_cast<const ClassDocumentation&>(doc));
-  else if(entdoc.is<EnumDocumentation>())
-    return serialize_documentation(static_cast<const EnumDocumentation&>(doc));
-  else if (entdoc.is<FunctionDocumentation>())
-    return serialize_documentation(static_cast<const FunctionDocumentation&>(doc));
-  else if (entdoc.is<NamespaceDocumentation>())
-    return serialize_documentation(static_cast<const NamespaceDocumentation&>(doc));
-
-  assert(("Not implemented", false));
-  return nullptr;
-}
-
-json::Json JsonExport::serialize_documentation(const ClassDocumentation& doc)
-{
-  json::Object result{};
-
-  write_entity_documentation(result, doc);
-
-  return result;
-}
-
-json::Json JsonExport::serialize_documentation(const EnumDocumentation& doc)
-{
-  json::Object result{};
-
-  write_entity_documentation(result, doc);
-
-  return result;
-}
-
-json::Json JsonExport::serialize_documentation(const FunctionDocumentation& doc)
-{
-  json::Object result{};
-
-  write_entity_documentation(result, doc);
-
-  if (!doc.parameters().empty())
-  {
-    json::Array params;
-
-    for (const std::string& p : doc.parameters())
-    {
-      params.push(p);
-    }
-
-    result["parameters"] = params;
-  }
-
-  if (doc.returnValue().has_value())
-  {
-    result["returns"] = doc.returnValue().value();
-  }
-
-  return result;
-}
-
-json::Json JsonExport::serialize_documentation(const NamespaceDocumentation& doc)
-{
-  json::Object result{};
-
-  write_entity_documentation(result, doc);
-
-  return result;
-}
-
-json::Array JsonExport::serialize_dom_content(const dom::Content& content)
-{
-  json::Array result;
-
-  for (const auto& node : content)
-  {
-    try
-    {
-      json::Json docnode = serialize_documentation_node(*node);
-      result.push(docnode);
-    }
-    catch (const std::runtime_error&)
-    {
-      // TODO: log ?
-    }
-  }
-
-  return result;
-}
-
-json::Json JsonExport::serialize_documentation_node(const dom::Node& docnode)
-{
-  if (docnode.is<dom::Paragraph>())
-  {
-    return serialize_paragraph(static_cast<const dom::Paragraph&>(docnode));
-  }
-  else if (docnode.is<dom::Image>())
-  {
-    return serialize_image(static_cast<const dom::Image&>(docnode));
-  }
-  else if (docnode.is<dom::List>())
-  {
-    return serialize_list(static_cast<const dom::List&>(docnode));
-  }
-
-  assert(("Not implemented", false));
-  return nullptr;
-}
-
-json::Json JsonExport::serialize_list(const dom::List& list)
-{
-  json::Json result;
-
-  if (!list.marker.empty())
-    result["marker"] = list.marker;
-
-  result["ordered"] = list.ordered;
-
-  if (list.ordered)
-    result["reversed"] = list.reversed;
-
-  json::Array items;
-
-  for (const auto& listitem : list.items)
-    items.push(serialize_listitem(*listitem));
-
-  result["items"] = items;
-
-  return result;
-}
-
-json::Json JsonExport::serialize_listitem(const dom::ListItem& listitem)
-{
-  json::Json result;
-
-  if (!listitem.marker.empty())
-    result["marker"] = listitem.marker;
-
-  if (listitem.value != -1)
-    result["value"] = listitem.value;
-
-  result["content"] = serialize_dom_content(listitem.content);
-
-  return result;
-}
-
-json::Json JsonExport::serialize_paragraph(const dom::Paragraph& par)
-{
-  json::Json result;
-
-  result["type"] = par.type();
-
-  result["text"] = par.text();
-
-  if (!par.metadata().empty())
-  {
-    json::Array metadatas;
-
-    for (const auto& md : par.metadata())
-    {
-      metadatas.push(serialize_par_metadata(*md));
-    }
-
-    result["metadata"] = metadatas;
-  }
-
-  return result;
-}
-
-json::Json JsonExport::serialize_image(const dom::Image& img)
-{
-  json::Json result{};
-  result["src"] = img.src;
-  
-  if (img.height != -1)
-    result["height"] = img.height;
-
-  if(img.width != -1)
-    result["width"] = img.width;
-
-  return result;
-}
-
 static std::string to_string(cxx::NodeKind n)
 {
   switch (n)
@@ -399,10 +64,241 @@ static std::string to_string(cxx::NodeKind n)
   }
 }
 
-void JsonExport::write_entity_info(json::Object& obj, const cxx::Entity& e)
+template<typename T>
+void write_if(json::Object& obj, const char* field, T&& val, bool cond)
 {
-  obj["name"] = e.name();
-  obj["type"] = to_string(e.kind());
+  if (cond)
+    obj[field] = std::forward<T>(val);
+}
+
+struct RAIIJsonExportContext
+{
+  std::vector<json::Object>* stack;
+
+  RAIIJsonExportContext(std::vector<json::Object>* s, const Model::PathElement& pe)
+    : stack(s)
+  {
+    if (pe.index == std::numeric_limits<size_t>::max())
+    {
+      json::Object obj{};
+      stack->back()[pe.name] = obj;
+      stack->push_back(obj);
+    }
+    else
+    {
+      json::Object obj{};
+
+      if (pe.index == 0)
+      {
+        stack->back()[pe.name] = json::Array();
+      }
+
+      stack->back()[pe.name].push(obj);
+      stack->push_back(obj);
+    }
+  }
+
+  ~RAIIJsonExportContext()
+  {
+    stack->pop_back();
+  }
+};
+
+json::Object JsonExport::serialize(const Model& model)
+{
+  json::Object result{};
+
+  JsonExport jexport;
+
+  jexport.m_json_stack.push_back(result);
+
+  jexport.visit(model);
+
+  return result;
+}
+
+json::Object& JsonExport::object()
+{
+  return m_json_stack.back();
+}
+
+static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
+{
+  json::Json result;
+
+  result["type"] = pmd.type();
+  result["begin"] = static_cast<int>(pmd.range().begin());
+  result["end"] = static_cast<int>(pmd.range().end());
+
+  if (pmd.is<dex::Since>())
+  {
+    result["version"] = pmd.get<dex::Since>().version();
+  }
+  else if (pmd.is<dom::TextStyle>())
+  {
+    result["style"] = static_cast<const dom::TextStyle&>(pmd).style();
+  }
+  else
+  {
+    // TODO: log or throw ?
+  }
+
+  return result;
+}
+
+void JsonExport::visit_domnode(const dom::Node& n)
+{
+  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+
+  object()["type"] = n.type();
+
+  ModelVisitor::visit_domnode(n);
+}
+
+void JsonExport::visit_domimage(const dom::Image& img)
+{
+  object()["src"] = img.src;
+
+  write_if(object(), "height", img.height, img.height != -1);
+  write_if(object(), "width", img.width, img.width != -1);
+}
+
+void JsonExport::visit_domlist(const dom::List& l)
+{
+  write_if(object(), "marker", l.marker, !l.marker.empty());
+
+  object()["ordered"] = l.ordered;
+
+  write_if(object(), "reversed", l.reversed, l.ordered);
+
+  ModelVisitor::visit_domlist(l);
+}
+
+void JsonExport::visit_domlistitem(const dom::ListItem& li)
+{
+  write_if(object(), "marker", li.marker, !li.marker.empty());
+  write_if(object(), "value", li.value, li.value != -1);
+
+  ModelVisitor::visit_domlistitem(li);
+}
+
+void JsonExport::visit_domparagraph(const dom::Paragraph& par)
+{
+  object()["text"] = par.text();
+
+  if (!par.metadata().empty())
+  {
+    json::Array metadatas;
+
+    for (const auto& md : par.metadata())
+    {
+      metadatas.push(serialize_par_metadata(*md));
+    }
+
+    object()["metadata"] = metadatas;
+  }
+
+  ModelVisitor::visit_domparagraph(par);
+}
+
+
+void JsonExport::visit_program(const cxx::Program& prog)
+{
+  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+  ModelVisitor::visit_program(prog);
+}
+
+void JsonExport::visit_entity(const cxx::Entity& e)
+{
+  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+
+  object()["name"] = e.name();
+  object()["type"] = to_string(e.kind());
+
+  write_location(object(), e.location());
+
+  ModelVisitor::visit_entity(e);
+}
+
+void JsonExport::visit_namespace(const cxx::Namespace& ns)
+{
+  ModelVisitor::visit_namespace(ns);
+}
+
+void JsonExport::visit_class(const cxx::Class& cla)
+{
+  ModelVisitor::visit_class(cla);
+
+  if (!cla.members().empty())
+  {
+    json::Array members = object()["members"].toArray();
+
+    for (size_t i(0); i < cla.members().size(); ++i)
+    {
+      members[i]["accessibility"] = to_string(cla.members().at(i).second);
+    }
+  }
+}
+
+void JsonExport::visit_enum(const cxx::Enum& en)
+{
+  ModelVisitor::visit_enum(en);
+}
+
+void JsonExport::visit_enumvalue(const cxx::EnumValue& ev)
+{
+  write_if(object(), "value", ev.value(), !ev.value().empty());
+
+  ModelVisitor::visit_enumvalue(ev);
+}
+
+void JsonExport::visit_function(const cxx::Function& f)
+{
+  ModelVisitor::visit_function(f);
+
+  object()["return_type"] = f.returnType().toString();
+}
+
+void JsonExport::visit_functionparameter(const cxx::FunctionParameter& fp)
+{
+  ModelVisitor::visit_functionparameter(fp);
+
+  object()["type"] = fp.parameterType().toString();
+  write_if(object(), "default_value", fp.defaultValue(), !fp.defaultValue().empty());
+}
+
+
+void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
+{
+  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+
+  if (edoc.brief().has_value())
+    object()["brief"] = edoc.brief().value();
+
+  if (edoc.since().has_value())
+    object()["since"] = edoc.since().value().version();
+
+  if (edoc.is<FunctionDocumentation>())
+  {
+    const auto& fndoc = static_cast<const FunctionDocumentation&>(edoc);
+
+    if (fndoc.returnValue().has_value())
+      object()["returns"] = fndoc.returnValue().value();
+
+    if (!fndoc.parameters().empty())
+    {
+      json::Array params;
+
+      for (const std::string& p : fndoc.parameters())
+      {
+        params.push(p);
+      }
+
+      object()["parameters"] = params;
+    }
+  }
+
+  ModelVisitor::visit_entitydocumentation(edoc);
 }
 
 void JsonExport::write_location(json::Object& obj, const cxx::SourceLocation& loc)
@@ -416,43 +312,6 @@ void JsonExport::write_location(json::Object& obj, const cxx::SourceLocation& lo
   result["file"] = loc.file()->path();
 
   obj["loc"] = result;
-}
-
-void JsonExport::write_documentation(json::Object& obj, const std::shared_ptr<cxx::Documentation>& doc)
-{
-  if (doc)
-    write_documentation(obj, *doc);
-}
-
-void JsonExport::write_documentation(json::Object& obj, const cxx::Documentation& doc)
-{
-  obj["documentation"] = serialize_documentation(doc);
-}
-
-void JsonExport::write_entity_documentation(json::Object& obj, const EntityDocumentation& doc)
-{
-  if (doc.brief().has_value())
-    obj["brief"] = doc.brief().value();
-
-  if (doc.since().has_value())
-    obj["since"] = doc.since().value().version();
-
-  if (!doc.description().empty())
-    obj["description"] = serialize_dom_content(doc.description());
-}
-
-void JsonExport::write_entities(json::Object& obj, const std::vector<std::shared_ptr<cxx::Entity>>& list)
-{
-  if (!list.empty())
-  {
-    json::Array entities;
-    for (const auto& e : list)
-    {
-      entities.push(serialize_entity(*e));
-    }
-
-    obj["entities"] = entities;
-  }
 }
 
 } // namespace dex

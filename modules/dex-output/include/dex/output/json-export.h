@@ -8,6 +8,7 @@
 #include "dex/dex-output.h"
 
 #include "dex/model/model.h"
+#include "dex/model/model-visitor.h"
 
 #include <dom/paragraph.h>
 
@@ -36,41 +37,39 @@ class SourceLocation;
 namespace dex
 {
 
-class DEX_OUTPUT_API JsonExport
+class DEX_OUTPUT_API JsonExport : public ModelVisitor
 {
 public:
 
   static json::Object serialize(const Model& model);
-  static json::Json serialize(const cxx::Program& prog);
 
 protected:
-  static json::Json serialize_entity(const cxx::Entity& e);
-  static json::Json serialize_namespace(const cxx::Namespace& ns);
-  static json::Json serialize_class(const cxx::Class& cla);
-  static json::Json serialize_enum(const cxx::Enum& en);
-  static json::Json serialize_enumvalue(const cxx::EnumValue& ev);
-  static json::Json serialize_function(const cxx::Function& f);
-  static json::Json serialize_documentation(const cxx::Documentation& doc);
 
-  static json::Json serialize_documentation(const ClassDocumentation& doc);
-  static json::Json serialize_documentation(const EnumDocumentation& doc);
-  static json::Json serialize_documentation(const FunctionDocumentation& doc);
-  static json::Json serialize_documentation(const NamespaceDocumentation& doc);
+  void visit_domnode(const dom::Node& n) override;
+  void visit_domimage(const dom::Image& img) override;
+  void visit_domlist(const dom::List& l) override;
+  void visit_domlistitem(const dom::ListItem& li) override;
+  void visit_domparagraph(const dom::Paragraph& par) override;
 
-  static json::Array serialize_dom_content(const dom::Content& content);
-  static json::Json serialize_documentation_node(const dom::Node& docnode);
-  static json::Json serialize_list(const dom::List& list);
-  static json::Json serialize_listitem(const dom::ListItem& listitem);
-  static json::Json serialize_paragraph(const dom::Paragraph& par);
-  static json::Json serialize_image(const dom::Image& img);
+  void visit_program(const cxx::Program& prog) override;
+  void visit_entity(const cxx::Entity& e) override;
+  void visit_namespace(const cxx::Namespace& ns) override;
+  void visit_class(const cxx::Class& cla) override;
+  void visit_enum(const cxx::Enum& en) override;
+  void visit_enumvalue(const cxx::EnumValue& ev) override;
+  void visit_function(const cxx::Function& f) override;
+  void visit_functionparameter(const cxx::FunctionParameter& fp) override;
+
+  void visit_entitydocumentation(const EntityDocumentation& edoc) override;
 
 protected:
-  static void write_entity_info(json::Object& obj, const cxx::Entity& e);
   static void write_location(json::Object& obj, const cxx::SourceLocation& loc);
-  static void write_documentation(json::Object& obj, const std::shared_ptr<cxx::Documentation>& doc);
-  static void write_documentation(json::Object& obj, const cxx::Documentation& doc);
-  static void write_entity_documentation(json::Object& obj, const EntityDocumentation& doc);
-  static void write_entities(json::Object& obj, const std::vector<std::shared_ptr<cxx::Entity>>& list);
+
+protected:
+  json::Object& object();
+
+private:
+  std::vector<json::Object> m_json_stack;
 };
 
 } // namespace dex

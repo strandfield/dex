@@ -126,7 +126,7 @@ void ModelVisitor::visit_program(const cxx::Program& prog)
 {
   {
     VisitorContext context{ &m_stack, "global_namespace" };
-    visit_namespace(*prog.globalNamespace());
+    visit_entity(*prog.globalNamespace());
   }
 }
 

@@ -84,13 +84,14 @@ static std::shared_ptr<cxx::Program> example_prog_with_class_and_fun()
 void TestDexOutput::jsonExport()
 {
   {
-    auto prog = example_prog_with_class();
+    auto model = std::make_shared<dex::Model>();
+    model->setProgram(example_prog_with_class());
 
-    json::Object jexport = dex::JsonExport::serialize(*prog).toObject();
+    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
 
     QVERIFY(jexport.data().size() == 1);
 
-    jexport = jexport["global_namespace"].toObject();
+    jexport = jexport["program"]["global_namespace"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
     QVERIFY(jexport.data().at("entities").length() == 1);
@@ -103,9 +104,6 @@ void TestDexOutput::jsonExport()
     model->setProgram(example_prog_with_fun());
 
     json::Object jexport = dex::JsonExport::serialize(*model).toObject();
-
-    QVERIFY(jexport.data().size() == 1);
-
     jexport = jexport["program"]["global_namespace"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
