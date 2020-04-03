@@ -88,6 +88,10 @@ void TestDexOutput::jsonExport()
 
     json::Object jexport = dex::JsonExport::serialize(*prog).toObject();
 
+    QVERIFY(jexport.data().size() == 1);
+
+    jexport = jexport["global_namespace"].toObject();
+
     QVERIFY(jexport.data().size() == 3);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
@@ -102,7 +106,7 @@ void TestDexOutput::jsonExport()
 
     QVERIFY(jexport.data().size() == 1);
 
-    jexport = jexport["program"].toObject();
+    jexport = jexport["program"]["global_namespace"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
     QVERIFY(jexport.data().at("entities").length() == 1);
@@ -129,17 +133,17 @@ void TestDexOutput::jsonAnnotator()
 
     QVERIFY(jexport.data().size() == 1);
 
-    jexport = jexport["program"].toObject();
+    jexport = jexport["program"]["global_namespace"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
 
     json::Object vec = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(vec["_path"] == "$.program.entities[0]");
+    QVERIFY(vec["_path"] == "$.program.global_namespace.entities[0]");
 
-    auto path = dex::JsonPathAnnotator::parse("$.program.entities[0]");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("entities"), 0 };
+    auto path = dex::JsonPathAnnotator::parse("$.program.global_namespace.entities[0]");
+    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("global_namespace"), std::string("entities"), 0 };
     QVERIFY(path == expected);
   }
 
@@ -154,15 +158,15 @@ void TestDexOutput::jsonAnnotator()
 
     QVERIFY(jexport.data().size() == 1);
 
-    jexport = jexport["program"].toObject();
+    jexport = jexport["program"]["global_namespace"].toObject();
 
     json::Object complex = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(complex["_path"] == "$.program.entities[0]");
+    QVERIFY(complex["_path"] == "$.program.global_namespace.entities[0]");
     json::Object real = complex.data().at("members").at(0).toObject();
-    QVERIFY(real["_path"] == "$.program.entities[0].members[0]");
+    QVERIFY(real["_path"] == "$.program.global_namespace.entities[0].members[0]");
 
-    auto path = dex::JsonPathAnnotator::parse("$.program.entities[0].members[0]");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("entities"), 0, std::string("members"), 0 };
+    auto path = dex::JsonPathAnnotator::parse("$.program.global_namespace.entities[0].members[0]");
+    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("global_namespace"), std::string("entities"), 0, std::string("members"), 0 };
     QVERIFY(path == expected);
   }
 }

@@ -46,7 +46,9 @@ json::Object JsonExport::serialize(const Model& model)
 
 json::Json JsonExport::serialize(const cxx::Program& prog)
 {
-  return serialize_namespace(*prog.globalNamespace());
+  json::Object result;
+  result["global_namespace"] = serialize_namespace(*prog.globalNamespace());
+  return result;
 }
 
 json::Json JsonExport::serialize_entity(const cxx::Entity& e)

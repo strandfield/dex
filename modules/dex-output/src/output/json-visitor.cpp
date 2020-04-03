@@ -48,7 +48,11 @@ void JsonVisitor::visit(const Model& model, json::Object& obj)
 
 void JsonVisitor::visit(const cxx::Program& prog, json::Object& obj)
 {
-  visit_namespace(*prog.globalNamespace(), obj);
+  {
+    VisitorContext context{ &m_stack, "global_namespace" };
+    json::Object global_namespace = obj["global_namespace"].toObject();
+    visit_namespace(*prog.globalNamespace(), global_namespace);
+  }
 }
 
 void JsonVisitor::visit_entity(const cxx::Entity& e, json::Object& obj)
