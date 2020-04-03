@@ -10,6 +10,8 @@
 
 #include "dex/common/errors.h"
 
+#include "dex/model/model.h"
+
 #include <cxx/class.h>
 #include <cxx/documentation.h>
 #include <cxx/function.h>
@@ -129,8 +131,13 @@ void LiquidExporter::dumpClasses()
   if (m_templates.class_template.nodes().empty())
     return;
 
+  if (!model()->program())
+    return;
+
+  json::Object prog = m_serialized_model["program"].toObject();
+
   ClassDumper dumper{ *this };
-  dumper.visit(*m_program, m_json_program);
+  dumper.visit(*model()->program(), prog);
 }
 
 void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
@@ -143,7 +150,7 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
   const std::string url = obj["url"].toString();
 
   json::Object context;
-  context["prog"] = LiquidExporter::jsonProgram();
+  context["prog"] = m_serialized_model["program"];
   context["class"] = obj;
 
   std::string output = liquid::Renderer::render(m_templates.class_template, context);
@@ -170,19 +177,19 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
   file.close();
 }
 
-void LiquidExporter::setProgram(const std::shared_ptr<cxx::Program>& prog)
+void LiquidExporter::setModel(std::shared_ptr<Model> model)
 {
-  m_program = prog;
-
-  m_json_program = JsonExport::serialize(*prog).toObject();
+  m_model = model;
+  
+  m_serialized_model = JsonExport::serialize(*model).toObject();
 
   JsonPathAnnotator path_annotator;
-  path_annotator.annotate(*prog, m_json_program);
+  path_annotator.annotate(*model, m_serialized_model);
 }
 
 std::shared_ptr<cxx::Entity> LiquidExporter::get(const JsonPath& path) const
 {
-  TreeNode node = m_program->globalNamespace();
+  TreeNode node = model()->program()->globalNamespace();
 
   for (const auto& p : path)
   {

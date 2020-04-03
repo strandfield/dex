@@ -33,6 +33,7 @@ public:
 
   std::shared_ptr<cxx::Program> program() const;
   std::shared_ptr<cxx::Program> getOrCreateProgram();  
+  void setProgram(std::shared_ptr<cxx::Program> prog);
 
   struct DEX_MODEL_API PathElement
   {
@@ -76,6 +77,11 @@ inline std::shared_ptr<cxx::Program> Model::getOrCreateProgram()
     m_program = std::make_shared<cxx::Program>();
 
   return m_program;
+}
+
+inline void Model::setProgram(std::shared_ptr<cxx::Program> prog)
+{
+  m_program = prog;
 }
 
 } // namespace dex

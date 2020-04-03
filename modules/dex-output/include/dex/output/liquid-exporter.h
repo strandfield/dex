@@ -24,6 +24,8 @@ class Program;
 namespace dex
 {
 
+class Model;
+
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
 {
 public:
@@ -51,11 +53,9 @@ public:
 
 protected:
 
-  const cxx::Program& program() const;
-  const json::Object& jsonProgram() const;
-  json::Object& jsonProgram();
-
-  void setProgram(const std::shared_ptr<cxx::Program>& prog);
+  void setModel(std::shared_ptr<Model> model);
+  std::shared_ptr<Model> model() const;
+  json::Object serializedModel() const;
 
 protected:
 
@@ -76,8 +76,8 @@ protected:
 
 private:
   QDir m_output_dir;
-  std::shared_ptr<cxx::Program> m_program;
-  json::Object m_json_program;
+  std::shared_ptr<Model> m_model;
+  json::Object m_serialized_model;
   Templates m_templates;
 };
 
@@ -91,19 +91,14 @@ inline LiquidExporter::Templates& LiquidExporter::templates()
   return m_templates;
 }
 
-inline const cxx::Program& LiquidExporter::program() const
+inline std::shared_ptr<Model> LiquidExporter::model() const
 {
-  return *m_program;
+  return m_model;
 }
 
-inline const json::Object& LiquidExporter::jsonProgram() const
+inline json::Object LiquidExporter::serializedModel() const
 {
-  return m_json_program;
-}
-
-inline json::Object& LiquidExporter::jsonProgram()
-{
-  return m_json_program;
+  return m_serialized_model;
 }
 
 } // namespace dex

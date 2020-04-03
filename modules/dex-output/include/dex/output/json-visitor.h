@@ -31,6 +31,7 @@ class DEX_OUTPUT_API JsonVisitor
 {
 public:
 
+  void visit(const Model& model, json::Object& obj);
   void visit(const cxx::Program& prog, json::Object& obj);
 
   const std::vector<std::variant<size_t, std::string>>& stack() const;

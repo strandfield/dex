@@ -42,15 +42,15 @@ MarkdownExport::MarkdownExport()
   templates().class_template = liquid::parse(tmplt);
 }
 
-void MarkdownExport::dump(const std::shared_ptr<cxx::Program>& prog, const QDir& dir)
+void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
 {
   LiquidExporter::setOutputDir(dir);
+  LiquidExporter::setModel(model);
 
-  LiquidExporter::setProgram(prog);
-  json::Object& json_export = jsonProgram();
+  json::Object json_export = LiquidExporter::serializedModel();
 
   JsonMarkdownUrlAnnotator url_annotator;
-  url_annotator.annotate(*prog, json_export);
+  url_annotator.annotate(*model, json_export);
 
   LiquidExporter::dumpClasses();
 }

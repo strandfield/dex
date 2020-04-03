@@ -13,9 +13,9 @@
 namespace dex
 {
 
-void JsonAnnotator::annotate(const cxx::Program& prog, json::Object& obj)
+void JsonAnnotator::annotate(const Model& model, json::Object& obj)
 {
-  visit_namespace(*prog.globalNamespace(), obj);
+  visit(model, obj);
 }
 
 void JsonPathAnnotator::visit_entity(const cxx::Entity& e, json::Object& obj)

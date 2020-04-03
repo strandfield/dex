@@ -34,6 +34,16 @@ static std::string to_string(cxx::AccessSpecifier as)
   }
 }
 
+json::Object JsonExport::serialize(const Model& model)
+{
+  json::Object result;
+
+  if(model.program())
+    result["program"] = serialize(*model.program());
+
+  return result;
+}
+
 json::Json JsonExport::serialize(const cxx::Program& prog)
 {
   return serialize_namespace(*prog.globalNamespace());

@@ -35,6 +35,17 @@ struct VisitorContext
   }
 };
 
+void JsonVisitor::visit(const Model& model, json::Object& obj)
+{
+  if (model.program())
+  {
+    VisitorContext context{ &m_stack, "program" };
+
+    json::Object prog = obj["program"].toObject();
+    visit(*model.program(), prog);
+  }
+}
+
 void JsonVisitor::visit(const cxx::Program& prog, json::Object& obj)
 {
   visit_namespace(*prog.globalNamespace(), obj);

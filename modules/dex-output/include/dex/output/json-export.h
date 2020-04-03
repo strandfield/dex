@@ -40,6 +40,7 @@ class DEX_OUTPUT_API JsonExport
 {
 public:
 
+  static json::Object serialize(const Model& model);
   static json::Json serialize(const cxx::Program& prog);
 
 protected:
@@ -50,10 +51,12 @@ protected:
   static json::Json serialize_enumvalue(const cxx::EnumValue& ev);
   static json::Json serialize_function(const cxx::Function& f);
   static json::Json serialize_documentation(const cxx::Documentation& doc);
+
   static json::Json serialize_documentation(const ClassDocumentation& doc);
   static json::Json serialize_documentation(const EnumDocumentation& doc);
   static json::Json serialize_documentation(const FunctionDocumentation& doc);
   static json::Json serialize_documentation(const NamespaceDocumentation& doc);
+
   static json::Array serialize_dom_content(const dom::Content& content);
   static json::Json serialize_documentation_node(const dom::Node& docnode);
   static json::Json serialize_list(const dom::List& list);

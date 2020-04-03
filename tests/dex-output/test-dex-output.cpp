@@ -84,7 +84,7 @@ static std::shared_ptr<cxx::Program> example_prog_with_class_and_fun()
 void TestDexOutput::jsonExport()
 {
   {
-    std::shared_ptr<cxx::Program> prog = example_prog_with_class();
+    auto prog = example_prog_with_class();
 
     json::Object jexport = dex::JsonExport::serialize(*prog).toObject();
 
@@ -95,9 +95,14 @@ void TestDexOutput::jsonExport()
   }
   
   {
-    std::shared_ptr<cxx::Program> prog = example_prog_with_fun();
+    auto model = std::make_shared<dex::Model>();
+    model->setProgram(example_prog_with_fun());
 
-    json::Object jexport = dex::JsonExport::serialize(*prog).toObject();
+    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
+
+    QVERIFY(jexport.data().size() == 1);
+
+    jexport = jexport["program"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
     QVERIFY(jexport.data().at("entities").length() == 1);
@@ -114,40 +119,50 @@ void TestDexOutput::jsonExport()
 void TestDexOutput::jsonAnnotator()
 {
   {
-    std::shared_ptr<cxx::Program> prog = example_prog_with_class();
+    auto model = std::make_shared<dex::Model>();
+    model->setProgram(example_prog_with_class());
 
-    json::Object jexport = dex::JsonExport::serialize(*prog).toObject();
+    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
 
     dex::JsonPathAnnotator annotator;
-    annotator.annotate(*prog, jexport);
+    annotator.annotate(*model, jexport);
+
+    QVERIFY(jexport.data().size() == 1);
+
+    jexport = jexport["program"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
 
     json::Object vec = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(vec["_path"] == "$.entities[0]");
+    QVERIFY(vec["_path"] == "$.program.entities[0]");
 
-    auto path = dex::JsonPathAnnotator::parse("$.entities[0]");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("entities"), 0 };
+    auto path = dex::JsonPathAnnotator::parse("$.program.entities[0]");
+    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("entities"), 0 };
     QVERIFY(path == expected);
   }
 
   {
-    std::shared_ptr<cxx::Program> prog = example_prog_with_class_and_fun();
+    auto model = std::make_shared<dex::Model>();
+    model->setProgram(example_prog_with_class_and_fun());
 
-    json::Object jexport = dex::JsonExport::serialize(*prog).toObject();
+    json::Object jexport = dex::JsonExport::serialize(*model);
 
     dex::JsonPathAnnotator annotator;
-    annotator.annotate(*prog, jexport);
+    annotator.annotate(*model, jexport);
+
+    QVERIFY(jexport.data().size() == 1);
+
+    jexport = jexport["program"].toObject();
 
     json::Object complex = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(complex["_path"] == "$.entities[0]");
+    QVERIFY(complex["_path"] == "$.program.entities[0]");
     json::Object real = complex.data().at("members").at(0).toObject();
-    QVERIFY(real["_path"] == "$.entities[0].members[0]");
+    QVERIFY(real["_path"] == "$.program.entities[0].members[0]");
 
-    auto path = dex::JsonPathAnnotator::parse("$.entities[0].members[0]");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("entities"), 0, std::string("members"), 0 };
+    auto path = dex::JsonPathAnnotator::parse("$.program.entities[0].members[0]");
+    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("entities"), 0, std::string("members"), 0 };
     QVERIFY(path == expected);
   }
 }
@@ -155,10 +170,12 @@ void TestDexOutput::jsonAnnotator()
 void TestDexOutput::markdownExport()
 {
   {
-    std::shared_ptr<cxx::Program> prog = example_prog_with_class();
+    auto model = std::make_shared<dex::Model>();
+    model->setProgram(example_prog_with_class());
+
     dex::MarkdownExport md_export;
 
-    md_export.dump(prog, QDir::current());
+    md_export.dump(model, QDir::current());
 
     std::string content = dex::file_utils::read_all("classes/vector.md");
 

@@ -14,7 +14,7 @@ class DEX_OUTPUT_API JsonAnnotator : public JsonVisitor
 {
 public:
 
-  void annotate(const cxx::Program& prog, json::Object& obj);
+  void annotate(const Model& model, json::Object& obj);
 };
 
 class DEX_OUTPUT_API JsonPathAnnotator : public JsonAnnotator

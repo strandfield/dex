@@ -24,7 +24,7 @@ class DEX_OUTPUT_API MarkdownExport : protected LiquidExporter
 public:
   MarkdownExport();
 
-  void dump(const std::shared_ptr<cxx::Program>& prog, const QDir& dir);
+  void dump(std::shared_ptr<Model> model, const QDir& dir);
 
 protected:
   void postProcess(std::string& output) override;
