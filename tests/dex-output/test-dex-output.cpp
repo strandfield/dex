@@ -75,6 +75,31 @@ static std::shared_ptr<dex::Model> example_prog_with_class_image_description()
   return model;
 }
 
+static std::shared_ptr<dex::Model> example_prog_with_class_list_description()
+{
+  auto model = std::make_shared<dex::Model>();
+
+  auto prog = std::make_shared<cxx::Program>();
+  auto global = prog->globalNamespace();
+
+  auto vector = std::make_shared<cxx::Class>("vector", global);
+  auto doc = std::make_shared<dex::ClassDocumentation>();
+  auto list = make<dom::List>();
+  auto listitem = make<dom::ListItem>();
+  listitem->content.push_back(make<dom::Paragraph>("first item"));
+  list->items.push_back(listitem);
+  listitem = make<dom::ListItem>();
+  listitem->content.push_back(make<dom::Paragraph>("second item"));
+  list->items.push_back(listitem);
+  doc->description().push_back(list);
+  vector->setDocumentation(doc);
+
+  global->entities().push_back(vector);
+
+  model->setProgram(prog);
+
+  return model;
+}
 
 static std::shared_ptr<cxx::Program> example_prog_with_fun()
 {
@@ -231,6 +256,23 @@ void TestDexOutput::markdownExport()
     const std::string expected =
       "\n# vector Class\n\n"
       "## Detailed description\n\n![image](test.jpg)\n\n"
+      "## Members documentation\n\n";
+
+    QVERIFY(content == expected);
+  }
+
+  {
+    auto model = example_prog_with_class_list_description();
+
+    dex::MarkdownExport md_export;
+
+    md_export.dump(model, QDir::current());
+
+    std::string content = dex::file_utils::read_all("classes/vector.md");
+
+    const std::string expected =
+      "\n# vector Class\n\n"
+      "## Detailed description\n\n- first item\n- second item\n\n"
       "## Members documentation\n\n";
 
     QVERIFY(content == expected);

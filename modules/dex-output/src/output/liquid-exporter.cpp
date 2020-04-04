@@ -18,6 +18,7 @@
 #include <cxx/program.h>
 
 #include <dom/image.h>
+#include <dom/list.h>
 
 namespace dex
 {
@@ -150,11 +151,7 @@ std::string LiquidExporter::stringify(const json::Json& val)
     if (std::holds_alternative<std::shared_ptr<dom::Node>>(model_node))
     {
       auto dom_node = std::get< std::shared_ptr<dom::Node>>(model_node);
-
-      if (dom_node->is<dom::Paragraph>())
-        return stringify_paragraph(*static_cast<const dom::Paragraph*>(dom_node.get()));
-      else if(dom_node->is<dom::Image>())
-        return stringify_image(*static_cast<const dom::Image*>(dom_node.get()));
+      return stringify_domnode(*dom_node);
     }
   }
   else
@@ -165,6 +162,33 @@ std::string LiquidExporter::stringify(const json::Json& val)
 
   assert(("Not implemented", false));
   return {};
+}
+
+std::string LiquidExporter::stringify_domnode(const dom::Node& node)
+{
+  if (node.is<dom::Paragraph>())
+    return stringify_paragraph(static_cast<const dom::Paragraph&>(node));
+  else if (node.is<dom::List>())
+    return stringify_list(static_cast<const dom::List&>(node));
+  else if (node.is<dom::ListItem>())
+    return stringify_listitem(static_cast<const dom::ListItem&>(node));
+  else if (node.is<dom::Image>())
+    return stringify_image(static_cast<const dom::Image&>(node));
+
+  assert(("dom element not implemented", false));
+  return {};
+}
+
+std::string LiquidExporter::stringify_domcontent(const dom::Content& content)
+{
+  std::string result;
+
+  for (const auto& node : content)
+  {
+    result += stringify_domnode(*node);
+  }
+
+  return result;
 }
 
 void LiquidExporter::postProcess(std::string& output)

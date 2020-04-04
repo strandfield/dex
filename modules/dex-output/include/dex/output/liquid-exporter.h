@@ -19,6 +19,8 @@
 namespace dom
 {
 class Image;
+class List;
+class ListItem;
 class Paragraph;
 } // namespace dom
 
@@ -70,7 +72,12 @@ protected:
 protected:
   std::string stringify(const json::Json& val) override;
 
+  virtual std::string stringify_domnode(const dom::Node& node);
+  virtual std::string stringify_domcontent(const dom::Content& content);
+
   virtual std::string stringify_array(const json::Array& list) = 0;
+  virtual std::string stringify_list(const dom::List& list) = 0;
+  virtual std::string stringify_listitem(const dom::ListItem& li) = 0;
   virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
   virtual std::string stringify_image(const dom::Image& img) = 0;
 

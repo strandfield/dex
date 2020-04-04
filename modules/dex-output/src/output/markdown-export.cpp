@@ -17,6 +17,7 @@
 #include <cxx/program.h>
 
 #include <dom/image.h>
+#include <dom/list.h>
 #include <dom/paragraph.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
@@ -78,6 +79,25 @@ std::string MarkdownExport::stringify_array(const json::Array& list)
   }
 
   return result;
+}
+
+std::string MarkdownExport::stringify_list(const dom::List& list)
+{
+  // @TODO: handle nested list
+
+  std::string result;
+
+  for (const auto& li : list.items)
+  {
+    result += "- " + stringify_listitem(*li) + "\n";
+  }
+
+  return result;
+}
+
+std::string MarkdownExport::stringify_listitem(const dom::ListItem& li)
+{
+  return stringify_domcontent(li.content);
 }
 
 std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)

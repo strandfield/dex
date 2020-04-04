@@ -34,6 +34,8 @@ protected:
 
 protected:
   std::string stringify_array(const json::Array& list) override;
+  std::string stringify_list(const dom::List& list) override;
+  std::string stringify_listitem(const dom::ListItem& li) override;
   std::string stringify_paragraph(const dom::Paragraph& par) override;
   std::string stringify_image(const dom::Image& img) override;
 };
