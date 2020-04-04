@@ -18,6 +18,7 @@
 
 namespace dom
 {
+class Image;
 class Paragraph;
 } // namespace dom
 
@@ -71,6 +72,7 @@ protected:
 
   virtual std::string stringify_array(const json::Array& list) = 0;
   virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
+  virtual std::string stringify_image(const dom::Image& img) = 0;
 
 protected:
 

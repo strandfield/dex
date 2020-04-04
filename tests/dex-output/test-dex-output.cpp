@@ -18,6 +18,8 @@
 #include <cxx/namespace.h>
 #include <cxx/program.h>
 
+#include <dom/image.h>
+#include <dom/list.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
 
@@ -28,6 +30,12 @@
 static std::shared_ptr<dom::Paragraph> make_par(const std::string& str)
 {
   return std::make_shared<dom::Paragraph>(str);
+}
+
+template<typename T, typename...Args>
+std::shared_ptr<T> make(Args&&... args)
+{
+  return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
 static std::shared_ptr<cxx::Program> example_prog_with_class()
@@ -46,6 +54,27 @@ static std::shared_ptr<cxx::Program> example_prog_with_class()
 
   return prog;
 }
+
+static std::shared_ptr<dex::Model> example_prog_with_class_image_description()
+{
+  auto model = std::make_shared<dex::Model>();
+
+  auto prog = std::make_shared<cxx::Program>();
+  auto global = prog->globalNamespace();
+
+  auto vector = std::make_shared<cxx::Class>("vector", global);
+  auto doc = std::make_shared<dex::ClassDocumentation>();
+  auto img = make<dom::Image>("test.jpg");
+  doc->description().push_back(img);
+  vector->setDocumentation(doc);
+
+  global->entities().push_back(vector);
+
+  model->setProgram(prog);
+
+  return model;
+}
+
 
 static std::shared_ptr<cxx::Program> example_prog_with_fun()
 {
@@ -185,6 +214,23 @@ void TestDexOutput::markdownExport()
       "\n# vector Class\n\n**Brief:** sequence container that encapsulates dynamic size arrays\n\n"
       "## Detailed description\n\nThe elements are stored contiguously, ...\n\n"
       "The storage of the vector is handled automatically, ...\n\n"
+      "## Members documentation\n\n";
+
+    QVERIFY(content == expected);
+  }
+
+  {
+    auto model = example_prog_with_class_image_description();
+
+    dex::MarkdownExport md_export;
+
+    md_export.dump(model, QDir::current());
+
+    std::string content = dex::file_utils::read_all("classes/vector.md");
+
+    const std::string expected =
+      "\n# vector Class\n\n"
+      "## Detailed description\n\n![image](test.jpg)\n\n"
       "## Members documentation\n\n";
 
     QVERIFY(content == expected);

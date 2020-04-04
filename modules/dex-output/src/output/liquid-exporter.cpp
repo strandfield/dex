@@ -17,6 +17,8 @@
 #include <cxx/namespace.h>
 #include <cxx/program.h>
 
+#include <dom/image.h>
+
 namespace dex
 {
 
@@ -151,6 +153,8 @@ std::string LiquidExporter::stringify(const json::Json& val)
 
       if (dom_node->is<dom::Paragraph>())
         return stringify_paragraph(*static_cast<const dom::Paragraph*>(dom_node.get()));
+      else if(dom_node->is<dom::Image>())
+        return stringify_image(*static_cast<const dom::Image*>(dom_node.get()));
     }
   }
   else

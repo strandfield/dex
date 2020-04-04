@@ -16,6 +16,7 @@
 #include <cxx/namespace.h>
 #include <cxx/program.h>
 
+#include <dom/image.h>
 #include <dom/paragraph.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
@@ -83,6 +84,11 @@ std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
 {
   // @TODO : stringify paragraph with formatting
   return par.text();
+}
+
+std::string MarkdownExport::stringify_image(const dom::Image& img)
+{
+  return "![image](" + img.src + ")";
 }
 
 } // namespace dex
