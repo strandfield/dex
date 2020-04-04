@@ -251,7 +251,7 @@ void TestDexInput::parserMachineImage()
   QVERIFY(ns->entities().size() > 0);
   QVERIFY(ns->entities().front()->is<cxx::Class>());
   auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
-  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()));
+  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()) != nullptr);
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
   QVERIFY(doc->description().size() == 3);
 
@@ -301,7 +301,7 @@ void TestDexInput::parserMachineList()
   QVERIFY(ns->entities().size() > 0);
   QVERIFY(ns->entities().front()->is<cxx::Class>());
   auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
-  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()));
+  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()) != nullptr);
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
   QVERIFY(doc->description().size() == 1);
   QVERIFY(doc->description().front()->is<dom::List>());
@@ -348,7 +348,7 @@ void TestDexInput::parserMachineClass()
   QVERIFY(ns->entities().front()->is<cxx::Class>());
   auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
   QVERIFY(vec->name() == "vector");
-  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()));
+  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()) != nullptr);
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
   QVERIFY(doc->brief().value() == "sequence container that encapsulates dynamic size arrays");
   QVERIFY(doc->description().size() == 1);
@@ -391,7 +391,7 @@ void TestDexInput::parserMachineFunction()
   QVERIFY(ns->entities().front()->is<cxx::Function>());
   auto getenv = std::static_pointer_cast<cxx::Function>(ns->entities().front());
   QVERIFY(getenv->name() == "char* getenv(const char* env_var);");
-  QVERIFY(std::dynamic_pointer_cast<dex::FunctionDocumentation>(getenv->documentation()));
+  QVERIFY(std::dynamic_pointer_cast<dex::FunctionDocumentation>(getenv->documentation()) != nullptr);
   auto doc = std::static_pointer_cast<dex::FunctionDocumentation>(getenv->documentation());
   QVERIFY(doc->brief().value() == "get value from environment variables");
   QVERIFY(doc->since().value().version() == "C++98");
@@ -443,7 +443,7 @@ void TestDexInput::parserMachineEnum()
   auto corner = std::static_pointer_cast<cxx::Enum>(ns->entities().front());
   QVERIFY(corner->name() == "Corner");
   QVERIFY(corner->values().size() == 4);
-  QVERIFY(std::dynamic_pointer_cast<dex::EnumDocumentation>(corner->documentation()));
+  QVERIFY(std::dynamic_pointer_cast<dex::EnumDocumentation>(corner->documentation()) != nullptr);
   auto doc = std::static_pointer_cast<dex::EnumDocumentation>(corner->documentation());
   QVERIFY(doc->brief().value() == "describes a corner");
   QVERIFY(doc->description().size() == 1);
