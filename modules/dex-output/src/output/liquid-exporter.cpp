@@ -8,6 +8,7 @@
 #include "dex/output/json-export.h"
 
 #include "dex/common/errors.h"
+#include "dex/common/settings.h"
 
 #include "dex/model/model.h"
 
@@ -44,6 +45,11 @@ struct ClassDumper : ModelVisitor
   }
 };
 
+QDir LiquidExporter::outputDir() const
+{
+  return m_output_dir;
+}
+
 void LiquidExporter::setOutputDir(const QDir& dir)
 {
   m_output_dir = dir;
@@ -71,7 +77,7 @@ Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
 
 void LiquidExporter::dumpClasses()
 {
-  if (m_templates.class_template.nodes().empty())
+  if (m_profile.class_template.nodes().empty())
     return;
 
   if (!model()->program())
@@ -97,7 +103,7 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
   // @TODO: remove this 'prog' property
   context["prog"] = m_serialized_model["program"];
 
-  std::string output = liquid::Renderer::render(m_templates.class_template, context);
+  std::string output = liquid::Renderer::render(m_profile.class_template, context);
 
   postProcess(output);
 

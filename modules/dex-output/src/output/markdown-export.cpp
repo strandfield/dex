@@ -40,8 +40,9 @@ struct JsonMarkdownUrlAnnotator : JsonUrlAnnotator
 
 MarkdownExport::MarkdownExport()
 {
-  std::string tmplt = file_utils::read_all(":/templates/markdown/class.md");
-  templates().class_template = liquid::parse(tmplt);
+  LiquidExporterProfile prof;
+  prof.load(QDir{ ":/templates/markdown" });
+  profile() = std::move(prof);
 }
 
 void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)

@@ -7,6 +7,8 @@
 
 #include "dex/dex-output.h"
 
+#include "dex/output/liquid-exporter-profile.h"
+
 #include "dex/model/model.h"
 
 #include <liquid/renderer.h>
@@ -45,15 +47,24 @@ public:
 
   static Model::Path convertToModelPath(const JsonPath& jspath);
 
-  struct Templates
+  struct Settings
   {
     liquid::Template class_template;
+    liquid::Template namespace_template;
+    liquid::Template function_template;
+    std::string class_outdir;
+    std::string namespace_outdir;
+    std::string function_outdir;
+    std::vector<std::pair<std::string, liquid::Template>> files;
   };
 
   void dumpClasses();
 
-  Templates& templates();
+  typedef LiquidExporterProfile Profile;
 
+  Profile& profile();
+
+  QDir outputDir() const;
   void setOutputDir(const QDir& dir);
 
   void render();
@@ -97,7 +108,7 @@ private:
   QDir m_output_dir;
   std::shared_ptr<Model> m_model;
   json::Object m_serialized_model;
-  Templates m_templates;
+  Profile m_profile;
 };
 
 } // namespace dex
@@ -105,9 +116,9 @@ private:
 namespace dex
 {
 
-inline LiquidExporter::Templates& LiquidExporter::templates()
+inline LiquidExporterProfile& LiquidExporter::profile()
 {
-  return m_templates;
+  return m_profile;
 }
 
 inline std::shared_ptr<Model> LiquidExporter::model() const
