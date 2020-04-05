@@ -17,6 +17,7 @@ namespace dex
 class DEX_OUTPUT_API LiquidExporterProfile
 {
 public:
+  std::string profile_path;
   liquid::Template class_template;
   liquid::Template namespace_template;
   liquid::Template function_template;

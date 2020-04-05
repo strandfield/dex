@@ -58,8 +58,6 @@ public:
     std::vector<std::pair<std::string, liquid::Template>> files;
   };
 
-  void dumpClasses();
-
   typedef LiquidExporterProfile Profile;
 
   Profile& profile();
@@ -69,8 +67,6 @@ public:
 
   void render();
 
-  void dump(const cxx::Class& cla, const json::Object& obj);
-
   static void trim_right(std::string& str);
   static void simplify_empty_lines(std::string& str);
 
@@ -79,6 +75,11 @@ protected:
   void setModel(std::shared_ptr<Model> model);
   std::shared_ptr<Model> model() const;
   json::Object serializedModel() const;
+
+protected:
+  friend class LiquidExporterModelVisitor;
+
+  void dump(const cxx::Class& cla, const json::Object& obj);
 
 protected:
   std::string stringify(const json::Json& val) override;
@@ -103,6 +104,7 @@ protected:
 protected:
 
   virtual void postProcess(std::string& output);
+  void write(const std::string& data, const std::string& filepath);
 
 private:
   QDir m_output_dir;

@@ -24,12 +24,13 @@
 namespace dex
 {
 
-struct ClassDumper : ModelVisitor
+class LiquidExporterModelVisitor : public ModelVisitor
 {
+public:
   LiquidExporter& exporter;
   json::Object& serializedModel;
 
-  ClassDumper(LiquidExporter& e, json::Object& m)
+  LiquidExporterModelVisitor(LiquidExporter& e, json::Object& m)
     : exporter{ e },
     serializedModel{ m }
   {
@@ -37,9 +38,11 @@ struct ClassDumper : ModelVisitor
 
   void visit_class(const cxx::Class& cla) override
   {
-    json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
-
-    exporter.dump(cla, obj);
+    if (!exporter.profile().class_template.nodes().empty())
+    {
+      json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
+      exporter.dump(cla, obj);
+    }
 
     ModelVisitor::visit_class(cla);
   }
@@ -57,7 +60,23 @@ void LiquidExporter::setOutputDir(const QDir& dir)
 
 void LiquidExporter::render()
 {
-  dumpClasses();
+  if (!model()->program())
+    return;
+
+  LiquidExporterModelVisitor visitor{ *this, m_serialized_model };
+  visitor.visit(*model());
+
+  for (const std::pair<std::string, liquid::Template>& file : profile().files)
+  {
+    json::Object context;
+    context["model"] = m_serialized_model;
+
+    std::string output = liquid::Renderer::render(file.second, context);
+
+    postProcess(output);
+
+    write(output, (outputDir().absolutePath() + "/" + QString::fromStdString(file.first)).toStdString());
+  }
 }
 
 Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
@@ -73,18 +92,6 @@ Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
   }
 
   return result;
-}
-
-void LiquidExporter::dumpClasses()
-{
-  if (m_profile.class_template.nodes().empty())
-    return;
-
-  if (!model()->program())
-    return;
-
-  ClassDumper dumper{ *this, m_serialized_model };
-  dumper.visit(*model());
 }
 
 void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
@@ -107,24 +114,7 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
 
   postProcess(output);
 
-  QFileInfo fileinfo{ m_output_dir.absolutePath() + "/" + QString::fromStdString(url) };
-
-  if (!fileinfo.dir().exists())
-  {
-    const bool success = QDir().mkpath(fileinfo.dir().absolutePath());
-
-    if (!success)
-      throw IOException{ fileinfo.dir().absolutePath().toStdString(), "could not create directory" };
-  }
-
-  QFile file{ fileinfo.absoluteFilePath() };
-
-  if (!file.open(QIODevice::WriteOnly))
-    throw IOException{ fileinfo.absoluteFilePath().toStdString(), "could not open file for writing" };
-
-  file.write(output.data());
-
-  file.close();
+  write(output, (m_output_dir.absolutePath() + "/" + QString::fromStdString(url)).toStdString());
 }
 
 void LiquidExporter::setModel(std::shared_ptr<Model> model)
@@ -200,6 +190,28 @@ std::string LiquidExporter::stringify_domcontent(const dom::Content& content)
 void LiquidExporter::postProcess(std::string& output)
 {
   /* no-op */
+}
+
+void LiquidExporter::write(const std::string& data, const std::string& filepath)
+{
+  QFileInfo fileinfo{ QString::fromStdString(filepath) };
+
+  if (!fileinfo.dir().exists())
+  {
+    const bool success = QDir().mkpath(fileinfo.dir().absolutePath());
+
+    if (!success)
+      throw IOException{ fileinfo.dir().absolutePath().toStdString(), "could not create directory" };
+  }
+
+  QFile file{ fileinfo.absoluteFilePath() };
+
+  if (!file.open(QIODevice::WriteOnly))
+    throw IOException{ fileinfo.absoluteFilePath().toStdString(), "could not open file for writing" };
+
+  file.write(data.data());
+
+  file.close();
 }
 
 void LiquidExporter::trim_right(std::string& str)

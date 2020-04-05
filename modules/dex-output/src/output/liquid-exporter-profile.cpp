@@ -26,6 +26,8 @@ void LiquidExporterProfile::load(const QDir& dir)
   if (!dir.exists("config.ini"))
     throw std::runtime_error{ "Bad profile directory" };
 
+  profile_path = dir.absolutePath().toStdString();
+
   std::set<std::string> exclusions;
   exclusions.insert(dir.absoluteFilePath("config.ini").toStdString());
 
@@ -52,6 +54,8 @@ void LiquidExporterProfile::load(const QDir& dir)
       continue;
 
     liquid::Template tmplt = open_liquid_template(path);
+
+    path.erase(path.begin(), path.begin() + this->profile_path.length() + 1);
     this->files.emplace_back(std::move(path), std::move(tmplt));
   }
 }

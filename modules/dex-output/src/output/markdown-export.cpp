@@ -55,7 +55,7 @@ void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
   JsonMarkdownUrlAnnotator url_annotator;
   url_annotator.annotate(*model, json_export);
 
-  LiquidExporter::dumpClasses();
+  LiquidExporter::render();
 }
 
 void MarkdownExport::postProcess(std::string& output)
