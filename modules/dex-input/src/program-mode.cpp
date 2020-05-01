@@ -20,6 +20,8 @@
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 
+#include <cxx/parsers/restricted-parser.h>
+
 namespace dex
 {
 
@@ -287,28 +289,45 @@ void ProgramMode::fn_fn(const FunctionCall& call)
     throw BadControlSequence{ "function" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  const auto fn_signature = std::get<std::string>(call.arguments.front());
+  std::string fn_signature = std::get<std::string>(call.arguments.front());
 
-  auto new_fn = std::make_shared<cxx::Function>(fn_signature, parent);
-  new_fn->setDocumentation(std::make_shared<FunctionDocumentation>());
+  while (fn_signature.back() == ' ')
+    fn_signature.pop_back();
+
+  if (fn_signature.back() != ';')
+    fn_signature.push_back(';');
+
+  std::shared_ptr<cxx::Function> the_fn = [&]() {
+    try
+    {
+      return cxx::parsers::RestrictedParser::parseFunctionSignature(fn_signature);
+    }
+    catch (...)
+    {
+      LOG_INFO << "could not parse function signature '" << fn_signature << "'";
+      return std::make_shared<cxx::Function>(fn_signature, parent);
+    }
+  }();
+
+  the_fn->setDocumentation(std::make_shared<FunctionDocumentation>());
   // TODO: set source location
 
   if (currentFrame().node->is<cxx::Class>())
   {
     auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
-    cla->members().push_back({ new_fn, cxx::AccessSpecifier::PUBLIC });
+    cla->members().push_back({ the_fn, cxx::AccessSpecifier::PUBLIC });
   }
   else if (currentFrame().node->is<cxx::Namespace>())
   {
     auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-    ns->entities().push_back(new_fn);
+    ns->entities().push_back(the_fn);
   }
   else
   {
     throw BadControlSequence{ "function" };
   }
 
-  m_state.enter<FrameType::Function>(new_fn);
+  m_state.enter<FrameType::Function>(the_fn);
 }
 
 void ProgramMode::cs_endfn()

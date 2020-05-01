@@ -390,7 +390,7 @@ void TestDexInput::parserMachineFunction()
   QVERIFY(ns->entities().size() > 0);
   QVERIFY(ns->entities().front()->is<cxx::Function>());
   auto getenv = std::static_pointer_cast<cxx::Function>(ns->entities().front());
-  QVERIFY(getenv->name() == "char* getenv(const char* env_var);");
+  QVERIFY(getenv->name() == "getenv");
   QVERIFY(std::dynamic_pointer_cast<dex::FunctionDocumentation>(getenv->documentation()) != nullptr);
   auto doc = std::static_pointer_cast<dex::FunctionDocumentation>(getenv->documentation());
   QVERIFY(doc->brief().value() == "get value from environment variables");
