@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="/">
     <file>data/datasets.txt</file>
+    <file>data/class-with-inline.txt</file>
+    <file>data/class-with-inline.json</file>
     <file>data/enum-doc.txt</file>
     <file>data/enum-doc.json</file>
   </qresource>
