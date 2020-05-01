@@ -28,6 +28,33 @@ static EntityDocumentation& doc(const std::shared_ptr<cxx::Documentation>& d)
   return *static_cast<EntityDocumentation*>(d.get());
 }
 
+template<typename T>
+std::shared_ptr<T> find(const cxx::Entity& e, const std::string& name)
+{
+  if (e.kind() == cxx::NodeKind::Class)
+  {
+    const cxx::Class& cla = static_cast<const cxx::Class&>(e);
+
+    for (auto m : cla.members())
+    {
+      if (m.first->name() == name)
+        return std::dynamic_pointer_cast<T>(m.first);
+    }
+  }
+  else if (e.kind() == cxx::NodeKind::Namespace)
+  {
+    const cxx::Namespace& ns = static_cast<const cxx::Namespace&>(e);
+
+    for (auto child : ns.entities())
+    {
+      if (child->name() == name)
+        return std::dynamic_pointer_cast<T>(child);
+    }
+  }
+
+  return nullptr;
+}
+
 ProgramMode::Frame::Frame(FrameType ft)
   : state::Frame<FrameType>(ft)
 {
@@ -217,26 +244,31 @@ void ProgramMode::fn_class(const FunctionCall& call)
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
   const auto class_name = std::get<std::string>(call.arguments.front());
 
-  auto new_class = std::make_shared<cxx::Class>(class_name, parent);
-  new_class->setDocumentation(std::make_shared<ClassDocumentation>());
-  // TODO: set source location
+  auto the_class = find<cxx::Class>(*static_cast<cxx::Entity*>(currentFrame().node.get()), class_name);
 
-  if (currentFrame().node->is<cxx::Class>())
+  if (the_class == nullptr)
   {
-    auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
-    cla->members().push_back({ new_class, cxx::AccessSpecifier::PUBLIC });
-  }
-  else if (currentFrame().node->is<cxx::Namespace>())
-  {
-    auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-    ns->entities().push_back(new_class);
-  }
-  else
-  {
-    throw BadControlSequence{ "class" };
+    the_class = std::make_shared<cxx::Class>(class_name, parent);
+    the_class->setDocumentation(std::make_shared<ClassDocumentation>());
+    // TODO: set source location
+
+    if (currentFrame().node->is<cxx::Class>())
+    {
+      auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
+      cla->members().push_back({ the_class, cxx::AccessSpecifier::PUBLIC });
+    }
+    else if (currentFrame().node->is<cxx::Namespace>())
+    {
+      auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
+      ns->entities().push_back(the_class);
+    }
+    else
+    {
+      throw BadControlSequence{ "class" };
+    }
   }
 
-  m_state.enter<FrameType::Class>(new_class);
+  m_state.enter<FrameType::Class>(the_class);
 }
 
 void ProgramMode::cs_endclass()
@@ -293,13 +325,18 @@ void ProgramMode::fn_namespace(const FunctionCall& call)
   auto parent_ns = std::dynamic_pointer_cast<cxx::Namespace>(currentFrame().node);
   const auto ns_name = std::get<std::string>(call.arguments.front());
 
-  auto new_namespace = std::make_shared<cxx::Namespace>(ns_name, parent_ns);
-  new_namespace->setDocumentation(std::make_shared<NamespaceDocumentation>());
-  // TODO: set source location
+  auto the_namespace = find<cxx::Namespace>(*static_cast<cxx::Entity*>(currentFrame().node.get()), ns_name);
 
-  parent_ns->entities().push_back(new_namespace);
+  if (the_namespace == nullptr)
+  {
+    the_namespace = std::make_shared<cxx::Namespace>(ns_name, parent_ns);
+    the_namespace->setDocumentation(std::make_shared<NamespaceDocumentation>());
+    // TODO: set source location
 
-  m_state.enter<FrameType::Namespace>(new_namespace);
+    parent_ns->entities().push_back(the_namespace);
+  }
+
+  m_state.enter<FrameType::Namespace>(the_namespace);
 }
 
 void ProgramMode::cs_endnamespace()
@@ -471,7 +508,8 @@ void ProgramMode::exitFrame()
     auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
     f.writer->finish();
 
-    doc(ent->documentation()).description() = std::move(f.writer->output());
+    if(!f.writer->output().empty())
+      doc(ent->documentation()).description() = std::move(f.writer->output());
   }
 
   m_state.leave();

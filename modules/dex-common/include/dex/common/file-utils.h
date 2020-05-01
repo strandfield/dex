@@ -8,6 +8,7 @@
 #include "dex/dex-common.h"
 
 #include <filesystem>
+#include <string>
 
 namespace dex
 {
@@ -17,6 +18,7 @@ namespace file_utils
 
 DEX_COMMON_API bool is_embed_resource(const std::filesystem::path& p);
 DEX_COMMON_API std::string read_all(const std::filesystem::path& p);
+DEX_COMMON_API void crlf2lf(std::string& str);
 
 } // namespace file_utils
 

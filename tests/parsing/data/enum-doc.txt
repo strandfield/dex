@@ -1,0 +1,22 @@
+
+/*!
+ * \enum LayoutDirection
+ * \brief Specifies the direction of text handling.
+ *
+ * Right-to-left layouts are necessary for certain languages, notably Arabic and Hebrew.
+ */
+enum LayoutDirection
+{
+  /*!
+   * \value LeftToRight Left-to-right layout
+   */
+  LeftToRight,
+  /*!
+   * \value RightToLeft Right-to-left layout
+   */
+  RightToLeft,
+  /*!
+   * \value LayoutDirectionAuto Automatic layout
+   */
+  LayoutDirectionAuto,
+};

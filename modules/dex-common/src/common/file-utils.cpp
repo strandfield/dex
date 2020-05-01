@@ -37,6 +37,22 @@ std::string read_all(const std::filesystem::path& p)
   }
 }
 
+void crlf2lf(std::string& str)
+{
+  size_t r = 0;
+  size_t w = 0;
+
+  while (r < str.size())
+  {
+    if (str.at(r) == '\r')
+      ++r;
+    else
+      str[w++] = str[r++];
+  }
+
+  str.resize(w);
+}
+
 } // namespace file_utils
 
 } // namespace dex

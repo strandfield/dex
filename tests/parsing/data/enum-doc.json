@@ -1,0 +1,47 @@
+{
+  "program": {
+    "global_namespace": {
+      "entities": [{
+          "documentation": {
+            "brief": "Specifies the direction of text handling.",
+            "description": [{
+                "text": "Right-to-left layouts are necessary for certain languages, notably Arabic and Hebrew.",
+                "type": "paragraph"
+              }]
+          },
+          "name": "LayoutDirection",
+          "type": "enum",
+          "values": [{
+              "documentation": {
+                "description": [{
+                    "text": "Left-to-right layout",
+                    "type": "paragraph"
+                  }]
+              },
+              "name": "LeftToRight",
+              "type": "enum-value"
+            }, {
+              "documentation": {
+                "description": [{
+                    "text": "Right-to-left layout",
+                    "type": "paragraph"
+                  }]
+              },
+              "name": "RightToLeft",
+              "type": "enum-value"
+            }, {
+              "documentation": {
+                "description": [{
+                    "text": "Automatic layout",
+                    "type": "paragraph"
+                  }]
+              },
+              "name": "LayoutDirectionAuto",
+              "type": "enum-value"
+            }]
+        }],
+      "name": "",
+      "type": "namespace"
+    }
+  }
+}
