@@ -239,7 +239,7 @@ void FunctionCaller::finishParseOptions(Task& t)
 
   if (macro)
   {
-    preprocessor.input().insert(preprocessor.input().end(), macro->replacementText().begin(), macro->replacementText().end());
+    preprocessor.input.insert(preprocessor.input.end(), macro->replacementText().begin(), macro->replacementText().end());
   }
 }
 

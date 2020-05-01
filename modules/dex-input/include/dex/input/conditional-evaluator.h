@@ -8,7 +8,7 @@
 #include "dex/dex-input.h"
 
 #include <tex/token.h>
-#include <tex/parsing/registers.h>
+#include <tex/parsing/preprocessor.h>
 
 #include <vector>
 
@@ -30,7 +30,7 @@ class DEX_INPUT_API ConditionalEvaluator
 {
 public:
   explicit ConditionalEvaluator(ParserMachine& machine);
-  ConditionalEvaluator(tex::parsing::Registers& registers, InputStream& is, tex::parsing::Lexer& lex);
+  ConditionalEvaluator(InputStream& is, tex::parsing::Lexer& lex, tex::parsing::Preprocessor& preproc);
 
   InputStream& inputStream();
   tex::parsing::Lexer& lexer();
@@ -48,9 +48,9 @@ public:
   std::vector<tex::parsing::Token>& output();
 
 private:
-  tex::parsing::Registers& m_registers;
   InputStream& m_inputstream;
   tex::parsing::Lexer& m_lexer;
+  tex::parsing::Preprocessor& m_preprocessor;
   State m_state;
   std::vector<tex::parsing::Token> m_output;
 };

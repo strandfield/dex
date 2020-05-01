@@ -16,15 +16,15 @@ namespace dex
 {
 
 ConditionalEvaluator::ConditionalEvaluator(ParserMachine& machine)
-  : ConditionalEvaluator{machine.registers(), machine.inputStream(), machine.lexer()}
+  : ConditionalEvaluator{machine.inputStream(), machine.lexer(), machine.preprocessor()}
 {
 
 }
 
-ConditionalEvaluator::ConditionalEvaluator(tex::parsing::Registers& registers, InputStream& is, tex::parsing::Lexer& lex)
-  : m_registers{ registers }, 
-    m_inputstream { is },
+ConditionalEvaluator::ConditionalEvaluator(InputStream& is, tex::parsing::Lexer& lex, tex::parsing::Preprocessor& preproc)
+  : m_inputstream { is },
     m_lexer{lex},
+    m_preprocessor{preproc},
     m_state{ State::Idle }
 {
 
@@ -55,7 +55,7 @@ void ConditionalEvaluator::write(tex::parsing::Token&& tok)
     {
       if (tok.controlSequence() == "testleftbr@ce")
       {
-        m_registers.br = inputStream().peekChar() == '{';
+        m_preprocessor.br = inputStream().peekChar() == '{';
       }
       else if (tok.controlSequence() == "testnextch@r")
       {
@@ -78,9 +78,10 @@ void ConditionalEvaluator::write(tex::parsing::Token&& tok)
       throw UnexpectedControlSequence{ tok.controlSequence() };
 
     if(lexer().output().empty())
-      m_registers.br = inputStream().peekChar() == tok.characterToken().value;
+      m_preprocessor.br = inputStream().peekChar() == tok.characterToken().value;
     else
-      m_registers.br = lexer().output().front().isCharacterToken() && lexer().output().front().characterToken().value == tok.characterToken().value;
+      m_preprocessor.br = lexer().output().front().isCharacterToken() 
+        && lexer().output().front().characterToken().value == tok.characterToken().value;
 
     m_state = State::Idle;
   }

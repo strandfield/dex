@@ -255,11 +255,10 @@ InputStream& InputStream::operator=(const QFileInfo& file)
 }
 
 ParserMachine::ParserMachine()
-  : m_registers{}, 
-    m_lexercatcodes{},
+  : m_lexercatcodes{},
     m_inputstream {},
     m_lexer{},
-    m_preprocessor{m_registers},
+    m_preprocessor{},
     m_condeval{*this},
     m_caller{*this},
     m_modes{},
@@ -293,11 +292,6 @@ ParserMachine::State ParserMachine::state() const
 void ParserMachine::process(const QFileInfo& file)
 {
   processFile(file.absoluteFilePath().toStdString());
-}
-
-tex::parsing::Registers& ParserMachine::registers()
-{
-  return m_registers;
 }
 
 void ParserMachine::input(const std::string& filename)
@@ -352,10 +346,10 @@ ParserMode& ParserMachine::currentMode() const
 
 bool ParserMachine::sendTokens()
 {
-  if (m_preprocessor.output().empty())
+  if (m_preprocessor.output.empty())
     return false;
 
-  tex::parsing::Token t = tex::parsing::read(m_preprocessor.output());
+  tex::parsing::Token t = tex::parsing::read(m_preprocessor.output);
 
   send_token(std::move(t), m_condeval, m_caller);
 
@@ -373,7 +367,7 @@ bool ParserMachine::sendTokens()
   }
 
   if (m_caller.output().empty())
-    return !m_preprocessor.output().empty();
+    return !m_preprocessor.output.empty();
 
   m_modes.back()->write(tex::parsing::read(m_caller.output()));
 
@@ -384,7 +378,7 @@ bool ParserMachine::sendTokens()
     m_modes.back()->childFinished(*mode);
   }
 
-  return !m_preprocessor.output().empty();
+  return !m_preprocessor.output.empty();
 }
 
 void ParserMachine::resume()
@@ -452,9 +446,9 @@ void ParserMachine::advance()
     {
       m_preprocessor.advance();
 
-      if (!m_preprocessor.output().empty())
+      if (!m_preprocessor.output.empty())
         m_state = State::SendToken;
-      else if (!m_preprocessor.input().empty())
+      else if (!m_preprocessor.input.empty())
         m_state = State::Preprocess;
       else
         m_state = State::ReadChar;
@@ -464,7 +458,7 @@ void ParserMachine::advance()
     {
       while (sendTokens());
 
-      if (!m_preprocessor.input().empty())
+      if (!m_preprocessor.input.empty())
         m_state = State::Preprocess;
       else
         m_state = State::ReadToken;
@@ -508,8 +502,8 @@ bool ParserMachine::recover()
   m_state = State::SeekBlock;
 
   m_lexer.output().clear();
-  m_preprocessor.input().clear();
-  m_preprocessor.output().clear();
+  m_preprocessor.input.clear();
+  m_preprocessor.output.clear();
   m_condeval.output().clear();
   m_caller.output().clear();
 
@@ -535,8 +529,8 @@ void ParserMachine::reset()
 
   m_inputstream.clear();
   m_lexer.output().clear();
-  m_preprocessor.input().clear();
-  m_preprocessor.output().clear();
+  m_preprocessor.input.clear();
+  m_preprocessor.output.clear();
   m_condeval.output().clear();
   m_caller.output().clear();
 

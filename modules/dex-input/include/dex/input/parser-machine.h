@@ -16,7 +16,6 @@
 #include <cxx/program.h>
 
 #include <tex/lexer.h>
-#include <tex/parsing/registers.h>
 #include <tex/parsing/preprocessor.h>
 
 #include <QFileInfo>
@@ -113,8 +112,6 @@ public:
 
   void process(const QFileInfo& file);
 
-  tex::parsing::Registers& registers();
-
   void input(const std::string& filename);
   InputStream& inputStream();
 
@@ -155,7 +152,6 @@ protected:
   bool sendTokens();
 
 private:
-  tex::parsing::Registers m_registers;
   dex::FunctionCall m_call;
   std::stack<tex::parsing::Lexer::CatCodeTable> m_lexercatcodes;
   InputStream m_inputstream;

@@ -122,10 +122,10 @@ void TestDexInput::argumentParsing()
 
 void TestDexInput::conditionalEvaluator()
 {
-  tex::parsing::Registers registers;
   dex::InputStream istream;
   tex::parsing::Lexer lexer;
-  dex::ConditionalEvaluator parser{ registers, istream, lexer };
+  tex::parsing::Preprocessor preproc;
+  dex::ConditionalEvaluator parser{ istream, lexer, preproc };
 
   istream.inject("{[");
 
@@ -136,19 +136,19 @@ void TestDexInput::conditionalEvaluator()
 
   parser.write(tok("testleftbr@ce"));
   QVERIFY(parser.output().size() == 2);
-  QVERIFY(registers.br);
+  QVERIFY(preproc.br);
 
   QVERIFY(istream.readChar() == '{');
 
   parser.write(tok("testnextch@r"));
   parser.write(tok(']'));
   QVERIFY(parser.output().size() == 2);
-  QVERIFY(!registers.br);
+  QVERIFY(!preproc.br);
 
   parser.write(tok("testnextch@r"));
   parser.write(tok('['));
   QVERIFY(parser.output().size() == 2);
-  QVERIFY(registers.br);
+  QVERIFY(preproc.br);
 }
 
 void TestDexInput::documentWriterParagraph()
