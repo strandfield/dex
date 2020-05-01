@@ -269,6 +269,7 @@ void ProgramMode::fn_class(const FunctionCall& call)
   }
 
   m_state.enter<FrameType::Class>(the_class);
+  m_lastblock_entity = the_class;
 }
 
 void ProgramMode::cs_endclass()
@@ -277,6 +278,7 @@ void ProgramMode::cs_endclass()
     throw BadControlSequence{ Functions::ENDCLASS };
 
   exitFrame();
+  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
 }
 
 void ProgramMode::fn_fn(const FunctionCall& call)
@@ -337,6 +339,7 @@ void ProgramMode::fn_namespace(const FunctionCall& call)
   }
 
   m_state.enter<FrameType::Namespace>(the_namespace);
+  m_lastblock_entity = the_namespace;
 }
 
 void ProgramMode::cs_endnamespace()
@@ -345,6 +348,7 @@ void ProgramMode::cs_endnamespace()
     throw BadControlSequence{ "endnamespace" };
 
   exitFrame();
+  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
 }
 
 void ProgramMode::fn_enum(const FunctionCall& call)
@@ -370,6 +374,7 @@ void ProgramMode::fn_enum(const FunctionCall& call)
   }
 
   m_state.enter<FrameType::Enum>(new_enum);
+  m_lastblock_entity = new_enum;
 }
 
 void ProgramMode::cs_endenum()
@@ -378,6 +383,7 @@ void ProgramMode::cs_endenum()
     throw BadControlSequence{ "endenum" };
 
   exitFrame();
+  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
 }
 
 void ProgramMode::fn_enumvalue(const FunctionCall& call)
@@ -386,7 +392,12 @@ void ProgramMode::fn_enumvalue(const FunctionCall& call)
     exitFrame();
 
   if (!currentFrame().node->is<cxx::Enum>())
-    throw BadControlSequence{ "value" };
+  {
+    if(m_lastblock_entity->node_kind() != cxx::NodeKind::Enum)
+      throw BadControlSequence{ "value" };
+
+    m_state.enter<FrameType::Enum>(m_lastblock_entity);
+  }
 
   const auto en = std::static_pointer_cast<cxx::Enum>(currentFrame().node);
 
@@ -488,7 +499,11 @@ void ProgramMode::beginBlock()
 
 void ProgramMode::endBlock()
 {
-  while (m_state.current().node->is<cxx::Function>())
+  auto is_func_or_enum = [](const std::shared_ptr<cxx::Node>& node) -> bool{
+    return node->node_kind() == cxx::NodeKind::Enum || node->node_kind() == cxx::NodeKind::Function;
+  };
+
+  while (is_func_or_enum(m_state.current().node))
   {
     exitFrame();
   }

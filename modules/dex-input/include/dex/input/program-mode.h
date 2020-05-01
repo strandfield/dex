@@ -115,6 +115,7 @@ protected:
 
 private:
   State m_state;
+  std::shared_ptr<cxx::Entity> m_lastblock_entity;
 };
 
 } // namespace dex
