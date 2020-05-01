@@ -80,7 +80,22 @@ void ParagraphWriter::writeSince(const std::string& version, const std::string& 
 
 void ParagraphWriter::finish()
 {
-  // no-op
+  dom::Paragraph& par = *output();
+  
+  // Removing trailing space, if any
+  if (par.length() > 0 && par.text().back() == ' ')
+  {
+    par.text().pop_back();
+
+    for (auto data : par.metadata())
+    {
+      if (data->range().end() > par.length())
+      {
+        const dom::ParagraphRange parrange = data->range();
+        data->range() = dom::ParagraphRange(parrange.paragraph(), parrange.begin(), par.length());
+      }
+    }
+  }
 }
 
 std::shared_ptr<dom::Paragraph> ParagraphWriter::output() const

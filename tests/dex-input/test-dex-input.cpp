@@ -257,7 +257,7 @@ void TestDexInput::parserMachineImage()
 
   QVERIFY(doc->description().at(0)->is<dom::Paragraph>());
   auto par = std::static_pointer_cast<dom::Paragraph>(doc->description().at(0));
-  QVERIFY(par->text() == "This is a first paragraph. ");
+  QVERIFY(par->text() == "This is a first paragraph.");
 
   QVERIFY(doc->description().at(1)->is<dom::Image>());
   auto img = std::static_pointer_cast<dom::Image>(doc->description().at(1));
@@ -266,7 +266,7 @@ void TestDexInput::parserMachineImage()
 
   QVERIFY(doc->description().at(2)->is<dom::Paragraph>());
   par = std::static_pointer_cast<dom::Paragraph>(doc->description().at(2));
-  QVERIFY(par->text() == "This is a second paragraph. ");
+  QVERIFY(par->text() == "This is a second paragraph.");
 }
 
 void TestDexInput::parserMachineList()
@@ -318,7 +318,7 @@ void TestDexInput::parserMachineList()
   QVERIFY(lst->items.front()->content.front()->is<dom::Paragraph>());
 
   auto par = std::static_pointer_cast<dom::Paragraph>(lst->items.front()->content.front());
-  QVERIFY(par->text() == "nested item ");
+  QVERIFY(par->text() == "nested item");
 }
 
 void TestDexInput::parserMachineClass()
@@ -354,7 +354,7 @@ void TestDexInput::parserMachineClass()
   QVERIFY(doc->description().size() == 1);
   QVERIFY(doc->description().front()->is<dom::Paragraph>());
   auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
-  QVERIFY(paragraph->text() == "The elements are stored contiguously, ... ");
+  QVERIFY(paragraph->text() == "The elements are stored contiguously, ...");
 
   QFile::remove("test.cpp");
 }
@@ -402,9 +402,9 @@ void TestDexInput::parserMachineFunction()
   QVERIFY(doc->description().front()->is<dom::Paragraph>());
   QVERIFY(doc->description().back()->is<dom::Paragraph>());
   auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
-  QVERIFY(paragraph->text() == "Searches the environment list provided by the host environment... ");
+  QVERIFY(paragraph->text() == "Searches the environment list provided by the host environment...");
   paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().back());
-  QVERIFY(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior. ");
+  QVERIFY(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior.");
 
   QFile::remove("test.cpp");
 }
@@ -449,7 +449,7 @@ void TestDexInput::parserMachineEnum()
   QVERIFY(doc->description().size() == 1);
   QVERIFY(doc->description().front()->is<dom::Paragraph>());
   auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
-  QVERIFY(paragraph->text() == "This is not that useful. ");
+  QVERIFY(paragraph->text() == "This is not that useful.");
 
   auto top_left = corner->values().at(0);
   auto valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(top_left->documentation());
@@ -457,7 +457,7 @@ void TestDexInput::parserMachineEnum()
   QVERIFY(valdoc->description().size() == 1);
   QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
   paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
-  QVERIFY(paragraph->text() == "the top left corner ");
+  QVERIFY(paragraph->text() == "the top left corner");
 
   auto bottom_right = corner->values().at(3);
   valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(bottom_right->documentation());
@@ -465,7 +465,7 @@ void TestDexInput::parserMachineEnum()
   QVERIFY(valdoc->description().size() == 1);
   QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
   paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
-  QVERIFY(paragraph->text() == "the bottom right corner ");
+  QVERIFY(paragraph->text() == "the bottom right corner");
 }
 
 void TestDexInput::modelPath()
@@ -507,5 +507,5 @@ void TestDexInput::modelPath()
 
   auto list_item = std::static_pointer_cast<dom::ListItem>(dom_node);
   auto par = std::static_pointer_cast<dom::Paragraph>(list_item->content.front());
-  QVERIFY(par->text() == "first item ");
+  QVERIFY(par->text() == "first item");
 }
