@@ -48,7 +48,7 @@ inline json::Json JsonPathAnnotator::get(const Model::Path& path, const json::Js
   for (const auto& p : path)
   {
     if (p.index != std::numeric_limits<size_t>::max())
-      result = result[p.name][p.index];
+      result = result[p.name][static_cast<int>(p.index)];
     else
       result = result[p.name];
   }

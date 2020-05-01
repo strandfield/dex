@@ -81,47 +81,51 @@ const char* fmt_src =
   "  \\p@rseline\\c@ll\\functi@n"
   "}"
   "" // 70
-  "\\def\\enum{"
+  "\\def\\variable{"
+  "  \\p@rseline\\c@ll\\v@ri@ble"
+  "}"
+  ""
+  "\\def\\enum{" // 75
   "  \\p@rseline\\c@ll\\@enum"
   "}"
   ""
-  "\\def\\value{" // 75
-  "  \\@ifnextchar[{"
+  "\\def\\value{"
+  "  \\@ifnextchar[{" // 80
   "    \\def\\@afteroptions{"
   "      \\p@rseword\\c@ll\\enumv@lue"
   "    }"
-  "    \\p@rseoptions" // 80
-  "  }{"
+  "    \\p@rseoptions"
+  "  }{" // 85
   "    \\p@rseword\\c@ll\\enumv@lue"
   "  }"
   "}"
-  "" // 85
-  "\\def\\brief{"
+  ""
+  "\\def\\brief{" // 90
   "  \\p@rseline\\c@ll\\@brief"
   "}"
   ""
-  "\\def\\param{" // 90
-  "  \\p@rseline\\c@ll\\p@r@m"
+  "\\def\\param{"
+  "  \\p@rseline\\c@ll\\p@r@m" // 95
   "}"
   ""
   "\\def\\returns{"
-  "  \\p@rseline\\c@ll\\@returns" // 95
-  "}"
+  "  \\p@rseline\\c@ll\\@returns"
+  "}" // 100
   ""
   "\\def\\since{"
   "  \\@ifnextchar[{"
-  "    \\def\\@fteroptions{" // 100
-  "      \\@ifleftbrace{"
+  "    \\def\\@fteroptions{"
+  "      \\@ifleftbrace{" // 105
   "        \\p@rseword\\c@ll\\@since"
   "      }{"
   "        \\beginsince"
-  "      }" // 105
-  "    }"
+  "      }"
+  "    }" // 110
   "    \\p@rseoptions"
   "  }{"
   "    \\p@rseline\\c@ll\\@since"
-  "  }" // 110
-  "}"
+  "  }"
+  "}" // 115
   ""
 ;
 
@@ -198,47 +202,51 @@ const char* fmt_bytecode =
   ">2c9c4c8"
   "s"
   "" // 70
-  "d4r"
+  "d8r"
+  ">2c9c4c8"
+  "s"
+  ""
+  "d4r" // 75
   ">2c9c4c5"
   "s"
   ""
-  "d5r" // 75
-  ">2c;tt"
+  "d5r"
+  ">2c;tt" // 80
   ">4c3c=t"
   ">6c9c4c9"
   ">4t"
-  ">4c<" // 80
-  ">2tt"
+  ">4c<"
+  ">2tt" // 85
   ">4c9c4c9"
   ">2t"
   "s"
-  "" // 85
-  "d5r"
+  ""
+  "d5r" // 90
   ">2c9c4c6"
   "s"
   ""
-  "d5r" // 90
-  ">2c9c4c5"
+  "d5r"
+  ">2c9c4c5" // 95
   "s"
   ""
   "d7r"
-  ">2c9c4c8" // 95
-  "s"
+  ">2c9c4c8"
+  "s" // 100
   ""
   "d5r"
   ">2c;tt"
-  ">4c3c<t" // 100
-  ">6c<t"
+  ">4c3c<t"
+  ">6c<t" // 105
   ">8c9c4c6"
   ">6tt"
   ">8c:"
-  ">6t" // 105
-  ">4t"
+  ">6t"
+  ">4t" // 110
   ">4c<"
   ">2tt"
   ">4c9c4c6"
-  ">2t" // 110
-  "s"
+  ">2t"
+  "s" // 115
   ""
   "e";
 

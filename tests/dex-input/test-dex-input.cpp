@@ -18,6 +18,7 @@
 #include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
+#include <cxx/variable.h>
 
 #include <dom/image.h>
 #include <dom/list.h>
@@ -466,6 +467,45 @@ void TestDexInput::parserMachineEnum()
   QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
   paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
   QVERIFY(paragraph->text() == "the bottom right corner");
+}
+
+void TestDexInput::parserMachineVariable()
+{
+  dex::ParserMachine parser;
+
+  QFile file{ "test.cpp" };
+  QVERIFY(file.open(QIODevice::WriteOnly));
+
+  file.write(
+    "/*!\n"
+    " * \\variable std::string name = \"dex\";\n"
+    " * \\brief the name of the program\n"
+    " * \\since 2020\n"
+    " * Stores the name of the program.\n"
+    " */\n"
+  );
+
+  file.close();
+
+  parser.process(QFileInfo{ "test.cpp" });
+
+  std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  QVERIFY(ns->entities().size() > 0);
+  QVERIFY(ns->entities().front()->is<cxx::Variable>());
+  auto variable = std::static_pointer_cast<cxx::Variable>(ns->entities().front());
+  QVERIFY(variable->name() == "name");
+  QVERIFY(std::dynamic_pointer_cast<dex::VariableDocumentation>(variable->documentation()) != nullptr);
+  auto doc = std::static_pointer_cast<dex::VariableDocumentation>(variable->documentation());
+  QVERIFY(doc->brief().value() == "the name of the program");
+  QVERIFY(doc->since().value().version() == "2020");
+ 
+  QVERIFY(doc->description().size() == 1);
+  QVERIFY(doc->description().front()->is<dom::Paragraph>());
+  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
+  QVERIFY(paragraph->text() == "Stores the name of the program.");
+
+  QFile::remove("test.cpp");
 }
 
 void TestDexInput::modelPath()

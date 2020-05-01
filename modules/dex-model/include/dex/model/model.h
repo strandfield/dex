@@ -9,6 +9,7 @@
 #include "dex/model/enum-documentation.h"
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
+#include "dex/model/variable-documentation.h"
 
 #include "dex/model/manual.h"
 

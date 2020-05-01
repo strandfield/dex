@@ -12,6 +12,7 @@
 #include "dex/model/enum-documentation.h"
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
+#include "dex/model/variable-documentation.h"
 
 #include "dex/common/logging.h"
 
@@ -19,6 +20,7 @@
 #include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
+#include <cxx/variable.h>
 
 #include <cxx/parsers/restricted-parser.h>
 
@@ -96,6 +98,8 @@ const std::map<std::string, ProgramMode::CS>& ProgramMode::csmap()
     {Functions::ENDENUM, CS::ENDENUM},
     {Functions::ENUMVALUE, CS::ENUMVALUE},
     {Functions::ENDENUMVALUE, CS::ENDENUMVALUE},
+    {Functions::VARIABLE, CS::VARIABLE},
+    {Functions::ENDVARIABLE, CS::ENDVARIABLE},
     {Functions::BRIEF, CS::BRIEF},
     {Functions::SINCE, CS::SINCE},
     {Functions::PARAM, CS::PARAM},
@@ -164,6 +168,8 @@ void ProgramMode::do_write(tex::parsing::Token&& tok)
         return cs_endenum();
       case CS::ENDENUMVALUE:
         return cs_endenumvalue();
+      case CS::ENDVARIABLE:
+        return cs_endvariable();
       default:
         throw UnexpectedControlSequence{ tok.controlSequence() };
       }
@@ -203,6 +209,10 @@ bool ProgramMode::handle(const FunctionCall& call)
   else if (call.function == Functions::ENUMVALUE)
   {
     fn_enumvalue(call);
+  }
+  else if (call.function == Functions::VARIABLE)
+  {
+    fn_variable(call);
   }
   else if (call.function == Functions::BRIEF)
   {
@@ -439,6 +449,59 @@ void ProgramMode::cs_endenumvalue()
   exitFrame();
 }
 
+void ProgramMode::fn_variable(const FunctionCall& call)
+{
+  if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
+    throw BadControlSequence{ "variable" };
+
+  auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+
+  std::string var_decl = std::get<std::string>(call.arguments.front());
+
+  while (var_decl.back() == ' ')
+    var_decl.pop_back();
+
+  if (var_decl.back() != ';')
+    var_decl.push_back(';');
+
+  std::shared_ptr<cxx::Variable> the_var = [&]() {
+    try
+    {
+      return cxx::parsers::RestrictedParser::parseVariable(var_decl);
+    }
+    catch (...)
+    {
+      LOG_INFO << "could not parse variable declaration '" << var_decl << "'";
+      return std::make_shared<cxx::Variable>(cxx::Type::Auto, var_decl, parent_entity);
+    }
+  }();
+
+  the_var->setDocumentation(std::make_shared<VariableDocumentation>());
+
+  if (parent_entity->is<cxx::Namespace>())
+  {
+    const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
+    ns->entities().push_back(the_var);
+  }
+  else
+  {
+    const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
+    cla->members().push_back({ the_var, cxx::AccessSpecifier::PUBLIC });
+  }
+
+  m_state.enter<FrameType::Variable>(the_var);
+  m_lastblock_entity = the_var;
+}
+
+void ProgramMode::cs_endvariable()
+{
+  if (!currentFrame().node->is<cxx::Variable>())
+    throw BadControlSequence{ "endvariable" };
+
+  exitFrame();
+  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+}
+
 void ProgramMode::fn_brief(const FunctionCall& call)
 {
   std::string text = std::get<std::string>(call.arguments.front());
@@ -519,7 +582,8 @@ void ProgramMode::beginBlock()
 void ProgramMode::endBlock()
 {
   auto is_func_or_enum = [](const std::shared_ptr<cxx::Node>& node) -> bool{
-    return node->node_kind() == cxx::NodeKind::Enum || node->node_kind() == cxx::NodeKind::Function;
+    return node->node_kind() == cxx::NodeKind::Enum || node->node_kind() == cxx::NodeKind::Function
+      || node->node_kind() == cxx::NodeKind::Variable;
   };
 
   while (is_func_or_enum(m_state.current().node))

@@ -65,6 +65,8 @@ struct DEX_INPUT_API Functions
   static const std::string ENDSINCE;
   static const std::string PARAM;
   static const std::string RETURNS;
+  static const std::string VARIABLE;
+  static const std::string ENDVARIABLE;
 
   static const std::string IMAGE;
 

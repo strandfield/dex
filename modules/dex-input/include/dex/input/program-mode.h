@@ -34,6 +34,7 @@ public:
     Function,
     Enum,
     EnumValue,
+    Variable,
   };
 
   struct Frame : state::Frame<FrameType>
@@ -68,6 +69,8 @@ public:
     ENDENUM,
     ENUMVALUE,
     ENDENUMVALUE,
+    VARIABLE,
+    ENDVARIABLE,
     /* Metadata */
     BRIEF,
     SINCE,
@@ -107,6 +110,8 @@ protected:
   void cs_endenum();
   void fn_enumvalue(const FunctionCall& call);
   void cs_endenumvalue();
+  void fn_variable(const FunctionCall& call);
+  void cs_endvariable();
 
   void fn_brief(const FunctionCall& call);
   void fn_since(const FunctionCall& call);

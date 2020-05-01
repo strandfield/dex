@@ -25,6 +25,8 @@ const std::string Functions::BEGINSINCE = "beginsince";
 const std::string Functions::ENDSINCE = "endsince";
 const std::string Functions::PARAM = "p@r@m";
 const std::string Functions::RETURNS = "@returns";
+const std::string Functions::VARIABLE = "v@ri@ble";
+const std::string Functions::ENDVARIABLE = "endvariable";
 
 const std::string Functions::IMAGE = "@image";
 
