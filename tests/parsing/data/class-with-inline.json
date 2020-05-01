@@ -16,6 +16,7 @@
               },
               "name": "day",
               "return_type": "int",
+              "specifiers": "const",
               "type": "function"
             }, {
               "accessibility": "public",

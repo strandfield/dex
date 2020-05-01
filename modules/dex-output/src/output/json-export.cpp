@@ -257,6 +257,30 @@ void JsonExport::visit_function(const cxx::Function& f)
   ModelVisitor::visit_function(f);
 
   object()["return_type"] = f.returnType().toString();
+
+  if (f.specifiers() != 0)
+  {
+    std::string specifiers;
+
+    if (f.specifiers() & cxx::FunctionSpecifier::Inline)
+      specifiers += "inline,";
+    if (f.specifiers() & cxx::FunctionSpecifier::Static)
+      specifiers += "static,";
+    if (f.specifiers() & cxx::FunctionSpecifier::Constexpr)
+      specifiers += "constexpr,";
+    if (f.specifiers() & cxx::FunctionSpecifier::Virtual)
+      specifiers += "virtual,";
+    if (f.specifiers() & cxx::FunctionSpecifier::Override)
+      specifiers += "override,";
+    if (f.specifiers() & cxx::FunctionSpecifier::Final)
+      specifiers += "final,";
+    if (f.specifiers() & cxx::FunctionSpecifier::Const)
+      specifiers += "const,";
+    
+    specifiers.pop_back();
+
+    object()["specifiers"] = specifiers;
+  }
 }
 
 void JsonExport::visit_functionparameter(const cxx::FunctionParameter& fp)
