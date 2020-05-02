@@ -1,0 +1,19 @@
+
+/*!
+ * \class Point
+ * \brief a 2D point with integer precision
+ */
+struct Point
+{
+  /*!
+   * \variable int x;
+   * \brief the first coordinate of the point
+   */
+  int x;
+
+  /*!
+   * \variable int y;
+   * \brief the second coordinate of the point
+   */
+  int y;
+};

@@ -1,0 +1,32 @@
+{
+  "program": {
+    "global_namespace": {
+      "entities": [{
+          "documentation": {
+            "brief": "a 2D point with integer precision"
+          },
+          "members": [{
+              "accessibility": "public",
+              "documentation": {
+                "brief": "the first coordinate of the point"
+              },
+              "name": "x",
+              "type": "variable",
+              "vartype": "int"
+            }, {
+              "accessibility": "public",
+              "documentation": {
+                "brief": "the second coordinate of the point"
+              },
+              "name": "y",
+              "type": "variable",
+              "vartype": "int"
+            }],
+          "name": "Point",
+          "type": "class"
+        }],
+      "name": "",
+      "type": "namespace"
+    }
+  }
+}
