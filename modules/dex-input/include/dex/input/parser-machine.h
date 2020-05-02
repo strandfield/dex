@@ -11,6 +11,7 @@
 
 #include "dex/input/conditional-evaluator.h"
 #include "dex/input/function-caller.h"
+#include "dex/input/parser-frontend.h"
 #include "dex/input/parser-errors.h"
 
 #include <cxx/program.h>
@@ -124,9 +125,6 @@ public:
   dex::FunctionCall& call();
   dex::FunctionCaller& caller();
 
-  const std::vector<std::unique_ptr<ParserMode>>& modes() const;
-  ParserMode& currentMode() const;
-
   void resume();
   void advance();
 
@@ -152,6 +150,7 @@ protected:
   bool sendTokens();
 
 private:
+  std::shared_ptr<Model> m_model;
   dex::FunctionCall m_call;
   std::stack<tex::parsing::Lexer::CatCodeTable> m_lexercatcodes;
   InputStream m_inputstream;
@@ -159,9 +158,8 @@ private:
   tex::parsing::Preprocessor m_preprocessor;
   dex::ConditionalEvaluator m_condeval;
   dex::FunctionCaller m_caller;
-  std::vector<std::unique_ptr<ParserMode>> m_modes;
+  ParserFrontend m_processor;
   State m_state = State::Idle;
-  std::shared_ptr<Model> m_model;
 };
 
 } // namespace dex

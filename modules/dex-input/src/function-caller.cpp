@@ -5,7 +5,6 @@
 #include "dex/input/function-caller.h"
 
 #include "dex/input/parser-machine.h"
-#include "dex/input/parser-mode.h"
 #include "dex/input/parser-errors.h"
 
 #include "dex/common/logging.h"

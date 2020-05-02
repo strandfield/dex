@@ -5,8 +5,6 @@
 #include "dex/input/parser-machine.h"
 
 #include "dex/input/format.h"
-#include "dex/input/parser-mode.h"
-#include "dex/input/program-mode.h"
 #include "dex/input/parser-errors.h"
 
 #include "dex/common/file-utils.h"
@@ -255,28 +253,24 @@ InputStream& InputStream::operator=(const QFileInfo& file)
 }
 
 ParserMachine::ParserMachine()
-  : m_lexercatcodes{},
+  : m_model{new Model},
+    m_lexercatcodes{},
     m_inputstream {},
     m_lexer{},
     m_preprocessor{},
     m_condeval{*this},
     m_caller{*this},
-    m_modes{},
-    m_state{State::Idle},
-    m_model{}
+    m_processor{*this},
+    m_state{State::Idle}
 {
 #if defined(Q_OS_WIN)
   m_lexer.catcodes()[static_cast<size_t>('\r')] = tex::parsing::CharCategory::Ignored;
 #endif // defined(Q_OS_WIN)
 
-  m_model = std::make_shared<Model>();
-
   for (const tex::parsing::Macro& m : tex::parsing::Format::load(DexFormat))
   {
     m_preprocessor.define(m);
   }
-
-  m_modes.push_back(std::make_unique<ProgramMode>(*this));
 }
 
 ParserMachine::~ParserMachine()
@@ -334,16 +328,6 @@ dex::FunctionCaller& ParserMachine::caller()
   return m_caller;
 }
 
-const std::vector<std::unique_ptr<ParserMode>>& ParserMachine::modes() const
-{
-  return m_modes;
-}
-
-ParserMode& ParserMachine::currentMode() const
-{
-  return *m_modes.back();
-}
-
 bool ParserMachine::sendTokens()
 {
   if (m_preprocessor.output.empty())
@@ -355,28 +339,14 @@ bool ParserMachine::sendTokens()
 
   if (m_caller.hasPendingCall())
   {
-    m_modes.back()->handle(m_caller.call());
+    m_processor.handle(m_caller.call());
     m_caller.clearPendingCall();
-
-    if (m_modes.back()->done())
-    {
-      std::unique_ptr<ParserMode> mode{ std::move(m_modes.back()) };
-      m_modes.pop_back();
-      m_modes.back()->childFinished(*mode);
-    }
   }
 
   if (m_caller.output().empty())
     return !m_preprocessor.output.empty();
 
-  m_modes.back()->write(tex::parsing::read(m_caller.output()));
-
-  if (m_modes.back()->done())
-  {
-    std::unique_ptr<ParserMode> mode{ std::move(m_modes.back()) };
-    m_modes.pop_back();
-    m_modes.back()->childFinished(*mode);
-  }
+  m_processor.write(tex::parsing::read(m_caller.output()));
 
   return !m_preprocessor.output.empty();
 }
@@ -496,7 +466,7 @@ bool ParserMachine::recover()
 
     inputStream().exitBlock();
 
-    currentMode().endBlock();
+    m_processor.endBlock();
   }
 
   m_state = State::SeekBlock;
@@ -506,11 +476,7 @@ bool ParserMachine::recover()
   m_preprocessor.output.clear();
   m_condeval.output().clear();
   m_caller.output().clear();
-
-  while (m_modes.size() > 1)
-  {
-    m_modes.pop_back();
-  }
+  m_processor.recover();
 
   return true;
 }
@@ -521,8 +487,8 @@ void ParserMachine::reset()
 
   if (inputStream().isInsideBlock())
   {
-    currentMode().endBlock();
-    currentMode().endFile();
+    m_processor.endBlock();
+    m_processor.endFile();
   }
 
   m_state = State::Idle;
@@ -534,9 +500,7 @@ void ParserMachine::reset()
   m_condeval.output().clear();
   m_caller.output().clear();
 
-  m_modes.clear();
-
-  m_modes.push_back(std::make_unique<ProgramMode>(*this));
+  m_processor.reset();
 }
 
 const std::shared_ptr<Model>& ParserMachine::output() const
@@ -556,22 +520,22 @@ void ParserMachine::processFile(const std::string& path)
 
 void ParserMachine::beginFile()
 {
-  currentMode().beginFile();
+  m_processor.beginFile();
 }
 
 void ParserMachine::endFile()
 {
-  currentMode().endFile();
+  m_processor.endFile();
 }
 
 void ParserMachine::beginBlock()
 {
-  currentMode().beginBlock();
+  m_processor.beginBlock();
 }
 
 void ParserMachine::endBlock()
 {
-  currentMode().endBlock();
+  m_processor.endBlock();
 }
 
 bool ParserMachine::seekBlock()
