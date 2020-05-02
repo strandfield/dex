@@ -47,7 +47,7 @@ public:
     Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent);
 
     std::shared_ptr<cxx::Node> node;
-    std::shared_ptr<DocumentWriterFrontend> writer;
+    std::shared_ptr<DocumentWriterToolchain> writer;
   };
 
   using State = state::State<Frame>;

@@ -69,7 +69,7 @@ ProgramMode::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
   : state::Frame<FrameType>(ft)
 {
   node = cxxent;
-  writer = std::make_shared<DocumentWriterFrontend>();
+  writer = std::make_shared<DocumentWriterToolchain>();
 }
 
 ProgramMode::ProgramMode(ParserMachine& machine)
