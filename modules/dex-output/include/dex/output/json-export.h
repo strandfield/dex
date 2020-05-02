@@ -23,14 +23,6 @@ class ListItem;
 
 namespace cxx
 {
-class Entity;
-class Class;
-class Documentation;
-class Enum;
-class EnumValue;
-class Function;
-class Namespace;
-class Program;
 class SourceLocation;
 } // namespace cxx
 
@@ -59,6 +51,7 @@ protected:
   void visit_enumvalue(const cxx::EnumValue& ev) override;
   void visit_function(const cxx::Function& f) override;
   void visit_functionparameter(const cxx::FunctionParameter& fp) override;
+  void visit_variable(const cxx::Variable& v) override;
 
   void visit_entitydocumentation(const EntityDocumentation& edoc) override;
 

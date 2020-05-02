@@ -12,6 +12,7 @@
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 #include <cxx/program.h>
+#include <cxx/variable.h>
 
 #include <dom/image.h>
 #include <dom/list.h>
@@ -54,6 +55,8 @@ static std::string to_string(cxx::NodeKind n)
     return "template-parameter";
   case cxx::NodeKind::TranslationUnit:
     return "translation-unit";
+  case cxx::NodeKind::Variable:
+    return "variable";
   case cxx::NodeKind::MultilineComment:
     return "multiline-comment";
   case cxx::NodeKind::Documentation:
@@ -289,6 +292,30 @@ void JsonExport::visit_functionparameter(const cxx::FunctionParameter& fp)
 
   object()["type"] = fp.parameterType().toString();
   write_if(object(), "default_value", fp.defaultValue(), !fp.defaultValue().empty());
+}
+
+void JsonExport::visit_variable(const cxx::Variable& v)
+{
+  ModelVisitor::visit_variable(v);
+
+  object()["vartype"] = v.type().toString();
+  write_if(object(), "default_value", v.defaultValue(), !v.defaultValue().empty());
+
+  if (v.specifiers() != 0)
+  {
+    std::string specifiers;
+
+    if (v.specifiers() & cxx::VariableSpecifier::Inline)
+      specifiers += "inline,";
+    if (v.specifiers() & cxx::VariableSpecifier::Static)
+      specifiers += "static,";
+    if (v.specifiers() & cxx::VariableSpecifier::Constexpr)
+      specifiers += "constexpr,";
+
+    specifiers.pop_back();
+
+    object()["specifiers"] = specifiers;
+  }
 }
 
 

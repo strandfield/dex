@@ -8,6 +8,7 @@
 #include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
+#include <cxx/variable.h>
 
 #include <dom/image.h>
 #include <dom/list.h>
@@ -144,6 +145,8 @@ void ModelVisitor::visit_entity(const cxx::Entity& e)
     visit_functionparameter(static_cast<const cxx::FunctionParameter&>(e));
   else if (e.is<cxx::Namespace>())
     visit_namespace(static_cast<const cxx::Namespace&>(e));
+  else if (e.is<cxx::Variable>())
+    visit_variable(static_cast<const cxx::Variable&>(e));
 
   if (e.documentation())
   {
@@ -223,6 +226,11 @@ void ModelVisitor::visit_function(const cxx::Function& f)
 }
 
 void ModelVisitor::visit_functionparameter(const cxx::FunctionParameter& /* fp */)
+{
+
+}
+
+void ModelVisitor::visit_variable(const cxx::Variable& /* v */)
 {
 
 }
