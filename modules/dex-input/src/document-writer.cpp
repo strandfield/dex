@@ -71,7 +71,7 @@ void DocumentWriter::image(std::string src, std::optional<int> width, std::optio
 {
   if (isWritingList())
   {
-    m_writer->image(src, width, height);
+    currentList().content().image(std::move(src), width, height);
     return;
   }
 
@@ -86,15 +86,7 @@ void DocumentWriter::image(std::string src, std::optional<int> width, std::optio
 
 void DocumentWriter::list()
 {
-  if (isIdle() || isWritingParagraph())
-  {
-    startList();
-  }
-  else
-  {
-    assert(isWritingList());
-    currentList().list();
-  }
+  list({}, {}, {});
 }
 
 void DocumentWriter::list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed)
@@ -119,7 +111,7 @@ void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> va
   if (!isWritingList())
     throw std::runtime_error{"DocumentWriter::li()"};
 
-  m_writer->li(marker, value);
+  currentList().li(std::move(marker), value);
 }
 
 void DocumentWriter::endlist()
@@ -127,7 +119,24 @@ void DocumentWriter::endlist()
   if (!isWritingList())
     throw std::runtime_error{ "DocumentWriter::endlist()" };
 
-  m_writer->endlist();
+  if (currentList().content().isWritingList())
+  {
+    currentList().endlist();
+  }
+  else
+  {
+    currentList().finish();
+    auto l = currentList().output();
+
+    if (m_since.has_value())
+    {
+      // TODO: handle since
+    }
+
+    m_nodes.push_back(l);
+    m_state = State::Idle;
+    m_writer = nullptr;
+  }
 }
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
@@ -187,11 +196,7 @@ void DocumentWriter::endParagraph()
 
 void DocumentWriter::startList()
 {
-  if (isWritingParagraph())
-    endParagraph();
-
-  m_state = State::WritingList;
-  m_writer = std::make_shared<ListWriter>();
+  list();
 }
 
 void DocumentWriter::endList()

@@ -31,11 +31,6 @@ public:
 
   virtual void write(char c) = 0;
 
-  virtual bool image(std::string& src, std::optional<int>& width, std::optional<int>& height);
-
-  virtual bool li(std::optional<std::string>& marker, std::optional<int>& value);
-  virtual bool endlist();
-
   virtual void finish() = 0;
 
   std::shared_ptr<dom::Node> output() const;

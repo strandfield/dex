@@ -4,13 +4,7 @@
 
 #include "dex/input/document-writer-frontend.h"
 
-#include "dex/model/since.h"
-
-#include "dex/input/list-writer.h"
-#include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-errors.h"
-
-#include <dom/image.h>
 
 #include <cassert>
 #include <stdexcept>

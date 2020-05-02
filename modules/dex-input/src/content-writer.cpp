@@ -22,21 +22,6 @@ ContentWriter::~ContentWriter()
 
 }
 
-bool ContentWriter::image(std::string& src, std::optional<int>& width, std::optional<int>& height)
-{
-  return false;
-}
-
-bool ContentWriter::li(std::optional<std::string>& marker, std::optional<int>& value)
-{
-  return false;
-}
-
-bool ContentWriter::endlist()
-{
-  return false;
-}
-
 std::shared_ptr<dom::Node> ContentWriter::output() const
 {
   return m_output;

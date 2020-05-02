@@ -56,38 +56,35 @@ void ListWriter::finish()
   }
 }
 
-bool ListWriter::image(std::string& src, std::optional<int>& width, std::optional<int>& height)
+DocumentWriter& ListWriter::content() const
 {
-  assert(m_doc_writer);
-  m_doc_writer->image(std::move(src), width, height);
-  return true;
+  if (!m_doc_writer)
+    throw std::runtime_error{ "ListWriter : no active listitem" };
+
+  return *m_doc_writer;
 }
 
 void ListWriter::list()
 {
-  assert(m_doc_writer);
-  m_doc_writer->list();
+  content().list();
 }
 
 void ListWriter::list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed)
 {
-  assert(m_doc_writer);
-  m_doc_writer->list(marker, ordered, reversed);
+  content().list(marker, ordered, reversed);
 }
 
-bool ListWriter::li(std::optional<std::string>& marker, std::optional<int>& value)
+void ListWriter::li(std::optional<std::string>& marker, std::optional<int>& value)
 {
   if (m_doc_writer)
   {
     if (m_doc_writer->isWritingList())
     {
       m_doc_writer->li(marker, value);
-      return true;
+      return;
     }
-    else
-    {
-      finish();
-    }
+
+    finish();
   }
 
   auto item = std::make_shared<dom::ListItem>();
@@ -98,13 +95,11 @@ bool ListWriter::li(std::optional<std::string>& marker, std::optional<int>& valu
   output()->items.push_back(item);
 
   m_doc_writer = std::make_shared<DocumentWriter>();
-  return true;
 }
 
-bool ListWriter::endlist()
+void ListWriter::endlist()
 {
-  finish();
-  return true;
+  content().endlist();
 }
 
 std::shared_ptr<dom::List> ListWriter::output() const

@@ -27,12 +27,12 @@ public:
   void write(char c) override;
   void finish() override;
 
-  bool image(std::string& src, std::optional<int>& width, std::optional<int>& height) override;
+  DocumentWriter& content() const;
 
   void list();
   void list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed);
-  bool li(std::optional<std::string>& marker, std::optional<int>& value) override;
-  bool endlist() override;
+  void li(std::optional<std::string>& marker, std::optional<int>& value);
+  void endlist();
 
   std::shared_ptr<dom::List> output() const;
   
