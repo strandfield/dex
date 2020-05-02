@@ -192,12 +192,12 @@ void TestDexInput::documentWriterList()
 {
   dex::DocumentWriter writer;
 
-  writer.startList();
+  writer.list();
   writer.li({}, {});
   writer.write("List item number 1");
   writer.li({}, {});
   writer.write("Number 2");
-  writer.endList();
+  writer.endlist();
 
   QVERIFY(writer.output().size() == 1);
   QVERIFY(writer.output().at(0)->is<dom::List>());

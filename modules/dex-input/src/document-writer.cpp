@@ -200,34 +200,17 @@ void DocumentWriter::endParagraph()
   m_writer = nullptr;
 }
 
-void DocumentWriter::startList()
-{
-  list();
-}
-
-void DocumentWriter::endList()
-{
-  assert(isWritingList());
-
-  currentList().finish();
-  auto l = currentList().output();
-
-  if (m_since.has_value())
-  {
-    // TODO: handle since
-  }
-
-  m_nodes.push_back(l);
-  m_state = State::Idle;
-  m_writer = nullptr;
-}
-
 void DocumentWriter::finish()
 {
   if (isWritingParagraph())
+  {
     endParagraph();
+  }
   else if (isWritingList())
-    endList();
+  {
+    // @TODO: should we issue a warning for a missing \endlist
+    endlist();
+  }
 }
 
 bool DocumentWriter::isIdle() const

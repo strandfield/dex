@@ -65,9 +65,6 @@ public:
   void startParagraph();
   void endParagraph();
 
-  void startList();
-  void endList();
-
   void finish();
 
   void write(const std::shared_ptr<dom::Node>& node);
