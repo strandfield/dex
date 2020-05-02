@@ -16,6 +16,9 @@ namespace dex
 
 class Logger;
 
+#pragma warning(push)
+#pragma warning(disable: 4275)
+
 class DEX_COMMON_API Exception : public std::exception
 {
 protected:
@@ -28,6 +31,8 @@ public:
   const char* what() const noexcept override;
 
 };
+
+#pragma warning(pop)
 
 class DEX_COMMON_API IOException : public Exception
 {
