@@ -67,6 +67,14 @@ BadControlSequence::BadControlSequence(std::string cs)
 
 }
 
+BadCall::BadCall(std::string fn, std::string mssg)
+  : ParserException("bad call to '" + fn + "': " + mssg),
+    fnname(std::move(fn)),
+    message(std::move(mssg))
+{
+
+}
+
 Logger& operator<<(Logger& logger, const ParserException& ex)
 {
   json::Object obj;

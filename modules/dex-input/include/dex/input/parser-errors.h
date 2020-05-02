@@ -62,6 +62,15 @@ public:
   BadControlSequence(std::string cs);
 };
 
+class DEX_INPUT_API BadCall : public ParserException
+{
+public:
+  std::string fnname;
+  std::string message;
+
+  BadCall(std::string fn, std::string mssg);
+};
+
 DEX_INPUT_API Logger& operator<<(Logger& logger, const ParserException& ex);
 
 } // namespace dex

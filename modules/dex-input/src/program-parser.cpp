@@ -6,7 +6,6 @@
 
 #include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-errors.h"
-#include "dex/input/functional.h"
 
 #include "dex/model/class-documentation.h"
 #include "dex/model/enum-documentation.h"
@@ -92,7 +91,9 @@ std::shared_ptr<DocumentWriter> ProgramParser::contentWriter()
 void ProgramParser::class_(std::string name)
 {
   if (currentFrame().node->is<cxx::Function>())
-    throw BadControlSequence{ "class" };
+    throw BadCall{ "ProgramParser::class()", "\\class cannot be used inside \\fn" };
+  else if (currentFrame().node->is<cxx::Enum>())
+    throw BadCall{ "ProgramParser::class()", "\\class cannot be used inside \\enum" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
 
@@ -109,14 +110,11 @@ void ProgramParser::class_(std::string name)
       auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
       cla->members().push_back({ the_class, cxx::AccessSpecifier::PUBLIC });
     }
-    else if (currentFrame().node->is<cxx::Namespace>())
-    {
-      auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-      ns->entities().push_back(the_class);
-    }
     else
     {
-      throw BadControlSequence{ "class" };
+      assert(currentFrame().node->is<cxx::Namespace>());
+      auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
+      ns->entities().push_back(the_class);
     }
   }
 
@@ -127,7 +125,7 @@ void ProgramParser::class_(std::string name)
 void ProgramParser::endclass()
 {
   if (!currentFrame().node->is<cxx::Class>())
-    throw BadControlSequence{ Functions::ENDCLASS };
+    throw BadCall{ "ProgramParser::endclass()", "\\endclass but no \\class" };
 
   exitFrame();
   m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -136,7 +134,9 @@ void ProgramParser::endclass()
 void ProgramParser::fn(std::string signature)
 {
   if (currentFrame().node->is<cxx::Function>())
-    throw BadControlSequence{ "function" };
+    throw BadCall{ "ProgramParser::fn()", "\\fn cannot be nested" };
+  else if (currentFrame().node->is<cxx::Enum>())
+    throw BadCall{ "ProgramParser::fn()", "\\fn cannot be used inside \\enum" };
 
   auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
 
@@ -168,12 +168,9 @@ void ProgramParser::fn(std::string signature)
   }
   else if (currentFrame().node->is<cxx::Namespace>())
   {
+    assert(currentFrame().node->is<cxx::Namespace>());
     auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
     ns->entities().push_back(the_fn);
-  }
-  else
-  {
-    throw BadControlSequence{ "function" };
   }
 
   m_state.enter<FrameType::Function>(the_fn);
@@ -182,7 +179,7 @@ void ProgramParser::fn(std::string signature)
 void ProgramParser::endfn()
 {
   if (!currentFrame().node->is<cxx::Function>())
-    throw BadControlSequence{ "endfunction" };
+    throw BadCall{ "ProgramParser::endfn()", "\\endfn but no \\fn" };
 
   exitFrame();
 }
@@ -190,7 +187,7 @@ void ProgramParser::endfn()
 void ProgramParser::namespace_(std::string name)
 {
   if (!currentFrame().node->is<cxx::Namespace>())
-    throw BadControlSequence{ "namespace" };
+    throw BadCall{ "ProgramParser::namespace()", "\\namespace can only be used inside \\namespace" };
 
   auto parent_ns = std::dynamic_pointer_cast<cxx::Namespace>(currentFrame().node);
 
@@ -212,7 +209,7 @@ void ProgramParser::namespace_(std::string name)
 void ProgramParser::endnamespace()
 {
   if (!currentFrame().node->is<cxx::Namespace>())
-    throw BadControlSequence{ "endnamespace" };
+    throw BadCall{ "ProgramParser::endnamespace()", "\\endnamespace but no \\namespace" };
 
   exitFrame();
   m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -221,7 +218,7 @@ void ProgramParser::endnamespace()
 void ProgramParser::enum_(std::string name)
 {
   if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
-    throw BadControlSequence{ "enum" };
+    throw BadCall{ "ProgramParser::enum()", "\\enum must be inside of \\namespace or \\class" };
 
   auto parent_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
 
@@ -246,7 +243,7 @@ void ProgramParser::enum_(std::string name)
 void ProgramParser::endenum()
 {
   if (!currentFrame().node->is<cxx::Enum>())
-    throw BadControlSequence{ "endenum" };
+    throw BadCall{ "ProgramParser::endenum()", "\\endenum but no \\enum" };
 
   exitFrame();
   m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -260,7 +257,7 @@ void ProgramParser::value(std::string name)
   if (!currentFrame().node->is<cxx::Enum>())
   {
     if (m_lastblock_entity->node_kind() != cxx::NodeKind::Enum)
-      throw BadControlSequence{ "value" };
+      throw BadCall{ "ProgramParser::value()", "\\value must be near \\enum" };
 
     m_state.enter<FrameType::Enum>(m_lastblock_entity);
   }
@@ -280,7 +277,7 @@ void ProgramParser::value(std::string name)
 void ProgramParser::endenumvalue()
 {
   if (currentFrame().type != FrameType::EnumValue)
-    throw BadControlSequence{ "endenumvalue" };
+    throw BadCall{ "ProgramParser::endenumvalue()", "\\endenumvalue must no \\value" };
 
   exitFrame();
 }
@@ -288,7 +285,7 @@ void ProgramParser::endenumvalue()
 void ProgramParser::variable(std::string decl)
 {
   if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
-    throw BadControlSequence{ "variable" };
+    throw BadCall{ "ProgramParser::variable()", "\\variable must be inside \\namespace or \\class" };
 
   auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
 
@@ -330,7 +327,7 @@ void ProgramParser::variable(std::string decl)
 void ProgramParser::endvariable()
 {
   if (!currentFrame().node->is<cxx::Variable>())
-    throw BadControlSequence{ "endvariable" };
+    throw BadCall{ "ProgramParser::endvariable()", "\\endvariable must no \\variable" };
 
   exitFrame();
   m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -353,7 +350,7 @@ void ProgramParser::param(std::string des)
   Frame& f = currentFrame();
 
   if (f.type != FrameType::Function)
-    throw BadControlSequence{ "param" };
+    throw BadCall{ "ProgramParser::param()", "\\param must inside \\fn" };
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
@@ -365,7 +362,7 @@ void ProgramParser::returns(std::string des)
   Frame& f = currentFrame();
 
   if (f.type != FrameType::Function)
-    throw BadControlSequence{ "returns" };
+    throw BadCall{ "ProgramParser::returns()", "\\returns must inside \\fn" };
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
