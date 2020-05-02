@@ -7,9 +7,9 @@
 
 #include "dex/dex-input.h"
 
-#include "dex/input/functional.h"
-
 #include <dom/paragraph.h>
+
+#include <optional>
 
 namespace dex
 {
@@ -30,8 +30,11 @@ public:
   virtual ~ContentWriter();
 
   virtual void write(char c) = 0;
-  virtual void control(const std::string& cs);
-  virtual bool handle(const FunctionCall& call);
+
+  virtual bool image(std::string& src, std::optional<int>& width, std::optional<int>& height);
+
+  virtual bool li(std::optional<std::string>& marker, std::optional<int>& value);
+  virtual bool endlist();
 
   virtual void finish() = 0;
 

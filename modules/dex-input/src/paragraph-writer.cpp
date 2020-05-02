@@ -32,23 +32,6 @@ void ParagraphWriter::write(const std::string& str)
   output()->addText(str);
 }
 
-bool ParagraphWriter::handle(const FunctionCall& call)
-{
-  if (call.function == Functions::SINCE)
-  {
-    std::string version = std::get<std::string>(call.options.at(""));
-    const std::string& text = std::get<std::string>(call.arguments.front());
-
-    writeSince(version, text);
-
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
 void ParagraphWriter::writeLink(std::string url, const std::string& text)
 {
   dom::Paragraph& par = *output();

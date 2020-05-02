@@ -22,12 +22,17 @@ ContentWriter::~ContentWriter()
 
 }
 
-void ContentWriter::control(const std::string& cs)
+bool ContentWriter::image(std::string& src, std::optional<int>& width, std::optional<int>& height)
 {
-  throw BadControlSequence{ cs };
+  return false;
 }
 
-bool ContentWriter::handle(const FunctionCall& call)
+bool ContentWriter::li(std::optional<std::string>& marker, std::optional<int>& value)
+{
+  return false;
+}
+
+bool ContentWriter::endlist()
 {
   return false;
 }

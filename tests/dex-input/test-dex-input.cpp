@@ -190,18 +190,12 @@ void TestDexInput::documentWriterParagraph()
 
 void TestDexInput::documentWriterList()
 {
-  auto li = []() -> dex::FunctionCall {
-    dex::FunctionCall ret;
-    ret.function = dex::Functions::LI;
-    return ret;
-  };
-
   dex::DocumentWriter writer;
 
   writer.startList();
-  writer.handle(li());
+  writer.li({}, {});
   writer.write("List item number 1");
-  writer.handle(li());
+  writer.li({}, {});
   writer.write("Number 2");
   writer.endList();
 

@@ -7,7 +7,7 @@
 
 #include "dex/input/parser-mode.h"
 
-#include "dex/input/document-writer.h"
+#include "dex/input/document-writer-frontend.h"
 
 #include "dex/common/state.h"
 
@@ -47,7 +47,7 @@ public:
     Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent);
 
     std::shared_ptr<cxx::Node> node;
-    std::shared_ptr<DocumentWriter> writer;
+    std::shared_ptr<DocumentWriterFrontend> writer;
   };
 
   using State = state::State<Frame>;

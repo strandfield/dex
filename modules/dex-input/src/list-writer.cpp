@@ -23,13 +23,13 @@ ListWriter::~ListWriter()
 
 }
 
-ListWriter::ListWriter(const FunctionCall& call)
+ListWriter::ListWriter(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed)
 {
   auto list = std::make_shared<dom::List>();
 
-  list->marker = call.opt<std::string>("marker", "");
-  list->ordered = call.opt<bool>("ordered", false);
-  list->reversed = call.opt<bool>("reversed", false);
+  list->marker = marker.value_or("");
+  list->ordered = ordered.value_or(false);
+  list->reversed = reversed.value_or(false);
 
   setOutput(list);
 }
@@ -45,37 +45,6 @@ void ListWriter::write(char c)
   m_doc_writer->write(c);
 }
 
-bool ListWriter::handle(const FunctionCall& call)
-{
-  if (m_doc_writer && m_doc_writer->handle(call))
-    return true;
-
-  if (call.function == Functions::LI)
-  {
-    if (m_doc_writer)
-      finish();
-
-    auto item = std::make_shared<dom::ListItem>();
-
-    item->marker = call.opt<std::string>("marker", "");
-    item->value = call.opt<int>("value", item->value);
-
-    output()->items.push_back(item);
-
-    m_doc_writer = std::make_shared<DocumentWriter>();
-    return true;
-  }
-  else if (call.function == Functions::ENDLIST)
-  {
-    finish();
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
 void ListWriter::finish()
 {
   if (m_doc_writer)
@@ -85,6 +54,57 @@ void ListWriter::finish()
     list->items.back()->content = m_doc_writer->output();
     m_doc_writer = nullptr;
   }
+}
+
+bool ListWriter::image(std::string& src, std::optional<int>& width, std::optional<int>& height)
+{
+  assert(m_doc_writer);
+  m_doc_writer->image(std::move(src), width, height);
+  return true;
+}
+
+void ListWriter::list()
+{
+  assert(m_doc_writer);
+  m_doc_writer->list();
+}
+
+void ListWriter::list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed)
+{
+  assert(m_doc_writer);
+  m_doc_writer->list(marker, ordered, reversed);
+}
+
+bool ListWriter::li(std::optional<std::string>& marker, std::optional<int>& value)
+{
+  if (m_doc_writer)
+  {
+    if (m_doc_writer->isWritingList())
+    {
+      m_doc_writer->li(marker, value);
+      return true;
+    }
+    else
+    {
+      finish();
+    }
+  }
+
+  auto item = std::make_shared<dom::ListItem>();
+
+  item->marker = marker.value_or("");
+  item->value = value.value_or(item->value);
+
+  output()->items.push_back(item);
+
+  m_doc_writer = std::make_shared<DocumentWriter>();
+  return true;
+}
+
+bool ListWriter::endlist()
+{
+  finish();
+  return true;
 }
 
 std::shared_ptr<dom::List> ListWriter::output() const

@@ -22,11 +22,17 @@ public:
   ListWriter();
   ~ListWriter();
 
-  explicit ListWriter(const FunctionCall& call);
+  ListWriter(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed);
 
   void write(char c) override;
-  bool handle(const FunctionCall& call) override;
   void finish() override;
+
+  bool image(std::string& src, std::optional<int>& width, std::optional<int>& height) override;
+
+  void list();
+  void list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed);
+  bool li(std::optional<std::string>& marker, std::optional<int>& value) override;
+  bool endlist() override;
 
   std::shared_ptr<dom::List> output() const;
   

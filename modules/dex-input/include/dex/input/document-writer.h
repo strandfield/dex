@@ -40,7 +40,15 @@ public:
 
   void write(char c);
   void write(const std::string& str);
-  bool handle(const FunctionCall& call);
+
+  void since(std::string version, const std::string& text);
+
+  void image(std::string src, std::optional<int> width, std::optional<int> height);
+
+  void list();
+  void list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed);
+  void li(std::optional<std::string> marker, std::optional<int> value);
+  void endlist();
 
   bool isIdle() const;
 
@@ -48,7 +56,6 @@ public:
   ParagraphWriter& paragraph();
 
   bool isWritingList() const;
-  ListWriter& list();
 
   void beginSinceBlock(const std::string& version);
   void endSinceBlock();
@@ -66,6 +73,7 @@ public:
   dom::Content& output();
 
 protected:
+  ListWriter& currentList();
   dom::Paragraph& currentParagraph();
 
 private:

@@ -41,7 +41,7 @@ void DocumentWriter::write(char c)
   }
   else if (isWritingList())
   {
-    list().write(c);
+    currentList().write(c);
   }
 }
 
@@ -58,53 +58,76 @@ void DocumentWriter::write(const std::string& str)
   }
 }
 
-bool DocumentWriter::handle(const FunctionCall& call)
+void DocumentWriter::since(std::string version, const std::string& text)
 {
-  if (call.function == Functions::BEGINSINCE)
+  // TODO: the following is incorrect and does not handle paragraphs inside a list
+  if (!isWritingParagraph())
+    throw std::runtime_error{ "DocumentWriter::since()" };
+
+  paragraph().writeSince(version, text);
+}
+
+void DocumentWriter::image(std::string src, std::optional<int> width, std::optional<int> height)
+{
+  if (isWritingList())
   {
-    std::string version = std::get<std::string>(call.options.at(""));
-    beginSinceBlock(std::move(version));
-    return true;
+    m_writer->image(src, width, height);
+    return;
   }
-  else if (call.function == Functions::ENDSINCE)
+
+  if (isWritingParagraph())
+    finish();
+
+  auto img = std::make_shared<dom::Image>(std::move(src));
+  img->height = height.value_or(img->height);
+  img->width = width.value_or(img->width);
+  m_nodes.push_back(img);
+}
+
+void DocumentWriter::list()
+{
+  if (isIdle() || isWritingParagraph())
   {
-    endSinceBlock();
-    return true;
-  }
-  else if (call.function == Functions::LIST)
-  {
-    if (isIdle() || isWritingParagraph())
-    {
-      startList();
-      return true;
-    }
-    else
-    {
-      assert(isWritingList());
-      return list().handle(call);
-    }
+    startList();
   }
   else
   {
-    if ((isWritingParagraph() || isWritingList()) && m_writer->handle(call))
-      return true;
-
-    if (isWritingList() || isWritingParagraph())
-      finish();
-
-    if (call.function == Functions::IMAGE)
-    {
-      std::string src = call.arg<std::string>(0);
-      auto img = std::make_shared<dom::Image>(std::move(src));
-      img->height = call.opt<int>("height", img->height);
-      img->width = call.opt<int>("width", img->width);
-      m_nodes.push_back(img);
-
-      return true;
-    }
+    assert(isWritingList());
+    currentList().list();
   }
+}
 
-  return false;
+void DocumentWriter::list(const std::optional<std::string>& marker, std::optional<bool> ordered, std::optional<bool> reversed)
+{
+  if (isIdle() || isWritingParagraph())
+  {
+    if (isWritingParagraph())
+      endParagraph();
+
+    m_state = State::WritingList;
+    m_writer = std::make_shared<ListWriter>(marker, ordered, reversed);
+  }
+  else
+  {
+    assert(isWritingList());
+    currentList().list(marker, ordered, reversed);
+  }
+}
+
+void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> value)
+{
+  if (!isWritingList())
+    throw std::runtime_error{"DocumentWriter::li()"};
+
+  m_writer->li(marker, value);
+}
+
+void DocumentWriter::endlist()
+{
+  if (!isWritingList())
+    throw std::runtime_error{ "DocumentWriter::endlist()" };
+
+  m_writer->endlist();
 }
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
@@ -175,8 +198,8 @@ void DocumentWriter::endList()
 {
   assert(isWritingList());
 
-  list().finish();
-  auto l = list().output();
+  currentList().finish();
+  auto l = currentList().output();
 
   if (m_since.has_value())
   {
@@ -217,7 +240,7 @@ bool DocumentWriter::isWritingList() const
   return m_state == State::WritingList;
 }
 
-ListWriter& DocumentWriter::list()
+ListWriter& DocumentWriter::currentList()
 {
   assert(isWritingList());
   return *static_cast<ListWriter*>(m_writer.get());

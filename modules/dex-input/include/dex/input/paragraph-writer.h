@@ -24,8 +24,6 @@ public:
   void write(char c) override;
   void write(const std::string& str);
 
-  bool handle(const FunctionCall& call) override;
-
   void writeLink(std::string url, const std::string& text);
   void writeStyledText(std::string style, const std::string& text);
 

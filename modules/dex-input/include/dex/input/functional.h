@@ -8,6 +8,7 @@
 #include "dex/dex-input.h"
 
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 #include <variant>
@@ -42,6 +43,13 @@ struct FunctionCall
   {
     auto it = options.find(key);
     return it == options.end() ? default_value : std::get<T>(it->second);
+  }
+
+  template<typename T>
+  std::optional<T> opt(const std::string& key) const
+  {
+    auto it = options.find(key);
+    return it == options.end() ? std::optional<T>{} : std::optional<T>{ std::get<T>(it->second) };
   }
 };
 
