@@ -44,9 +44,6 @@ public:
 
 protected:
   void setOutput(std::shared_ptr<dom::Node> out);
-
-private:
-  std::vector<std::shared_ptr<dom::Node>> m_nodes;
 };
 
 } // namespace dex
