@@ -29,7 +29,12 @@ void DocumentWriterFrontend::write(const std::string& str)
 
 bool DocumentWriterFrontend::handle(const FunctionCall& call)
 {
-  if (call.function == Functions::SINCE)
+  if (call.function == Functions::PAR)
+  {
+    m_writer.par();
+    return true;
+  }
+  else if (call.function == Functions::SINCE)
   {
     std::string version = std::get<std::string>(call.options.at(""));
     const std::string& text = std::get<std::string>(call.arguments.front());
@@ -81,41 +86,6 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
   return false;
 }
 
-void DocumentWriterFrontend::beginSinceBlock(const std::string& version)
-{
-  m_writer.beginSinceBlock(version);
-}
-
-void DocumentWriterFrontend::endSinceBlock()
-{
-  m_writer.endSinceBlock();
-}
-
-void DocumentWriterFrontend::write(const std::shared_ptr<dom::Node>& node)
-{
-  m_writer.write(node);
-}
-
-void DocumentWriterFrontend::startParagraph()
-{
-  m_writer.startParagraph();
-}
-
-void DocumentWriterFrontend::endParagraph()
-{
-  m_writer.endParagraph();
-}
-
-void DocumentWriterFrontend::startList()
-{
-  m_writer.startList();
-}
-
-void DocumentWriterFrontend::endList()
-{
-  m_writer.endList();
-}
-
 void DocumentWriterFrontend::finish()
 {
   m_writer.finish();
@@ -124,21 +94,6 @@ void DocumentWriterFrontend::finish()
 bool DocumentWriterFrontend::isIdle() const
 {
   return m_writer.isIdle();
-}
-
-bool DocumentWriterFrontend::isWritingParagraph() const
-{
-  return m_writer.isWritingParagraph();
-}
-
-ParagraphWriter& DocumentWriterFrontend::paragraph()
-{
-  return m_writer.paragraph();
-}
-
-bool DocumentWriterFrontend::isWritingList() const
-{
-  return m_writer.isWritingList();
 }
 
 } // namespace dex

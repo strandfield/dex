@@ -87,7 +87,6 @@ ProgramMode::State& ProgramMode::state()
 const std::map<std::string, ProgramMode::CS>& ProgramMode::csmap()
 {
   static std::map<std::string, CS> static_instance = { 
-    {Functions::PAR , CS::PAR},
     {Functions::CLASS, CS::CLASS},
     {Functions::ENDCLASS, CS::ENDCLASS},
     {Functions::FUNCTION , CS::FN},
@@ -156,8 +155,6 @@ void ProgramMode::do_write(tex::parsing::Token&& tok)
 
       switch (cs)
       {
-      case CS::PAR:
-        return cs_par();
       case CS::ENDFN:
         return cs_endfn();
       case CS::ENDCLASS:
@@ -238,14 +235,6 @@ bool ProgramMode::handle(const FunctionCall& call)
   }
 
   return done();
-}
-
-void ProgramMode::cs_par()
-{
-  Frame& f = currentFrame();
-
-  if (f.writer && f.writer->isWritingParagraph())
-    f.writer->endParagraph();
 }
 
 void ProgramMode::fn_class(const FunctionCall& call)

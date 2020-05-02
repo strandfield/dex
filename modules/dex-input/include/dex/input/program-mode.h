@@ -56,8 +56,6 @@ public:
 
   enum class CS
   {
-    /* TeX */
-    PAR,
     /* Entities */
     CLASS,
     ENDCLASS,
@@ -97,8 +95,6 @@ protected:
   CS parseCs(const std::string& str) const;
 
   void do_write(tex::parsing::Token&& tok);
-
-  void cs_par();
 
   void fn_class(const FunctionCall& call);
   void cs_endclass();

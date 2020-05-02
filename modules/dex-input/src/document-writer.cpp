@@ -58,6 +58,12 @@ void DocumentWriter::write(const std::string& str)
   }
 }
 
+void DocumentWriter::par()
+{
+  if (isWritingParagraph())
+    endParagraph();
+}
+
 void DocumentWriter::since(std::string version, const std::string& text)
 {
   // TODO: the following is incorrect and does not handle paragraphs inside a list

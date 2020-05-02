@@ -11,10 +11,6 @@
 namespace dex
 {
 
-class ContentWriter;
-class ListWriter;
-class ParagraphWriter;
-
 class DEX_INPUT_API DocumentWriterFrontend
 {
 public:
@@ -28,23 +24,7 @@ public:
 
   bool isIdle() const;
 
-  bool isWritingParagraph() const;
-  ParagraphWriter& paragraph();
-
-  bool isWritingList() const;
-
-  void beginSinceBlock(const std::string& version);
-  void endSinceBlock();
-  
-  void startParagraph();
-  void endParagraph();
-
-  void startList();
-  void endList();
-
   void finish();
-
-  void write(const std::shared_ptr<dom::Node>& node);
 
   dom::Content& output();
 

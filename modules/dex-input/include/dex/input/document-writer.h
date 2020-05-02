@@ -41,6 +41,8 @@ public:
   void write(char c);
   void write(const std::string& str);
 
+  void par();
+
   void since(std::string version, const std::string& text);
 
   void image(std::string src, std::optional<int> width, std::optional<int> height);
