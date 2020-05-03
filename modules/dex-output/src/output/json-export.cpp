@@ -352,6 +352,21 @@ void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
   ModelVisitor::visit_entitydocumentation(edoc);
 }
 
+void JsonExport::visit_manual(const Manual& man)
+{
+  object()["title"] = man.title;
+
+  ModelVisitor::visit_manual(man);
+}
+
+void JsonExport::visit_sectioning(const Sectioning& sec)
+{
+  object()["name"] = sec.name;
+  object()["depth"] = Sectioning::depth2str(sec.depth);
+
+  ModelVisitor::visit_sectioning(sec);
+}
+
 void JsonExport::write_location(json::Object& obj, const cxx::SourceLocation& loc)
 {
   if (loc.file() == nullptr)

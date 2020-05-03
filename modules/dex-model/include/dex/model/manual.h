@@ -35,6 +35,8 @@ public:
   static const std::string TypeId;
   const std::string& type() const override;
 
+  static std::string depth2str(Depth d);
+  static Depth str2depth(const std::string& str);
 };
 
 class DEX_MODEL_API Manual : public dom::Node

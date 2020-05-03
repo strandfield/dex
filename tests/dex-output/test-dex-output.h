@@ -12,6 +12,7 @@ public:
 
 private Q_SLOTS:
   void jsonExport();
+  void jsonExportManual();
   void jsonAnnotator();
   void markdownExport();
 };

@@ -206,6 +206,35 @@ void TestDexOutput::jsonExport()
   }
 }
 
+void TestDexOutput::jsonExportManual()
+{
+  auto model = std::make_shared<dex::Model>();
+  auto man = std::make_shared<dex::Manual>("The manual");
+  model->manuals().push_back(man);
+
+  auto sec = std::make_shared<dex::Sectioning>(dex::Sectioning::Part, "Part 1");
+  man->content.push_back(sec);
+
+  sec->content.push_back(make_par("Hello World!"));
+
+  json::Object jexport = dex::JsonExport::serialize(*model).toObject();
+
+  QVERIFY(jexport.data().size() == 1);
+
+  jexport = jexport["manuals"][0].toObject();
+
+  QVERIFY(jexport.data().at("title").toString() == "The manual");
+  QVERIFY(jexport.data().at("content").toArray().length() == 1);
+
+  jexport = jexport["content"][0].toObject();
+  QVERIFY(jexport.data().at("depth").toString() == "part");
+  QVERIFY(jexport.data().at("name").toString() == "Part 1");
+
+  QVERIFY(jexport.data().at("content").toArray().length() == 1);
+  jexport = jexport["content"][0].toObject();
+  QVERIFY(jexport["text"].toString() == "Hello World!");
+}
+
 void TestDexOutput::jsonAnnotator()
 {
   {

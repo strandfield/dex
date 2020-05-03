@@ -54,6 +54,16 @@ void ModelVisitor::visit(const Model& model)
 
     visit_program(*model.program());
   }
+
+  if (!model.manuals().empty())
+  {
+    VisitorContext context{ &m_stack, "manuals" };
+    for (size_t i(0); i < model.manuals().size(); ++i)
+    {
+      VisitorContext inner_context{ &m_stack, i };
+      visit_domnode(*model.manuals().at(i));
+    }
+  }
 }
 
 const Model& ModelVisitor::model() const
@@ -81,6 +91,10 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_domlistitem(static_cast<const dom::ListItem&>(n));
   else if (n.is<dom::Paragraph>())
     visit_domparagraph(static_cast<const dom::Paragraph&>(n));
+  else if (n.is<dex::Manual>())
+    visit_manual(static_cast<const dex::Manual&>(n));
+  else if (n.is<dex::Sectioning>())
+    visit_sectioning(static_cast<const dex::Sectioning&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -245,6 +259,34 @@ void ModelVisitor::visit_entitydocumentation(const EntityDocumentation& edoc)
       VisitorContext inner_context{ &m_stack, i };
 
       visit_domnode(*edoc.description().at(i));
+    }
+  }
+}
+
+void ModelVisitor::visit_manual(const dex::Manual& man)
+{
+  if (!man.content.empty())
+  {
+    VisitorContext context{ &m_stack, "content" };
+    for (size_t i(0); i < man.content.size(); ++i)
+    {
+      VisitorContext inner_context{ &m_stack, i };
+
+      visit_domnode(*man.content.at(i));
+    }
+  }
+}
+
+void ModelVisitor::visit_sectioning(const dex::Sectioning& section)
+{
+  if (!section.content.empty())
+  {
+    VisitorContext context{ &m_stack, "content" };
+    for (size_t i(0); i < section.content.size(); ++i)
+    {
+      VisitorContext inner_context{ &m_stack, i };
+
+      visit_domnode(*section.content.at(i));
     }
   }
 }

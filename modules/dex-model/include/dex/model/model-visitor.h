@@ -62,6 +62,9 @@ protected:
 
   virtual void visit_entitydocumentation(const EntityDocumentation& edoc);
 
+  virtual void visit_manual(const dex::Manual& man);
+  virtual void visit_sectioning(const dex::Sectioning& section);
+
 private:
   const Model* m_model = nullptr;
   std::vector<Model::PathElement> m_stack;
