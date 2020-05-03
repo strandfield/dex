@@ -51,6 +51,11 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::SINCE, CS::SINCE},
     {Functions::PARAM, CS::PARAM},
     {Functions::RETURNS, CS::RETURNS},
+    /* Manual */
+    {Functions::MANUAL, CS::manual},
+    {Functions::PART, CS::part},
+    {Functions::CHAPTER, CS::chapter},
+    {Functions::SECTION, CS::section},
   };
 
   return static_instance;
@@ -153,61 +158,46 @@ void ParserFrontend::write(tex::parsing::Token&& tok)
 
 void ParserFrontend::handle(const FunctionCall& call)
 {
-  if (call.function == Functions::CLASS)
+  auto it = csmap().find(call.function);
+
+  if (it != csmap().end())
   {
-    fn_class(call);
-  }
-  else if (call.function == Functions::FUNCTION)
-  {
-    fn_fn(call);
-  }
-  else if (call.function == Functions::NAMESPACE)
-  {
-    fn_namespace(call);
-  }
-  else if (call.function == Functions::ENUM)
-  {
-    fn_enum(call);
-  }
-  else if (call.function == Functions::ENUMVALUE)
-  {
-    fn_enumvalue(call);
-  }
-  else if (call.function == Functions::VARIABLE)
-  {
-    fn_variable(call);
-  }
-  else if (call.function == Functions::BRIEF)
-  {
-    fn_brief(call);
-  }
-  else if (call.function == Functions::SINCE)
-  {
-    fn_since(call);
-  }
-  else if (call.function == Functions::PARAM)
-  {
-    fn_param(call);
-  }
-  else if (call.function == Functions::RETURNS)
-  {
-    fn_returns(call);
-  }
-  else if (call.function == Functions::MANUAL)
-  {
-    fn_manual(call);
-  }
-  else if (call.function == Functions::PART)
-  {
-    fn_part(call);
-  }
-  else if (call.function == Functions::CHAPTER)
-  {
-    fn_chapter(call);
-  }
-  else if (call.function == Functions::SECTION)
-  {
-    fn_section(call);
+    CS cs = it->second;
+
+    switch (cs)
+    {
+    case CS::CLASS:
+      return fn_class(call);
+    case CS::FN:
+      return fn_fn(call);
+    case CS::NAMESPACE:
+      return fn_namespace(call);
+    case CS::ENUM:
+      return fn_enum(call);
+    case CS::ENUMVALUE:
+      return fn_enumvalue(call);
+    case CS::VARIABLE:
+      return fn_variable(call);
+    case CS::BRIEF:
+      return fn_brief(call);
+    case CS::SINCE:
+      return fn_since(call);
+    case CS::PARAM:
+      return fn_param(call);
+    case CS::RETURNS:
+      return fn_returns(call);
+      /* Manual*/
+    case CS::manual:
+      return fn_manual(call);
+    case CS::part:
+      return fn_part(call);
+    case CS::chapter:
+      return fn_chapter(call);
+    case CS::section:
+      return fn_section(call);
+    default:
+      throw UnexpectedControlSequence{ call.function };
+    }
   }
   else
   {
