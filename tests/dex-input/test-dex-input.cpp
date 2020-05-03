@@ -45,6 +45,20 @@ void write_chars(dex::FunctionCaller& parser, const std::string& str)
   }
 }
 
+void write_chars_lexer(dex::FunctionCaller& parser, const std::string& str)
+{
+  for (char c : str)
+  {
+    parser.machine().lexer().write(c);
+
+    if (!parser.machine().lexer().output().empty())
+    {
+      tex::parsing::Token tok = tex::parsing::read(parser.machine().lexer().output());
+      parser.write(std::move(tok));
+    }
+  }
+}
+
 void write_cs(dex::FunctionCaller& parser, const std::string& cs)
 {
   parser.write(tok(cs));
@@ -119,6 +133,16 @@ void TestDexInput::argumentParsing()
   QVERIFY(parser.call().function == "im@ge");
   QVERIFY(parser.call().arguments.size() == 1);
   QVERIFY(std::get<std::string>(parser.call().arguments.at(0)) == "test-image.jpg");
+
+  parser.clearPendingCall();
+
+  write_cs(parser, "p@rseline", "c@ll", "foo");
+  write_chars_lexer(parser, "{This one extends after\n the end of the line}");
+
+  QVERIFY(parser.hasPendingCall());
+  QVERIFY(parser.call().function == "foo");
+  QVERIFY(parser.call().arguments.size() == 1);
+  QVERIFY(std::get<std::string>(parser.call().arguments.at(0)) == "This one extends after the end of the line");
 }
 
 void TestDexInput::conditionalEvaluator()
@@ -555,7 +579,7 @@ void TestDexInput::parserMachineManual()
   QVERIFY(second_chapter != nullptr && second_chapter->depth == dex::Sectioning::Chapter);
 
   {
-    QVERIFY(second_chapter->name == "{Second chapter}");
+    QVERIFY(second_chapter->name == "Second chapter");
     QVERIFY(second_chapter->content.size() == 1);
 
     auto par = std::dynamic_pointer_cast<dom::Paragraph>(second_chapter->content.front());

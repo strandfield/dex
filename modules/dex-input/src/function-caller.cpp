@@ -346,14 +346,32 @@ void FunctionCaller::parse_word(tex::parsing::Token&& tok)
 
 void FunctionCaller::parse_longword(tex::parsing::Token&& tok)
 {
-  if (tok.characterToken().category == tex::parsing::CharCategory::Active
-    && tok.characterToken().value == '\n')
+  if (currentTask().progress == TP_GatheringChars)
   {
-    return finishCurrentTask();
-  }
+    if (currentTask().buffer.empty() && tok.characterToken().value == '{')
+    {
+      currentTask().progress = TP_GatheringCharsUntilRightBrace;
+      machine().lexer().catcodes()[static_cast<int>('\n')] = tex::parsing::CharCategory::EndOfLine;
+    }
+    else
+    {
+      if (tok.characterToken().category == tex::parsing::CharCategory::Active
+        && tok.characterToken().value == '\n')
+      {
+        return finishCurrentTask();
+      }
 
-  char c = tok.characterToken().value;
-  currentTask().buffer.push_back(c);
+      char c = tok.characterToken().value;
+      currentTask().buffer.push_back(c);
+    }
+  }
+  else if (currentTask().progress == TP_GatheringCharsUntilRightBrace)
+  {
+    if (tok.characterToken().value == '}')
+      return finishCurrentTask();
+    else
+      currentTask().buffer.push_back(tok.characterToken().value);
+  }
 }
 
 void FunctionCaller::parse_options(tex::parsing::Token&& tok)
