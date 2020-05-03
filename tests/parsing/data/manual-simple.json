@@ -1,0 +1,37 @@
+{
+  "manuals": [{
+      "content": [{
+          "content": [{
+              "text": "This is an introduction.",
+              "type": "paragraph"
+            }],
+          "depth": "chapter",
+          "name": "Introduction",
+          "type": "sectioning"
+        }, {
+          "content": [{
+              "text": "This is how to install the program.",
+              "type": "paragraph"
+            }],
+          "depth": "chapter",
+          "name": "Installation",
+          "type": "sectioning"
+        }, {
+          "content": [{
+              "text": "This is how to use the program.",
+              "type": "paragraph"
+            }],
+          "depth": "chapter",
+          "name": "Usage",
+          "type": "sectioning"
+        }],
+      "title": "A simple manual",
+      "type": "manual"
+    }],
+  "program": {
+    "global_namespace": {
+      "name": "",
+      "type": "namespace"
+    }
+  }
+}

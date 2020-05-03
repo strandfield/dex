@@ -7,5 +7,7 @@
     <file>data/class-with-var.json</file>
     <file>data/enum-doc.txt</file>
     <file>data/enum-doc.json</file>
+    <file>data/manual-simple.txt</file>
+    <file>data/manual-simple.json</file>
   </qresource>
 </RCC>

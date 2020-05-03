@@ -1,0 +1,17 @@
+
+/*!
+ * \manual A simple manual
+ * 
+ * \chapter Introduction
+ *
+ * This is an introduction.
+ *
+ * \chapter Installation
+ *
+ * This is how to install the program.
+ *
+ * \chapter Usage
+ *
+ * This is how to use the program.
+ *
+ */

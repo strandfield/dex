@@ -1,3 +1,4 @@
 class-with-inline
 class-with-var
 enum-doc
+manual-simple
