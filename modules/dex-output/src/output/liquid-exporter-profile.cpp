@@ -21,43 +21,93 @@ static liquid::Template open_liquid_template(const std::string& path)
   return liquid::parse(tmplt);
 }
 
+class LiquidExporterProfileLoader
+{
+public:
+  LiquidExporterProfile& profile;
+  QDir directory;
+  std::set<std::string> exclusions;
+  SettingsMap settings;
+
+public:
+  LiquidExporterProfileLoader(LiquidExporterProfile& pro, const QDir& dir)
+    : profile(pro),
+      directory(dir)
+  {
+
+  }
+
+protected:
+  bool excluded(const std::string& filepath)
+  {
+    return exclusions.find(filepath) != exclusions.end();
+  }
+
+  void exclude(std::string filepath)
+  {
+    exclusions.insert(std::move(filepath));
+  }
+
+  void exclude(const QString& filepath)
+  {
+    exclude(filepath.toStdString());
+  }
+
+  void read_template(const std::string& name, liquid::Template& src, std::string& dest, std::string default_out)
+  {
+    std::string path = dex::settings::read(settings, "templates/" + name, std::string());
+
+    if (!path.empty())
+    {
+      path = directory.absolutePath().toStdString() + "/" + path;
+      exclude(path);
+      src = open_liquid_template(path);
+
+      dest = dex::settings::read(settings, "output/" + name, std::move(default_out));
+    }
+  }
+
+  void list_files()
+  {
+    QDirIterator diriterator{ directory.absolutePath(), QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
+
+    while (diriterator.hasNext())
+    {
+      std::string path = diriterator.next().toStdString();
+
+      if (excluded(path))
+        continue;
+
+      liquid::Template tmplt = open_liquid_template(path);
+
+      path.erase(path.begin(), path.begin() + profile.profile_path.length() + 1);
+      profile.files.emplace_back(std::move(path), std::move(tmplt));
+    }
+  }
+
+public:
+
+  void load()
+  {
+    if (!directory.exists("config.ini"))
+      throw std::runtime_error{ "Bad profile directory" };
+
+    profile.profile_path = directory.absolutePath().toStdString();
+
+    std::string profile_config_file = directory.absoluteFilePath("config.ini").toStdString();
+    exclude(profile_config_file);
+    settings = dex::settings::load(profile_config_file);
+
+    read_template("class", profile.class_template, profile.class_outdir, "classes");
+
+    list_files();
+  }
+};
+
 void LiquidExporterProfile::load(const QDir& dir)
 {
-  if (!dir.exists("config.ini"))
-    throw std::runtime_error{ "Bad profile directory" };
-
-  profile_path = dir.absolutePath().toStdString();
-
-  std::set<std::string> exclusions;
-  exclusions.insert(dir.absoluteFilePath("config.ini").toStdString());
-
-  SettingsMap settings = dex::settings::load(dir.absoluteFilePath("config.ini").toStdString());
-
-  std::string path = dex::settings::read(settings, "templates/class", std::string());
-
-  if (!path.empty())
-  {
-    path = dir.absolutePath().toStdString() + "/" + path;
-    this->class_template = open_liquid_template(path);
-    exclusions.insert(path);
-
-    this->class_outdir = dex::settings::read(settings, "output/class", std::string("classes"));
-  }
-
-  QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
-
-  while (diriterator.hasNext()) 
-  {
-    std::string path = diriterator.next().toStdString();
-
-    if (exclusions.find(path) != exclusions.end())
-      continue;
-
-    liquid::Template tmplt = open_liquid_template(path);
-
-    path.erase(path.begin(), path.begin() + this->profile_path.length() + 1);
-    this->files.emplace_back(std::move(path), std::move(tmplt));
-  }
+  LiquidExporterProfileLoader loader{ *this, dir };
+  loader.load();
 }
 
 } // namespace dex

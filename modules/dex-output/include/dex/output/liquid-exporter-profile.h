@@ -29,6 +29,7 @@ public:
 public:
 
   void load(const QDir& dir);
+
 };
 
 } // namespace dex
