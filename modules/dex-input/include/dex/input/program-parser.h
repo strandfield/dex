@@ -16,8 +16,6 @@
 namespace dex
 {
 
-class FunctionCaller;
-
 class DEX_INPUT_API ProgramParser
 {
 public:

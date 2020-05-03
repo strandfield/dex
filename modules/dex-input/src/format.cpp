@@ -67,7 +67,7 @@ const char* fmt_src =
   "  }"
   "}" // 55
   ""
-  "% Dex"
+  "% Dex - Program %"
   ""
   "\\def\\class{"
   "  \\p@rseline\\c@ll\\cl@ss" // 60
@@ -126,6 +126,24 @@ const char* fmt_src =
   "    \\p@rseline\\c@ll\\@since"
   "  }"
   "}" // 115
+  ""
+  "% Dex - Manual %"
+  ""
+  "\\def\\manual{"
+  "  \\p@rseline\\c@ll\\@manual" // 120
+  "}"
+  ""
+  "\\def\\part{"
+  "  \\p@rseline\\c@ll\\@part"
+  "}" // 125
+  ""
+  "\\def\\chapter{"
+  "  \\p@rseline\\c@ll\\@chapter"
+  "}"
+  "" // 130
+  "\\def\\section{"
+  "  \\p@rseline\\c@ll\\@section"
+  "}"
   ""
 ;
 
@@ -188,7 +206,7 @@ const char* fmt_bytecode =
   ">2t"
   "s" // 55
   ""
-  ">5"
+  ">A"
   ""
   "d5r"
   ">2c9c4c5" // 60
@@ -248,7 +266,26 @@ const char* fmt_bytecode =
   ">2t"
   "s" // 115
   ""
+  ">@"
+  ""
+  "d6r"
+  ">2c9c4c7" // 120
+  "s"
+  ""
+  "d4r"
+  ">2c9c4c5"
+  "s" // 125
+  ""
+  "d7r"
+  ">2c9c4c8"
+  "s"
+  "" // 130
+  "d7r"
+  ">2c9c4c8"
+  "s"
+  ""
   "e";
+
 
 namespace dex
 {

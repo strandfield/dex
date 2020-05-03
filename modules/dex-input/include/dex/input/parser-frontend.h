@@ -18,6 +18,7 @@ namespace dex
 
 struct FunctionCall;
 
+class ManualParser;
 class ParserMachine;
 class ProgramParser;
 
@@ -31,6 +32,7 @@ public:
   {
     Idle,
     Program,
+    Manual,
   };
 
   enum class CS
@@ -53,6 +55,11 @@ public:
     SINCE,
     PARAM,
     RETURNS,
+    /* Manual */
+    manual,
+    part,
+    chapter,
+    section,
   };
 
   static const std::map<std::string, CS>& csmap();
@@ -72,6 +79,8 @@ protected:
 
   CS parseCs(const std::string& str) const;
 
+  void checkMode(Mode m);
+
   void fn_class(const FunctionCall& call);
   void cs_endclass();
   void fn_fn(const FunctionCall& call);
@@ -90,9 +99,16 @@ protected:
   void fn_param(const FunctionCall& call);
   void fn_returns(const FunctionCall& call);
 
+  void fn_manual(const FunctionCall& call);
+  void fn_part(const FunctionCall& call);
+  void fn_chapter(const FunctionCall& call);
+  void fn_section(const FunctionCall& call);
+
 private:
+  ParserMachine& m_machine;
   Mode m_mode;
   std::unique_ptr<ProgramParser> m_prog_parser;
+  std::unique_ptr<ManualParser> m_manual_parser;
 };
 
 } // namespace dex

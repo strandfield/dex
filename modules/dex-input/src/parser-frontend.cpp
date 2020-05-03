@@ -7,6 +7,7 @@
 #include "dex/input/document-writer.h"
 #include "dex/input/document-writer-frontend.h"
 #include "dex/input/functional.h"
+#include "dex/input/manual-parser.h"
 #include "dex/input/parser-machine.h"
 #include "dex/input/parser-errors.h"
 #include "dex/input/program-parser.h"
@@ -19,7 +20,8 @@ namespace dex
 {
 
 ParserFrontend::ParserFrontend(ParserMachine& machine)
-  : m_mode(Mode::Program)
+  : m_machine(machine),
+    m_mode(Mode::Program)
 {
   m_prog_parser.reset(new ProgramParser(machine.output()->getOrCreateProgram()->globalNamespace()));
 }
@@ -72,19 +74,34 @@ inline static bool is_discardable(const tex::parsing::Token& tok)
 
 void ParserFrontend::write(tex::parsing::Token&& tok)
 {
-  if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle && is_discardable(tok))
-    return;
+  if (m_mode == Mode::Program)
+  {
+    if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle && is_discardable(tok))
+      return;
+  }
 
   if (tok.isCharacterToken())
   {
-    if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
+    if (m_mode == Mode::Program)
     {
-      LOG_WARNING << "Non-space character ignored";
-      return;
-    }
+      if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
+      {
+        LOG_WARNING << "Non-space character ignored";
+        return;
+      }
 
-    DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
-    writer.write(tok.characterToken().value);
+      DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
+      writer.write(tok.characterToken().value);
+    }
+    else
+    {
+      DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
+
+      if (writer.isIdle() && is_discardable(tok))
+        return;
+
+      writer.write(tok.characterToken().value);
+    }
   }
   else
   {
@@ -120,8 +137,16 @@ void ParserFrontend::write(tex::parsing::Token&& tok)
       FunctionCall call;
       call.function = tok.controlSequence();
 
-      DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
-      writer.handle(call);
+      if (m_mode == Mode::Program)
+      {
+        DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
+        writer.handle(call);
+      }
+      else
+      {
+        DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
+        writer.handle(call);
+      }
     }
   }
 }
@@ -168,11 +193,41 @@ void ParserFrontend::handle(const FunctionCall& call)
   {
     fn_returns(call);
   }
+  else if (call.function == Functions::MANUAL)
+  {
+    fn_manual(call);
+  }
+  else if (call.function == Functions::PART)
+  {
+    fn_part(call);
+  }
+  else if (call.function == Functions::CHAPTER)
+  {
+    fn_chapter(call);
+  }
+  else if (call.function == Functions::SECTION)
+  {
+    fn_section(call);
+  }
   else
   {
-    DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
-    writer.handle(call);
+    if (m_mode == Mode::Program)
+    {
+      DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
+      writer.handle(call);
+    }
+    else
+    {
+      DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
+      writer.handle(call);
+    }
   }
+}
+
+void ParserFrontend::checkMode(Mode m)
+{
+  if (m_mode != m)
+    throw std::runtime_error{ "Bad mode" };
 }
 
 void ParserFrontend::fn_class(const FunctionCall& call)
@@ -276,6 +331,44 @@ void ParserFrontend::fn_returns(const FunctionCall& call)
   m_prog_parser->returns(des);
 }
 
+void ParserFrontend::fn_manual(const FunctionCall& call)
+{
+  std::string name = call.arg<std::string>(0);
+  auto man = std::make_shared<Manual>(std::move(name));
+
+  m_machine.output()->manuals().push_back(man);
+
+  m_mode = Mode::Manual;
+  m_manual_parser.reset(new ManualParser(man));
+}
+
+void ParserFrontend::fn_part(const FunctionCall& call)
+{
+  checkMode(Mode::Manual);
+
+  std::string name = call.arg<std::string>(0);
+
+  m_manual_parser->part(std::move(name));
+}
+
+void ParserFrontend::fn_chapter(const FunctionCall& call)
+{
+  checkMode(Mode::Manual);
+
+  std::string name = call.arg<std::string>(0);
+
+  m_manual_parser->chapter(std::move(name));
+}
+
+void ParserFrontend::fn_section(const FunctionCall& call)
+{
+  checkMode(Mode::Manual);
+
+  std::string name = call.arg<std::string>(0);
+
+  m_manual_parser->section(std::move(name));
+}
+
 void ParserFrontend::beginFile()
 {
   /* no-op */
@@ -283,7 +376,10 @@ void ParserFrontend::beginFile()
 
 void ParserFrontend::endFile()
 {
-  m_prog_parser->endFile();
+  if(m_mode == Mode::Program)
+    m_prog_parser->endFile();
+  else
+    m_manual_parser->endFile();
 }
 
 void ParserFrontend::beginBlock()
@@ -293,7 +389,10 @@ void ParserFrontend::beginBlock()
 
 void ParserFrontend::endBlock()
 {
-  m_prog_parser->endBlock();
+  if (m_mode == Mode::Program)
+    m_prog_parser->endBlock();
+  else
+    m_manual_parser->endBlock();
 }
 
 void ParserFrontend::recover()

@@ -238,7 +238,7 @@ void JsonExport::visit_class(const cxx::Class& cla)
 
     for (size_t i(0); i < cla.members().size(); ++i)
     {
-      members[i]["accessibility"] = to_string(cla.members().at(i).second);
+      members[static_cast<int>(i)]["accessibility"] = to_string(cla.members().at(i).second);
     }
   }
 }

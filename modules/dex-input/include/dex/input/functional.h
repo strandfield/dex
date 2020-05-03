@@ -76,6 +76,11 @@ struct DEX_INPUT_API Functions
   static const std::string VARIABLE;
   static const std::string ENDVARIABLE;
 
+  static const std::string MANUAL;
+  static const std::string PART;
+  static const std::string CHAPTER;
+  static const std::string SECTION;
+
   static const std::string IMAGE;
 
   static const std::string LIST;

@@ -21,5 +21,6 @@ private Q_SLOTS:
   void parserMachineFunction();
   void parserMachineEnum();
   void parserMachineVariable();
+  void parserMachineManual();
   void modelPath();
 };

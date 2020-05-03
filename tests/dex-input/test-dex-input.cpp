@@ -502,6 +502,67 @@ void TestDexInput::parserMachineVariable()
   QFile::remove("test.cpp");
 }
 
+void TestDexInput::parserMachineManual()
+{
+  dex::ParserMachine parser;
+
+  QFile file{ "test.cpp" };
+  QVERIFY(file.open(QIODevice::WriteOnly));
+
+  file.write(
+    "/*!\n"
+    " * \\manual Manual's title\n"
+    " *\n"
+    " * \\part First part\n"
+    " *\n"
+    " * \\chapter First chapter\n"
+    " * This is the content of the first chapter.\n"
+    " *\n"
+    " * \\chapter{Second chapter}\n"
+    " * This is the content of the second chapter.\n"
+    " */\n"
+  );
+
+  file.close();
+
+  parser.process(QFileInfo{ "test.cpp" });
+
+  QFile::remove("test.cpp");
+
+  QVERIFY(parser.output()->manuals().size() == 1);
+
+  std::shared_ptr<dex::Manual> man = parser.output()->manuals().front();
+
+  QVERIFY(man->content.size() == 1);
+  QVERIFY(man->content.front()->is<dex::Sectioning>());
+
+  auto part = std::dynamic_pointer_cast<dex::Sectioning>(man->content.front());
+  QVERIFY(part->depth == dex::Sectioning::Part);
+  QVERIFY(part->content.size() == 2);
+
+  auto first_chapter = std::dynamic_pointer_cast<dex::Sectioning>(part->content.front());
+  QVERIFY(first_chapter != nullptr && first_chapter->depth == dex::Sectioning::Chapter);
+
+  {
+    QVERIFY(first_chapter->name == "First chapter");
+    QVERIFY(first_chapter->content.size() == 1);
+
+    auto par = std::dynamic_pointer_cast<dom::Paragraph>(first_chapter->content.front());
+    QVERIFY(par != nullptr && par->text() == "This is the content of the first chapter.");
+  }
+
+  auto second_chapter = std::dynamic_pointer_cast<dex::Sectioning>(part->content.back());
+  QVERIFY(second_chapter != nullptr && second_chapter->depth == dex::Sectioning::Chapter);
+
+  {
+    QVERIFY(second_chapter->name == "{Second chapter}");
+    QVERIFY(second_chapter->content.size() == 1);
+
+    auto par = std::dynamic_pointer_cast<dom::Paragraph>(second_chapter->content.front());
+    QVERIFY(par != nullptr && par->text() == "This is the content of the second chapter.");
+  }
+}
+
 void TestDexInput::modelPath()
 {
   dex::ParserMachine parser;

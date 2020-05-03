@@ -28,6 +28,11 @@ const std::string Functions::RETURNS = "@returns";
 const std::string Functions::VARIABLE = "v@ri@ble";
 const std::string Functions::ENDVARIABLE = "endvariable";
 
+const std::string Functions::MANUAL = "@manual";
+const std::string Functions::PART = "@part";
+const std::string Functions::CHAPTER = "@chapter";
+const std::string Functions::SECTION = "@section";
+
 const std::string Functions::IMAGE = "@image";
 
 const std::string Functions::LIST = "@list";
