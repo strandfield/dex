@@ -38,7 +38,7 @@ public:
 
   void visit_class(const cxx::Class& cla) override
   {
-    if (!exporter.profile().class_template.nodes().empty())
+    if (!exporter.profile().class_template.model.nodes().empty())
     {
       json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
       exporter.dump(cla, obj);
@@ -110,7 +110,7 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
   // @TODO: remove this 'prog' property
   context["prog"] = m_serialized_model["program"];
 
-  std::string output = liquid::Renderer::render(m_profile.class_template, context);
+  std::string output = liquid::Renderer::render(m_profile.class_template.model, context);
 
   postProcess(output);
 

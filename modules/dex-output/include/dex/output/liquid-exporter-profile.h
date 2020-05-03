@@ -17,13 +17,16 @@ namespace dex
 class DEX_OUTPUT_API LiquidExporterProfile
 {
 public:
+
+  struct Template
+  {
+    liquid::Template model;
+    std::string outdir;
+  };
+
+public:
   std::string profile_path;
-  liquid::Template class_template;
-  liquid::Template namespace_template;
-  liquid::Template function_template;
-  std::string class_outdir;
-  std::string namespace_outdir;
-  std::string function_outdir;
+  Template class_template;
   std::vector<std::pair<std::string, liquid::Template>> files;
 
 public:

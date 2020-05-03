@@ -53,7 +53,7 @@ protected:
     exclude(filepath.toStdString());
   }
 
-  void read_template(const std::string& name, liquid::Template& src, std::string& dest, std::string default_out)
+  void read_template(const std::string& name, LiquidExporterProfile::Template& tmplt, std::string default_out)
   {
     std::string path = dex::settings::read(settings, "templates/" + name, std::string());
 
@@ -61,9 +61,8 @@ protected:
     {
       path = directory.absolutePath().toStdString() + "/" + path;
       exclude(path);
-      src = open_liquid_template(path);
-
-      dest = dex::settings::read(settings, "output/" + name, std::move(default_out));
+      tmplt.model = open_liquid_template(path);
+      tmplt.outdir = dex::settings::read(settings, "output/" + name, std::move(default_out));
     }
   }
 
@@ -98,7 +97,7 @@ public:
     exclude(profile_config_file);
     settings = dex::settings::load(profile_config_file);
 
-    read_template("class", profile.class_template, profile.class_outdir, "classes");
+    read_template("class", profile.class_template, "classes");
 
     list_files();
   }
