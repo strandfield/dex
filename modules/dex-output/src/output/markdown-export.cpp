@@ -40,7 +40,7 @@ struct JsonMarkdownUrlAnnotator : JsonUrlAnnotator
   std::string get_url(const dex::Manual& man) const override
   {
     // @TODO: remove spaces and illegal characters
-    return "manuals/" + man.title;
+    return "manuals/" + man.title + ".md";
   }
 };
 
@@ -116,6 +116,25 @@ std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
 std::string MarkdownExport::stringify_image(const dom::Image& img)
 {
   return "![image](" + img.src + ")";
+}
+
+std::string MarkdownExport::stringify_section(const dex::Sectioning& sec)
+{
+  std::string result;
+  
+  for (int i(0); i < (sec.depth - dex::Sectioning::Part) + 1; ++i)
+    result.push_back('#');
+
+  result.push_back(' ');
+
+  result += sec.name + "\n\n";
+
+  for (const auto& c : sec.content)
+  {
+    result += stringify_domnode(*c) + "\n";
+  }
+
+  return result;
 }
 
 } // namespace dex

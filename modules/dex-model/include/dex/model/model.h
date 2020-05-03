@@ -29,6 +29,8 @@ private:
 public:
   Model() = default;
 
+  bool empty() const;
+
   std::vector<std::shared_ptr<Manual>>& manuals();
   const std::vector<std::shared_ptr<Manual>>& manuals() const;
 

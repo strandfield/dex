@@ -15,4 +15,5 @@ private Q_SLOTS:
   void jsonExportManual();
   void jsonAnnotator();
   void markdownExport();
+  void markdownExportManual();
 };

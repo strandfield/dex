@@ -46,6 +46,17 @@ public:
 
     ModelVisitor::visit_class(cla);
   }
+
+  void visit_manual(const dex::Manual& man) override
+  {
+    if (!exporter.profile().manual_template.model.nodes().empty())
+    {
+      json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
+      exporter.dump(man, obj);
+    }
+
+    ModelVisitor::visit_manual(man);
+  }
 };
 
 QDir LiquidExporter::outputDir() const
@@ -60,7 +71,7 @@ void LiquidExporter::setOutputDir(const QDir& dir)
 
 void LiquidExporter::render()
 {
-  if (!model()->program())
+  if (model()->empty())
     return;
 
   LiquidExporterModelVisitor visitor{ *this, m_serialized_model };
@@ -111,6 +122,26 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
   context["prog"] = m_serialized_model["program"];
 
   std::string output = liquid::Renderer::render(m_profile.class_template.model, context);
+
+  postProcess(output);
+
+  write(output, (m_output_dir.absolutePath() + "/" + QString::fromStdString(url)).toStdString());
+}
+
+void LiquidExporter::dump(const dex::Manual& man, const json::Object& obj)
+{
+  if (obj["url"] == nullptr)
+  {
+    return;
+  }
+
+  const std::string url = obj["url"].toString();
+
+  json::Object context;
+  context["model"] = m_serialized_model;
+  context["manual"] = obj;
+
+  std::string output = liquid::Renderer::render(m_profile.manual_template.model, context);
 
   postProcess(output);
 
@@ -170,6 +201,8 @@ std::string LiquidExporter::stringify_domnode(const dom::Node& node)
     return stringify_listitem(static_cast<const dom::ListItem&>(node));
   else if (node.is<dom::Image>())
     return stringify_image(static_cast<const dom::Image&>(node));
+  else if (node.is<dex::Sectioning>())
+    return stringify_section(static_cast<const dex::Sectioning&>(node));
 
   assert(("dom element not implemented", false));
   return {};

@@ -152,6 +152,48 @@ static std::shared_ptr<cxx::Program> example_prog_with_class_and_fun()
   return prog;
 }
 
+static std::shared_ptr<dex::Model> example_manual()
+{
+  auto model = make<dex::Model>();
+
+  auto man = make<dex::Manual>("The manual");
+  model->manuals().push_back(man);
+
+  {
+    auto part = make<dex::Sectioning>(dex::Sectioning::Part, "First part");
+    man->content.push_back(part);
+
+    {
+      auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 1");
+      part->content.push_back(chap);
+
+      chap->content.push_back(make_par("This is the first paragraph of the manual."));
+      chap->content.push_back(make_par("And here is a second."));
+    }
+
+    {
+      auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 2");
+      part->content.push_back(chap);
+
+      chap->content.push_back(make_par("Warning! Skip this chapter."));
+    }
+  }
+
+  {
+    auto part = make<dex::Sectioning>(dex::Sectioning::Part, "Second part");
+    man->content.push_back(part);
+
+    {
+      auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 3");
+      part->content.push_back(chap);
+
+      chap->content.push_back(make<dom::Image>("img.jpg"));
+    }
+  }
+
+  return model;
+}
+
 void TestDexOutput::jsonExport()
 {
   {
@@ -340,4 +382,39 @@ void TestDexOutput::markdownExport()
 
     QVERIFY(content == expected);
   }
+}
+
+void TestDexOutput::markdownExportManual()
+{
+  auto model = example_manual();
+
+  dex::MarkdownExport md_export;
+
+  md_export.dump(model, QDir::current());
+
+  std::string content = dex::file_utils::read_all("manuals/The manual.md");
+
+  const std::string expected =
+    "\n"
+    "# The manual\n"
+    "\n"
+    "# First part\n"
+    "\n"
+    "## Chapter 1\n"
+    "\n"
+    "This is the first paragraph of the manual.\n"
+    "And here is a second.\n"
+    "\n"
+    "## Chapter 2\n"
+    "\n"
+    "Warning! Skip this chapter.\n"
+    "\n"
+    "# Second part\n"
+    "\n"
+    "## Chapter 3\n"
+    "\n"
+    "![image](img.jpg)\n"
+    "\n";
+
+  QVERIFY(content == expected);
 }

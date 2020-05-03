@@ -80,6 +80,7 @@ protected:
   friend class LiquidExporterModelVisitor;
 
   void dump(const cxx::Class& cla, const json::Object& obj);
+  void dump(const dex::Manual& man, const json::Object& obj);
 
 protected:
   std::string stringify(const json::Json& val) override;
@@ -92,6 +93,8 @@ protected:
   virtual std::string stringify_listitem(const dom::ListItem& li) = 0;
   virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
   virtual std::string stringify_image(const dom::Image& img) = 0;
+
+  virtual std::string stringify_section(const dex::Sectioning& sec) = 0;
 
 protected:
 

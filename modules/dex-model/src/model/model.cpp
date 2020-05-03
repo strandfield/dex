@@ -98,6 +98,20 @@ struct ChildNodeGetter
       if (path.name == "content")
         return listitem->content.at(path.index);
     }
+    else if (node->is<dex::Manual>())
+    {
+      auto man = std::static_pointer_cast<dex::Manual>(node);
+
+      if (path.name == "content")
+        return man->content.at(path.index);
+    }
+    else if (node->is<dex::Sectioning>())
+    {
+      auto sec = std::static_pointer_cast<dex::Sectioning>(node);
+
+      if (path.name == "content")
+        return sec->content.at(path.index);
+    }
 
     throw std::runtime_error{ "Invalid model path" };
   }
@@ -123,6 +137,10 @@ Model::PathElement::PathElement(std::string n, size_t i)
 
 }
 
+bool Model::empty() const
+{
+  return m_program == nullptr && m_manuals.empty();
+}
 
 Model::Node Model::get(const Path& path) const
 {

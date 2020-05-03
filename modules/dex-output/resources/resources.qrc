@@ -3,5 +3,6 @@
     <file>templates/markdown/config.ini</file>
     <file>templates/markdown/class.md</file>
     <file>templates/markdown/index.md</file>
+    <file>templates/markdown/manual.md</file>
   </qresource>
 </RCC>
