@@ -36,6 +36,12 @@ struct JsonMarkdownUrlAnnotator : JsonUrlAnnotator
 
     return "";
   }
+
+  std::string get_url(const dex::Manual& man) const override
+  {
+    // @TODO: remove spaces and illegal characters
+    return "manuals/" + man.title;
+  }
 };
 
 MarkdownExport::MarkdownExport()

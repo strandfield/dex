@@ -98,6 +98,7 @@ public:
     settings = dex::settings::load(profile_config_file);
 
     read_template("class", profile.class_template, "classes");
+    read_template("manual", profile.manual_template, "manuals");
 
     list_files();
   }

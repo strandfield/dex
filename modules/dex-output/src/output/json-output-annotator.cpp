@@ -27,4 +27,17 @@ void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
   ModelVisitor::visit_entity(e);
 }
 
+void JsonUrlAnnotator::visit_manual(const dex::Manual& man)
+{
+  std::string url = get_url(man);
+
+  if (!url.empty())
+  {
+    json::Object obj = JsonPathAnnotator::get(path(), serialized_model).toObject();
+    obj["url"] = url;
+  }
+
+  ModelVisitor::visit_manual(man);
+}
+
 } // namespace dex
