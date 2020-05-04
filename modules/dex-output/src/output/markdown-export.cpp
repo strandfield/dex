@@ -4,7 +4,7 @@
 
 #include "dex/output/markdown-export.h"
 
-#include "dex//output/json-output-annotator.h"
+#include "dex/output/liquid-exporter-url-annotator.h"
 
 #include "dex/model/since.h"
 
@@ -25,25 +25,6 @@
 namespace dex
 {
 
-struct JsonMarkdownUrlAnnotator : JsonUrlAnnotator
-{
-  std::string get_url(const cxx::Entity& e) const override
-  {
-    if (e.is<cxx::Class>())
-      return "classes/" + e.name() + ".md";
-    else if (e.is<cxx::Namespace>())
-      return "namespaces/" + e.name() + ".md";
-
-    return "";
-  }
-
-  std::string get_url(const dex::Manual& man) const override
-  {
-    // @TODO: remove spaces and illegal characters
-    return "manuals/" + man.title + ".md";
-  }
-};
-
 MarkdownExport::MarkdownExport()
 {
   LiquidExporterProfile prof;
@@ -58,7 +39,7 @@ void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
 
   json::Object json_export = LiquidExporter::serializedModel();
 
-  JsonMarkdownUrlAnnotator url_annotator;
+  LiquidExporterUrlAnnotator url_annotator{ profile(), ".md" };
   url_annotator.annotate(*model, json_export);
 
   LiquidExporter::render();
@@ -68,11 +49,6 @@ void MarkdownExport::postProcess(std::string& output)
 {
   LiquidExporter::trim_right(output);
   LiquidExporter::simplify_empty_lines(output);
-}
-
-json::Json MarkdownExport::applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args)
-{
-  return LiquidExporter::applyFilter(name, object, args);
 }
 
 std::string MarkdownExport::stringify_array(const json::Array& list)

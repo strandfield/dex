@@ -30,9 +30,6 @@ protected:
   void postProcess(std::string& output) override;
 
 protected:
-  json::Json applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) override;
-
-protected:
   std::string stringify_array(const json::Array& list) override;
   std::string stringify_list(const dom::List& list) override;
   std::string stringify_listitem(const dom::ListItem& li) override;
