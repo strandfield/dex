@@ -79,6 +79,8 @@ protected:
 protected:
   friend class LiquidExporterModelVisitor;
 
+  void dump(const json::Object& obj, const char* obj_field_name, const Profile::Template& tmplt);
+
   void dump(const cxx::Class& cla, const json::Object& obj);
   void dump(const dex::Manual& man, const json::Object& obj);
 

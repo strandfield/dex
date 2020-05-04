@@ -105,7 +105,7 @@ Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
   return result;
 }
 
-void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
+void LiquidExporter::dump(const json::Object& obj, const char* obj_field_name, const Profile::Template& tmplt)
 {
   if (obj["url"] == nullptr)
   {
@@ -116,36 +116,23 @@ void LiquidExporter::dump(const cxx::Class& cla, const json::Object& obj)
 
   json::Object context;
   context["model"] = m_serialized_model;
-  context["class"] = obj;
+  context[obj_field_name] = obj;
 
-  // @TODO: remove this 'prog' property
-  context["prog"] = m_serialized_model["program"];
-
-  std::string output = liquid::Renderer::render(m_profile.class_template.model, context);
+  std::string output = liquid::Renderer::render(tmplt.model, context);
 
   postProcess(output);
 
   write(output, (m_output_dir.absolutePath() + "/" + QString::fromStdString(url)).toStdString());
 }
 
-void LiquidExporter::dump(const dex::Manual& man, const json::Object& obj)
+void LiquidExporter::dump(const cxx::Class& /* cla */, const json::Object& obj)
 {
-  if (obj["url"] == nullptr)
-  {
-    return;
-  }
+  dump(obj, "class", m_profile.class_template);
+}
 
-  const std::string url = obj["url"].toString();
-
-  json::Object context;
-  context["model"] = m_serialized_model;
-  context["manual"] = obj;
-
-  std::string output = liquid::Renderer::render(m_profile.manual_template.model, context);
-
-  postProcess(output);
-
-  write(output, (m_output_dir.absolutePath() + "/" + QString::fromStdString(url)).toStdString());
+void LiquidExporter::dump(const dex::Manual& /* man */, const json::Object& obj)
+{
+  dump(obj, "manual", m_profile.manual_template);
 }
 
 void LiquidExporter::setModel(std::shared_ptr<Model> model)
