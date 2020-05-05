@@ -26,7 +26,7 @@ void send_token(tex::parsing::Token&& tok, C& c, Components& ... rest)
 {
   c.write(std::move(tok));
 
-  if (!c.output().empty())
+  while (!c.output().empty())
     send_token(tex::parsing::read(c.output()), rest...);
 }
 

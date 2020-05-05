@@ -335,7 +335,12 @@ void FunctionCaller::parse_word(tex::parsing::Token&& tok)
         || tok.characterToken().value == '.' || tok.characterToken().value == ','
         || tok.characterToken().value == ':')
       {
-        return finishCurrentTask();
+        finishCurrentTask();
+
+        if (m_tasks.empty())
+          m_output.push_back(std::move(tok));
+
+        return;
       }
 
       char c = tok.characterToken().value;

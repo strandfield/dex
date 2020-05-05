@@ -18,6 +18,12 @@
           "type": "sectioning"
         }, {
           "content": [{
+              "metadata": [{
+                  "begin": 15,
+                  "end": 18,
+                  "style": "bold",
+                  "type": "textstyle"
+                }],
               "text": "This is how to use the program.",
               "type": "paragraph"
             }],

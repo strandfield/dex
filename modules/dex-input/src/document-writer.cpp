@@ -64,6 +64,20 @@ void DocumentWriter::par()
     endParagraph();
 }
 
+void DocumentWriter::b(const std::string& text)
+{
+  DocumentWriter* target = nullptr;
+  
+  if (hasActiveNestedWriter(&target))
+  {
+    target->b(text);
+  }
+  else
+  {
+    paragraph().writeStyledText("bold", text);
+  }
+}
+
 void DocumentWriter::since(std::string version, const std::string& text)
 {
   // TODO: the following is incorrect and does not handle paragraphs inside a list
@@ -243,6 +257,15 @@ ListWriter& DocumentWriter::currentList()
 dom::Paragraph& DocumentWriter::currentParagraph()
 {
   return *(paragraph().output());
+}
+
+bool DocumentWriter::hasActiveNestedWriter(DocumentWriter** out)
+{
+  if (!isWritingList())
+    return false;
+
+  *out = &(currentList().content());
+  return true;
 }
 
 } // namespace dex

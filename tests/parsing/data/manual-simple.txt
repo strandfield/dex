@@ -12,6 +12,6 @@
  *
  * \chapter Usage
  *
- * This is how to use the program.
+ * This is how to \b use the program.
  *
  */

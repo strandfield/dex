@@ -43,6 +43,7 @@ public:
 
   void par();
 
+  void b(const std::string& text);
   void since(std::string version, const std::string& text);
 
   void image(std::string src, std::optional<int> width, std::optional<int> height);
@@ -74,6 +75,8 @@ public:
 protected:
   ListWriter& currentList();
   dom::Paragraph& currentParagraph();
+
+  bool hasActiveNestedWriter(DocumentWriter** out);
 
 private:
   State m_state = State::Idle;
