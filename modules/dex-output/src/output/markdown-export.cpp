@@ -19,6 +19,7 @@
 #include <dom/image.h>
 #include <dom/list.h>
 #include <dom/paragraph.h>
+#include <dom/paragraph/iterator.h>
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
 
@@ -83,10 +84,44 @@ std::string MarkdownExport::stringify_listitem(const dom::ListItem& li)
   return stringify_domcontent(li.content);
 }
 
+static void paragraph_conv_proc(const dom::ParagraphIterator begin, const dom::ParagraphIterator end, std::string& str)
+{
+  for (auto it = begin; it != end; ++it)
+  {
+    if (it.isText())
+    {
+      str += it.range().text();
+    }
+    else
+    {
+      const std::string& style = std::static_pointer_cast<dom::TextStyle>(*it)->style();
+      
+      std::string marker;
+
+      if (style == "bold")
+        marker = "**";
+
+      str += marker;
+
+      if (it.hasChild())
+      {
+        paragraph_conv_proc(it.begin(), it.end(), str);
+      }
+      else
+      {
+        str += it.range().text();
+      }
+
+      str += marker;
+    }
+  }
+}
+
 std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
 {
-  // @TODO : stringify paragraph with formatting
-  return par.text();
+  std::string result = "";
+  paragraph_conv_proc(par.begin(), par.end(), result);
+  return result;
 }
 
 std::string MarkdownExport::stringify_image(const dom::Image& img)
