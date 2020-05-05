@@ -82,6 +82,8 @@ struct DEX_INPUT_API Functions
   static const std::string SECTION;
   
   static const std::string BOLD;
+  static const std::string BEGINTEXTBF;
+  static const std::string ENDTEXTBF;
 
   static const std::string IMAGE;
 

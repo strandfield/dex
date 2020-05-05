@@ -44,6 +44,9 @@ public:
   void par();
 
   void b(const std::string& text);
+  void begintextbf();
+  void endtextbf();
+
   void since(std::string version, const std::string& text);
 
   void image(std::string src, std::optional<int> width, std::optional<int> height);

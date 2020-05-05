@@ -78,6 +78,34 @@ void DocumentWriter::b(const std::string& text)
   }
 }
 
+void DocumentWriter::begintextbf()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->begintextbf();
+  }
+  else
+  {
+    paragraph().begintextbf();
+  }
+}
+
+void DocumentWriter::endtextbf()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->endtextbf();
+  }
+  else
+  {
+    paragraph().endtextbf();
+  }
+}
+
 void DocumentWriter::since(std::string version, const std::string& text)
 {
   // TODO: the following is incorrect and does not handle paragraphs inside a list

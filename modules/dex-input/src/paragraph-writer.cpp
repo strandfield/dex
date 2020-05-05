@@ -32,6 +32,31 @@ void ParagraphWriter::write(const std::string& str)
   output()->addText(str);
 }
 
+void ParagraphWriter::begintextbf()
+{
+  dom::Paragraph& par = *output();
+  size_t start = par.length();
+
+  auto style = std::make_shared<dom::TextStyle>(dom::ParagraphRange(par, start, par.length()), "bold");
+  m_pending_metadata.push_back(style);
+}
+
+void ParagraphWriter::endtextbf()
+{
+  auto style = m_pending_metadata.back();
+
+  if (!style->is<dom::TextStyle>() || static_cast<dom::TextStyle*>(style.get())->style() != "bold")
+    throw std::runtime_error{ "ParagraphWriter::endtextbf() mismatch" };
+
+  m_pending_metadata.pop_back();
+
+  dom::Paragraph& par = *output();
+  size_t end = par.length();
+  style->range() = dom::ParagraphRange(par, style->range().begin(), end);
+
+  par.addMetaData(style);
+}
+
 void ParagraphWriter::writeLink(std::string url, const std::string& text)
 {
   dom::Paragraph& par = *output();

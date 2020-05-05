@@ -19,6 +19,11 @@
         }, {
           "content": [{
               "metadata": [{
+                  "begin": 8,
+                  "end": 11,
+                  "style": "bold",
+                  "type": "textstyle"
+                }, {
                   "begin": 15,
                   "end": 18,
                   "style": "bold",

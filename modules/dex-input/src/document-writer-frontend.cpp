@@ -47,6 +47,16 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
     m_writer->b(word);
     return true;
   }
+  else if (call.function == Functions::BEGINTEXTBF)
+  {
+    m_writer->begintextbf();
+    return true;
+  }
+  else if (call.function == Functions::ENDTEXTBF)
+  {
+    m_writer->endtextbf();
+    return true;
+  }
   else if (call.function == Functions::SINCE)
   {
     std::string version = std::get<std::string>(call.options.at(""));

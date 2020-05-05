@@ -24,6 +24,9 @@ public:
   void write(char c) override;
   void write(const std::string& str);
 
+  void begintextbf();
+  void endtextbf();
+
   void writeLink(std::string url, const std::string& text);
   void writeStyledText(std::string style, const std::string& text);
 
@@ -32,6 +35,9 @@ public:
   void finish() override;
 
   std::shared_ptr<dom::Paragraph> output() const;
+
+private:
+  std::vector<std::shared_ptr<dom::ParagraphMetaData>> m_pending_metadata;
 };
 
 } // namespace dex
