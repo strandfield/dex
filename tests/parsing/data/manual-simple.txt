@@ -13,5 +13,7 @@
  * \chapter Usage
  *
  * This is \b how to \textbf{use} the program.
+ * Please \e do note that not only \textit{italic text is supported}, 
+ * but also inline \c code.
  *
  */

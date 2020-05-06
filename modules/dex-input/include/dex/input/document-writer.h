@@ -47,6 +47,14 @@ public:
   void begintextbf();
   void endtextbf();
 
+  void e(const std::string& text);
+  void begintextit();
+  void endtextit();
+
+  void c(const std::string& text);
+  void begintexttt();
+  void endtexttt();
+
   void since(std::string version, const std::string& text);
 
   void image(std::string src, std::optional<int> width, std::optional<int> height);

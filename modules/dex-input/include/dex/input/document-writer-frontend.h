@@ -38,6 +38,12 @@ protected:
   void bold(const FunctionCall& c);
   void begintextbf(const FunctionCall& c);
   void endtextbf(const FunctionCall& c);
+  void italic(const FunctionCall& c);
+  void begintextit(const FunctionCall& c);
+  void endtextit(const FunctionCall& c);
+  void inlinecode(const FunctionCall& c);
+  void begintexttt(const FunctionCall& c);
+  void endtexttt(const FunctionCall& c);
   void since(const FunctionCall& c);
   void beginsince(const FunctionCall& c);
   void endsince(const FunctionCall& c);

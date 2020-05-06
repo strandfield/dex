@@ -34,27 +34,32 @@ void ParagraphWriter::write(const std::string& str)
 
 void ParagraphWriter::begintextbf()
 {
-  dom::Paragraph& par = *output();
-  size_t start = par.length();
-
-  auto style = std::make_shared<dom::TextStyle>(dom::ParagraphRange(par, start, par.length()), "bold");
-  m_pending_metadata.push_back(style);
+  beginStyledText("bold");
 }
 
 void ParagraphWriter::endtextbf()
 {
-  auto style = m_pending_metadata.back();
+  endStyledText("bold");
+}
 
-  if (!style->is<dom::TextStyle>() || static_cast<dom::TextStyle*>(style.get())->style() != "bold")
-    throw std::runtime_error{ "ParagraphWriter::endtextbf() mismatch" };
+void ParagraphWriter::begintextit()
+{
+  beginStyledText("italic");
+}
 
-  m_pending_metadata.pop_back();
+void ParagraphWriter::endtextit()
+{
+  endStyledText("italic");
+}
 
-  dom::Paragraph& par = *output();
-  size_t end = par.length();
-  style->range() = dom::ParagraphRange(par, style->range().begin(), end);
+void ParagraphWriter::begintexttt()
+{
+  beginStyledText("code");
+}
 
-  par.addMetaData(style);
+void ParagraphWriter::endtexttt()
+{
+  endStyledText("code");
 }
 
 void ParagraphWriter::writeLink(std::string url, const std::string& text)
@@ -109,6 +114,32 @@ void ParagraphWriter::finish()
 std::shared_ptr<dom::Paragraph> ParagraphWriter::output() const
 {
   return std::static_pointer_cast<dom::Paragraph>(ContentWriter::output());
+}
+
+
+void ParagraphWriter::beginStyledText(std::string style)
+{
+  dom::Paragraph& par = *output();
+  size_t start = par.length();
+
+  auto data = std::make_shared<dom::TextStyle>(dom::ParagraphRange(par, start, par.length()), std::move(style));
+  m_pending_metadata.push_back(data);
+}
+
+void ParagraphWriter::endStyledText(const char* style)
+{
+  auto data = m_pending_metadata.back();
+
+  if (!data->is<dom::TextStyle>() || static_cast<dom::TextStyle*>(data.get())->style() != style)
+    throw std::runtime_error{ "ParagraphWriter::endStyledText() mismatch" };
+
+  m_pending_metadata.pop_back();
+
+  dom::Paragraph& par = *output();
+  size_t end = par.length();
+  data->range() = dom::ParagraphRange(par, data->range().begin(), end);
+
+  par.addMetaData(data);
 }
 
 } // namespace dex

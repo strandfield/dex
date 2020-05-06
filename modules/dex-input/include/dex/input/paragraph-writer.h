@@ -27,6 +27,12 @@ public:
   void begintextbf();
   void endtextbf();
 
+  void begintextit();
+  void endtextit();
+
+  void begintexttt();
+  void endtexttt();
+
   void writeLink(std::string url, const std::string& text);
   void writeStyledText(std::string style, const std::string& text);
 
@@ -35,6 +41,10 @@ public:
   void finish() override;
 
   std::shared_ptr<dom::Paragraph> output() const;
+
+protected:
+  void beginStyledText(std::string style);
+  void endStyledText(const char* style);
 
 private:
   std::vector<std::shared_ptr<dom::ParagraphMetaData>> m_pending_metadata;

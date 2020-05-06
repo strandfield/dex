@@ -28,8 +28,23 @@
                   "end": 18,
                   "style": "bold",
                   "type": "textstyle"
+                }, {
+                  "begin": 39,
+                  "end": 41,
+                  "style": "italic",
+                  "type": "textstyle"
+                }, {
+                  "begin": 61,
+                  "end": 85,
+                  "style": "italic",
+                  "type": "textstyle"
+                }, {
+                  "begin": 103,
+                  "end": 107,
+                  "style": "code",
+                  "type": "textstyle"
                 }],
-              "text": "This is how to use the program.",
+              "text": "This is how to use the program. Please do note that not only italic text is supported, but also inline code.",
               "type": "paragraph"
             }],
           "depth": "chapter",

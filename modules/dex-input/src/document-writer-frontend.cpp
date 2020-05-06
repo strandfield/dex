@@ -43,6 +43,12 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
     {Functions::BOLD, &DocumentWriterFrontend::bold},
     {Functions::BEGINTEXTBF, &DocumentWriterFrontend::begintextbf},
     {Functions::ENDTEXTBF, &DocumentWriterFrontend::endtextbf},
+    {Functions::ITALIC, &DocumentWriterFrontend::italic},
+    {Functions::BEGINTEXTIT, &DocumentWriterFrontend::begintextit},
+    {Functions::ENDTEXTIT, &DocumentWriterFrontend::endtextit},
+    {Functions::INLINECODE, &DocumentWriterFrontend::inlinecode},
+    {Functions::BEGINTEXTTT, &DocumentWriterFrontend::begintexttt},
+    {Functions::ENDTEXTTT, &DocumentWriterFrontend::endtexttt},
     {Functions::SINCE, &DocumentWriterFrontend::since},
     {Functions::BEGINSINCE, &DocumentWriterFrontend::beginsince},
     {Functions::ENDSINCE, &DocumentWriterFrontend::endsince},
@@ -93,6 +99,38 @@ void DocumentWriterFrontend::begintextbf(const FunctionCall&)
 void DocumentWriterFrontend::endtextbf(const FunctionCall&)
 {
   m_writer->endtextbf();
+}
+
+void DocumentWriterFrontend::italic(const FunctionCall& c)
+{
+  const std::string& word = c.arg<std::string>(0);
+  m_writer->e(word);
+}
+
+void DocumentWriterFrontend::begintextit(const FunctionCall& c)
+{
+  m_writer->begintextit();
+}
+
+void DocumentWriterFrontend::endtextit(const FunctionCall& c)
+{
+  m_writer->endtextit();
+}
+
+void DocumentWriterFrontend::inlinecode(const FunctionCall& c)
+{
+  const std::string& word = c.arg<std::string>(0);
+  m_writer->c(word);
+}
+
+void DocumentWriterFrontend::begintexttt(const FunctionCall& c)
+{
+  m_writer->begintexttt();
+}
+
+void DocumentWriterFrontend::endtexttt(const FunctionCall& c)
+{
+  m_writer->endtexttt();
 }
 
 void DocumentWriterFrontend::since(const FunctionCall& c)

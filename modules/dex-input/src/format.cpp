@@ -42,115 +42,131 @@ const char* fmt_src =
   "  \\@begintextbf #1\\@endtextbf"
   "}" // 30
   ""
+  "\\def\\e{"
+  "  \\p@rseword\\c@ll\\@e"
+  "}"
+  "" // 35
+  "\\def\\textit#1{"
+  "  \\@begintextit #1\\@endtextit"
+  "}"
+  ""
+  "\\def\\c{" // 40
+  "  \\p@rseword\\c@ll\\@c"
+  "}"
+  ""
+  "\\def\\texttt#1{"
+  "  \\@begintexttt #1\\@endtexttt" // 45
+  "}"
+  ""
   "\\def\\image{"
   "  \\@ifnextchar[{"
-  "    \\def\\@fteroptions{"
-  "      \\p@rseword\\c@ll\\@image" // 35
+  "    \\def\\@fteroptions{" // 50
+  "      \\p@rseword\\c@ll\\@image"
   "    }"
   "    \\p@rseoptions"
   "  }{"
-  "    \\p@rseword\\c@ll\\@image"
-  "  }" // 40
+  "    \\p@rseword\\c@ll\\@image" // 55
+  "  }"
   "}"
   ""
   "\\def\\list{"
-  "  \\@ifnextchar[{"
-  "    \\def\\@fteroptions{" // 45
+  "  \\@ifnextchar[{" // 60
+  "    \\def\\@fteroptions{"
   "      \\c@ll\\@list"
   "    }"
   "    \\p@rseoptions"
-  "  }{"
-  "    \\c@ll\\@list" // 50
+  "  }{" // 65
+  "    \\c@ll\\@list"
   "  }"
   "}"
   ""
-  "\\def\\li{"
-  "  \\@ifnextchar[{" // 55
+  "\\def\\li{" // 70
+  "  \\@ifnextchar[{"
   "    \\def\\@fteroptions{"
   "      \\c@ll\\@li"
   "    }"
-  "    \\p@rseoptions"
-  "  }{" // 60
+  "    \\p@rseoptions" // 75
+  "  }{"
   "    \\c@ll\\@li"
   "  }"
   "}"
-  ""
-  "% Dex - Program %" // 65
+  "" // 80
+  "% Dex - Program %"
   ""
   "\\def\\class{"
   "  \\p@rseline\\c@ll\\cl@ss"
-  "}"
-  "" // 70
+  "}" // 85
+  ""
   "\\def\\namespace{"
   "  \\p@rseline\\c@ll\\n@mesp@ce"
   "}"
-  ""
-  "\\def\\fn{" // 75
+  "" // 90
+  "\\def\\fn{"
   "  \\p@rseline\\c@ll\\functi@n"
   "}"
   ""
-  "\\def\\variable{"
-  "  \\p@rseline\\c@ll\\v@ri@ble" // 80
+  "\\def\\variable{" // 95
+  "  \\p@rseline\\c@ll\\v@ri@ble"
   "}"
   ""
   "\\def\\enum{"
-  "  \\p@rseline\\c@ll\\@enum"
-  "}" // 85
+  "  \\p@rseline\\c@ll\\@enum" // 100
+  "}"
   ""
   "\\def\\value{"
   "  \\@ifnextchar[{"
-  "    \\def\\@afteroptions{"
-  "      \\p@rseword\\c@ll\\enumv@lue" // 90
+  "    \\def\\@afteroptions{" // 105
+  "      \\p@rseword\\c@ll\\enumv@lue"
   "    }"
   "    \\p@rseoptions"
   "  }{"
-  "    \\p@rseword\\c@ll\\enumv@lue"
-  "  }" // 95
-  "}"
-  ""
-  "\\def\\brief{"
-  "  \\p@rseline\\c@ll\\@brief"
-  "}" // 100
-  ""
-  "\\def\\param{"
-  "  \\p@rseline\\c@ll\\p@r@m"
-  "}"
-  "" // 105
-  "\\def\\returns{"
-  "  \\p@rseline\\c@ll\\@returns"
-  "}"
-  ""
-  "\\def\\since{" // 110
-  "  \\@ifnextchar[{"
-  "    \\def\\@fteroptions{"
-  "      \\@ifleftbrace{"
-  "        \\p@rseword\\c@ll\\@since"
-  "      }{" // 115
-  "        \\beginsince"
-  "      }"
-  "    }"
-  "    \\p@rseoptions"
-  "  }{" // 120
-  "    \\p@rseline\\c@ll\\@since"
+  "    \\p@rseword\\c@ll\\enumv@lue" // 110
   "  }"
   "}"
   ""
-  "% Dex - Manual %" // 125
+  "\\def\\brief{"
+  "  \\p@rseline\\c@ll\\@brief" // 115
+  "}"
+  ""
+  "\\def\\param{"
+  "  \\p@rseline\\c@ll\\p@r@m"
+  "}" // 120
+  ""
+  "\\def\\returns{"
+  "  \\p@rseline\\c@ll\\@returns"
+  "}"
+  "" // 125
+  "\\def\\since{"
+  "  \\@ifnextchar[{"
+  "    \\def\\@fteroptions{"
+  "      \\@ifleftbrace{"
+  "        \\p@rseword\\c@ll\\@since" // 130
+  "      }{"
+  "        \\beginsince"
+  "      }"
+  "    }"
+  "    \\p@rseoptions" // 135
+  "  }{"
+  "    \\p@rseline\\c@ll\\@since"
+  "  }"
+  "}"
+  "" // 140
+  "% Dex - Manual %"
   ""
   "\\def\\manual{"
   "  \\p@rseline\\c@ll\\@manual"
-  "}"
-  "" // 130
+  "}" // 145
+  ""
   "\\def\\part{"
   "  \\p@rseline\\c@ll\\@part"
   "}"
-  ""
-  "\\def\\chapter{" // 135
+  "" // 150
+  "\\def\\chapter{"
   "  \\p@rseline\\c@ll\\@chapter"
   "}"
   ""
-  "\\def\\section{"
-  "  \\p@rseline\\c@ll\\@section" // 140
+  "\\def\\section{" // 155
+  "  \\p@rseline\\c@ll\\@section"
   "}"
   ""
 ;
@@ -189,115 +205,131 @@ const char* fmt_bytecode =
   ">2c<>1pc:"
   "s" // 30
   ""
+  "d1r"
+  ">2c9c4c2"
+  "s"
+  "" // 35
+  "d6pr"
+  ">2c<>1pc:"
+  "s"
+  ""
+  "d1r" // 40
+  ">2c9c4c2"
+  "s"
+  ""
+  "d6pr"
+  ">2c<>1pc:" // 45
+  "s"
+  ""
   "d5r"
   ">2c;tt"
-  ">4c3c<t"
-  ">6c9c4c6" // 35
+  ">4c3c<t" // 50
+  ">6c9c4c6"
   ">4t"
   ">4c<"
   ">2tt"
-  ">4c9c4c6"
-  ">2t" // 40
+  ">4c9c4c6" // 55
+  ">2t"
   "s"
   ""
   "d4r"
-  ">2c;tt"
-  ">4c3c<t" // 45
+  ">2c;tt" // 60
+  ">4c3c<t"
   ">6c4c5"
   ">4t"
   ">4c<"
-  ">2tt"
-  ">4c4c5" // 50
+  ">2tt" // 65
+  ">4c4c5"
   ">2t"
   "s"
   ""
-  "d2r"
-  ">2c;tt" // 55
+  "d2r" // 70
+  ">2c;tt"
   ">4c3c<t"
   ">6c4c3"
   ">4t"
-  ">4c<"
-  ">2tt" // 60
+  ">4c<" // 75
+  ">2tt"
   ">4c4c3"
   ">2t"
   "s"
-  ""
-  ">A" // 65
+  "" // 80
+  ">A"
   ""
   "d5r"
-  ">2c9c4c5"
-  "s"
-  "" // 70
-  "d9r"
-  ">2c9c4c9"
-  "s"
-  ""
-  "d2r" // 75
-  ">2c9c4c8"
-  "s"
-  ""
-  "d8r"
-  ">2c9c4c8" // 80
-  "s"
-  ""
-  "d4r"
   ">2c9c4c5"
   "s" // 85
   ""
+  "d9r"
+  ">2c9c4c9"
+  "s"
+  "" // 90
+  "d2r"
+  ">2c9c4c8"
+  "s"
+  ""
+  "d8r" // 95
+  ">2c9c4c8"
+  "s"
+  ""
+  "d4r"
+  ">2c9c4c5" // 100
+  "s"
+  ""
   "d5r"
   ">2c;tt"
-  ">4c3c=t"
-  ">6c9c4c9" // 90
+  ">4c3c=t" // 105
+  ">6c9c4c9"
   ">4t"
   ">4c<"
   ">2tt"
-  ">4c9c4c9"
-  ">2t" // 95
-  "s"
-  ""
-  "d5r"
-  ">2c9c4c6"
-  "s" // 100
-  ""
-  "d5r"
-  ">2c9c4c5"
-  "s"
-  "" // 105
-  "d7r"
-  ">2c9c4c8"
-  "s"
-  ""
-  "d5r" // 110
-  ">2c;tt"
-  ">4c3c<t"
-  ">6c<t"
-  ">8c9c4c6"
-  ">6tt" // 115
-  ">8c:"
-  ">6t"
-  ">4t"
-  ">4c<"
-  ">2tt" // 120
-  ">4c9c4c6"
+  ">4c9c4c9" // 110
   ">2t"
   "s"
   ""
-  ">@" // 125
+  "d5r"
+  ">2c9c4c6" // 115
+  "s"
+  ""
+  "d5r"
+  ">2c9c4c5"
+  "s" // 120
+  ""
+  "d7r"
+  ">2c9c4c8"
+  "s"
+  "" // 125
+  "d5r"
+  ">2c;tt"
+  ">4c3c<t"
+  ">6c<t"
+  ">8c9c4c6" // 130
+  ">6tt"
+  ">8c:"
+  ">6t"
+  ">4t"
+  ">4c<" // 135
+  ">2tt"
+  ">4c9c4c6"
+  ">2t"
+  "s"
+  "" // 140
+  ">@"
   ""
   "d6r"
   ">2c9c4c7"
-  "s"
-  "" // 130
+  "s" // 145
+  ""
   "d4r"
   ">2c9c4c5"
   "s"
-  ""
-  "d7r" // 135
+  "" // 150
+  "d7r"
   ">2c9c4c8"
   "s"
   ""
-  "d7r"
-  ">2c9c4c8" // 140
+  "d7r" // 155
+  ">2c9c4c8"
   "s"
   ""
   "e";

@@ -100,6 +100,10 @@ static void paragraph_conv_proc(const dom::ParagraphIterator begin, const dom::P
 
       if (style == "bold")
         marker = "**";
+      else if (style == "italic")
+        marker = "*";
+      else if (style == "code")
+        marker = '`';
 
       str += marker;
 

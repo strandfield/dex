@@ -106,6 +106,90 @@ void DocumentWriter::endtextbf()
   }
 }
 
+void DocumentWriter::e(const std::string& text)
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->b(text);
+  }
+  else
+  {
+    paragraph().writeStyledText("italic", text);
+  }
+}
+
+void DocumentWriter::begintextit()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->begintextit();
+  }
+  else
+  {
+    paragraph().begintextit();
+  }
+}
+
+void DocumentWriter::endtextit()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->endtextit();
+  }
+  else
+  {
+    paragraph().endtextit();
+  }
+}
+
+void DocumentWriter::c(const std::string& text)
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->b(text);
+  }
+  else
+  {
+    paragraph().writeStyledText("code", text);
+  }
+}
+
+void DocumentWriter::begintexttt()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->begintexttt();
+  }
+  else
+  {
+    paragraph().begintexttt();
+  }
+}
+
+void DocumentWriter::endtexttt()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+  {
+    target->endtexttt();
+  }
+  else
+  {
+    paragraph().endtexttt();
+  }
+}
+
 void DocumentWriter::since(std::string version, const std::string& text)
 {
   // TODO: the following is incorrect and does not handle paragraphs inside a list

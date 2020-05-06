@@ -84,6 +84,12 @@ struct DEX_INPUT_API Functions
   static const std::string BOLD;
   static const std::string BEGINTEXTBF;
   static const std::string ENDTEXTBF;
+  static const std::string ITALIC;
+  static const std::string BEGINTEXTIT;
+  static const std::string ENDTEXTIT;
+  static const std::string INLINECODE;
+  static const std::string BEGINTEXTTT;
+  static const std::string ENDTEXTTT;
 
   static const std::string IMAGE;
 

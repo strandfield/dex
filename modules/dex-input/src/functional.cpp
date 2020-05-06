@@ -37,6 +37,14 @@ const std::string Functions::BOLD = "@b";
 const std::string Functions::BEGINTEXTBF = "@begintextbf";
 const std::string Functions::ENDTEXTBF = "@endtextbf";
 
+const std::string Functions::ITALIC = "@e";
+const std::string Functions::BEGINTEXTIT = "@begintextit";
+const std::string Functions::ENDTEXTIT = "@endtextit";
+
+const std::string Functions::INLINECODE = "@c";
+const std::string Functions::BEGINTEXTTT = "@begintexttt";
+const std::string Functions::ENDTEXTTT = "@endtexttt";
+
 const std::string Functions::IMAGE = "@image";
 
 const std::string Functions::LIST = "@list";
