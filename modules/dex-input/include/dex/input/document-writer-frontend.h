@@ -32,6 +32,19 @@ public:
   void finish();
 
   dom::Content& output();
+
+protected:
+  void par(const FunctionCall& c);
+  void bold(const FunctionCall& c);
+  void begintextbf(const FunctionCall& c);
+  void endtextbf(const FunctionCall& c);
+  void since(const FunctionCall& c);
+  void beginsince(const FunctionCall& c);
+  void endsince(const FunctionCall& c);
+  void list(const FunctionCall& c);
+  void li(const FunctionCall& c);
+  void endlist(const FunctionCall& c);
+  void image(const FunctionCall& c);
 };
 
 class DEX_INPUT_API DocumentWriterToolchain

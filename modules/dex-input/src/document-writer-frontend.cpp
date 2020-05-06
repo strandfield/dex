@@ -36,77 +36,32 @@ void DocumentWriterFrontend::write(const std::string& str)
 
 bool DocumentWriterFrontend::handle(const FunctionCall& call)
 {
-  if (call.function == Functions::PAR)
-  {
-    m_writer->par();
-    return true;
-  }
-  else if (call.function == Functions::BOLD)
-  {
-    const std::string& word = call.arg<std::string>(0);
-    m_writer->b(word);
-    return true;
-  }
-  else if (call.function == Functions::BEGINTEXTBF)
-  {
-    m_writer->begintextbf();
-    return true;
-  }
-  else if (call.function == Functions::ENDTEXTBF)
-  {
-    m_writer->endtextbf();
-    return true;
-  }
-  else if (call.function == Functions::SINCE)
-  {
-    std::string version = std::get<std::string>(call.options.at(""));
-    const std::string& text = std::get<std::string>(call.arguments.front());
+  typedef void(DocumentWriterFrontend::*Callback)(const FunctionCall&);
 
-    m_writer->since(std::move(version), text);
-    return true;
-  }
-  else if (call.function == Functions::BEGINSINCE)
-  {
-    std::string version = std::get<std::string>(call.options.at(""));
-    m_writer->beginSinceBlock(std::move(version));
-    return true;
-  }
-  else if (call.function == Functions::ENDSINCE)
-  {
-    m_writer->endSinceBlock();
-    return true;
-  }
-  else if (call.function == Functions::LIST)
-  {
-    std::optional<std::string> marker = call.opt<std::string>("marker");
-    std::optional<bool> ordered = call.opt<bool>("ordered");
-    std::optional<bool> reversed = call.opt<bool>("reversed");
+  static const std::map<std::string, Callback> fn_map = {
+    {Functions::PAR, &DocumentWriterFrontend::par},
+    {Functions::BOLD, &DocumentWriterFrontend::bold},
+    {Functions::BEGINTEXTBF, &DocumentWriterFrontend::begintextbf},
+    {Functions::ENDTEXTBF, &DocumentWriterFrontend::endtextbf},
+    {Functions::SINCE, &DocumentWriterFrontend::since},
+    {Functions::BEGINSINCE, &DocumentWriterFrontend::beginsince},
+    {Functions::ENDSINCE, &DocumentWriterFrontend::endsince},
+    {Functions::LIST, &DocumentWriterFrontend::list},
+    {Functions::LI, &DocumentWriterFrontend::li},
+    {Functions::ENDLIST, &DocumentWriterFrontend::endlist},
+    {Functions::IMAGE, &DocumentWriterFrontend::image},
+  };
 
-    m_writer->list(marker, ordered, reversed);
-    return true;
-  }
-  else if (call.function == Functions::LI)
-  {
-    std::optional<std::string> marker = call.opt<std::string>("marker");
-    std::optional<int> value = call.opt<int>("value");
-    m_writer->li(marker, value);
-    return true;
-  }
-  else if (call.function == Functions::ENDLIST)
-  {
-    m_writer->endlist();
-    return true;
-  }
-  else if (call.function == Functions::IMAGE)
-  {
-    std::string src = call.arg<std::string>(0);
-    std::optional<int> width = call.opt<int>("width");
-    std::optional<int> height = call.opt<int>("height");
-    m_writer->image(std::move(src), width, height);
-    return true;
-  }
+  auto it = fn_map.find(call.function);
 
-  return false;
+  if (it == fn_map.end())
+    return false;
+
+  Callback fun = it->second;
+
+  ((*this).*fun)(call);
+
+  return true;
 }
 
 void DocumentWriterFrontend::finish()
@@ -117,6 +72,74 @@ void DocumentWriterFrontend::finish()
 bool DocumentWriterFrontend::isIdle() const
 {
   return m_writer->isIdle();
+}
+
+void DocumentWriterFrontend::par(const FunctionCall&)
+{
+  m_writer->par();
+}
+
+void DocumentWriterFrontend::bold(const FunctionCall& c)
+{
+  const std::string& word = c.arg<std::string>(0);
+  m_writer->b(word);
+}
+
+void DocumentWriterFrontend::begintextbf(const FunctionCall&)
+{
+  m_writer->begintextbf();
+}
+
+void DocumentWriterFrontend::endtextbf(const FunctionCall&)
+{
+  m_writer->endtextbf();
+}
+
+void DocumentWriterFrontend::since(const FunctionCall& c)
+{
+  std::string version = std::get<std::string>(c.options.at(""));
+  const std::string& text = std::get<std::string>(c.arguments.front());
+  m_writer->since(std::move(version), text);
+}
+
+void DocumentWriterFrontend::beginsince(const FunctionCall& c)
+{
+  std::string version = std::get<std::string>(c.options.at(""));
+  m_writer->beginSinceBlock(std::move(version));
+}
+
+void DocumentWriterFrontend::endsince(const FunctionCall&)
+{
+  m_writer->endSinceBlock();
+}
+
+void DocumentWriterFrontend::list(const FunctionCall& c)
+{
+  std::optional<std::string> marker = c.opt<std::string>("marker");
+  std::optional<bool> ordered = c.opt<bool>("ordered");
+  std::optional<bool> reversed = c.opt<bool>("reversed");
+
+  m_writer->list(marker, ordered, reversed);
+}
+
+void DocumentWriterFrontend::li(const FunctionCall& c)
+{
+  std::optional<std::string> marker = c.opt<std::string>("marker");
+  std::optional<int> value = c.opt<int>("value");
+  m_writer->li(marker, value);
+}
+
+void DocumentWriterFrontend::endlist(const FunctionCall&)
+{
+  m_writer->endlist();
+}
+
+void DocumentWriterFrontend::image(const FunctionCall& c)
+{
+  std::string src = c.arg<std::string>(0);
+  std::optional<int> width = c.opt<int>("width");
+  std::optional<int> height = c.opt<int>("height");
+  m_writer->image(std::move(src), width, height);
 }
 
 
