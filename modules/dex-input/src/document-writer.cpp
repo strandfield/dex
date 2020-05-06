@@ -159,7 +159,7 @@ void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> va
   if (!isWritingList())
     throw std::runtime_error{"DocumentWriter::li()"};
 
-  currentList().li(std::move(marker), value);
+  currentList().li(marker, value);
 }
 
 void DocumentWriter::endlist()
