@@ -9,6 +9,7 @@
 
 #include "dex/input/parser-machine.h"
 #include "dex/output/json-export.h"
+#include "dex/output/latex-export.h"
 #include "dex/output/markdown-export.h"
 
 #include <cxx/parsers/libclang-parser.h>
@@ -177,6 +178,11 @@ void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name)
   {
     dex::MarkdownExport md_export;
     md_export.dump(model, info.dir());
+  }
+  else if (info.suffix() == "tex")
+  {
+    dex::LatexExport latex_export;
+    latex_export.dump(model, info.dir());
   }
   else
   {

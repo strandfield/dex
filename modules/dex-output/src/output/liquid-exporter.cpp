@@ -207,6 +207,19 @@ std::string LiquidExporter::stringify_domcontent(const dom::Content& content)
   return result;
 }
 
+std::string LiquidExporter::stringify_array(const json::Array& list)
+{
+  std::string result;
+
+  for (const auto& val : list.data())
+  {
+    result += stringify(val);
+    result += "\n\n";
+  }
+
+  return result;
+}
+
 void LiquidExporter::postProcess(std::string& output)
 {
   /* no-op */

@@ -1,0 +1,58 @@
+
+\documentclass[10pt,a4paper]{memoir}
+
+\begin{document}
+
+\include{macros.tex}
+
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+\pagenumbering{arabic}
+
+{% for e in model.program.global_namespace.entities %}
+
+  {% if e.type == 'class' %}
+  
+  {% assign class = e %}
+  
+\chapter{{'{'}}{{ class.name }}{{'}'}}
+  
+{% if class.documentation.brief %}
+\textbf{Brief:} {{ class.documentation.brief }}
+{% endif %}
+
+{{ class.documentation.description }}
+
+{% for f in class.members | filter_by_type: 'function' %}
+
+\section{{'{'}}{{ f.name }}{{'}'}}
+
+{% if f.documentation.brief %}
+\textbf{Brief:} {{ f.documentation.brief }}
+{% endif %}
+
+{% if f.documentation.params and f.documentation.params.size > 0 %}
+Parameters:
+{% for p in f.documentation.params %}
+- {{ p }}
+{% endfor %}
+{% endif %}
+
+{% if f.documentation.returns %}
+\textbf{Returns:}  {{ f.documentation.returns }}
+{% endif %}
+
+{{ f.documentation.description }}
+
+{% endfor %}
+  
+  {% endif %}
+
+{% endfor %}
+
+\end{document}

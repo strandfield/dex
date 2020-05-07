@@ -1,19 +1,19 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#ifndef DEX_OUTPUT_MARKDOWN_EXPORT_H
-#define DEX_OUTPUT_MARKDOWN_EXPORT_H
+#ifndef DEX_OUTPUT_LATEX_EXPORT_H
+#define DEX_OUTPUT_LATEX_EXPORT_H
 
 #include "dex/output/liquid-exporter.h"
 
 namespace dex
 {
 
-class DEX_OUTPUT_API MarkdownExport : protected LiquidExporter
+class DEX_OUTPUT_API LatexExport : protected LiquidExporter
 {
 public:
-  MarkdownExport();
+  LatexExport();
 
   void dump(std::shared_ptr<Model> model, const QDir& dir);
 
@@ -30,4 +30,4 @@ protected:
 
 } // namespace dex
 
-#endif // DEX_OUTPUT_MARKDOWN_EXPORT_H
+#endif // DEX_OUTPUT_LATEX_EXPORT_H

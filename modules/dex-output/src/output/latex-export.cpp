@@ -1,8 +1,8 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/markdown-export.h"
+#include "dex/output/latex-export.h"
 
 #include "dex/output/liquid-exporter-url-annotator.h"
 
@@ -26,47 +26,47 @@
 namespace dex
 {
 
-MarkdownExport::MarkdownExport()
+LatexExport::LatexExport()
 {
   LiquidExporterProfile prof;
-  prof.load(QDir{ ":/templates/markdown" });
+  prof.load(QDir{ ":/templates/latex" });
   profile() = std::move(prof);
 }
 
-void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
+void LatexExport::dump(std::shared_ptr<Model> model, const QDir& dir)
 {
   LiquidExporter::setOutputDir(dir);
   LiquidExporter::setModel(model);
 
   json::Object json_export = LiquidExporter::serializedModel();
 
-  LiquidExporterUrlAnnotator url_annotator{ profile(), ".md" };
+  LiquidExporterUrlAnnotator url_annotator{ profile(), ".tex" };
   url_annotator.annotate(*model, json_export);
 
   LiquidExporter::render();
 }
 
-void MarkdownExport::postProcess(std::string& output)
+void LatexExport::postProcess(std::string& output)
 {
   LiquidExporter::trim_right(output);
   LiquidExporter::simplify_empty_lines(output);
 }
 
-std::string MarkdownExport::stringify_list(const dom::List& list)
+std::string LatexExport::stringify_list(const dom::List& list)
 {
-  // @TODO: handle nested list
-
-  std::string result;
+  std::string result = "\\begin{itemize}\n";
 
   for (const auto& li : list.items)
   {
-    result += "- " + stringify_listitem(*li) + "\n";
+    result += "  \\item " + stringify_listitem(*li) + "\n";
   }
+
+  result += "\\end{itemize}";
 
   return result;
 }
 
-std::string MarkdownExport::stringify_listitem(const dom::ListItem& li)
+std::string LatexExport::stringify_listitem(const dom::ListItem& li)
 {
   return stringify_domcontent(li.content);
 }
@@ -86,11 +86,11 @@ static void paragraph_conv_proc(const dom::ParagraphIterator begin, const dom::P
       std::string marker;
 
       if (style == "bold")
-        marker = "**";
+        marker = "\\textbf{";
       else if (style == "italic")
-        marker = "*";
+        marker = "\\textit{";
       else if (style == "code")
-        marker = '`';
+        marker = "\\texttt{";
 
       str += marker;
 
@@ -103,33 +103,45 @@ static void paragraph_conv_proc(const dom::ParagraphIterator begin, const dom::P
         str += it.range().text();
       }
 
-      str += marker;
+      if (!marker.empty())
+        str += "}";
     }
   }
 }
 
-std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
+std::string LatexExport::stringify_paragraph(const dom::Paragraph& par)
 {
   std::string result = "";
   paragraph_conv_proc(par.begin(), par.end(), result);
   return result;
 }
 
-std::string MarkdownExport::stringify_image(const dom::Image& img)
+std::string LatexExport::stringify_image(const dom::Image& img)
 {
-  return "![image](" + img.src + ")";
+  return "\\includegraphics{" + img.src + "}";
 }
 
-std::string MarkdownExport::stringify_section(const dex::Sectioning& sec)
+std::string LatexExport::stringify_section(const dex::Sectioning& sec)
 {
   std::string result;
+
+  switch (sec.depth)
+  {
+  case dex::Sectioning::Part:
+    result += "\\part{";
+    break;
+  case dex::Sectioning::Chapter:
+    result += "\\chapter{";
+    break;
+  case dex::Sectioning::Section:
+    result += "\\section{";
+    break;
+  default:
+    result += "{";
+    break;
+  }
   
-  for (int i(0); i < (sec.depth - dex::Sectioning::Part) + 1; ++i)
-    result.push_back('#');
-
-  result.push_back(' ');
-
-  result += sec.name + "\n\n";
+  result += sec.name + "}\n\n";
 
   for (const auto& c : sec.content)
   {
