@@ -2,4 +2,4 @@ class-with-inline
 class-with-var
 enum-doc
 manual-simple
-manual-with-inline-math
+manual-with-math

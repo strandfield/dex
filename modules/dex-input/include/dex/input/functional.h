@@ -96,6 +96,9 @@ struct DEX_INPUT_API Functions
   static const std::string LIST;
   static const std::string ENDLIST;
   static const std::string LI;
+
+  static const std::string BACKSLASH_LBRACKET;
+  static const std::string BACKSLASH_RBRACKET;
 };
 
 } // namespace dex

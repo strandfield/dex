@@ -51,4 +51,7 @@ const std::string Functions::LIST = "@list";
 const std::string Functions::ENDLIST = "endlist";
 const std::string Functions::LI = "@li";
 
+const std::string Functions::BACKSLASH_LBRACKET = "[";
+const std::string Functions::BACKSLASH_RBRACKET = "]";
+
 } // namespace dex

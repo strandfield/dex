@@ -22,6 +22,7 @@ namespace dex
 
 class ContentWriter;
 class ListWriter;
+class MathWriter;
 class ParagraphWriter;
 
 class DEX_INPUT_API DocumentWriter
@@ -34,12 +35,15 @@ public:
     Idle,
     WritingParagraph,
     WritingList,
+    WritingMath,
   };
 
   State state() const;
 
   void write(char c);
   void write(const std::string& str);
+
+  void writeCs(const std::string& cs);
 
   void bgroup();
   void egroup();
@@ -72,13 +76,17 @@ public:
   void li(std::optional<std::string> marker, std::optional<int> value);
   void endlist();
 
+  void displaymath();
+  void enddisplaymath();
+
   bool isIdle() const;
 
   bool isWritingParagraph() const;
   ParagraphWriter& paragraph();
 
   bool isWritingList() const;
-
+  bool isWritingMath() const;
+  
   void beginSinceBlock(const std::string& version);
   void endSinceBlock();
   
@@ -94,6 +102,7 @@ public:
 protected:
   ListWriter& currentList();
   dom::Paragraph& currentParagraph();
+  MathWriter& currentMath();
 
   bool hasActiveNestedWriter(DocumentWriter** out);
 

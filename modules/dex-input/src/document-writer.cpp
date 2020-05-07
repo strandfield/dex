@@ -7,6 +7,7 @@
 #include "dex/model/since.h"
 
 #include "dex/input/list-writer.h"
+#include "dex/input/math-writer.h"
 #include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-errors.h"
 
@@ -43,6 +44,10 @@ void DocumentWriter::write(char c)
   {
     currentList().write(c);
   }
+  else if (isWritingMath())
+  {
+    currentMath().write(c);
+  }
 }
 
 void DocumentWriter::write(const std::string& str)
@@ -58,14 +63,54 @@ void DocumentWriter::write(const std::string& str)
   }
 }
 
+void DocumentWriter::writeCs(const std::string& cs)
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->writeCs(cs);
+
+  switch (m_state)
+  {
+  case State::WritingParagraph:
+    return paragraph().writeCs(cs);
+  case State::WritingMath:
+    return currentMath().writeControlSequence(cs);
+  default:
+    throw std::runtime_error{ "DocumentWriter::writeCs()" };
+  }
+}
+
 void DocumentWriter::bgroup()
 {
-  /* no-op */
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->bgroup();
+
+  switch (m_state)
+  {
+  case State::WritingMath:
+    return currentMath().beginMathList();
+  default:
+    break;
+  }
 }
 
 void DocumentWriter::egroup()
 {
-  /* no-op */
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->egroup();
+
+  switch (m_state)
+  {
+  case State::WritingMath:
+    return currentMath().endMathList();
+  default:
+    break;
+  }
 }
 
 void DocumentWriter::mathshift()
@@ -85,7 +130,15 @@ void DocumentWriter::alignmenttab()
   if (hasActiveNestedWriter(&target))
     return target->alignmenttab();
 
-  paragraph().alignmenttab();
+  switch (m_state)
+  {
+  case State::WritingParagraph:
+    return paragraph().alignmenttab();
+  case State::WritingMath:
+    return currentMath().alignmentTab();
+  default:
+    throw std::runtime_error{ "DocumentWriter::alignmenttab()" };
+  }
 }
 
 void DocumentWriter::superscript()
@@ -95,7 +148,15 @@ void DocumentWriter::superscript()
   if (hasActiveNestedWriter(&target))
     return target->superscript();
 
-  paragraph().superscript();
+  switch (m_state)
+  {
+  case State::WritingParagraph:
+    return paragraph().superscript();
+  case State::WritingMath:
+    return currentMath().superscript();
+  default:
+    throw std::runtime_error{ "DocumentWriter::superscript()" };
+  }
 }
 
 void DocumentWriter::subscript()
@@ -105,7 +166,15 @@ void DocumentWriter::subscript()
   if (hasActiveNestedWriter(&target))
     return target->subscript();
 
-  paragraph().subscript();
+  switch (m_state)
+  {
+  case State::WritingParagraph:
+    return paragraph().subscript();
+  case State::WritingMath:
+    return currentMath().subscript();
+  default:
+    throw std::runtime_error{ "DocumentWriter::subscript()" };
+  }
 }
 
 void DocumentWriter::par()
@@ -321,6 +390,29 @@ void DocumentWriter::endlist()
   }
 }
 
+void DocumentWriter::displaymath()
+{
+  if (isWritingParagraph())
+    endParagraph();
+
+  if (m_state != State::Idle)
+    throw std::runtime_error{ "DocumentWriter::displaymath()" };
+
+  m_writer = std::make_shared<dex::MathWriter>();
+  m_state = State::WritingMath;
+}
+
+void DocumentWriter::enddisplaymath()
+{
+  if(!isWritingMath())
+    throw std::runtime_error{ "DocumentWriter::enddisplaymath()" };
+
+  m_writer->finish();
+  m_nodes.push_back(m_writer->output());
+  m_writer.reset();
+  m_state = State::Idle;
+}
+
 void DocumentWriter::beginSinceBlock(const std::string& version)
 {
   if(m_since.has_value())
@@ -419,6 +511,17 @@ ListWriter& DocumentWriter::currentList()
 dom::Paragraph& DocumentWriter::currentParagraph()
 {
   return *(paragraph().output());
+}
+
+bool DocumentWriter::isWritingMath() const
+{
+  return m_state == State::WritingMath;
+}
+
+MathWriter& DocumentWriter::currentMath()
+{
+  assert(isWritingMath());
+  return *static_cast<MathWriter*>(m_writer.get());
 }
 
 bool DocumentWriter::hasActiveNestedWriter(DocumentWriter** out)

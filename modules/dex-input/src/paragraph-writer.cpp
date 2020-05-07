@@ -43,6 +43,12 @@ void ParagraphWriter::write(const std::string& str)
   output()->addText(str);
 }
 
+void ParagraphWriter::writeCs(const std::string& str)
+{
+  m_math_parser->writeControlSequence(str);
+  write("\\" + str);
+}
+
 void ParagraphWriter::mathshift()
 {
   if (m_math_parser)

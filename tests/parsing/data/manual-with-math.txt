@@ -1,9 +1,10 @@
 
 /*!
- * \manual Manual with inline-math
+ * \manual Manual with math
  * 
  * \chapter Example
  *
  * The paragraph contains inline math if $x^2 + 2x_n - 5 = 0$.
  *
+ * \[ \gamma + \frac{1 + \sqrt{2}}{\alpha}  \]
  */

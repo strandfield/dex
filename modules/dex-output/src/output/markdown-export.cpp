@@ -7,6 +7,7 @@
 #include "dex/output/liquid-exporter-url-annotator.h"
 #include "dex/output/paragraph-converter.h"
 
+#include "dex/model/display-math.h"
 #include "dex/model/inline-math.h"
 #include "dex/model/since.h"
 
@@ -119,6 +120,14 @@ std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
 std::string MarkdownExport::stringify_image(const dom::Image& img)
 {
   return "![image](" + img.src + ")";
+}
+
+std::string MarkdownExport::stringify_math(const dex::DisplayMath& math)
+{
+  std::string result = "```tex\n";
+  result += math.source;
+  result += "\n```\n";
+  return result;
 }
 
 std::string MarkdownExport::stringify_section(const dex::Sectioning& sec)

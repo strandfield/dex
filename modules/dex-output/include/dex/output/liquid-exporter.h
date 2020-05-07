@@ -36,6 +36,7 @@ class Program;
 namespace dex
 {
 
+class DisplayMath;
 class Model;
 
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
@@ -95,6 +96,7 @@ protected:
   virtual std::string stringify_listitem(const dom::ListItem& li) = 0;
   virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
   virtual std::string stringify_image(const dom::Image& img) = 0;
+  virtual std::string stringify_math(const dex::DisplayMath& math) = 0;
 
   virtual std::string stringify_section(const dex::Sectioning& sec) = 0;
 

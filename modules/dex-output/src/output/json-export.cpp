@@ -4,6 +4,7 @@
 
 #include "dex/output/json-export.h"
 
+#include "dex/model/display-math.h"
 #include "dex/model/since.h"
 
 #include <cxx/class.h>
@@ -202,6 +203,13 @@ void JsonExport::visit_domparagraph(const dom::Paragraph& par)
   }
 
   ModelVisitor::visit_domparagraph(par);
+}
+
+void JsonExport::visit_displaymath(const dex::DisplayMath& math)
+{
+  object()["source"] = math.source;
+
+  ModelVisitor::visit_displaymath(math);
 }
 
 

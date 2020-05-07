@@ -25,6 +25,8 @@ public:
 
   void write(char c);
   void write(const std::string& str);
+
+  // @TODO: remove this bool return value
   bool handle(const FunctionCall& call);
 
   bool isIdle() const;
@@ -51,6 +53,8 @@ protected:
   void li(const FunctionCall& c);
   void endlist(const FunctionCall& c);
   void image(const FunctionCall& c);
+  void displaymath(const FunctionCall& c);
+  void enddisplaymath(const FunctionCall& c);
 };
 
 class DEX_INPUT_API DocumentWriterToolchain

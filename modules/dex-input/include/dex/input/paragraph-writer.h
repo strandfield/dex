@@ -33,6 +33,8 @@ public:
   void write(char c) override;
   void write(const std::string& str);
 
+  void writeCs(const std::string& str);
+
   void mathshift();
   void alignmenttab();
   void superscript();

@@ -10,6 +10,7 @@
 #include "dex/common/errors.h"
 #include "dex/common/settings.h"
 
+#include "dex/model/display-math.h"
 #include "dex/model/model.h"
 
 #include <cxx/class.h>
@@ -190,6 +191,8 @@ std::string LiquidExporter::stringify_domnode(const dom::Node& node)
     return stringify_image(static_cast<const dom::Image&>(node));
   else if (node.is<dex::Sectioning>())
     return stringify_section(static_cast<const dex::Sectioning&>(node));
+  else if (node.is<dex::DisplayMath>())
+    return stringify_math(static_cast<const dex::DisplayMath&>(node));
 
   assert(("dom element not implemented", false));
   return {};

@@ -32,6 +32,8 @@ class Variable;
 namespace dex
 {
 
+class DisplayMath;
+
 class DEX_MODEL_API ModelVisitor
 {
 public:
@@ -49,6 +51,7 @@ protected:
   virtual void visit_domlist(const dom::List& l);
   virtual void visit_domlistitem(const dom::ListItem& li);
   virtual void visit_domparagraph(const dom::Paragraph& par);
+  virtual void visit_displaymath(const dex::DisplayMath& math);
 
   virtual void visit_program(const cxx::Program& prog);
   virtual void visit_entity(const cxx::Entity& e);

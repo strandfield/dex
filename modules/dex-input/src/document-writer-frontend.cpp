@@ -56,18 +56,26 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
     {Functions::LI, &DocumentWriterFrontend::li},
     {Functions::ENDLIST, &DocumentWriterFrontend::endlist},
     {Functions::IMAGE, &DocumentWriterFrontend::image},
+    {Functions::BACKSLASH_LBRACKET, &DocumentWriterFrontend::displaymath},
+    {Functions::BACKSLASH_RBRACKET, &DocumentWriterFrontend::enddisplaymath},
   };
 
   auto it = fn_map.find(call.function);
 
   if (it == fn_map.end())
-    return false;
+  {
+    m_writer->writeCs(call.function);
 
-  Callback fun = it->second;
+    return true;
+  }
+  else
+  {
+    Callback fun = it->second;
 
-  ((*this).*fun)(call);
+    ((*this).*fun)(call);
 
-  return true;
+    return true;
+  }
 }
 
 void DocumentWriterFrontend::finish()
@@ -178,6 +186,16 @@ void DocumentWriterFrontend::image(const FunctionCall& c)
   std::optional<int> width = c.opt<int>("width");
   std::optional<int> height = c.opt<int>("height");
   m_writer->image(std::move(src), width, height);
+}
+
+void DocumentWriterFrontend::displaymath(const FunctionCall&)
+{
+  m_writer->displaymath();
+}
+
+void DocumentWriterFrontend::enddisplaymath(const FunctionCall&)
+{
+  m_writer->enddisplaymath();
 }
 
 

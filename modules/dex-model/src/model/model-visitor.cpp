@@ -4,6 +4,8 @@
 
 #include "dex/model/model-visitor.h"
 
+#include <dex/model/display-math.h>
+
 #include <cxx/class.h>
 #include <cxx/enum.h>
 #include <cxx/function.h>
@@ -95,6 +97,8 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_manual(static_cast<const dex::Manual&>(n));
   else if (n.is<dex::Sectioning>())
     visit_sectioning(static_cast<const dex::Sectioning&>(n));
+  else if (n.is<dex::DisplayMath>())
+    visit_displaymath(static_cast<const dex::DisplayMath&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -133,6 +137,11 @@ void ModelVisitor::visit_domlistitem(const dom::ListItem& li)
 }
 
 void ModelVisitor::visit_domparagraph(const dom::Paragraph& /* par */)
+{
+
+}
+
+void ModelVisitor::visit_displaymath(const dex::DisplayMath& /* math */)
 {
 
 }
