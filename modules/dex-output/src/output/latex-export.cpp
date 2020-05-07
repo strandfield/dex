@@ -5,6 +5,7 @@
 #include "dex/output/latex-export.h"
 
 #include "dex/output/liquid-exporter-url-annotator.h"
+#include "dex/output/paragraph-converter.h"
 
 #include "dex/model/since.h"
 
@@ -25,6 +26,34 @@
 
 namespace dex
 {
+
+class LatexParagraphConverter : public ParagraphConverter
+{
+public:
+
+  using ParagraphConverter::ParagraphConverter;
+
+  void process_bold(const dom::ParagraphIterator it) override
+  {
+    result += "\\textbf{";
+    process(it);
+    result += "}";
+  }
+
+  void process_italic(const dom::ParagraphIterator it) override
+  {
+    result += "\\textit{";
+    process(it);
+    result += "}";
+  }
+
+  void process_typewriter(const dom::ParagraphIterator it) override
+  {
+    result += "\\texttt{";
+    process(it);
+    result += "}";
+  }
+};
 
 LatexExport::LatexExport()
 {
@@ -71,49 +100,11 @@ std::string LatexExport::stringify_listitem(const dom::ListItem& li)
   return stringify_domcontent(li.content);
 }
 
-static void paragraph_conv_proc(const dom::ParagraphIterator begin, const dom::ParagraphIterator end, std::string& str)
-{
-  for (auto it = begin; it != end; ++it)
-  {
-    if (it.isText())
-    {
-      str += it.range().text();
-    }
-    else
-    {
-      const std::string& style = std::static_pointer_cast<dom::TextStyle>(*it)->style();
-      
-      std::string marker;
-
-      if (style == "bold")
-        marker = "\\textbf{";
-      else if (style == "italic")
-        marker = "\\textit{";
-      else if (style == "code")
-        marker = "\\texttt{";
-
-      str += marker;
-
-      if (it.hasChild())
-      {
-        paragraph_conv_proc(it.begin(), it.end(), str);
-      }
-      else
-      {
-        str += it.range().text();
-      }
-
-      if (!marker.empty())
-        str += "}";
-    }
-  }
-}
-
 std::string LatexExport::stringify_paragraph(const dom::Paragraph& par)
 {
-  std::string result = "";
-  paragraph_conv_proc(par.begin(), par.end(), result);
-  return result;
+  LatexParagraphConverter converter{ par };
+  converter.process();
+  return std::string(std::move(converter.result));
 }
 
 std::string LatexExport::stringify_image(const dom::Image& img)

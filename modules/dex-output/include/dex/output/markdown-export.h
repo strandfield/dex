@@ -7,6 +7,11 @@
 
 #include "dex/output/liquid-exporter.h"
 
+namespace dom
+{
+class ParagraphIterator;
+} // namespace dom;
+
 namespace dex
 {
 

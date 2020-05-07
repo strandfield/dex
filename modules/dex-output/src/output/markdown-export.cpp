@@ -5,7 +5,9 @@
 #include "dex/output/markdown-export.h"
 
 #include "dex/output/liquid-exporter-url-annotator.h"
+#include "dex/output/paragraph-converter.h"
 
+#include "dex/model/inline-math.h"
 #include "dex/model/since.h"
 
 #include "dex/common/file-utils.h"
@@ -25,6 +27,42 @@
 
 namespace dex
 {
+
+class MarkdownParagraphConverter : public ParagraphConverter
+{
+public:
+
+  using ParagraphConverter::ParagraphConverter;
+
+  void process_bold(const dom::ParagraphIterator it) override
+  {
+    result += "**";
+    process(it);
+    result += "**";
+  }
+
+  void process_italic(const dom::ParagraphIterator it) override
+  {
+    result += "*";
+    process(it);
+    result += "*";
+  }
+
+  void process_typewriter(const dom::ParagraphIterator it) override
+  {
+    result += "`";
+    process(it);
+    result += "`";
+  }
+
+  void process_math(const dom::ParagraphIterator it) override
+  {
+    result += "`";
+    auto text_begin = it.paragraph().text().begin();
+    result.insert(result.end(), text_begin + it.range().begin() + 1, text_begin + it.range().end() - 1);
+    result += "`";
+  }
+};
 
 MarkdownExport::MarkdownExport()
 {
@@ -71,48 +109,11 @@ std::string MarkdownExport::stringify_listitem(const dom::ListItem& li)
   return stringify_domcontent(li.content);
 }
 
-static void paragraph_conv_proc(const dom::ParagraphIterator begin, const dom::ParagraphIterator end, std::string& str)
-{
-  for (auto it = begin; it != end; ++it)
-  {
-    if (it.isText())
-    {
-      str += it.range().text();
-    }
-    else
-    {
-      const std::string& style = std::static_pointer_cast<dom::TextStyle>(*it)->style();
-      
-      std::string marker;
-
-      if (style == "bold")
-        marker = "**";
-      else if (style == "italic")
-        marker = "*";
-      else if (style == "code")
-        marker = '`';
-
-      str += marker;
-
-      if (it.hasChild())
-      {
-        paragraph_conv_proc(it.begin(), it.end(), str);
-      }
-      else
-      {
-        str += it.range().text();
-      }
-
-      str += marker;
-    }
-  }
-}
-
 std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
 {
-  std::string result = "";
-  paragraph_conv_proc(par.begin(), par.end(), result);
-  return result;
+  MarkdownParagraphConverter converter{ par };
+  converter.process();
+  return std::string(std::move(converter.result));
 }
 
 std::string MarkdownExport::stringify_image(const dom::Image& img)
