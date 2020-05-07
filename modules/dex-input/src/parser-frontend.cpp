@@ -87,26 +87,7 @@ void ParserFrontend::write(tex::parsing::Token&& tok)
 
   if (tok.isCharacterToken())
   {
-    if (m_mode == Mode::Program)
-    {
-      if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
-      {
-        LOG_WARNING << "Non-space character ignored";
-        return;
-      }
-
-      DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
-      writer.write(tok.characterToken().value);
-    }
-    else
-    {
-      DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
-
-      if (writer.isIdle() && is_discardable(tok))
-        return;
-
-      writer.write(tok.characterToken().value);
-    }
+    write(tok.characterToken().value);
   }
   else
   {
@@ -153,6 +134,30 @@ void ParserFrontend::write(tex::parsing::Token&& tok)
         writer.handle(call);
       }
     }
+  }
+}
+
+void ParserFrontend::write(char c)
+{
+  if (m_mode == Mode::Program)
+  {
+    if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
+    {
+      LOG_WARNING << "Non-space character ignored";
+      return;
+    }
+
+    DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
+    writer.write(c);
+  }
+  else
+  {
+    DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
+
+    if (writer.isIdle() && c == ' ')
+      return;
+
+    writer.write(c);
   }
 }
 

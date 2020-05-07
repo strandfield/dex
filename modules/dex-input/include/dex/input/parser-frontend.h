@@ -66,6 +66,7 @@ public:
   static const std::map<std::string, CS>& csmap();
   
   void write(tex::parsing::Token&& tok);
+  void write(char c);
 
   void bgroup();
   void egroup();
