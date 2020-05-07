@@ -68,6 +68,46 @@ void DocumentWriter::egroup()
   /* no-op */
 }
 
+void DocumentWriter::mathshift()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->mathshift();
+  
+  paragraph().mathshift();
+}
+
+void DocumentWriter::alignmenttab()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->alignmenttab();
+
+  paragraph().alignmenttab();
+}
+
+void DocumentWriter::superscript()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->superscript();
+
+  paragraph().superscript();
+}
+
+void DocumentWriter::subscript()
+{
+  DocumentWriter* target = nullptr;
+
+  if (hasActiveNestedWriter(&target))
+    return target->subscript();
+
+  paragraph().subscript();
+}
+
 void DocumentWriter::par()
 {
   if (isWritingParagraph())

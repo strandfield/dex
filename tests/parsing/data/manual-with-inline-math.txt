@@ -1,0 +1,9 @@
+
+/*!
+ * \manual Manual with inline-math
+ * 
+ * \chapter Example
+ *
+ * The paragraph contains inline math if $x^2 + 2x_n - 5 = 0$.
+ *
+ */

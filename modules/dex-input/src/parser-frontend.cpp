@@ -106,22 +106,22 @@ void ParserFrontend::egroup()
 
 void ParserFrontend::mathshift() 
 {
-  throw std::runtime_error{ "Not implemented : ParserFrontend::mathshift()" };
+  currentWriter().mathshift();
 }
 
 void ParserFrontend::alignmenttab()
 {
-  throw std::runtime_error{ "Not implemented : ParserFrontend::alignmenttab()" };
+  currentWriter().alignmenttab();
 }
 
 void ParserFrontend::superscript()
 {
-  throw std::runtime_error{ "Not implemented : ParserFrontend::superscript()" };
+  currentWriter().superscript();
 }
 
 void ParserFrontend::subscript()
 {
-  throw std::runtime_error{ "Not implemented : ParserFrontend::subscript()" };
+  currentWriter().subscript();
 }
 
 void ParserFrontend::handle(const FunctionCall& call)

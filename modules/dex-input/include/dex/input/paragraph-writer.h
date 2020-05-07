@@ -13,6 +13,14 @@
 
 #include <dom/paragraph.h>
 
+namespace tex
+{
+namespace parsing
+{
+class MathParserFrontend;
+} // namespace parsing
+} // namespace tex
+
 namespace dex
 {
 
@@ -20,9 +28,15 @@ class DEX_INPUT_API ParagraphWriter : public ContentWriter
 {
 public:
   ParagraphWriter();
+  ~ParagraphWriter();
 
   void write(char c) override;
   void write(const std::string& str);
+
+  void mathshift();
+  void alignmenttab();
+  void superscript();
+  void subscript();
 
   void begintextbf();
   void endtextbf();
@@ -48,6 +62,7 @@ protected:
 
 private:
   std::vector<std::shared_ptr<dom::ParagraphMetaData>> m_pending_metadata;
+  std::unique_ptr<tex::parsing::MathParserFrontend> m_math_parser;
 };
 
 } // namespace dex

@@ -4,9 +4,12 @@
 
 #include "dex/input/paragraph-writer.h"
 
+#include "dex/model/inline-math.h"
 #include "dex/model/since.h"
 
 #include "dex/input/parser-errors.h"
+
+#include <tex/parsing/mathparserfrontend.h>
 
 #include <dom/paragraph/link.h>
 #include <dom/paragraph/textstyle.h>
@@ -22,14 +25,78 @@ ParagraphWriter::ParagraphWriter()
   setOutput(std::make_shared<dom::Paragraph>());
 }
 
+ParagraphWriter::~ParagraphWriter()
+{
+
+}
+
 void ParagraphWriter::write(char c)
 {
+  if (m_math_parser)
+    m_math_parser->writeChar(c);
+
   output()->addChar(c);
 }
 
 void ParagraphWriter::write(const std::string& str)
 {
   output()->addText(str);
+}
+
+void ParagraphWriter::mathshift()
+{
+  if (m_math_parser)
+  {
+    m_math_parser->finish();
+    tex::MathList mlist = m_math_parser->output();
+
+    auto data = m_pending_metadata.back();
+
+    if (data->type() != dex::InlineMath::TypeId)
+      throw std::runtime_error{ "ParagraphWriter::mathshift() mismatch" };
+
+    m_pending_metadata.pop_back();
+
+    dom::Paragraph& par = *output();
+    par.addChar('$');
+    size_t end = par.length();
+    data->range() = dom::ParagraphRange(par, data->range().begin(), end);
+
+    static_cast<dom::GenericParagraphMetaData<dex::InlineMath>*>(data.get())->value().mlist = mlist;
+
+    par.addMetaData(data);
+  }
+  else
+  {
+    dom::Paragraph& par = *output();
+    size_t start = par.length();
+    dom::ParagraphRange range{par, start, par.length() };
+
+    auto data = std::make_shared<dom::GenericParagraphMetaData<dex::InlineMath>>(range, dex::InlineMath());
+    m_pending_metadata.push_back(data);
+
+    par.addChar('$');
+
+    m_math_parser.reset(new tex::parsing::MathParserFrontend);
+  }
+}
+
+void ParagraphWriter::alignmenttab()
+{
+  m_math_parser->alignmentTab();
+  write('&');
+}
+
+void ParagraphWriter::superscript()
+{
+  m_math_parser->beginSuperscript();
+  write('^');
+}
+
+void ParagraphWriter::subscript()
+{
+  m_math_parser->beginSubscript();
+  write('_');
 }
 
 void ParagraphWriter::begintextbf()

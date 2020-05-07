@@ -1,0 +1,26 @@
+{
+  "manuals": [{
+      "content": [{
+          "content": [{
+              "metadata": [{
+                  "begin": 38,
+                  "end": 58,
+                  "type": "inline-math"
+                }],
+              "text": "The paragraph contains inline math if $x^2 + 2x_n - 5 = 0$.",
+              "type": "paragraph"
+            }],
+          "depth": "chapter",
+          "name": "Example",
+          "type": "sectioning"
+        }],
+      "title": "Manual with inline-math",
+      "type": "manual"
+    }],
+  "program": {
+    "global_namespace": {
+      "name": "",
+      "type": "namespace"
+    }
+  }
+}

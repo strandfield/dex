@@ -44,6 +44,11 @@ public:
   void bgroup();
   void egroup();
 
+  void mathshift();
+  void alignmenttab();
+  void superscript();
+  void subscript();
+
   void par();
 
   void b(const std::string& text);

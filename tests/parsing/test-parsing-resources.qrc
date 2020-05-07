@@ -9,5 +9,7 @@
     <file>data/enum-doc.json</file>
     <file>data/manual-simple.txt</file>
     <file>data/manual-simple.json</file>
+    <file>data/manual-with-inline-math.txt</file>
+    <file>data/manual-with-inline-math.json</file>
   </qresource>
 </RCC>
