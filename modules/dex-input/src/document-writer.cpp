@@ -58,6 +58,16 @@ void DocumentWriter::write(const std::string& str)
   }
 }
 
+void DocumentWriter::bgroup()
+{
+  /* no-op */
+}
+
+void DocumentWriter::egroup()
+{
+  /* no-op */
+}
+
 void DocumentWriter::par()
 {
   if (isWritingParagraph())

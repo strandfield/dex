@@ -156,6 +156,16 @@ void ParserFrontend::write(tex::parsing::Token&& tok)
   }
 }
 
+void ParserFrontend::bgroup()
+{
+  currentWriter().bgroup();
+}
+
+void ParserFrontend::egroup()
+{
+  currentWriter().egroup();
+}
+
 void ParserFrontend::handle(const FunctionCall& call)
 {
   auto it = csmap().find(call.function);
@@ -211,6 +221,18 @@ void ParserFrontend::handle(const FunctionCall& call)
       DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
       writer.handle(call);
     }
+  }
+}
+
+DocumentWriter& ParserFrontend::currentWriter()
+{
+  if (m_mode == Mode::Program)
+  {
+    return *m_prog_parser->contentWriter();
+  }
+  else
+  {
+    return *m_manual_parser->contentWriter();
   }
 }
 

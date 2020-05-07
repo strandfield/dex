@@ -41,6 +41,9 @@ public:
   void write(char c);
   void write(const std::string& str);
 
+  void bgroup();
+  void egroup();
+
   void par();
 
   void b(const std::string& text);

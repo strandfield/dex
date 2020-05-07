@@ -364,21 +364,30 @@ void ParserMachine::interpret(tex::parsing::Token tok)
     case tex::parsing::CharCategory::GroupEnd:
       endGroup();
       break;
+    case tex::parsing::CharCategory::Letter:
+    case tex::parsing::CharCategory::Other:
+    case tex::parsing::CharCategory::Space:
+      m_processor.write(std::move(tok));
+      break;
     default:
       break;
     }
   }
-
-  m_processor.write(std::move(tok));
+  else
+  {
+    m_processor.write(std::move(tok));
+  }
 }
 
 void ParserMachine::beginGroup()
 {
   m_preprocessor.beginGroup();
+  m_processor.bgroup();
 }
 
 void ParserMachine::endGroup()
 {
+  m_processor.egroup();
   m_preprocessor.endGroup();
 }
 

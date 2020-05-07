@@ -18,6 +18,7 @@ namespace dex
 
 struct FunctionCall;
 
+class DocumentWriter;
 class ManualParser;
 class ParserMachine;
 class ProgramParser;
@@ -65,6 +66,10 @@ public:
   static const std::map<std::string, CS>& csmap();
   
   void write(tex::parsing::Token&& tok);
+
+  void bgroup();
+  void egroup();
+
   void handle(const FunctionCall& call);
 
   void beginFile();
@@ -76,6 +81,8 @@ public:
   void reset();
 
 protected:
+
+  DocumentWriter& currentWriter();
 
   CS parseCs(const std::string& str) const;
 
