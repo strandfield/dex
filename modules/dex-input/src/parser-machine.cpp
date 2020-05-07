@@ -346,9 +346,40 @@ bool ParserMachine::sendTokens()
   if (m_caller.output().empty())
     return !m_preprocessor.output.empty();
 
-  m_processor.write(tex::parsing::read(m_caller.output()));
+  interpret(tex::parsing::read(m_caller.output()));
+
 
   return !m_preprocessor.output.empty();
+}
+
+void ParserMachine::interpret(tex::parsing::Token tok)
+{
+  if (tok.isCharacterToken())
+  {
+    switch (tok.characterToken().category)
+    {
+    case tex::parsing::CharCategory::GroupBegin:
+      beginGroup();
+      break;
+    case tex::parsing::CharCategory::GroupEnd:
+      endGroup();
+      break;
+    default:
+      break;
+    }
+  }
+
+  m_processor.write(std::move(tok));
+}
+
+void ParserMachine::beginGroup()
+{
+  m_preprocessor.beginGroup();
+}
+
+void ParserMachine::endGroup()
+{
+  m_preprocessor.endGroup();
 }
 
 void ParserMachine::resume()

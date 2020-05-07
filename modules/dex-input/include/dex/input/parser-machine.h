@@ -149,6 +149,11 @@ protected:
 
   bool sendTokens();
 
+  void interpret(tex::parsing::Token tok);
+
+  void beginGroup();
+  void endGroup();
+
 private:
   std::shared_ptr<Model> m_model;
   dex::FunctionCall m_call;
