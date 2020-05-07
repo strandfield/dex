@@ -35,6 +35,9 @@ ParserFrontend::~ParserFrontend()
 const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
 {
   static std::map<std::string, CS> static_instance = { 
+    /* TeX */
+    {Functions::PAR, CS::PAR},
+    /* Program */
     {Functions::CLASS, CS::CLASS},
     {Functions::ENDCLASS, CS::ENDCLASS},
     {Functions::FUNCTION , CS::FN},
@@ -71,94 +74,19 @@ ParserFrontend::CS ParserFrontend::parseCs(const std::string& str) const
   return it->second;
 }
 
-inline static bool is_discardable(const tex::parsing::Token& tok)
-{
-  return (tok.isCharacterToken() && tok.characterToken().category == tex::parsing::CharCategory::Space)
-    || (tok.isControlSequence() && tok.controlSequence() == Functions::PAR);
-}
-
-void ParserFrontend::write(tex::parsing::Token&& tok)
-{
-  if (m_mode == Mode::Program)
-  {
-    if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle && is_discardable(tok))
-      return;
-  }
-
-  if (tok.isCharacterToken())
-  {
-    write(tok.characterToken().value);
-  }
-  else
-  {
-    auto it = csmap().find(tok.controlSequence());
-
-    if (it != csmap().end())
-    {
-      CS cs = it->second;
-
-      switch (cs)
-      {
-      case CS::ENDFN:
-        return cs_endfn();
-      case CS::ENDCLASS:
-        return cs_endclass();
-      case CS::ENDNAMESPACE:
-        return cs_endnamespace();
-      case CS::ENDENUM:
-        return cs_endenum();
-      case CS::ENDENUMVALUE:
-        return cs_endenumvalue();
-      case CS::ENDVARIABLE:
-        return cs_endvariable();
-      default:
-        throw UnexpectedControlSequence{ tok.controlSequence() };
-      }
-    }
-    else
-    {
-      //if (!currentFrame().writer)
-      //  throw UnexpectedControlSequence{ tok.controlSequence() };
-
-      FunctionCall call;
-      call.function = tok.controlSequence();
-
-      if (m_mode == Mode::Program)
-      {
-        DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
-        writer.handle(call);
-      }
-      else
-      {
-        DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
-        writer.handle(call);
-      }
-    }
-  }
-}
-
 void ParserFrontend::write(char c)
 {
-  if (m_mode == Mode::Program)
-  {
-    if (m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
-    {
-      LOG_WARNING << "Non-space character ignored";
-      return;
-    }
+  currentWriter().write(c);
+}
 
-    DocumentWriterFrontend writer{ *m_prog_parser->contentWriter() };
-    writer.write(c);
-  }
-  else
-  {
-    DocumentWriterFrontend writer{ *m_manual_parser->contentWriter() };
+void ParserFrontend::write_space(char c)
+{
+  auto& w = currentWriter();
 
-    if (writer.isIdle() && c == ' ')
-      return;
+  if (w.isIdle())
+    return;
 
-    writer.write(c);
-  }
+  w.write(c);
 }
 
 void ParserFrontend::bgroup()
@@ -181,6 +109,20 @@ void ParserFrontend::handle(const FunctionCall& call)
 
     switch (cs)
     {
+    case CS::PAR:
+      return par(call);
+    case CS::ENDFN:
+      return cs_endfn();
+    case CS::ENDCLASS:
+      return cs_endclass();
+    case CS::ENDNAMESPACE:
+      return cs_endnamespace();
+    case CS::ENDENUM:
+      return cs_endenum();
+    case CS::ENDENUMVALUE:
+      return cs_endenumvalue();
+    case CS::ENDVARIABLE:
+      return cs_endvariable();
     case CS::CLASS:
       return fn_class(call);
     case CS::FN:
@@ -245,6 +187,14 @@ void ParserFrontend::checkMode(Mode m)
 {
   if (m_mode != m)
     throw std::runtime_error{ "Bad mode" };
+}
+
+void ParserFrontend::par(const FunctionCall& call)
+{
+  if (m_mode == Mode::Program &&  m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
+    return;
+
+  currentWriter().par();
 }
 
 void ParserFrontend::fn_class(const FunctionCall& call)

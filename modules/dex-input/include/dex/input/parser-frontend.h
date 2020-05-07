@@ -7,8 +7,6 @@
 
 #include "dex/dex-input.h"
 
-#include <tex/token.h>
-
 #include <map>
 #include <memory>
 #include <string>
@@ -38,6 +36,8 @@ public:
 
   enum class CS
   {
+    /* TeX */
+    PAR,
     /* Entities */
     CLASS,
     ENDCLASS,
@@ -65,8 +65,8 @@ public:
 
   static const std::map<std::string, CS>& csmap();
   
-  void write(tex::parsing::Token&& tok);
   void write(char c);
+  void write_space(char c);
 
   void bgroup();
   void egroup();
@@ -88,6 +88,8 @@ protected:
   CS parseCs(const std::string& str) const;
 
   void checkMode(Mode m);
+
+  void par(const FunctionCall& call);
 
   void fn_class(const FunctionCall& call);
   void cs_endclass();

@@ -366,16 +366,19 @@ void ParserMachine::interpret(tex::parsing::Token tok)
       break;
     case tex::parsing::CharCategory::Letter:
     case tex::parsing::CharCategory::Other:
-    case tex::parsing::CharCategory::Space:
-      m_processor.write(std::move(tok));
+      m_processor.write(tok.characterToken().value);
       break;
+    case tex::parsing::CharCategory::Space:
+      m_processor.write_space(tok.characterToken().value);
     default:
       break;
     }
   }
   else
   {
-    m_processor.write(std::move(tok));
+    static FunctionCall simple_call = {};
+    simple_call.function = tok.controlSequence();
+    m_processor.handle(simple_call);
   }
 }
 
