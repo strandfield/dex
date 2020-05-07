@@ -67,9 +67,15 @@ public:
   
   void write(char c);
   void write_space(char c);
+  void write_active(char c);
 
   void bgroup();
   void egroup();
+
+  void mathshift();
+  void alignmenttab();
+  void superscript();
+  void subscript();
 
   void handle(const FunctionCall& call);
 

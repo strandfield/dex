@@ -89,6 +89,11 @@ void ParserFrontend::write_space(char c)
   w.write(c);
 }
 
+void ParserFrontend::write_active(char /* c */)
+{
+  // nothing for now
+}
+
 void ParserFrontend::bgroup()
 {
   currentWriter().bgroup();
@@ -97,6 +102,26 @@ void ParserFrontend::bgroup()
 void ParserFrontend::egroup()
 {
   currentWriter().egroup();
+}
+
+void ParserFrontend::mathshift() 
+{
+  throw std::runtime_error{ "Not implemented : ParserFrontend::mathshift()" };
+}
+
+void ParserFrontend::alignmenttab()
+{
+  throw std::runtime_error{ "Not implemented : ParserFrontend::alignmenttab()" };
+}
+
+void ParserFrontend::superscript()
+{
+  throw std::runtime_error{ "Not implemented : ParserFrontend::superscript()" };
+}
+
+void ParserFrontend::subscript()
+{
+  throw std::runtime_error{ "Not implemented : ParserFrontend::subscript()" };
 }
 
 void ParserFrontend::handle(const FunctionCall& call)

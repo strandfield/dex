@@ -364,12 +364,29 @@ void ParserMachine::interpret(tex::parsing::Token tok)
     case tex::parsing::CharCategory::GroupEnd:
       endGroup();
       break;
+    case tex::parsing::CharCategory::MathShift:
+      m_processor.mathshift();
+      break;
+    case tex::parsing::CharCategory::AlignmentTab:
+      m_processor.alignmenttab();
+      break;
+    case tex::parsing::CharCategory::Superscript:
+      m_processor.superscript();
+      break;
+    case tex::parsing::CharCategory::Subscript:
+      m_processor.subscript();
+      break;
     case tex::parsing::CharCategory::Letter:
     case tex::parsing::CharCategory::Other:
       m_processor.write(tok.characterToken().value);
       break;
     case tex::parsing::CharCategory::Space:
       m_processor.write_space(tok.characterToken().value);
+      break;
+    case tex::parsing::CharCategory::Active:
+      m_processor.write_active(tok.characterToken().value);
+      break;
+    case tex::parsing::CharCategory::Ignored:
     default:
       break;
     }
