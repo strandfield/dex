@@ -66,6 +66,9 @@ public:
   QDir outputDir() const;
   void setOutputDir(const QDir& dir);
 
+  void setVariables(json::Object obj);
+  const json::Object& variables() const;
+
   void render();
 
   static void trim_right(std::string& str);
@@ -110,6 +113,7 @@ protected:
 
 protected:
 
+  void setupContext(json::Object& context);
   virtual void postProcess(std::string& output);
   void write(const std::string& data, const std::string& filepath);
 
@@ -118,6 +122,7 @@ private:
   std::shared_ptr<Model> m_model;
   json::Object m_serialized_model;
   Profile m_profile;
+  json::Object m_user_variables;
 };
 
 } // namespace dex

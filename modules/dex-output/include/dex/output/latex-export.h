@@ -15,6 +15,8 @@ class DEX_OUTPUT_API LatexExport : protected LiquidExporter
 public:
   LatexExport();
 
+  using LiquidExporter::setVariables;
+
   void dump(std::shared_ptr<Model> model, const QDir& dir);
 
 protected:

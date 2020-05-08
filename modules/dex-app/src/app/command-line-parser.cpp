@@ -16,6 +16,7 @@ CommandLineParser::CommandLineParser()
 
   addOption({ "i", "Input (file / directory)", "input" });
   addOption({ "o", "Output", "output" });
+  addOption({ "value", "Project values for the Liquid-exporter", "variables" });
 }
 
 CommandLineParserResult CommandLineParser::parse(const QStringList& args)
@@ -46,6 +47,7 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
     result.status = CommandLineParserResult::Work;
     result.inputs = values("i");
     result.output = value("o");
+    result.values = values("value");
   }
 
   return result;

@@ -27,6 +27,7 @@ struct CommandLineParserResult
   QString error;
   QStringList inputs;
   QString output;
+  QStringList values;
 };
 
 class DEX_APP_API CommandLineParser : protected QCommandLineParser

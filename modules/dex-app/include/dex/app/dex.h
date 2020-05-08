@@ -28,12 +28,12 @@ public:
 protected:
   std::string libClangVersion() const;
 
-  void process(const QStringList& inputs, QString output);
+  void process(const QStringList& inputs, QString output, QStringList values);
 
   void feed(ParserMachine& parser, const QString& input);
   void feed(ParserMachine& parser, const QDir& input);
 
-  void write_output(const std::shared_ptr<Model>& model, const QString& name);
+  void write_output(const std::shared_ptr<Model>& model, const QString& name, QStringList values);
   
 private:
   QStringList m_suffixes;

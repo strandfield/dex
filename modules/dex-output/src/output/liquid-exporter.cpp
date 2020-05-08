@@ -71,6 +71,16 @@ void LiquidExporter::setOutputDir(const QDir& dir)
   m_output_dir = dir;
 }
 
+void LiquidExporter::setVariables(json::Object obj)
+{
+  m_user_variables = obj;
+}
+
+const json::Object& LiquidExporter::variables() const
+{
+  return m_user_variables;
+}
+
 void LiquidExporter::render()
 {
   if (model()->empty())
@@ -82,7 +92,7 @@ void LiquidExporter::render()
   for (const std::pair<std::string, liquid::Template>& file : profile().files)
   {
     json::Object context;
-    context["model"] = m_serialized_model;
+    setupContext(context);
 
     std::string output = liquid::Renderer::render(file.second, context);
 
@@ -117,7 +127,7 @@ void LiquidExporter::dump(const json::Object& obj, const char* obj_field_name, c
   const std::string url = obj["url"].toString();
 
   json::Object context;
-  context["model"] = m_serialized_model;
+  setupContext(context);
   context[obj_field_name] = obj;
 
   std::string output = liquid::Renderer::render(tmplt.model, context);
@@ -222,6 +232,16 @@ std::string LiquidExporter::stringify_array(const json::Array& list)
   }
 
   return result;
+}
+
+void LiquidExporter::setupContext(json::Object& context)
+{
+  context["model"] = m_serialized_model;
+
+  for (const auto& e : m_user_variables.data())
+  {
+    context[e.first] = e.second;
+  }
 }
 
 void LiquidExporter::postProcess(std::string& output)

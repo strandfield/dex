@@ -3,6 +3,10 @@
 
 Welcome !
 
+{% if project and project.name %}
+This is {{ project.name }}!
+{% endif %}
+
 {% assign classes = model.program.global_namespace.entities | filter_by_type: 'class' %}
 
 {% if classes and classes.length > 0 %}

@@ -20,6 +20,8 @@ class DEX_OUTPUT_API MarkdownExport : protected LiquidExporter
 public:
   MarkdownExport();
 
+  using LiquidExporter::setVariables;
+
   void dump(std::shared_ptr<Model> model, const QDir& dir);
 
 protected:
