@@ -24,13 +24,13 @@ class MathParserFrontend;
 namespace dex
 {
 
-class DEX_INPUT_API ParagraphWriter : public DomWriter
+class DEX_INPUT_API ParagraphWriter
 {
 public:
   ParagraphWriter();
   ~ParagraphWriter();
 
-  void write(char c) override;
+  void write(char c);
   void write(const std::string& str);
 
   void writeCs(const std::string& str);
@@ -54,7 +54,7 @@ public:
 
   void writeSince(const std::string& version, const std::string& text);
 
-  void finish() override;
+  void finish();
 
   std::shared_ptr<dom::Paragraph> output() const;
 
@@ -63,6 +63,7 @@ protected:
   void endStyledText(const char* style);
 
 private:
+  std::shared_ptr<dom::Paragraph> m_output;
   std::vector<std::shared_ptr<dom::ParagraphMetaData>> m_pending_metadata;
   std::unique_ptr<tex::parsing::MathParserFrontend> m_math_parser;
 };

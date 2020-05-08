@@ -18,7 +18,6 @@ MathWriter::MathWriter()
 {
   m_math_parser.reset(new tex::parsing::MathParserFrontend);
   m_output = std::make_shared<dex::DisplayMath>();
-  setOutput(m_output);
 }
 
 MathWriter::~MathWriter()

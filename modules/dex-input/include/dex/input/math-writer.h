@@ -20,14 +20,14 @@ class MathParserFrontend;
 namespace dex
 {
 
-class DEX_INPUT_API MathWriter : public DomWriter
+class DEX_INPUT_API MathWriter
 {
 public:
   MathWriter();
   ~MathWriter();
 
-  void write(char c) override;
-  void finish() override;
+  void write(char c);
+  void finish();
 
   void writeControlSequence(const std::string& csname);
 

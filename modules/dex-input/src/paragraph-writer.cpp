@@ -22,7 +22,7 @@ namespace dex
 
 ParagraphWriter::ParagraphWriter()
 {
-  setOutput(std::make_shared<dom::Paragraph>());
+  m_output = std::make_shared<dom::Paragraph>();
 }
 
 ParagraphWriter::~ParagraphWriter()
@@ -186,7 +186,7 @@ void ParagraphWriter::finish()
 
 std::shared_ptr<dom::Paragraph> ParagraphWriter::output() const
 {
-  return std::static_pointer_cast<dom::Paragraph>(DomWriter::output());
+  return m_output;
 }
 
 
