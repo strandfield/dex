@@ -104,7 +104,7 @@ void ListWriter::endlist()
 
 std::shared_ptr<dom::List> ListWriter::output() const
 {
-  return std::static_pointer_cast<dom::List>(ContentWriter::output());
+  return std::static_pointer_cast<dom::List>(DomWriter::output());
 }
 
 } // namespace dex

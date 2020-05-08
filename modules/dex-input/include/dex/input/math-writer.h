@@ -5,7 +5,7 @@
 #ifndef DEX_INPUT_MATHWRITER_H
 #define DEX_INPUT_MATHWRITER_H
 
-#include "dex/input/content-writer.h"
+#include "dex/input/dom-writer.h"
 
 #include "dex/model/display-math.h"
 
@@ -20,7 +20,7 @@ class MathParserFrontend;
 namespace dex
 {
 
-class DEX_INPUT_API MathWriter : public ContentWriter
+class DEX_INPUT_API MathWriter : public DomWriter
 {
 public:
   MathWriter();

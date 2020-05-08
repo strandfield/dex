@@ -2,8 +2,8 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#ifndef DEX_INPUT_CONTENTWRITER_H
-#define DEX_INPUT_CONTENTWRITER_H
+#ifndef DEX_INPUT_DOMWRITER_H
+#define DEX_INPUT_DOMWRITER_H
 
 #include "dex/dex-input.h"
 
@@ -19,15 +19,15 @@ inline bool is_space(char c)
   return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
-class DEX_INPUT_API ContentWriter
+class DEX_INPUT_API DomWriter
 {
 private:
   std::shared_ptr<dom::Node> m_output;
 
 public:
-  ContentWriter();
-  ContentWriter(const ContentWriter&) = delete;
-  virtual ~ContentWriter();
+  DomWriter();
+  DomWriter(const DomWriter&) = delete;
+  virtual ~DomWriter();
 
   virtual void write(char c) = 0;
 
@@ -35,7 +35,7 @@ public:
 
   std::shared_ptr<dom::Node> output() const;
 
-  ContentWriter& operator=(const ContentWriter&) = delete;
+  DomWriter& operator=(const DomWriter&) = delete;
 
 protected:
   void setOutput(std::shared_ptr<dom::Node> out);
@@ -43,4 +43,4 @@ protected:
 
 } // namespace dex
 
-#endif // DEX_INPUT_CONTENTWRITER_H
+#endif // DEX_INPUT_DOMWRITER_H

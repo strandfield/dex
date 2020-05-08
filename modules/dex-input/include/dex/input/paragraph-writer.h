@@ -9,7 +9,7 @@
 
 #include "dex/common/state.h"
 
-#include "dex/input/content-writer.h"
+#include "dex/input/dom-writer.h"
 
 #include <dom/paragraph.h>
 
@@ -24,7 +24,7 @@ class MathParserFrontend;
 namespace dex
 {
 
-class DEX_INPUT_API ParagraphWriter : public ContentWriter
+class DEX_INPUT_API ParagraphWriter : public DomWriter
 {
 public:
   ParagraphWriter();

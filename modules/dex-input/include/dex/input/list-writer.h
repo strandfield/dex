@@ -7,7 +7,7 @@
 
 #include "dex/dex-input.h"
 
-#include "dex/input/content-writer.h"
+#include "dex/input/dom-writer.h"
 
 #include <dom/list.h>
 
@@ -16,7 +16,7 @@ namespace dex
 
 class DocumentWriter;
 
-class DEX_INPUT_API ListWriter : public ContentWriter
+class DEX_INPUT_API ListWriter : public DomWriter
 {
 public:
   ListWriter();

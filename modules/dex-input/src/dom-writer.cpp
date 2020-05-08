@@ -2,7 +2,7 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/input/content-writer.h"
+#include "dex/input/dom-writer.h"
 
 #include "dex/input/parser-errors.h"
 
@@ -12,22 +12,22 @@
 namespace dex
 {
 
-ContentWriter::ContentWriter()
+DomWriter::DomWriter()
 {
 
 }
 
-ContentWriter::~ContentWriter()
+DomWriter::~DomWriter()
 {
 
 }
 
-std::shared_ptr<dom::Node> ContentWriter::output() const
+std::shared_ptr<dom::Node> DomWriter::output() const
 {
   return m_output;
 }
 
-void ContentWriter::setOutput(std::shared_ptr<dom::Node> out)
+void DomWriter::setOutput(std::shared_ptr<dom::Node> out)
 {
   m_output = out;
 }

@@ -9,7 +9,7 @@
 
 #include "dex/common/state.h"
 
-#include "dex/input/content-writer.h"
+#include "dex/input/dom-writer.h"
 
 #include <dom/content.h>
 #include <dom/paragraph.h>
@@ -20,7 +20,7 @@
 namespace dex
 {
 
-class ContentWriter;
+class DomWriter;
 class ListWriter;
 class MathWriter;
 class ParagraphWriter;
@@ -108,7 +108,7 @@ protected:
 
 private:
   State m_state = State::Idle;
-  std::shared_ptr<ContentWriter> m_writer;
+  std::shared_ptr<DomWriter> m_writer;
   std::optional<std::string> m_since;
   std::vector<std::shared_ptr<dom::Node>> m_nodes;
 };

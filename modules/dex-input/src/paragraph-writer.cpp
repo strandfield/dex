@@ -186,7 +186,7 @@ void ParagraphWriter::finish()
 
 std::shared_ptr<dom::Paragraph> ParagraphWriter::output() const
 {
-  return std::static_pointer_cast<dom::Paragraph>(ContentWriter::output());
+  return std::static_pointer_cast<dom::Paragraph>(DomWriter::output());
 }
 
 
