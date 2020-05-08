@@ -43,6 +43,7 @@ void MathWriter::writeControlSequence(const std::string& csname)
 
   m_output->source.push_back('\\');
   m_output->source += csname;
+  m_output->source.push_back(' ');
 }
 
 void MathWriter::superscript()

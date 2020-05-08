@@ -47,6 +47,7 @@ void ParagraphWriter::writeCs(const std::string& str)
 {
   m_math_parser->writeControlSequence(str);
   write("\\" + str);
+  write(' ');
 }
 
 void ParagraphWriter::mathshift()

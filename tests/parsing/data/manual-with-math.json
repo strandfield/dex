@@ -10,7 +10,7 @@
               "text": "The paragraph contains inline math if $x^2 + 2x_n - 5 = 0$.",
               "type": "paragraph"
             }, {
-              "source": " \\gamma+ \\frac{1 + \\sqrt{2}}{\\alpha} ",
+              "source": " \\gamma + \\frac {1 + \\sqrt {2}}{\\alpha } ",
               "type": "math"
             }],
           "depth": "chapter",
