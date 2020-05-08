@@ -21,20 +21,22 @@ namespace dex
 {
 
 class DomWriter;
-class ListWriter;
 class MathWriter;
 class ParagraphWriter;
 
 class DEX_INPUT_API DocumentWriter
 {
 public:
-  explicit DocumentWriter();
+  DocumentWriter();
+  DocumentWriter(DocumentWriter&&) = delete;
+  ~DocumentWriter();
 
   enum class State
   {
     Idle,
     WritingParagraph,
     WritingList,
+    WritingListItem,
     WritingMath,
   };
 
@@ -82,16 +84,13 @@ public:
   bool isIdle() const;
 
   bool isWritingParagraph() const;
-  ParagraphWriter& paragraph();
+  ParagraphWriter& paragraphWriter();
 
   bool isWritingList() const;
   bool isWritingMath() const;
   
   void beginSinceBlock(const std::string& version);
   void endSinceBlock();
-  
-  void startParagraph();
-  void endParagraph();
 
   void finish();
 
@@ -100,17 +99,32 @@ public:
   dom::Content& output();
 
 protected:
-  ListWriter& currentList();
-  dom::Paragraph& currentParagraph();
+
+  void startParagraph();
+  void endParagraph();
+
   MathWriter& currentMath();
 
-  bool hasActiveNestedWriter(DocumentWriter** out);
+  dom::Node& currentNode();
+  std::shared_ptr<dom::Node> currentNodeShared();
+
+  void adjustState();
+
+  void pushNode(std::shared_ptr<dom::Node> n);
+  void popNode();
+
+  void pushContent(dom::Content& c);
+  void popContent();
 
 private:
   State m_state = State::Idle;
-  std::shared_ptr<DomWriter> m_writer;
+  std::unique_ptr<ParagraphWriter> m_paragraph_writer;
+  std::unique_ptr<MathWriter> m_math_writer;
   std::optional<std::string> m_since;
-  dom::Content m_content;
+  dom::Content m_result;
+  std::vector<dom::Content*> m_contents;
+  dom::Content* m_cur_content;
+  std::vector<std::shared_ptr<dom::Node>> m_nodes;
 };
 
 } // namespace dex
@@ -125,7 +139,7 @@ inline DocumentWriter::State DocumentWriter::state() const
 
 inline dom::Content& DocumentWriter::output()
 {
-  return m_content;
+  return m_result;
 }
 
 } // namespace dex

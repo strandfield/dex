@@ -180,16 +180,16 @@ void TestDexInput::documentWriterParagraph()
 {
   dex::DocumentWriter writer;
 
-  writer.startParagraph();
+  //writer.startParagraph();
 
-  writer.paragraph().writeStyledText("code", "std::vector");
+  writer.c("std::vector");
   writer.write(" is a sequence container that encapsulates dynamic size arrays");
   writer.write('.');
-  writer.endParagraph();
+  writer.par();
 
   writer.beginSinceBlock("C++03");
   writer.write("The elements are stored contiguously, ");
-  writer.paragraph().writeLink("#more", "...");
+  writer.paragraphWriter().writeLink("#more", "...");
   writer.endSinceBlock();
 
   QVERIFY(writer.output().size() == 2);
