@@ -20,7 +20,7 @@ void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
 
   if (!url.empty())
   {
-    json::Object obj = JsonPathAnnotator::get(path(), serialized_model).toObject();
+    json::Object obj = JsonUrlAnnotator::get(path(), serialized_model).toObject();
     obj["url"] = url;
   }
   
@@ -33,7 +33,7 @@ void JsonUrlAnnotator::visit_manual(const dex::Manual& man)
 
   if (!url.empty())
   {
-    json::Object obj = JsonPathAnnotator::get(path(), serialized_model).toObject();
+    json::Object obj = JsonUrlAnnotator::get(path(), serialized_model).toObject();
     obj["url"] = url;
   }
 

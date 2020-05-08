@@ -5,9 +5,11 @@
 #ifndef DEX_OUTPUT_JSON_OUTPUT_ANNOTATOR_H
 #define DEX_OUTPUT_JSON_OUTPUT_ANNOTATOR_H
 
-#include "dex/output/json-annotator.h"
+#include "dex/dex-output.h"
 
 #include "dex/model/model-visitor.h"
+
+#include <json-toolkit/json.h>
 
 namespace dex
 {
@@ -19,6 +21,8 @@ private:
 
 public:
   void annotate(const Model& model, json::Object& obj);
+
+  static json::Json get(const Model::Path& path, const json::Json& val);
 
 protected:
   void visit_entity(const cxx::Entity& e) override;
@@ -34,6 +38,21 @@ private:
 
 namespace dex
 {
+
+inline json::Json JsonUrlAnnotator::get(const Model::Path& path, const json::Json& val)
+{
+  auto result = val;
+
+  for (const auto& p : path)
+  {
+    if (p.index != std::numeric_limits<size_t>::max())
+      result = result[p.name][static_cast<int>(p.index)];
+    else
+      result = result[p.name];
+  }
+
+  return result;
+}
 
 } // namespace dex
 

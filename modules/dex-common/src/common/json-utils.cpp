@@ -1,11 +1,54 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/json-annotator.h"
+#include "dex/common/json-utils.h"
 
 namespace dex
 {
+
+inline void write_path(json::Json& obj, const std::vector<std::variant<size_t, std::string>>& path, const json::Json& val)
+{
+  auto result = obj;
+
+  for (size_t i(0); i < path.size() - 1; ++i)
+  {
+    const auto& p = path.at(i);
+
+    if (std::holds_alternative<std::string>(p))
+      result = result[std::get<std::string>(p)];
+    else
+      result = result[static_cast<int>(std::get<size_t>(p))];
+  }
+  
+  result[std::get<std::string>(path.back())] = val;
+}
+
+json::Json make_json_value(const SettingsValue& v)
+{
+  if (std::holds_alternative<bool>(v))
+    return std::get<bool>(v);
+  else if (std::holds_alternative<int>(v))
+    return std::get<int>(v);
+  else if (std::holds_alternative<double>(v))
+    return std::get<double>(v);
+  else
+    return std::get<std::string>(v);
+}
+
+json::Object build_json(const SettingsMap& map)
+{
+  json::Object result;
+
+  for (const auto& entry : map)
+  {
+    std::string key = "$." + entry.first;
+    std::vector<std::variant<size_t, std::string>> path = JsonPathAnnotator::parse(key);
+    write_path(result, path, make_json_value(entry.second));
+  }
+
+  return result;
+}
 
 inline static std::string next_token(const std::string& path, size_t index)
 {

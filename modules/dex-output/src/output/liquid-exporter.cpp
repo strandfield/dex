@@ -4,10 +4,11 @@
 
 #include "dex/output/liquid-exporter.h"
 
-#include "dex/output/json-annotator.h"
+#include "dex/output/json-output-annotator.h"
 #include "dex/output/json-export.h"
 
 #include "dex/common/errors.h"
+#include "dex/common/json-utils.h"
 #include "dex/common/settings.h"
 
 #include "dex/model/display-math.h"
@@ -41,7 +42,7 @@ public:
   {
     if (!exporter.profile().class_template.model.nodes().empty())
     {
-      json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
+      json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
       exporter.dump(cla, obj);
     }
 
@@ -52,7 +53,7 @@ public:
   {
     if (!exporter.profile().manual_template.model.nodes().empty())
     {
-      json::Object obj = JsonPathAnnotator::get(path(), serializedModel).toObject();
+      json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
       exporter.dump(man, obj);
     }
 

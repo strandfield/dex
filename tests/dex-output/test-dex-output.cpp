@@ -7,8 +7,8 @@
 #include "dex/model/since.h"
 
 #include "dex/common/file-utils.h"
+#include "dex/common/json-utils.h"
 
-#include "dex/output/json-annotator.h"
 #include "dex/output/json-export.h"
 #include "dex/output/markdown-export.h"
 
@@ -275,57 +275,6 @@ void TestDexOutput::jsonExportManual()
   QVERIFY(jexport.data().at("content").toArray().length() == 1);
   jexport = jexport["content"][0].toObject();
   QVERIFY(jexport["text"].toString() == "Hello World!");
-}
-
-void TestDexOutput::jsonAnnotator()
-{
-  {
-    auto model = std::make_shared<dex::Model>();
-    model->setProgram(example_prog_with_class());
-
-    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
-
-    dex::JsonPathAnnotator annotator;
-    annotator.annotate(jexport);
-
-    QVERIFY(jexport.data().size() == 1);
-
-    jexport = jexport["program"]["global_namespace"].toObject();
-
-    QVERIFY(jexport.data().size() == 4);
-    QVERIFY(jexport.data().at("entities").length() == 1);
-    QVERIFY(jexport.data().at("entities").toArray().length() == 1);
-
-    json::Object vec = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(vec["_path"] == "$.program.global_namespace.entities[0]");
-
-    auto path = dex::JsonPathAnnotator::parse("$.program.global_namespace.entities[0]");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("global_namespace"), std::string("entities"), 0 };
-    QVERIFY(path == expected);
-  }
-
-  {
-    auto model = std::make_shared<dex::Model>();
-    model->setProgram(example_prog_with_class_and_fun());
-
-    json::Object jexport = dex::JsonExport::serialize(*model);
-
-    dex::JsonPathAnnotator annotator;
-    annotator.annotate(jexport);
-
-    QVERIFY(jexport.data().size() == 1);
-
-    jexport = jexport["program"]["global_namespace"].toObject();
-
-    json::Object complex = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(complex["_path"] == "$.program.global_namespace.entities[0]");
-    json::Object real = complex.data().at("members").at(0).toObject();
-    QVERIFY(real["_path"] == "$.program.global_namespace.entities[0].members[0]");
-
-    auto path = dex::JsonPathAnnotator::parse("$.program.global_namespace.entities[0].members[0]");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("program"), std::string("global_namespace"), std::string("entities"), 0, std::string("members"), 0 };
-    QVERIFY(path == expected);
-  }
 }
 
 void TestDexOutput::markdownExport()
