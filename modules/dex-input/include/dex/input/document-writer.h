@@ -110,7 +110,7 @@ private:
   State m_state = State::Idle;
   std::shared_ptr<DomWriter> m_writer;
   std::optional<std::string> m_since;
-  std::vector<std::shared_ptr<dom::Node>> m_nodes;
+  dom::Content m_content;
 };
 
 } // namespace dex
@@ -125,7 +125,7 @@ inline DocumentWriter::State DocumentWriter::state() const
 
 inline dom::Content& DocumentWriter::output()
 {
-  return m_nodes;
+  return m_content;
 }
 
 } // namespace dex

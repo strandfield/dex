@@ -332,7 +332,7 @@ void DocumentWriter::image(std::string src, std::optional<int> width, std::optio
   auto img = std::make_shared<dom::Image>(std::move(src));
   img->height = height.value_or(img->height);
   img->width = width.value_or(img->width);
-  m_nodes.push_back(img);
+  m_content.push_back(img);
 }
 
 void DocumentWriter::list()
@@ -384,7 +384,7 @@ void DocumentWriter::endlist()
       // TODO: handle since
     }
 
-    m_nodes.push_back(l);
+    m_content.push_back(l);
     m_state = State::Idle;
     m_writer = nullptr;
   }
@@ -408,7 +408,7 @@ void DocumentWriter::enddisplaymath()
     throw std::runtime_error{ "DocumentWriter::enddisplaymath()" };
 
   m_writer->finish();
-  m_nodes.push_back(m_writer->output());
+  m_content.push_back(m_writer->output());
   m_writer.reset();
   m_state = State::Idle;
 }
@@ -439,7 +439,7 @@ void DocumentWriter::write(const std::shared_ptr<dom::Node>& node)
   if (isWritingParagraph())
     endParagraph();
 
-  m_nodes.push_back(node);
+  m_content.push_back(node);
 }
 
 void DocumentWriter::startParagraph()
@@ -463,7 +463,7 @@ void DocumentWriter::endParagraph()
     par->add<dex::Since>(dom::ParagraphRange(*par), m_since.value());
   }
 
-  m_nodes.push_back(par);
+  m_content.push_back(par);
   m_state = State::Idle;
   m_writer = nullptr;
 }
