@@ -7,6 +7,8 @@
 
 #include "dex/dex-app.h"
 
+#include <json-toolkit/json.h>
+
 #include <QCommandLineParser>
 
 namespace dex
@@ -27,7 +29,7 @@ struct CommandLineParserResult
   QString error;
   QStringList inputs;
   QString output;
-  QStringList values;
+  json::Object values;
 };
 
 class DEX_APP_API CommandLineParser : protected QCommandLineParser

@@ -81,6 +81,9 @@ void ParserFrontend::write(char c)
 
 void ParserFrontend::write_space(char c)
 {
+  if (m_mode == Mode::Program && m_prog_parser->state().current().type == ProgramParser::FrameType::Idle)
+    return;
+
   auto& w = currentWriter();
 
   if (w.isIdle())

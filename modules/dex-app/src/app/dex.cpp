@@ -4,7 +4,6 @@
 
 #include "dex/app/dex.h"
 
-#include "dex/app/command-line-parser.h"
 #include "dex/app/message-handler.h"
 
 #include "dex/common/json-utils.h"
@@ -38,8 +37,8 @@ Dex::Dex(int argc, char* argv[])
 int Dex::exec()
 {
   CommandLineParser parser;
-  
-  auto result = parser.parse(Dex::arguments());
+  m_cli = parser.parse(Dex::arguments());
+  auto& result = m_cli;
 
   if (result.status == CommandLineParserResult::ParseError)
   {
@@ -61,10 +60,32 @@ int Dex::exec()
   }
   else if (result.status == CommandLineParserResult::Work)
   {
-    process(result.inputs, result.output, result.values);
+    work();
   }
 
   return 0;
+}
+
+void Dex::work()
+{
+  m_ini = parse_ini_config();
+
+  QStringList inputs = m_ini.inputs;
+
+  if (!m_cli.inputs.empty())
+    inputs = m_cli.inputs;
+
+  QString output = m_ini.output;
+
+  if (!m_cli.output.isEmpty())
+    output = m_cli.output;
+
+  json::Object values = m_ini.variables;
+
+  if (!m_cli.values.data().empty())
+    values = m_cli.values;
+
+  process(inputs, output, values);
 }
 
 std::string Dex::libClangVersion() const
@@ -82,7 +103,7 @@ std::string Dex::libClangVersion() const
   }
 }
 
-void Dex::process(const QStringList& inputs, QString output, QStringList values)
+void Dex::process(const QStringList& inputs, QString output, json::Object values)
 {
   dex::ParserMachine parser;
 
@@ -159,26 +180,7 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
   }
 }
 
-static json::Object values_to_json(QStringList all_values)
-{
-  dex::SettingsMap result;
-
-  QStringList values = all_values.join(";").split(";", QString::SkipEmptyParts);
-
-  for (QString key_value_pair : values)
-  {
-    QStringList key_value = key_value_pair.split('=', QString::SkipEmptyParts);
-
-    if (key_value.size() == 2)
-    {
-      result[key_value.front().toStdString()] = key_value.back().toStdString();
-    }
-  }
-
-  return build_json(result);
-}
-
-void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, QStringList values)
+void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
 {
   QFileInfo info{ name };
 
@@ -196,15 +198,13 @@ void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name,
   else if (info.suffix() == "md")
   {
     dex::MarkdownExport md_export;
-    json::Object vars = values_to_json(values);
-    md_export.setVariables(vars);
+    md_export.setVariables(values);
     md_export.dump(model, info.dir());
   }
   else if (info.suffix() == "tex")
   {
     dex::LatexExport latex_export;
-    json::Object vars = values_to_json(values);
-    latex_export.setVariables(vars);
+    latex_export.setVariables(values);
     latex_export.dump(model, info.dir());
   }
   else

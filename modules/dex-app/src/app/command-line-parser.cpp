@@ -4,8 +4,29 @@
 
 #include "dex/app/command-line-parser.h"
 
+#include "dex/common/json-utils.h"
+
 namespace dex
 {
+
+static json::Object values_to_json(QStringList all_values)
+{
+  dex::SettingsMap result;
+
+  QStringList values = all_values.join(";").split(";", QString::SkipEmptyParts);
+
+  for (QString key_value_pair : values)
+  {
+    QStringList key_value = key_value_pair.split('=', QString::SkipEmptyParts);
+
+    if (key_value.size() == 2)
+    {
+      result[key_value.front().toStdString()] = key_value.back().toStdString();
+    }
+  }
+
+  return build_json(result);
+}
 
 CommandLineParser::CommandLineParser()
 {
@@ -47,7 +68,7 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
     result.status = CommandLineParserResult::Work;
     result.inputs = values("i");
     result.output = value("o");
-    result.values = values("value");
+    result.values = values_to_json(values("value"));
   }
 
   return result;

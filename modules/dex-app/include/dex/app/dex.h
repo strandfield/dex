@@ -7,6 +7,9 @@
 
 #include "dex/dex-app.h"
 
+#include "dex/app/command-line-parser.h"
+#include "dex/app/ini-config-parser.h"
+
 #include "dex/model/model.h"
 
 #include <QCoreApplication>
@@ -28,15 +31,19 @@ public:
 protected:
   std::string libClangVersion() const;
 
-  void process(const QStringList& inputs, QString output, QStringList values);
+  void process(const QStringList& inputs, QString output, json::Object values);
+
+  void work();
 
   void feed(ParserMachine& parser, const QString& input);
   void feed(ParserMachine& parser, const QDir& input);
 
-  void write_output(const std::shared_ptr<Model>& model, const QString& name, QStringList values);
+  void write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values);
   
 private:
   QStringList m_suffixes;
+  CommandLineParserResult m_cli;
+  IniOptions m_ini;
 };
 
 } // namespace dex

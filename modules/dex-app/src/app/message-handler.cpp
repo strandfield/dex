@@ -50,6 +50,7 @@ void app_message_handler(log::Severity type, Logger& logger, const json::Json& v
     }
   }
   break;
+  case log::Info:
   case log::Output:
   {
     if (value.isString())
