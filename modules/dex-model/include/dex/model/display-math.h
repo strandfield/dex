@@ -24,6 +24,10 @@ public:
 public:
   DisplayMath();
 
+  static void normalize(std::string& str, size_t offset);
+  
+  void normalize();
+
   static const std::string TypeId;
   const std::string& type() const override;
 };

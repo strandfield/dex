@@ -35,6 +35,7 @@ void MathWriter::finish()
 {
   m_math_parser->finish();
   m_output->mlist = std::move(m_math_parser->output());
+  m_output->normalize();
 }
 
 void MathWriter::writeControlSequence(const std::string& csname)

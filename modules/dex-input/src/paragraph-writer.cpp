@@ -5,6 +5,7 @@
 #include "dex/input/paragraph-writer.h"
 
 #include "dex/model/inline-math.h"
+#include "dex/model/display-math.h"
 #include "dex/model/since.h"
 
 #include "dex/input/parser-errors.h"
@@ -66,6 +67,7 @@ void ParagraphWriter::mathshift()
 
     dom::Paragraph& par = *output();
     par.addChar('$');
+    DisplayMath::normalize(par.text(), data->range().begin());
     size_t end = par.length();
     data->range() = dom::ParagraphRange(par, data->range().begin(), end);
 
