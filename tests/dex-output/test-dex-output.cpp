@@ -110,12 +110,14 @@ static std::shared_ptr<cxx::Program> example_prog_with_fun()
   auto getenv = std::make_shared<cxx::Function>("getenv", global);
   auto doc = std::make_shared<dex::FunctionDocumentation>();
   doc->brief() = "get value from environment variables";
-  doc->parameters().push_back("name of the environment variable");
   doc->returnValue() = "value of environment variable";
   doc->since() = dex::Since{ "C++98" };
   doc->description().push_back(make_par("Searches the environment list provided by the host environment..."));
   doc->description().push_back(make_par("Modifying the string returned by getenv invokes undefined behavior."));
   getenv->setDocumentation(doc);
+
+  getenv->parameters().push_back(make<cxx::FunctionParameter>(cxx::Type("std::string"), "str"));
+  getenv->parameters().front()->setDocumentation(make<dex::FunctionParameterDocumentation>("name of the environment variable"));
 
   global->entities().push_back(getenv);
 
@@ -224,9 +226,11 @@ void TestDexOutput::jsonExport()
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
     QVERIFY(jexport.data().at("entities").at(0)["name"] == "getenv");
 
-    jexport = jexport.data().at("entities").at(0)["documentation"].toObject();
+    jexport = jexport.data().at("entities").at(0).toObject();
+    QVERIFY(jexport["parameters"].at(0)["documentation"] == "name of the environment variable");
+
+    jexport = jexport["documentation"].toObject();
     QVERIFY(jexport["since"] == "C++98");
-    QVERIFY(jexport["parameters"].at(0) == "name of the environment variable");
     QVERIFY(jexport["returns"] == "value of environment variable");
   }
 

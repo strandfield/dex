@@ -352,9 +352,19 @@ void ProgramParser::param(std::string des)
   if (f.type != FrameType::Function)
     throw BadCall{ "ProgramParser::param()", "\\param must inside \\fn" };
 
-  auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
-  auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
-  doc->parameters().push_back(std::move(des));
+  auto fun = std::static_pointer_cast<cxx::Function>(currentFrame().node);
+  auto param_doc = std::make_shared<dex::FunctionParameterDocumentation>(std::move(des));
+
+  for (size_t i(0); fun->parameters().size(); ++i)
+  {
+    if (fun->parameters().at(i)->documentation() == nullptr)
+    {
+      fun->parameters().at(i)->setDocumentation(param_doc);
+      return;
+    }
+  }
+
+  // @TODO: should we throw for this ignored piece of documentation
 }
 
 void ProgramParser::returns(std::string des)

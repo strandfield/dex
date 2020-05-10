@@ -414,8 +414,9 @@ void TestDexInput::parserMachineFunction()
   auto doc = std::static_pointer_cast<dex::FunctionDocumentation>(getenv->documentation());
   QVERIFY(doc->brief().value() == "get value from environment variables");
   QVERIFY(doc->since().value().version() == "C++98");
-  QVERIFY(doc->parameters().size() == 1);
-  QVERIFY(doc->parameters().front() == "name of the environment variable");
+  QVERIFY(getenv->parameters().size() == 1);
+  auto funparamdoc = std::static_pointer_cast<dex::FunctionParameterDocumentation>(getenv->parameters().front()->documentation());
+  QVERIFY(funparamdoc->brief == "name of the environment variable");
   QVERIFY(doc->returnValue().value_or("") == "value of environment variable");
   QVERIFY(doc->description().size() == 2);
   QVERIFY(doc->description().front()->is<dom::Paragraph>());

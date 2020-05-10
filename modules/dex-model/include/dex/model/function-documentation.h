@@ -13,19 +13,25 @@
 namespace dex
 {
 
+class DEX_MODEL_API FunctionParameterDocumentation : public cxx::Documentation
+{
+public:
+  std::string brief;
+
+public:
+
+  explicit FunctionParameterDocumentation(std::string str);
+};
+
 class DEX_MODEL_API FunctionDocumentation : public EntityDocumentation
 {
 private:
-  std::vector<std::string> m_parameters;
   std::optional<std::string> m_returnvalue;
 
 public:
 
   static const std::string TypeId;
   const std::string& type() const override;
-
-  const std::vector<std::string>& parameters() const;
-  std::vector<std::string>& parameters();
 
   const std::optional<std::string>& returnValue() const;
   std::optional<std::string>& returnValue();
@@ -35,16 +41,6 @@ public:
 
 namespace dex
 {
-
-inline const std::vector<std::string>& FunctionDocumentation::parameters() const
-{
-  return m_parameters;
-}
-
-inline std::vector<std::string>& FunctionDocumentation::parameters()
-{
-  return m_parameters;
-}
 
 inline const std::optional<std::string>& FunctionDocumentation::returnValue() const
 {

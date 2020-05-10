@@ -300,6 +300,9 @@ void JsonExport::visit_functionparameter(const cxx::FunctionParameter& fp)
 
   object()["type"] = fp.parameterType().toString();
   write_if(object(), "default_value", fp.defaultValue(), !fp.defaultValue().empty());
+  
+  if (fp.documentation() != nullptr)
+    object()["documentation"] = static_cast<dex::FunctionParameterDocumentation*>(fp.documentation().get())->brief;
 }
 
 void JsonExport::visit_variable(const cxx::Variable& v)
@@ -343,18 +346,6 @@ void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
 
     if (fndoc.returnValue().has_value())
       object()["returns"] = fndoc.returnValue().value();
-
-    if (!fndoc.parameters().empty())
-    {
-      json::Array params;
-
-      for (const std::string& p : fndoc.parameters())
-      {
-        params.push(p);
-      }
-
-      object()["parameters"] = params;
-    }
   }
 
   ModelVisitor::visit_entitydocumentation(edoc);

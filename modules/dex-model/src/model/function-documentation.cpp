@@ -14,4 +14,10 @@ const std::string& FunctionDocumentation::type() const
   return TypeId;
 }
 
+FunctionParameterDocumentation::FunctionParameterDocumentation(std::string str)
+  : brief(std::move(str))
+{
+
+}
+
 } // namespace dex

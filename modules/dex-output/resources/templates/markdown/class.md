@@ -19,10 +19,10 @@
 **Brief:** {{ f.documentation.brief }}
 {% endif %}
 
-{% if f.documentation.params.size > 0 %}
+{% if f.parameters and f.parameters.size > 0 %}
 Parameters:
-{% for p in f.documentation.params %}
-- {{ p }}
+{% for p in f.parameters %}
+- {{ p.documentation }}
 {% endfor %}
 {% endif %}
 
