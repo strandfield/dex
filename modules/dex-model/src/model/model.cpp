@@ -33,28 +33,28 @@ struct ChildNodeGetter
   Model::Node operator()(std::shared_ptr<cxx::Entity> e)
   {
     if (path.name == "documentation")
-      return e->documentation();
+      return e->documentation;
 
     if (e->is<cxx::Namespace>())
     {
       auto ns = std::static_pointer_cast<cxx::Namespace>(e);
 
       if (path.name == "entities")
-        return ns->entities().at(path.index);
+        return ns->entities.at(path.index);
     }
     else if (e->is<cxx::Class>())
     {
       auto cla = std::static_pointer_cast<cxx::Class>(e);
 
       if (path.name == "members")
-        return cla->members().at(path.index).first;
+        return cla->members.at(path.index);
     }
     else if (e->is<cxx::Enum>())
     {
       auto en = std::static_pointer_cast<cxx::Enum>(e);
 
       if (path.name == "values")
-        return en->values().at(path.index);
+        return en->values.at(path.index);
 
     }
     else if (e->is<cxx::Function>())
@@ -62,7 +62,7 @@ struct ChildNodeGetter
       auto fn = std::static_pointer_cast<cxx::Function>(e);
 
       if (path.name == "parameters")
-        return fn->parameters().at(path.index);
+        return fn->parameters.at(path.index);
     }
 
     throw std::runtime_error{ "Invalid model path" };

@@ -21,7 +21,7 @@ LiquidExporterUrlAnnotator::LiquidExporterUrlAnnotator(const LiquidExporterProfi
 std::string LiquidExporterUrlAnnotator::get_url(const cxx::Entity& e) const
 {
   if (e.is<cxx::Class>())
-    return profile.class_template.outdir + "/" + e.name() + suffix;
+    return profile.class_template.outdir + "/" + e.name + suffix;
 
   return "";
 }

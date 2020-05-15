@@ -49,9 +49,9 @@ static std::shared_ptr<cxx::Program> example_prog_with_class()
   doc->brief() = "sequence container that encapsulates dynamic size arrays";
   doc->description().push_back(make_par("The elements are stored contiguously, ..."));
   doc->description().push_back(make_par("The storage of the vector is handled automatically, ..."));
-  vector->setDocumentation(doc);
+  vector->documentation = doc;
 
-  global->entities().push_back(vector);
+  global->entities.push_back(vector);
 
   return prog;
 }
@@ -67,9 +67,9 @@ static std::shared_ptr<dex::Model> example_prog_with_class_image_description()
   auto doc = std::make_shared<dex::ClassDocumentation>();
   auto img = make<dom::Image>("test.jpg");
   doc->description().push_back(img);
-  vector->setDocumentation(doc);
+  vector->documentation = doc;
 
-  global->entities().push_back(vector);
+  global->entities.push_back(vector);
 
   model->setProgram(prog);
 
@@ -93,9 +93,9 @@ static std::shared_ptr<dex::Model> example_prog_with_class_list_description()
   listitem->content.push_back(make<dom::Paragraph>("second item"));
   list->items.push_back(listitem);
   doc->description().push_back(list);
-  vector->setDocumentation(doc);
+  vector->documentation = doc;
 
-  global->entities().push_back(vector);
+  global->entities.push_back(vector);
 
   model->setProgram(prog);
 
@@ -114,12 +114,12 @@ static std::shared_ptr<cxx::Program> example_prog_with_fun()
   doc->since() = dex::Since{ "C++98" };
   doc->description().push_back(make_par("Searches the environment list provided by the host environment..."));
   doc->description().push_back(make_par("Modifying the string returned by getenv invokes undefined behavior."));
-  getenv->setDocumentation(doc);
+  getenv->documentation = doc;
 
-  getenv->parameters().push_back(make<cxx::FunctionParameter>(cxx::Type("std::string"), "str"));
-  getenv->parameters().front()->setDocumentation(make<dex::FunctionParameterDocumentation>("name of the environment variable"));
+  getenv->parameters.push_back(make<cxx::FunctionParameter>(cxx::Type("std::string"), "str"));
+  getenv->parameters.front()->documentation = make<dex::FunctionParameterDocumentation>("name of the environment variable");
 
-  global->entities().push_back(getenv);
+  global->entities.push_back(getenv);
 
   return prog;
 }
@@ -133,9 +133,9 @@ static std::shared_ptr<cxx::Program> example_prog_with_var()
   auto doc = std::make_shared<dex::VariableDocumentation>();
   doc->brief() = "the math constant pi";
   doc->description().push_back(make_par("This mathematical constant is roughly equal to 3."));
-  variable->setDocumentation(doc);
+  variable->documentation = doc;
 
-  global->entities().push_back(variable);
+  global->entities.push_back(variable);
 
   return prog;
 }
@@ -146,10 +146,10 @@ static std::shared_ptr<cxx::Program> example_prog_with_class_and_fun()
   auto global = prog->globalNamespace();
 
   auto complex = std::make_shared<cxx::Class>("complex", global);
-  global->entities().push_back(complex);
+  global->entities.push_back(complex);
 
   auto real = std::make_shared<cxx::Function>("real", complex);
-  complex->members().emplace_back(real, cxx::AccessSpecifier::PUBLIC);
+  complex->members.emplace_back(real);
 
   return prog;
 }

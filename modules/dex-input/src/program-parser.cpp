@@ -39,19 +39,19 @@ std::shared_ptr<T> find(const cxx::Entity& e, const std::string& name)
   {
     const cxx::Class& cla = static_cast<const cxx::Class&>(e);
 
-    for (auto m : cla.members())
+    for (auto m : cla.members)
     {
-      if (m.first->name() == name)
-        return std::dynamic_pointer_cast<T>(m.first);
+      if (m->name == name)
+        return std::dynamic_pointer_cast<T>(m);
     }
   }
   else if (e.kind() == cxx::NodeKind::Namespace)
   {
     const cxx::Namespace& ns = static_cast<const cxx::Namespace&>(e);
 
-    for (auto child : ns.entities())
+    for (auto child : ns.entities)
     {
-      if (child->name() == name)
+      if (child->name == name)
         return std::dynamic_pointer_cast<T>(child);
     }
   }
@@ -102,19 +102,19 @@ void ProgramParser::class_(std::string name)
   if (the_class == nullptr)
   {
     the_class = std::make_shared<cxx::Class>(std::move(name), parent);
-    the_class->setDocumentation(std::make_shared<ClassDocumentation>());
+    the_class->documentation = std::make_shared<ClassDocumentation>();
     // TODO: set source location
 
     if (currentFrame().node->is<cxx::Class>())
     {
       auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
-      cla->members().push_back({ the_class, cxx::AccessSpecifier::PUBLIC });
+      cla->members.push_back(the_class);
     }
     else
     {
       assert(currentFrame().node->is<cxx::Namespace>());
       auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-      ns->entities().push_back(the_class);
+      ns->entities.push_back(the_class);
     }
   }
 
@@ -158,19 +158,19 @@ void ProgramParser::fn(std::string signature)
     }
   }();
 
-  the_fn->setDocumentation(std::make_shared<FunctionDocumentation>());
+  the_fn->documentation = std::make_shared<FunctionDocumentation>();
   // TODO: set source location
 
   if (currentFrame().node->is<cxx::Class>())
   {
     auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
-    cla->members().push_back({ the_fn, cxx::AccessSpecifier::PUBLIC });
+    cla->members.push_back(the_fn);
   }
   else if (currentFrame().node->is<cxx::Namespace>())
   {
     assert(currentFrame().node->is<cxx::Namespace>());
     auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-    ns->entities().push_back(the_fn);
+    ns->entities.push_back(the_fn);
   }
 
   m_state.enter<FrameType::Function>(the_fn);
@@ -196,10 +196,10 @@ void ProgramParser::namespace_(std::string name)
   if (the_namespace == nullptr)
   {
     the_namespace = std::make_shared<cxx::Namespace>(std::move(name), parent_ns);
-    the_namespace->setDocumentation(std::make_shared<NamespaceDocumentation>());
+    the_namespace->documentation = std::make_shared<NamespaceDocumentation>();
     // TODO: set source location
 
-    parent_ns->entities().push_back(the_namespace);
+    parent_ns->entities.push_back(the_namespace);
   }
 
   m_state.enter<FrameType::Namespace>(the_namespace);
@@ -223,17 +223,17 @@ void ProgramParser::enum_(std::string name)
   auto parent_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
 
   auto new_enum = std::make_shared<cxx::Enum>(std::move(name), parent_entity);
-  new_enum->setDocumentation(std::make_shared<EnumDocumentation>());
+  new_enum->documentation = std::make_shared<EnumDocumentation>();
 
   if (parent_entity->is<cxx::Namespace>())
   {
     const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
-    ns->entities().push_back(new_enum);
+    ns->entities.push_back(new_enum);
   }
   else
   {
     const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
-    cla->members().push_back({ new_enum, cxx::AccessSpecifier::PUBLIC });
+    cla->members.push_back(new_enum);
   }
 
   m_state.enter<FrameType::Enum>(new_enum);
@@ -265,9 +265,9 @@ void ProgramParser::value(std::string name)
   const auto en = std::static_pointer_cast<cxx::Enum>(currentFrame().node);
 
   auto enum_value = std::make_shared<cxx::EnumValue>(std::move(name), en);
-  enum_value->setDocumentation(std::make_shared<EnumValueDocumentation>());
+  enum_value->documentation = std::make_shared<EnumValueDocumentation>();
 
-  en->values().push_back(enum_value);
+  en->values.push_back(enum_value);
 
   // TODO: handle optional since clause
 
@@ -307,17 +307,17 @@ void ProgramParser::variable(std::string decl)
     }
   }();
 
-  the_var->setDocumentation(std::make_shared<VariableDocumentation>());
+  the_var->documentation = std::make_shared<VariableDocumentation>();
 
   if (parent_entity->is<cxx::Namespace>())
   {
     const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
-    ns->entities().push_back(the_var);
+    ns->entities.push_back(the_var);
   }
   else
   {
     const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
-    cla->members().push_back({ the_var, cxx::AccessSpecifier::PUBLIC });
+    cla->members.push_back(the_var);
   }
 
   m_state.enter<FrameType::Variable>(the_var);
@@ -336,13 +336,13 @@ void ProgramParser::endvariable()
 void ProgramParser::brief(std::string brieftext)
 {
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  doc(entity->documentation()).brief() = std::move(brieftext);
+  doc(entity->documentation).brief() = std::move(brieftext);
 }
 
 void ProgramParser::since(std::string version)
 {
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  doc(entity->documentation()).since() = dex::Since{ version };
+  doc(entity->documentation).since() = dex::Since{ version };
 }
 
 void ProgramParser::param(std::string des)
@@ -355,11 +355,11 @@ void ProgramParser::param(std::string des)
   auto fun = std::static_pointer_cast<cxx::Function>(currentFrame().node);
   auto param_doc = std::make_shared<dex::FunctionParameterDocumentation>(std::move(des));
 
-  for (size_t i(0); fun->parameters().size(); ++i)
+  for (size_t i(0); fun->parameters.size(); ++i)
   {
-    if (fun->parameters().at(i)->documentation() == nullptr)
+    if (fun->parameters.at(i)->documentation == nullptr)
     {
-      fun->parameters().at(i)->setDocumentation(param_doc);
+      fun->parameters.at(i)->documentation = param_doc;
       return;
     }
   }
@@ -375,7 +375,7 @@ void ProgramParser::returns(std::string des)
     throw BadCall{ "ProgramParser::returns()", "\\returns must inside \\fn" };
 
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
-  auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation());
+  auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation);
   doc->returnValue() = std::move(des);
 }
 
@@ -425,7 +425,7 @@ void ProgramParser::exitFrame()
     f.writer->finish();
 
     if(!f.writer->output().empty())
-      doc(ent->documentation()).description() = std::move(f.writer->output());
+      doc(ent->documentation).description() = std::move(f.writer->output());
   }
 
   m_state.leave();

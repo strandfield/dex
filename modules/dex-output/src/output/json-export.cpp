@@ -54,8 +54,6 @@ static std::string to_string(cxx::NodeKind n)
     return "namespace";
   case cxx::NodeKind::TemplateParameter:
     return "template-parameter";
-  case cxx::NodeKind::TranslationUnit:
-    return "translation-unit";
   case cxx::NodeKind::Variable:
     return "variable";
   case cxx::NodeKind::MultilineComment:
@@ -223,10 +221,10 @@ void JsonExport::visit_entity(const cxx::Entity& e)
 {
   RAIIJsonExportContext context{ &m_json_stack, path().back() };
 
-  object()["name"] = e.name();
+  object()["name"] = e.name;
   object()["type"] = to_string(e.kind());
 
-  write_location(object(), e.location());
+  write_location(object(), e.location);
 
   ModelVisitor::visit_entity(e);
 }
@@ -240,13 +238,13 @@ void JsonExport::visit_class(const cxx::Class& cla)
 {
   ModelVisitor::visit_class(cla);
 
-  if (!cla.members().empty())
+  if (!cla.members.empty())
   {
     json::Array members = object()["members"].toArray();
 
-    for (size_t i(0); i < cla.members().size(); ++i)
+    for (size_t i(0); i < cla.members.size(); ++i)
     {
-      members[static_cast<int>(i)]["accessibility"] = to_string(cla.members().at(i).second);
+      members[static_cast<int>(i)]["accessibility"] = to_string(cla.members.at(i)->getAccessSpecifier());
     }
   }
 }
@@ -267,25 +265,25 @@ void JsonExport::visit_function(const cxx::Function& f)
 {
   ModelVisitor::visit_function(f);
 
-  object()["return_type"] = f.returnType().toString();
+  object()["return_type"] = f.return_type.toString();
 
-  if (f.specifiers() != 0)
+  if (f.specifiers != 0)
   {
     std::string specifiers;
 
-    if (f.specifiers() & cxx::FunctionSpecifier::Inline)
+    if (f.specifiers & cxx::FunctionSpecifier::Inline)
       specifiers += "inline,";
-    if (f.specifiers() & cxx::FunctionSpecifier::Static)
+    if (f.specifiers & cxx::FunctionSpecifier::Static)
       specifiers += "static,";
-    if (f.specifiers() & cxx::FunctionSpecifier::Constexpr)
+    if (f.specifiers & cxx::FunctionSpecifier::Constexpr)
       specifiers += "constexpr,";
-    if (f.specifiers() & cxx::FunctionSpecifier::Virtual)
+    if (f.specifiers & cxx::FunctionSpecifier::Virtual)
       specifiers += "virtual,";
-    if (f.specifiers() & cxx::FunctionSpecifier::Override)
+    if (f.specifiers & cxx::FunctionSpecifier::Override)
       specifiers += "override,";
-    if (f.specifiers() & cxx::FunctionSpecifier::Final)
+    if (f.specifiers & cxx::FunctionSpecifier::Final)
       specifiers += "final,";
-    if (f.specifiers() & cxx::FunctionSpecifier::Const)
+    if (f.specifiers & cxx::FunctionSpecifier::Const)
       specifiers += "const,";
     
     specifiers.pop_back();
@@ -298,11 +296,11 @@ void JsonExport::visit_functionparameter(const cxx::FunctionParameter& fp)
 {
   ModelVisitor::visit_functionparameter(fp);
 
-  object()["type"] = fp.parameterType().toString();
-  write_if(object(), "default_value", fp.defaultValue(), !fp.defaultValue().empty());
+  object()["type"] = fp.type.toString();
+  write_if(object(), "default_value", fp.default_value.toString(), fp.default_value != cxx::Expression());
   
-  if (fp.documentation() != nullptr)
-    object()["documentation"] = static_cast<dex::FunctionParameterDocumentation*>(fp.documentation().get())->brief;
+  if (fp.documentation != nullptr)
+    object()["documentation"] = static_cast<dex::FunctionParameterDocumentation*>(fp.documentation.get())->brief;
 }
 
 void JsonExport::visit_variable(const cxx::Variable& v)
@@ -310,7 +308,7 @@ void JsonExport::visit_variable(const cxx::Variable& v)
   ModelVisitor::visit_variable(v);
 
   object()["vartype"] = v.type().toString();
-  write_if(object(), "default_value", v.defaultValue(), !v.defaultValue().empty());
+  write_if(object(), "default_value", v.defaultValue().toString(), v.defaultValue() != cxx::Expression());
 
   if (v.specifiers() != 0)
   {

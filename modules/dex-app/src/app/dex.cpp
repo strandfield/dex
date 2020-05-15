@@ -12,7 +12,7 @@
 #include "dex/output/latex-export.h"
 #include "dex/output/markdown-export.h"
 
-#include <cxx/parsers/libclang-parser.h>
+#include <cxx/libclang.h>
 
 #include <json-toolkit/stringify.h>
 
@@ -92,12 +92,12 @@ std::string Dex::libClangVersion() const
 {
   try
   {
-    cxx::parsers::LibClangParser parser;
-    CXVersion ver = parser.version();
+    cxx::LibClang libclang;
+    CXVersion ver = libclang.version();
 
     return std::to_string(ver.Major) + "." + std::to_string(ver.Minor) + "." + std::to_string(ver.Subminor);
   }
-  catch (const cxx::parsers::LibClangParserError&)
+  catch (const cxx::LibClangError&)
   {
     return "libclang could not be found";
   }

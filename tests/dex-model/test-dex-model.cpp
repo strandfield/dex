@@ -12,5 +12,5 @@ void TestDexModel::mathNormalization()
 
   dex::DisplayMath::normalize(src, 0);
 
-  QVERIFY(src == "\\alpha x + \\gamma\\frac{1}{2}");
+  QVERIFY(src == "\\alpha x + \\gamma \\frac{1}{2}");
 }

@@ -171,9 +171,9 @@ void ModelVisitor::visit_entity(const cxx::Entity& e)
   else if (e.is<cxx::Variable>())
     visit_variable(static_cast<const cxx::Variable&>(e));
 
-  if (e.documentation())
+  if (e.documentation)
   {
-    auto edoc = std::dynamic_pointer_cast<EntityDocumentation>(e.documentation());
+    auto edoc = std::dynamic_pointer_cast<EntityDocumentation>(e.documentation);
 
     if (edoc)
     {
@@ -185,45 +185,45 @@ void ModelVisitor::visit_entity(const cxx::Entity& e)
 
 void ModelVisitor::visit_namespace(const cxx::Namespace& ns)
 {
-  if (!ns.entities().empty())
+  if (!ns.entities.empty())
   {
     VisitorContext context{ &m_stack, "entities" };
 
-    for (size_t i(0); i < ns.entities().size(); ++i)
+    for (size_t i(0); i < ns.entities.size(); ++i)
     {
       VisitorContext inner_context{ &m_stack, i };
 
-      visit_entity(*ns.entities().at(i));
+      visit_entity(*ns.entities.at(i));
     }
   }
 }
 
 void ModelVisitor::visit_class(const cxx::Class& cla)
 {
-  if (!cla.members().empty())
+  if (!cla.members.empty())
   {
     VisitorContext context{ &m_stack, "members" };
 
-    for (size_t i(0); i < cla.members().size(); ++i)
+    for (size_t i(0); i < cla.members.size(); ++i)
     {
       VisitorContext inner_context{ &m_stack, i };
 
-      visit_entity(*cla.members().at(i).first);
+      visit_entity(*cla.members.at(i));
     }
   }
 }
 
 void ModelVisitor::visit_enum(const cxx::Enum& en)
 {
-  if (!en.values().empty())
+  if (!en.values.empty())
   {
     VisitorContext context{ &m_stack, "values" };
 
-    for (size_t i(0); i < en.values().size(); ++i)
+    for (size_t i(0); i < en.values.size(); ++i)
     {
       VisitorContext inner_context{ &m_stack, i };
 
-      visit_entity(*en.values().at(i));
+      visit_entity(*en.values.at(i));
     }
   }
 }
@@ -235,15 +235,15 @@ void ModelVisitor::visit_enumvalue(const cxx::EnumValue& /* ev */)
 
 void ModelVisitor::visit_function(const cxx::Function& f)
 {
-  if (!f.parameters().empty())
+  if (!f.parameters.empty())
   {
     VisitorContext context{ &m_stack, "parameters" };
 
-    for (size_t i(0); i < f.parameters().size(); ++i)
+    for (size_t i(0); i < f.parameters.size(); ++i)
     {
       VisitorContext inner_context{ &m_stack, i };
 
-      visit_entity(*f.parameters().at(i));
+      visit_entity(*f.parameters.at(i));
     }
   }
 }

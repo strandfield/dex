@@ -267,11 +267,11 @@ void TestDexInput::parserMachineImage()
 
   std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities().size() > 0);
-  QVERIFY(ns->entities().front()->is<cxx::Class>());
-  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
-  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()) != nullptr);
-  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
+  QVERIFY(ns->entities.size() > 0);
+  QVERIFY(ns->entities.front()->is<cxx::Class>());
+  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities.front());
+  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation) != nullptr);
+  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation);
   QVERIFY(doc->description().size() == 3);
 
   QVERIFY(doc->description().at(0)->is<dom::Paragraph>());
@@ -317,11 +317,11 @@ void TestDexInput::parserMachineList()
 
   std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities().size() > 0);
-  QVERIFY(ns->entities().front()->is<cxx::Class>());
-  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
-  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()) != nullptr);
-  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
+  QVERIFY(ns->entities.size() > 0);
+  QVERIFY(ns->entities.front()->is<cxx::Class>());
+  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities.front());
+  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation) != nullptr);
+  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation);
   QVERIFY(doc->description().size() == 1);
   QVERIFY(doc->description().front()->is<dom::List>());
 
@@ -363,12 +363,12 @@ void TestDexInput::parserMachineClass()
 
   std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities().size() > 0);
-  QVERIFY(ns->entities().front()->is<cxx::Class>());
-  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities().front());
-  QVERIFY(vec->name() == "vector");
-  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation()) != nullptr);
-  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation());
+  QVERIFY(ns->entities.size() > 0);
+  QVERIFY(ns->entities.front()->is<cxx::Class>());
+  auto vec = std::static_pointer_cast<cxx::Class>(ns->entities.front());
+  QVERIFY(vec->name == "vector");
+  QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation) != nullptr);
+  auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation);
   QVERIFY(doc->brief().value() == "sequence container that encapsulates dynamic size arrays");
   QVERIFY(doc->description().size() == 1);
   QVERIFY(doc->description().front()->is<dom::Paragraph>());
@@ -406,16 +406,16 @@ void TestDexInput::parserMachineFunction()
 
   std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities().size() > 0);
-  QVERIFY(ns->entities().front()->is<cxx::Function>());
-  auto getenv = std::static_pointer_cast<cxx::Function>(ns->entities().front());
-  QVERIFY(getenv->name() == "getenv");
-  QVERIFY(std::dynamic_pointer_cast<dex::FunctionDocumentation>(getenv->documentation()) != nullptr);
-  auto doc = std::static_pointer_cast<dex::FunctionDocumentation>(getenv->documentation());
+  QVERIFY(ns->entities.size() > 0);
+  QVERIFY(ns->entities.front()->is<cxx::Function>());
+  auto getenv = std::static_pointer_cast<cxx::Function>(ns->entities.front());
+  QVERIFY(getenv->name == "getenv");
+  QVERIFY(std::dynamic_pointer_cast<dex::FunctionDocumentation>(getenv->documentation) != nullptr);
+  auto doc = std::static_pointer_cast<dex::FunctionDocumentation>(getenv->documentation);
   QVERIFY(doc->brief().value() == "get value from environment variables");
   QVERIFY(doc->since().value().version() == "C++98");
-  QVERIFY(getenv->parameters().size() == 1);
-  auto funparamdoc = std::static_pointer_cast<dex::FunctionParameterDocumentation>(getenv->parameters().front()->documentation());
+  QVERIFY(getenv->parameters.size() == 1);
+  auto funparamdoc = std::static_pointer_cast<dex::FunctionParameterDocumentation>(getenv->parameters.front()->documentation);
   QVERIFY(funparamdoc->brief == "name of the environment variable");
   QVERIFY(doc->returnValue().value_or("") == "value of environment variable");
   QVERIFY(doc->description().size() == 2);
@@ -458,30 +458,30 @@ void TestDexInput::parserMachineEnum()
 
   std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities().size() > 0);
-  QVERIFY(ns->entities().front()->is<cxx::Enum>());
-  auto corner = std::static_pointer_cast<cxx::Enum>(ns->entities().front());
-  QVERIFY(corner->name() == "Corner");
-  QVERIFY(corner->values().size() == 4);
-  QVERIFY(std::dynamic_pointer_cast<dex::EnumDocumentation>(corner->documentation()) != nullptr);
-  auto doc = std::static_pointer_cast<dex::EnumDocumentation>(corner->documentation());
+  QVERIFY(ns->entities.size() > 0);
+  QVERIFY(ns->entities.front()->is<cxx::Enum>());
+  auto corner = std::static_pointer_cast<cxx::Enum>(ns->entities.front());
+  QVERIFY(corner->name == "Corner");
+  QVERIFY(corner->values.size() == 4);
+  QVERIFY(std::dynamic_pointer_cast<dex::EnumDocumentation>(corner->documentation) != nullptr);
+  auto doc = std::static_pointer_cast<dex::EnumDocumentation>(corner->documentation);
   QVERIFY(doc->brief().value() == "describes a corner");
   QVERIFY(doc->description().size() == 1);
   QVERIFY(doc->description().front()->is<dom::Paragraph>());
   auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
   QVERIFY(paragraph->text() == "This is not that useful.");
 
-  auto top_left = corner->values().at(0);
-  auto valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(top_left->documentation());
-  QVERIFY(top_left->name() == "TopLeft");
+  auto top_left = corner->values.at(0);
+  auto valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(top_left->documentation);
+  QVERIFY(top_left->name == "TopLeft");
   QVERIFY(valdoc->description().size() == 1);
   QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
   paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
   QVERIFY(paragraph->text() == "the top left corner");
 
-  auto bottom_right = corner->values().at(3);
-  valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(bottom_right->documentation());
-  QVERIFY(bottom_right->name() == "BottomRight");
+  auto bottom_right = corner->values.at(3);
+  valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(bottom_right->documentation);
+  QVERIFY(bottom_right->name == "BottomRight");
   QVERIFY(valdoc->description().size() == 1);
   QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
   paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
@@ -510,12 +510,12 @@ void TestDexInput::parserMachineVariable()
 
   std::shared_ptr<cxx::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities().size() > 0);
-  QVERIFY(ns->entities().front()->is<cxx::Variable>());
-  auto variable = std::static_pointer_cast<cxx::Variable>(ns->entities().front());
-  QVERIFY(variable->name() == "name");
-  QVERIFY(std::dynamic_pointer_cast<dex::VariableDocumentation>(variable->documentation()) != nullptr);
-  auto doc = std::static_pointer_cast<dex::VariableDocumentation>(variable->documentation());
+  QVERIFY(ns->entities.size() > 0);
+  QVERIFY(ns->entities.front()->is<cxx::Variable>());
+  auto variable = std::static_pointer_cast<cxx::Variable>(ns->entities.front());
+  QVERIFY(variable->name == "name");
+  QVERIFY(std::dynamic_pointer_cast<dex::VariableDocumentation>(variable->documentation) != nullptr);
+  auto doc = std::static_pointer_cast<dex::VariableDocumentation>(variable->documentation);
   QVERIFY(doc->brief().value() == "the name of the program");
   QVERIFY(doc->since().value().version() == "2020");
  
