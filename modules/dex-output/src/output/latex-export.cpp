@@ -154,7 +154,7 @@ std::string LatexExport::stringify_section(const dex::Sectioning& sec)
 
   for (const auto& c : sec.content)
   {
-    result += stringify_domnode(*c) + "\n";
+    result += stringify_domnode(*c) + "\n\n";
   }
 
   return result;
