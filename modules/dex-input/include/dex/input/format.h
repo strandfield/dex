@@ -12,7 +12,11 @@
 namespace dex
 {
 
-DEX_INPUT_API extern const tex::parsing::Format DexFormat;
+class DEX_INPUT_API DexFormat
+{
+public:
+  static std::vector<tex::parsing::Macro> load();
+};
 
 } // namespace dex
 

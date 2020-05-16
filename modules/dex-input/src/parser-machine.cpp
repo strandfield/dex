@@ -307,7 +307,7 @@ ParserMachine::ParserMachine()
   m_lexer.catcodes()[static_cast<size_t>('\r')] = tex::parsing::CharCategory::Ignored;
 #endif // defined(Q_OS_WIN)
 
-  for (const tex::parsing::Macro& m : tex::parsing::Format::load(DexFormat))
+  for (const tex::parsing::Macro& m : DexFormat::load())
   {
     m_preprocessor.define(m);
   }

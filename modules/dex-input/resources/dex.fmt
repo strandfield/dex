@@ -1,0 +1,161 @@
+
+% Input conditionals
+
+\def\@ifnextchar#1#2#3{%
+  \testnextch@r #1\ifbr #2\else #3\fi
+}
+
+\def\@ifleftbrace#1#2{%
+  \testleftbr@ce \ifbr #1\else #2\fi
+}
+
+% Environment
+
+\def\begin#1{%
+  \csname #1\endcsname
+}
+
+\def\end#1{%
+  \csname end#1\endcsname
+}
+
+% Document
+
+\def\b{%
+  \p@rseword\c@ll\@b
+}
+
+\def\textbf#1{%
+  \@begintextbf #1\@endtextbf
+}
+
+\def\e{%
+  \p@rseword\c@ll\@e
+}
+
+\def\textit#1{%
+  \@begintextit #1\@endtextit
+}
+
+\def\c{%
+  \p@rseword\c@ll\@c
+}
+
+\def\texttt#1{%
+  \@begintexttt #1\@endtexttt
+}
+
+\def\href{%
+  \p@rseword\p@rseword\c@ll\@href
+}
+
+\def\image{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \p@rseword\c@ll\@image
+    }%
+    \p@rseoptions
+  }{%
+    \p@rseword\c@ll\@image
+  }%
+}
+
+\def\list{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \c@ll\@list
+    }%
+    \p@rseoptions
+  }{%
+    \c@ll\@list
+  }%
+}
+
+\def\li{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \c@ll\@li
+    }%
+    \p@rseoptions
+  }{%
+    \c@ll\@li
+  }%
+}
+
+% Dex - Program %
+
+\def\class{%
+  \p@rseline\c@ll\cl@ss
+}
+
+\def\namespace{%
+  \p@rseline\c@ll\n@mesp@ce
+}
+
+\def\fn{%
+  \p@rseline\c@ll\functi@n
+}
+
+\def\variable{%
+  \p@rseline\c@ll\v@ri@ble
+}
+
+\def\enum{%
+  \p@rseline\c@ll\@enum
+}
+
+\def\value{%
+  \@ifnextchar[{%
+    \def\@afteroptions{%
+      \p@rseword\c@ll\enumv@lue
+    }%
+    \p@rseoptions
+  }{%
+    \p@rseword\c@ll\enumv@lue
+  }%
+}
+
+\def\brief{%
+  \p@rseline\c@ll\@brief
+}
+
+\def\param{%
+  \p@rseline\c@ll\p@r@m
+}
+
+\def\returns{%
+  \p@rseline\c@ll\@returns
+}
+
+\def\since{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \@ifleftbrace{%
+        \p@rseword\c@ll\@since
+      }{%
+        \beginsince
+      }%
+    }%
+    \p@rseoptions
+  }{%
+    \p@rseline\c@ll\@since
+  }%
+}
+
+% Dex - Manual %
+
+\def\manual{%
+  \p@rseline\c@ll\@manual
+}
+
+\def\part{%
+  \p@rseline\c@ll\@part
+}
+
+\def\chapter{%
+  \p@rseline\c@ll\@chapter
+}
+
+\def\section{%
+  \p@rseline\c@ll\@section
+}
