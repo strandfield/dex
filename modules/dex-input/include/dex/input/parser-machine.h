@@ -27,11 +27,23 @@
 namespace dex
 {
 
+class DEX_INPUT_API BlockBasedDocument
+{
+public:
+  std::pair<std::string, std::string> block_delimiters;
+  std::string filepath;
+  std::string content;
+
+public:
+  explicit BlockBasedDocument(std::string text, std::string path = "");
+};
+
 class DEX_INPUT_API InputStream
 {
 public:
   InputStream();
   InputStream(std::string doc);
+  InputStream(BlockBasedDocument doc);
   explicit InputStream(const QFileInfo& file);
   InputStream(const InputStream &) = default;
 
@@ -50,6 +62,8 @@ public:
   bool read(const std::string_view& text);
 
   void discard(int n);
+
+  bool isBlockBased() const;
 
   bool seekBlock();
   bool isInsideBlock() const;
@@ -86,6 +100,7 @@ protected:
 private:
   std::stack<Document> m_documents;
   std::pair<std::string, std::string> m_block_delimiters;
+  bool m_is_block_based = false;
   bool m_inside_block = false;
 };
 

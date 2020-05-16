@@ -531,28 +531,28 @@ void TestDexInput::parserMachineManual()
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
+  QFile file{ "test.dex" };
   QVERIFY(file.open(QIODevice::WriteOnly));
 
   file.write(
-    "/*!\n"
-    " * \\manual Manual's title\n"
-    " *\n"
-    " * \\part First part\n"
-    " *\n"
-    " * \\chapter First chapter\n"
-    " * This is the content of the first chapter.\n"
-    " *\n"
-    " * \\chapter{Second chapter}\n"
-    " * This is the content of the second chapter.\n"
-    " */\n"
+    "\n"
+    "\\manual Manual's title\n"
+    "\n"
+    "\\part First part\n"
+    "\n"
+    "\\chapter First chapter\n"
+    "This is the content of the first chapter.\n"
+    "\n"
+    "\\chapter{Second chapter}\n"
+    "This is the content of the second chapter.\n"
+    "\n"
   );
 
   file.close();
 
-  parser.process(QFileInfo{ "test.cpp" });
+  parser.process(QFileInfo{ "test.dex" });
 
-  QFile::remove("test.cpp");
+  QFile::remove("test.dex");
 
   QVERIFY(parser.output()->manuals().size() == 1);
 

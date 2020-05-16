@@ -30,6 +30,14 @@ void send_token(tex::parsing::Token&& tok, C& c, Components& ... rest)
     send_token(tex::parsing::read(c.output()), rest...);
 }
 
+BlockBasedDocument::BlockBasedDocument(std::string text, std::string path)
+  : block_delimiters{ "/*!", "*/" },
+    filepath(std::move(path)),
+    content(std::move(text))
+{
+
+}
+
 InputStream::InputStream()
   : m_block_delimiters{ "/*!", "*/" }
 {
@@ -43,6 +51,22 @@ InputStream::InputStream(std::string doc)
   document.content = std::move(doc);
   document.pos = 0;
   m_documents.push(document);
+
+  m_is_block_based = false;
+  m_inside_block = false;
+}
+
+InputStream::InputStream(BlockBasedDocument doc)
+  : m_block_delimiters{ std::move(doc.block_delimiters) }
+{
+  Document document;
+  document.content = std::move(doc.content);
+  document.file_path = std::move(doc.filepath);
+  document.pos = 0;
+  m_documents.push(document);
+
+  m_is_block_based = true;
+  m_inside_block = false;
 }
 
 InputStream::InputStream(const QFileInfo& file)
@@ -52,6 +76,9 @@ InputStream::InputStream(const QFileInfo& file)
   d.content = file_utils::read_all(file.absoluteFilePath().toStdString());
   d.file_path = file.filePath().toStdString();
   m_documents.push(d);
+
+  m_is_block_based = file.suffix() != "dex";
+  m_inside_block = false;
 }
 
 void InputStream::setBlockDelimiters(std::string start, std::string end)
@@ -138,8 +165,15 @@ void InputStream::discard(int n)
     readChar(), --n;
 }
 
+bool InputStream::isBlockBased() const
+{
+  return m_is_block_based;
+}
+
 bool InputStream::seekBlock()
 {
+  assert(isBlockBased());
+
   while (!atEnd() && !read(m_block_delimiters.first))
     readChar();
 
@@ -154,7 +188,7 @@ bool InputStream::isInsideBlock() const
 
 bool InputStream::atBlockEnd() const
 {
-  return peek(static_cast<int>(m_block_delimiters.second.length())) == m_block_delimiters.second;
+  return isInsideBlock() && peek(static_cast<int>(m_block_delimiters.second.length())) == m_block_delimiters.second;
 }
 
 void InputStream::seekBlockEnd()
@@ -174,7 +208,7 @@ void InputStream::exitBlock()
 
 void InputStream::beginLine()
 {
-  if (stackSize() > 1)
+  if (stackSize() > 1 || !isBlockBased())
     return;
 
   auto is_space = [](char c) -> bool {
@@ -237,6 +271,9 @@ InputStream& InputStream::operator=(std::string str)
   document.content = std::move(str);
   m_documents.push(document);
 
+  m_is_block_based = false;
+  m_inside_block = false;
+
   return *this;
 }
 
@@ -248,6 +285,9 @@ InputStream& InputStream::operator=(const QFileInfo& file)
   document.content = file_utils::read_all(file.absoluteFilePath().toStdString());
   document.file_path = file.filePath().toStdString();
   m_documents.push(document);
+
+  m_is_block_based = file.suffix() != "dex";
+  m_inside_block = false;
 
   return *this;
 }
@@ -428,7 +468,7 @@ void ParserMachine::advance()
     case State::BeginFile:
     {
       beginFile();
-      m_state = State::SeekBlock;
+      m_state = inputStream().isBlockBased() ? State::SeekBlock : State::ReadChar;
     }
     break;
     case State::SeekBlock:
@@ -446,16 +486,31 @@ void ParserMachine::advance()
     break;
     case State::ReadChar:
     {
-      if (inputStream().atBlockEnd())
+      if (inputStream().isBlockBased())
       {
-        inputStream().exitBlock();
-        endBlock();
-        m_state = State::SeekBlock;
+        if (inputStream().atBlockEnd())
+        {
+          inputStream().exitBlock();
+          endBlock();
+          m_state = State::SeekBlock;
+        }
+        else
+        {
+          m_lexer.write(inputStream().readChar());
+          m_state = m_lexer.output().empty() ? State::ReadChar : State::ReadToken;
+        }
       }
       else
       {
-        m_lexer.write(inputStream().readChar());
-        m_state = m_lexer.output().empty() ? State::ReadChar : State::ReadToken;
+        if (inputStream().atEnd())
+        {
+          m_state = State::EndFile;
+        }
+        else
+        {
+          m_lexer.write(inputStream().readChar());
+          m_state = m_lexer.output().empty() ? State::ReadChar : State::ReadToken;
+        }
       }
     }
     break;
