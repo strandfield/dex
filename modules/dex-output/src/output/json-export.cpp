@@ -140,6 +140,10 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   {
     result["style"] = static_cast<const dom::TextStyle&>(pmd).style();
   }
+  else if (pmd.is<dom::Link>())
+  {
+    result["url"] = static_cast<const dom::Link&>(pmd).url();
+  }
   else
   {
     // TODO: log or throw ?

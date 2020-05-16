@@ -207,6 +207,11 @@ void DocumentWriter::since(std::string version, const std::string& text)
   paragraphWriter().writeSince(version, text);
 }
 
+void DocumentWriter::href(std::string link, const std::string& text)
+{
+  paragraphWriter().writeLink(std::move(link), text);
+}
+
 void DocumentWriter::image(std::string src, std::optional<int> width, std::optional<int> height)
 {
   if (isWritingParagraph())

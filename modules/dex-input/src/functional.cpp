@@ -45,6 +45,8 @@ const std::string Functions::INLINECODE = "@c";
 const std::string Functions::BEGINTEXTTT = "@begintexttt";
 const std::string Functions::ENDTEXTTT = "@endtexttt";
 
+const std::string Functions::HREF = "@href";
+
 const std::string Functions::IMAGE = "@image";
 
 const std::string Functions::LIST = "@list";

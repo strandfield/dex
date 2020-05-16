@@ -27,6 +27,7 @@ protected:
   virtual void process_bold(const dom::ParagraphIterator it);
   virtual void process_italic(const dom::ParagraphIterator it);
   virtual void process_typewriter(const dom::ParagraphIterator it);
+  virtual void process_link(const dom::ParagraphIterator it, const std::string& url);
   virtual void process_math(const dom::ParagraphIterator it);
   void process(const dom::ParagraphIterator it);
 };

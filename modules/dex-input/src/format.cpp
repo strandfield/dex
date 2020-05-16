@@ -58,115 +58,119 @@ const char* fmt_src =
   "  \\@begintexttt #1\\@endtexttt" // 45
   "}"
   ""
+  "\\def\\href{"
+  "  \\p@rseword\\p@rseword\\c@ll\\@href"
+  "}" // 50
+  ""
   "\\def\\image{"
   "  \\@ifnextchar[{"
-  "    \\def\\@fteroptions{" // 50
-  "      \\p@rseword\\c@ll\\@image"
+  "    \\def\\@fteroptions{"
+  "      \\p@rseword\\c@ll\\@image" // 55
   "    }"
   "    \\p@rseoptions"
   "  }{"
-  "    \\p@rseword\\c@ll\\@image" // 55
-  "  }"
+  "    \\p@rseword\\c@ll\\@image"
+  "  }" // 60
   "}"
   ""
   "\\def\\list{"
-  "  \\@ifnextchar[{" // 60
-  "    \\def\\@fteroptions{"
+  "  \\@ifnextchar[{"
+  "    \\def\\@fteroptions{" // 65
   "      \\c@ll\\@list"
   "    }"
   "    \\p@rseoptions"
-  "  }{" // 65
-  "    \\c@ll\\@list"
+  "  }{"
+  "    \\c@ll\\@list" // 70
   "  }"
   "}"
   ""
-  "\\def\\li{" // 70
-  "  \\@ifnextchar[{"
+  "\\def\\li{"
+  "  \\@ifnextchar[{" // 75
   "    \\def\\@fteroptions{"
   "      \\c@ll\\@li"
   "    }"
-  "    \\p@rseoptions" // 75
-  "  }{"
+  "    \\p@rseoptions"
+  "  }{" // 80
   "    \\c@ll\\@li"
   "  }"
   "}"
-  "" // 80
-  "% Dex - Program %"
+  ""
+  "% Dex - Program %" // 85
   ""
   "\\def\\class{"
   "  \\p@rseline\\c@ll\\cl@ss"
-  "}" // 85
-  ""
+  "}"
+  "" // 90
   "\\def\\namespace{"
   "  \\p@rseline\\c@ll\\n@mesp@ce"
   "}"
-  "" // 90
-  "\\def\\fn{"
+  ""
+  "\\def\\fn{" // 95
   "  \\p@rseline\\c@ll\\functi@n"
   "}"
   ""
-  "\\def\\variable{" // 95
-  "  \\p@rseline\\c@ll\\v@ri@ble"
+  "\\def\\variable{"
+  "  \\p@rseline\\c@ll\\v@ri@ble" // 100
   "}"
   ""
   "\\def\\enum{"
-  "  \\p@rseline\\c@ll\\@enum" // 100
-  "}"
+  "  \\p@rseline\\c@ll\\@enum"
+  "}" // 105
   ""
   "\\def\\value{"
   "  \\@ifnextchar[{"
-  "    \\def\\@afteroptions{" // 105
-  "      \\p@rseword\\c@ll\\enumv@lue"
+  "    \\def\\@afteroptions{"
+  "      \\p@rseword\\c@ll\\enumv@lue" // 110
   "    }"
   "    \\p@rseoptions"
   "  }{"
-  "    \\p@rseword\\c@ll\\enumv@lue" // 110
-  "  }"
+  "    \\p@rseword\\c@ll\\enumv@lue"
+  "  }" // 115
   "}"
   ""
   "\\def\\brief{"
-  "  \\p@rseline\\c@ll\\@brief" // 115
-  "}"
+  "  \\p@rseline\\c@ll\\@brief"
+  "}" // 120
   ""
   "\\def\\param{"
   "  \\p@rseline\\c@ll\\p@r@m"
-  "}" // 120
-  ""
+  "}"
+  "" // 125
   "\\def\\returns{"
   "  \\p@rseline\\c@ll\\@returns"
   "}"
-  "" // 125
-  "\\def\\since{"
+  ""
+  "\\def\\since{" // 130
   "  \\@ifnextchar[{"
   "    \\def\\@fteroptions{"
   "      \\@ifleftbrace{"
-  "        \\p@rseword\\c@ll\\@since" // 130
-  "      }{"
+  "        \\p@rseword\\c@ll\\@since"
+  "      }{" // 135
   "        \\beginsince"
   "      }"
   "    }"
-  "    \\p@rseoptions" // 135
-  "  }{"
+  "    \\p@rseoptions"
+  "  }{" // 140
   "    \\p@rseline\\c@ll\\@since"
   "  }"
   "}"
-  "" // 140
-  "% Dex - Manual %"
+  ""
+  "% Dex - Manual %" // 145
   ""
   "\\def\\manual{"
   "  \\p@rseline\\c@ll\\@manual"
-  "}" // 145
-  ""
+  "}"
+  "" // 150
   "\\def\\part{"
   "  \\p@rseline\\c@ll\\@part"
   "}"
-  "" // 150
-  "\\def\\chapter{"
+  ""
+  "\\def\\chapter{" // 155
   "  \\p@rseline\\c@ll\\@chapter"
   "}"
   ""
-  "\\def\\section{" // 155
-  "  \\p@rseline\\c@ll\\@section"
+  "\\def\\section{"
+  "  \\p@rseline\\c@ll\\@section" // 160
   "}"
   ""
 ;
@@ -221,115 +225,119 @@ const char* fmt_bytecode =
   ">2c<>1pc:" // 45
   "s"
   ""
+  "d4r"
+  ">2c9c9c4c5"
+  "s" // 50
+  ""
   "d5r"
   ">2c;tt"
-  ">4c3c<t" // 50
-  ">6c9c4c6"
+  ">4c3c<t"
+  ">6c9c4c6" // 55
   ">4t"
   ">4c<"
   ">2tt"
-  ">4c9c4c6" // 55
-  ">2t"
+  ">4c9c4c6"
+  ">2t" // 60
   "s"
   ""
   "d4r"
-  ">2c;tt" // 60
-  ">4c3c<t"
+  ">2c;tt"
+  ">4c3c<t" // 65
   ">6c4c5"
   ">4t"
   ">4c<"
-  ">2tt" // 65
-  ">4c4c5"
+  ">2tt"
+  ">4c4c5" // 70
   ">2t"
   "s"
   ""
-  "d2r" // 70
-  ">2c;tt"
+  "d2r"
+  ">2c;tt" // 75
   ">4c3c<t"
   ">6c4c3"
   ">4t"
-  ">4c<" // 75
-  ">2tt"
+  ">4c<"
+  ">2tt" // 80
   ">4c4c3"
   ">2t"
   "s"
-  "" // 80
-  ">A"
+  ""
+  ">A" // 85
   ""
   "d5r"
   ">2c9c4c5"
-  "s" // 85
-  ""
+  "s"
+  "" // 90
   "d9r"
   ">2c9c4c9"
   "s"
-  "" // 90
-  "d2r"
+  ""
+  "d2r" // 95
   ">2c9c4c8"
   "s"
   ""
-  "d8r" // 95
-  ">2c9c4c8"
+  "d8r"
+  ">2c9c4c8" // 100
   "s"
   ""
   "d4r"
-  ">2c9c4c5" // 100
-  "s"
+  ">2c9c4c5"
+  "s" // 105
   ""
   "d5r"
   ">2c;tt"
-  ">4c3c=t" // 105
-  ">6c9c4c9"
+  ">4c3c=t"
+  ">6c9c4c9" // 110
   ">4t"
   ">4c<"
   ">2tt"
-  ">4c9c4c9" // 110
-  ">2t"
+  ">4c9c4c9"
+  ">2t" // 115
   "s"
   ""
   "d5r"
-  ">2c9c4c6" // 115
-  "s"
+  ">2c9c4c6"
+  "s" // 120
   ""
   "d5r"
   ">2c9c4c5"
-  "s" // 120
-  ""
+  "s"
+  "" // 125
   "d7r"
   ">2c9c4c8"
   "s"
-  "" // 125
-  "d5r"
+  ""
+  "d5r" // 130
   ">2c;tt"
   ">4c3c<t"
   ">6c<t"
-  ">8c9c4c6" // 130
-  ">6tt"
+  ">8c9c4c6"
+  ">6tt" // 135
   ">8c:"
   ">6t"
   ">4t"
-  ">4c<" // 135
-  ">2tt"
+  ">4c<"
+  ">2tt" // 140
   ">4c9c4c6"
   ">2t"
   "s"
-  "" // 140
-  ">@"
+  ""
+  ">@" // 145
   ""
   "d6r"
   ">2c9c4c7"
-  "s" // 145
-  ""
-  "d4r"
-  ">2c9c4c5"
   "s"
   "" // 150
-  "d7r"
-  ">2c9c4c8"
+  "d4r"
+  ">2c9c4c5"
   "s"
   ""
   "d7r" // 155
   ">2c9c4c8"
+  "s"
+  ""
+  "d7r"
+  ">2c9c4c8" // 160
   "s"
   ""
   "e";
@@ -338,5 +346,4 @@ const char* fmt_bytecode =
 namespace dex
 {
 const tex::parsing::Format DexFormat = tex::parsing::Format(fmt_src, fmt_bytecode);
-
 } // namespace dex

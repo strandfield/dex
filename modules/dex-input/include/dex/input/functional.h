@@ -91,6 +91,8 @@ struct DEX_INPUT_API Functions
   static const std::string BEGINTEXTTT;
   static const std::string ENDTEXTTT;
 
+  static const std::string HREF;
+
   static const std::string IMAGE;
 
   static const std::string LIST;

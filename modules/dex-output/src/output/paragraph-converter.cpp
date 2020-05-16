@@ -39,6 +39,10 @@ void ParagraphConverter::process(const dom::ParagraphIterator begin, const dom::
       {
         process_style(it, std::static_pointer_cast<dom::TextStyle>(*it)->style());
       }
+      else if ((*it)->is<dom::Link>())
+      {
+        process_link(it, std::static_pointer_cast<dom::Link>(*it)->url());
+      }
       else if((*it)->type() == dex::InlineMath::TypeId)
       {
         process_math(it);
@@ -74,6 +78,11 @@ void ParagraphConverter::process_italic(const dom::ParagraphIterator it)
 }
 
 void ParagraphConverter::process_typewriter(const dom::ParagraphIterator it)
+{
+  process(it);
+}
+
+void ParagraphConverter::process_link(const dom::ParagraphIterator it, const std::string& /* url */)
 {
   process(it);
 }

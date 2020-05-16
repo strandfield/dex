@@ -54,6 +54,15 @@ public:
     process(it);
     result += "}";
   }
+
+  void process_link(const dom::ParagraphIterator it, const std::string& url) override
+  {
+    result += "\\href{";
+    result += url;
+    result += "}{";
+    process(it);
+    result += "}";
+  }
 };
 
 LatexExport::LatexExport()

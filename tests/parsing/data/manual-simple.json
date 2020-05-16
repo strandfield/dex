@@ -46,6 +46,15 @@
                 }],
               "text": "This is how to use the program. Please do note that not only italic text is supported, but also inline code.",
               "type": "paragraph"
+            }, {
+              "metadata": [{
+                  "begin": 18,
+                  "end": 30,
+                  "type": "link",
+                  "url": "en.cppreference.com"
+                }],
+              "text": "This is a link to cppreference.",
+              "type": "paragraph"
             }],
           "depth": "chapter",
           "name": "Usage",

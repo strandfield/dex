@@ -16,4 +16,5 @@
  * Please \e do note that not only \textit{italic text is supported}, 
  * but also inline \c code.
  *
+ * This is a link to \href{en.cppreference.com}{cppreference}.
  */

@@ -52,6 +52,7 @@ protected:
   void list(const FunctionCall& c);
   void li(const FunctionCall& c);
   void endlist(const FunctionCall& c);
+  void href(const FunctionCall& c);
   void image(const FunctionCall& c);
   void displaymath(const FunctionCall& c);
   void enddisplaymath(const FunctionCall& c);

@@ -55,6 +55,7 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
     {Functions::LIST, &DocumentWriterFrontend::list},
     {Functions::LI, &DocumentWriterFrontend::li},
     {Functions::ENDLIST, &DocumentWriterFrontend::endlist},
+    {Functions::HREF, &DocumentWriterFrontend::href},
     {Functions::IMAGE, &DocumentWriterFrontend::image},
     {Functions::BACKSLASH_LBRACKET, &DocumentWriterFrontend::displaymath},
     {Functions::BACKSLASH_RBRACKET, &DocumentWriterFrontend::enddisplaymath},
@@ -178,6 +179,13 @@ void DocumentWriterFrontend::li(const FunctionCall& c)
 void DocumentWriterFrontend::endlist(const FunctionCall&)
 {
   m_writer->endlist();
+}
+
+void DocumentWriterFrontend::href(const FunctionCall& c)
+{
+  std::string link = c.arg<std::string>(0);
+  std::string text = c.arg<std::string>(1);
+  m_writer->href(std::move(link), text);
 }
 
 void DocumentWriterFrontend::image(const FunctionCall& c)

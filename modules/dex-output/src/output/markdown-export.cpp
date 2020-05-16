@@ -56,6 +56,15 @@ public:
     result += "`";
   }
 
+  void process_link(const dom::ParagraphIterator it, const std::string& url) override
+  {
+    result += "[";
+    process(it);
+    result += "](";
+    result += url;
+    result += ")";
+  }
+
   void process_math(const dom::ParagraphIterator it) override
   {
     result += "`";
