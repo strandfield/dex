@@ -99,21 +99,9 @@ set_target_properties(typeset PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINAR
 
 set(LIQUID_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/liquid" CACHE PATH "Provide the directory of the liquid library")
 
-# json-toolkit
+set(LIQUID_BUILD_TESTS OFF CACHE BOOL "whether to build cxxast test")
 
-file(GLOB_RECURSE JSON_HDR_FILES ${LIQUID_PROJECT_DIR}/json-toolkit/include/*.h)
-
-add_custom_target(json-toolkit SOURCES ${JSON_HDR_FILES})
-
-## Create target
-
-file(GLOB_RECURSE LIQUID_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/liquid/src/*.cpp)
-file(GLOB_RECURSE LIQUID_HDR_FILES ${CMAKE_CURRENT_SOURCE_DIR}/liquid/include/*.h)
-add_library(liquid SHARED ${LIQUID_HDR_FILES} ${LIQUID_SRC_FILES})
-target_compile_definitions(liquid PRIVATE -DLIQUID_BUILD_SHARED_LIBRARY)
-target_compile_definitions(liquid PUBLIC -DJSONTOOLKIT_HAS_CONFIG)
-target_include_directories(liquid PUBLIC "${LIQUID_PROJECT_DIR}/json-toolkit/include")
-target_include_directories(liquid PUBLIC "${LIQUID_PROJECT_DIR}/include")
+add_subdirectory(liquid)
 
 set_target_properties(liquid PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 set_target_properties(liquid PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
