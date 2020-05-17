@@ -529,30 +529,43 @@ void TestDexInput::parserMachineVariable()
 
 void TestDexInput::parserMachineManual()
 {
+  {
+    QFile file{ "test.dex" };
+    QVERIFY(file.open(QIODevice::WriteOnly));
+
+    file.write(
+      "\n"
+      "\\manual Manual's title\n"
+      "\n"
+      "\\part First part\n"
+      "\n"
+      "\\input{toast}"
+      "\n"
+      "\\chapter{Second chapter}\n"
+      "This is the content of the second chapter.\n"
+      "\n"
+    );
+
+    file.close();
+  }
+
+  {
+    QFile file{ "toast.dex" };
+    QVERIFY(file.open(QIODevice::WriteOnly));
+
+    file.write(
+      "\\chapter First chapter\n"
+      "This is the content of the first chapter.\n"
+    );
+
+    file.close();
+  }
+
   dex::ParserMachine parser;
-
-  QFile file{ "test.dex" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
-
-  file.write(
-    "\n"
-    "\\manual Manual's title\n"
-    "\n"
-    "\\part First part\n"
-    "\n"
-    "\\chapter First chapter\n"
-    "This is the content of the first chapter.\n"
-    "\n"
-    "\\chapter{Second chapter}\n"
-    "This is the content of the second chapter.\n"
-    "\n"
-  );
-
-  file.close();
-
   parser.process(QFileInfo{ "test.dex" });
 
   QFile::remove("test.dex");
+  QFile::remove("toast.dex");
 
   QVERIFY(parser.output()->manuals().size() == 1);
 

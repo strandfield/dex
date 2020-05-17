@@ -38,6 +38,7 @@ public:
   {
     /* TeX */
     PAR,
+    INPUT,
     /* Entities */
     CLASS,
     ENDCLASS,
@@ -96,6 +97,7 @@ protected:
   void checkMode(Mode m);
 
   void par(const FunctionCall& call);
+  void input(const FunctionCall& call);
 
   void fn_class(const FunctionCall& call);
   void cs_endclass();

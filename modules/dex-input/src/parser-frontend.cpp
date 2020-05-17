@@ -37,6 +37,7 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
   static std::map<std::string, CS> static_instance = { 
     /* TeX */
     {Functions::PAR, CS::PAR},
+    {Functions::INPUT, CS::INPUT},
     /* Program */
     {Functions::CLASS, CS::CLASS},
     {Functions::ENDCLASS, CS::ENDCLASS},
@@ -139,6 +140,8 @@ void ParserFrontend::handle(const FunctionCall& call)
     {
     case CS::PAR:
       return par(call);
+    case CS::INPUT:
+      return input(call);
     case CS::ENDFN:
       return cs_endfn();
     case CS::ENDCLASS:
@@ -223,6 +226,12 @@ void ParserFrontend::par(const FunctionCall& call)
     return;
 
   currentWriter().par();
+}
+
+void ParserFrontend::input(const FunctionCall& call)
+{
+  const std::string& path = call.arg<std::string>(0);
+  m_machine.input(path);
 }
 
 void ParserFrontend::fn_class(const FunctionCall& call)

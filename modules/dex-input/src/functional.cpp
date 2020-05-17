@@ -9,6 +9,8 @@ namespace dex
 
 const std::string Functions::PAR = "par";
 
+const std::string Functions::INPUT = "@input";
+
 const std::string Functions::CLASS = "cl@ss";
 const std::string Functions::ENDCLASS = "endclass";
 const std::string Functions::FUNCTION = "functi@n";

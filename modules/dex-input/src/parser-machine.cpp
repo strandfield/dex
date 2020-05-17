@@ -9,8 +9,10 @@
 
 #include "dex/common/file-utils.h"
 
-#include <QDebug>
+#include <QDir>
 #include <QFile>
+
+#include <QDebug>
 
 namespace dex
 {
@@ -334,10 +336,22 @@ void ParserMachine::input(const std::string& filename)
 
   QFileInfo file{ qt_filename };
 
+  if (file.suffix().isEmpty())
+    file.setFile(file.filePath() + ".dex");
+
+  if (file.exists())
+  {
+    m_inputstream.inject(file);
+    return;
+  }
+
+  QFileInfo current{ QString::fromStdString(m_inputstream.currentDocument().file_path) };
+
+  file.setFile(current.dir().path() + "/" + qt_filename);
+
   if (!file.exists())
   {
-    qDebug() << "Could not find input file " << qt_filename;
-    return;
+    throw std::runtime_error{ "No such file" };
   }
 
   m_inputstream.inject(file);

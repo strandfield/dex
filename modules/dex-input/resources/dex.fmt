@@ -9,6 +9,12 @@
   \testleftbr@ce \ifbr #1\else #2\fi
 }
 
+% Input
+
+\def\input{%
+  \p@rseword\c@ll\@input
+}
+
 % Environment
 
 \def\begin#1{%

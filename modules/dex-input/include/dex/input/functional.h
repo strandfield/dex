@@ -57,6 +57,8 @@ struct DEX_INPUT_API Functions
 {
   static const std::string PAR;
 
+  static const std::string INPUT;
+
   static const std::string CLASS;
   static const std::string ENDCLASS;
   static const std::string FUNCTION;
