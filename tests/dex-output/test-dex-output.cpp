@@ -356,6 +356,7 @@ void TestDexOutput::markdownExportManual()
     "## Chapter 1\n"
     "\n"
     "This is the first paragraph of the manual.\n"
+    "\n"
     "And here is a second.\n"
     "\n"
     "## Chapter 2\n"
