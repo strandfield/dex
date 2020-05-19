@@ -251,6 +251,9 @@ void LiquidExporter::postProcess(std::string& output)
 
 void LiquidExporter::write(const std::string& data, const std::string& filepath)
 {
+  if (data.empty())
+    return;
+
   QFileInfo fileinfo{ QString::fromStdString(filepath) };
 
   if (!fileinfo.dir().exists())
