@@ -3,3 +3,4 @@ class-with-var
 enum-doc
 manual-simple
 manual-with-math
+namespace-with-typedef

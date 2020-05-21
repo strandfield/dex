@@ -11,5 +11,7 @@
     <file>data/manual-simple.json</file>
     <file>data/manual-with-math.txt</file>
     <file>data/manual-with-math.json</file>
+    <file>data/namespace-with-typedef.txt</file>
+    <file>data/namespace-with-typedef.json</file>
   </qresource>
 </RCC>

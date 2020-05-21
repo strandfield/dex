@@ -52,6 +52,8 @@ public:
     ENDENUMVALUE,
     VARIABLE,
     ENDVARIABLE,
+    TYPEDEF, 
+    ENDTYPEDEF,
     /* Metadata */
     BRIEF,
     SINCE,
@@ -111,6 +113,8 @@ protected:
   void cs_endenumvalue();
   void fn_variable(const FunctionCall& call);
   void cs_endvariable();
+  void typedef_(const FunctionCall& call);
+  void endtypedef();
 
   void fn_brief(const FunctionCall& call);
   void fn_since(const FunctionCall& call);

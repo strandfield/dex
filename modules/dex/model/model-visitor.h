@@ -26,6 +26,7 @@ class Function;
 class FunctionParameter;
 class Namespace;
 class Program;
+class Typedef;
 class Variable;
 } // namespace cxx
 
@@ -62,6 +63,7 @@ protected:
   virtual void visit_function(const cxx::Function& f);
   virtual void visit_functionparameter(const cxx::FunctionParameter& fp);
   virtual void visit_variable(const cxx::Variable& v);
+  virtual void visit_typedef(const cxx::Typedef& t);
 
   virtual void visit_entitydocumentation(const EntityDocumentation& edoc);
 

@@ -53,6 +53,7 @@ protected:
   void visit_function(const cxx::Function& f) override;
   void visit_functionparameter(const cxx::FunctionParameter& fp) override;
   void visit_variable(const cxx::Variable& v) override;
+  void visit_typedef(const cxx::Typedef& t) override;
 
   void visit_entitydocumentation(const EntityDocumentation& edoc) override;
 

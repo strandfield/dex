@@ -13,6 +13,7 @@
 #include <cxx/function.h>
 #include <cxx/namespace.h>
 #include <cxx/program.h>
+#include <cxx/typedef.h>
 #include <cxx/variable.h>
 
 #include <dom/image.h>
@@ -54,6 +55,8 @@ static std::string to_string(cxx::NodeKind n)
     return "namespace";
   case cxx::NodeKind::TemplateParameter:
     return "template-parameter";
+  case cxx::NodeKind::Typedef:
+    return "typedef";
   case cxx::NodeKind::Variable:
     return "variable";
   case cxx::NodeKind::MultilineComment:
@@ -331,6 +334,11 @@ void JsonExport::visit_variable(const cxx::Variable& v)
   }
 }
 
+void JsonExport::visit_typedef(const cxx::Typedef& t)
+{
+  ModelVisitor::visit_typedef(t);
+  object()["typedef"] = t.type.toString();
+}
 
 void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
 {

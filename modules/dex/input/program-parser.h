@@ -30,6 +30,7 @@ public:
     Enum,
     EnumValue,
     Variable,
+    Typedef,
   };
 
   struct Frame : state::Frame<FrameType>
@@ -74,6 +75,9 @@ public:
 
   void variable(std::string decl);
   void endvariable();
+
+  void typedef_(std::string decl);
+  void endtypedef();
 
   void brief(std::string brieftext);
   void since(std::string version);

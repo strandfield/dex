@@ -10,6 +10,7 @@
 #include <cxx/enum.h>
 #include <cxx/function.h>
 #include <cxx/namespace.h>
+#include <cxx/typedef.h>
 #include <cxx/variable.h>
 
 #include <dom/image.h>
@@ -168,6 +169,8 @@ void ModelVisitor::visit_entity(const cxx::Entity& e)
     visit_functionparameter(static_cast<const cxx::FunctionParameter&>(e));
   else if (e.is<cxx::Namespace>())
     visit_namespace(static_cast<const cxx::Namespace&>(e));
+  else if (e.is<cxx::Typedef>())
+    visit_typedef(static_cast<const cxx::Typedef&>(e));
   else if (e.is<cxx::Variable>())
     visit_variable(static_cast<const cxx::Variable&>(e));
 
@@ -254,6 +257,11 @@ void ModelVisitor::visit_functionparameter(const cxx::FunctionParameter& /* fp *
 }
 
 void ModelVisitor::visit_variable(const cxx::Variable& /* v */)
+{
+
+}
+
+void ModelVisitor::visit_typedef(const cxx::Typedef& /* t */)
 {
 
 }

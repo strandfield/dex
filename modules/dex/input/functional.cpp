@@ -29,6 +29,8 @@ const std::string Functions::PARAM = "p@r@m";
 const std::string Functions::RETURNS = "@returns";
 const std::string Functions::VARIABLE = "v@ri@ble";
 const std::string Functions::ENDVARIABLE = "endvariable";
+const std::string Functions::TYPEDEF = "@typedef";
+const std::string Functions::ENDTYPEDEF = "endtypedef";
 
 const std::string Functions::MANUAL = "@manual";
 const std::string Functions::PART = "@part";

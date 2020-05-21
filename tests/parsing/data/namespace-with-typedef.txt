@@ -1,0 +1,17 @@
+
+/*!
+ * \namespace dex
+ */
+namespace dex
+{
+
+/*!
+ * \typedef std::variant<bool, int, std::string> Argument
+ * \brief defines a generic argument
+ * 
+ * This typedef is used by the various components to pass arguments parsed from the
+ * source files.
+ */
+typedef std::variant<bool, int, std::string> Argument;
+
+} // namespace dex

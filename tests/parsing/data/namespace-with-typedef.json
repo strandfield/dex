@@ -1,0 +1,25 @@
+{
+  "program": {
+    "global_namespace": {
+      "entities": [{
+          "documentation": {},
+          "entities": [{
+              "documentation": {
+                "brief": "defines a generic argument",
+                "description": [{
+                    "text": "This typedef is used by the various components to pass arguments parsed from the source files.",
+                    "type": "paragraph"
+                  }]
+              },
+              "name": "Argument",
+              "type": "typedef",
+              "typedef": "std::variant<bool, int, std::string>"
+            }],
+          "name": "dex",
+          "type": "namespace"
+        }],
+      "name": "",
+      "type": "namespace"
+    }
+  }
+}

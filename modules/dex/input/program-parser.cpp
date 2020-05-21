@@ -11,6 +11,7 @@
 #include "dex/model/enum-documentation.h"
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
+#include "dex/model/typedef-documentation.h"
 #include "dex/model/variable-documentation.h"
 
 #include "dex/common/logging.h"
@@ -327,7 +328,60 @@ void ProgramParser::variable(std::string decl)
 void ProgramParser::endvariable()
 {
   if (!currentFrame().node->is<cxx::Variable>())
-    throw BadCall{ "ProgramParser::endvariable()", "\\endvariable must no \\variable" };
+    throw BadCall{ "ProgramParser::endvariable()", "\\endvariable but no \\variable" };
+
+  exitFrame();
+  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+}
+
+void ProgramParser::typedef_(std::string decl)
+{
+  if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
+    throw BadCall{ "ProgramParser::typedef()", "\\typedef must be inside \\namespace or \\class" };
+
+  auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+
+  while (decl.back() == ' ')
+    decl.pop_back();
+
+  if (decl.back() != ';')
+    decl.push_back(';');
+  
+  decl = "typedef " + decl;
+
+  std::shared_ptr<cxx::Typedef> the_typedef = [&]() {
+    try
+    {
+      return cxx::parsers::RestrictedParser::parseTypedef(decl);
+    }
+    catch (...)
+    {
+      LOG_INFO << "could not parse variable declaration '" << decl << "'";
+      return std::make_shared<cxx::Typedef>(cxx::Type::Auto, decl, parent_entity);
+    }
+  }();
+
+  the_typedef->documentation = std::make_shared<TypedefDocumentation>();
+
+  if (parent_entity->is<cxx::Namespace>())
+  {
+    const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
+    ns->entities.push_back(the_typedef);
+  }
+  else
+  {
+    const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
+    cla->members.push_back(the_typedef);
+  }
+
+  m_state.enter<FrameType::Typedef>(the_typedef);
+  m_lastblock_entity = the_typedef;
+}
+
+void ProgramParser::endtypedef()
+{
+  if (!currentFrame().node->is<cxx::Typedef>())
+    throw BadCall{ "ProgramParser::endtypedef()", "\\endtypedef but no \\typedef" };
 
   exitFrame();
   m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -399,12 +453,13 @@ void ProgramParser::beginBlock()
 
 void ProgramParser::endBlock()
 {
-  auto is_func_or_enum = [](const std::shared_ptr<cxx::Node>& node) -> bool{
+  auto is_terminal_node = [](const std::shared_ptr<cxx::Node>& node) -> bool{
     return node->node_kind() == cxx::NodeKind::Enum || node->node_kind() == cxx::NodeKind::Function
-      || node->node_kind() == cxx::NodeKind::Variable;
+      || node->node_kind() == cxx::NodeKind::Variable
+      || node->node_kind() == cxx::NodeKind::Typedef;
   };
 
-  while (is_func_or_enum(m_state.current().node))
+  while (is_terminal_node(m_state.current().node))
   {
     exitFrame();
   }

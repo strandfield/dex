@@ -121,6 +121,10 @@
   }%
 }
 
+\def\typedef{%
+  \p@rseline\c@ll\@typedef
+}
+
 \def\brief{%
   \p@rseline\c@ll\@brief
 }

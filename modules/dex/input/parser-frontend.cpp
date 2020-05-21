@@ -51,6 +51,8 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::ENDENUMVALUE, CS::ENDENUMVALUE},
     {Functions::VARIABLE, CS::VARIABLE},
     {Functions::ENDVARIABLE, CS::ENDVARIABLE},
+    {Functions::TYPEDEF, CS::TYPEDEF},
+    {Functions::ENDTYPEDEF, CS::ENDTYPEDEF},
     {Functions::BRIEF, CS::BRIEF},
     {Functions::SINCE, CS::SINCE},
     {Functions::PARAM, CS::PARAM},
@@ -166,6 +168,10 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_enumvalue(call);
     case CS::VARIABLE:
       return fn_variable(call);
+    case CS::TYPEDEF:
+      return typedef_(call);
+    case CS::ENDTYPEDEF:
+      return endtypedef();
     case CS::BRIEF:
       return fn_brief(call);
     case CS::SINCE:
@@ -298,6 +304,17 @@ void ParserFrontend::fn_variable(const FunctionCall& call)
 void ParserFrontend::cs_endvariable()
 {
   m_prog_parser->endvariable();
+}
+
+void ParserFrontend::typedef_(const FunctionCall& call)
+{
+  std::string decl = call.arg<std::string>(0);
+  m_prog_parser->typedef_(std::move(decl));
+}
+
+void ParserFrontend::endtypedef()
+{
+  m_prog_parser->endtypedef();
 }
 
 void ParserFrontend::fn_brief(const FunctionCall& call)
