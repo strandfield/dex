@@ -11,6 +11,7 @@
 #include <cxx/documentation.h>
 #include <cxx/enum.h>
 #include <cxx/function.h>
+#include <cxx/macro.h>
 #include <cxx/namespace.h>
 #include <cxx/program.h>
 #include <cxx/typedef.h>
@@ -51,6 +52,8 @@ static std::string to_string(cxx::NodeKind n)
     return "function";
   case cxx::NodeKind::FunctionParameter:
     return "function-parameter";
+  case cxx::NodeKind::Macro:
+    return "macro";
   case cxx::NodeKind::Namespace:
     return "namespace";
   case cxx::NodeKind::TemplateParameter:
@@ -338,6 +341,18 @@ void JsonExport::visit_typedef(const cxx::Typedef& t)
 {
   ModelVisitor::visit_typedef(t);
   object()["typedef"] = t.type.toString();
+}
+
+void JsonExport::visit_macro(const cxx::Macro& m)
+{
+  ModelVisitor::visit_macro(m);
+
+  json::Array params;
+
+  for (const std::string& p : m.parameters)
+    params.push(p);
+
+  object()["parameters"] = params;
 }
 
 void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)

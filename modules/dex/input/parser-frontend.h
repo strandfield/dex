@@ -54,6 +54,8 @@ public:
     ENDVARIABLE,
     TYPEDEF, 
     ENDTYPEDEF,
+    MACRO,
+    ENDMACRO,
     /* Metadata */
     BRIEF,
     SINCE,
@@ -115,6 +117,8 @@ protected:
   void cs_endvariable();
   void typedef_(const FunctionCall& call);
   void endtypedef();
+  void macro(const FunctionCall& call);
+  void endmacro();
 
   void fn_brief(const FunctionCall& call);
   void fn_since(const FunctionCall& call);

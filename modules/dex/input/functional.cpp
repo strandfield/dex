@@ -31,6 +31,8 @@ const std::string Functions::VARIABLE = "v@ri@ble";
 const std::string Functions::ENDVARIABLE = "endvariable";
 const std::string Functions::TYPEDEF = "@typedef";
 const std::string Functions::ENDTYPEDEF = "endtypedef";
+const std::string Functions::MACRO = "@macro";
+const std::string Functions::ENDMACRO = "endmacro";
 
 const std::string Functions::MANUAL = "@manual";
 const std::string Functions::PART = "@part";

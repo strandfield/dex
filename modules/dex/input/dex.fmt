@@ -125,6 +125,10 @@
   \p@rseline\c@ll\@typedef
 }
 
+\def\macro{%
+  \p@rseline\c@ll\@macro
+}
+
 \def\brief{%
   \p@rseline\c@ll\@brief
 }

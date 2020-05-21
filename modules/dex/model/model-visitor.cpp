@@ -9,6 +9,7 @@
 #include <cxx/class.h>
 #include <cxx/enum.h>
 #include <cxx/function.h>
+#include <cxx/macro.h>
 #include <cxx/namespace.h>
 #include <cxx/typedef.h>
 #include <cxx/variable.h>
@@ -153,6 +154,17 @@ void ModelVisitor::visit_program(const cxx::Program& prog)
     VisitorContext context{ &m_stack, "global_namespace" };
     visit_entity(*prog.globalNamespace());
   }
+
+  {
+    VisitorContext context{ &m_stack, "macros" };
+    
+    for (size_t i(0); i < prog.macros.size(); ++i)
+    {
+      VisitorContext inner_context{ &m_stack, i };
+
+      visit_entity(*prog.macros.at(i));
+    }
+  }
 }
 
 void ModelVisitor::visit_entity(const cxx::Entity& e)
@@ -167,6 +179,8 @@ void ModelVisitor::visit_entity(const cxx::Entity& e)
     visit_function(static_cast<const cxx::Function&>(e));
   else if (e.is<cxx::FunctionParameter>())
     visit_functionparameter(static_cast<const cxx::FunctionParameter&>(e));
+  else if (e.is<cxx::Macro>())
+    visit_macro(static_cast<const cxx::Macro&>(e));
   else if (e.is<cxx::Namespace>())
     visit_namespace(static_cast<const cxx::Namespace&>(e));
   else if (e.is<cxx::Typedef>())
@@ -262,6 +276,11 @@ void ModelVisitor::visit_variable(const cxx::Variable& /* v */)
 }
 
 void ModelVisitor::visit_typedef(const cxx::Typedef& /* t */)
+{
+
+}
+
+void ModelVisitor::visit_macro(const cxx::Macro& /* m */)
 {
 
 }

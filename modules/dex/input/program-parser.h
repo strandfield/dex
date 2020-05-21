@@ -12,6 +12,7 @@
 #include "dex/common/state.h"
 
 #include <cxx/namespace.h>
+#include <cxx/program.h>
 
 namespace dex
 {
@@ -19,7 +20,7 @@ namespace dex
 class DEX_INPUT_API ProgramParser
 {
 public:
-  explicit ProgramParser(std::shared_ptr<cxx::Namespace> global_namespace);
+  explicit ProgramParser(std::shared_ptr<cxx::Program> prog);
 
   enum class FrameType
   {
@@ -31,6 +32,7 @@ public:
     EnumValue,
     Variable,
     Typedef,
+    Macro,
   };
 
   struct Frame : state::Frame<FrameType>
@@ -79,6 +81,9 @@ public:
   void typedef_(std::string decl);
   void endtypedef();
 
+  void macro(std::string decl);
+  void endmacro();
+
   void brief(std::string brieftext);
   void since(std::string version);
 
@@ -91,6 +96,7 @@ protected:
 
 private:
   State m_state;
+  std::shared_ptr<cxx::Program> m_program;
   std::shared_ptr<cxx::Entity> m_lastblock_entity;
 };
 

@@ -1,5 +1,11 @@
 
 /*!
+ * \macro FOO_BAR(x)
+ * \brief expands to 5
+ */
+#define FOO_BAR(x) 5
+
+/*!
  * \namespace dex
  */
 namespace dex

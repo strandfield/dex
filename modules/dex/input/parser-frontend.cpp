@@ -23,7 +23,7 @@ ParserFrontend::ParserFrontend(ParserMachine& machine)
   : m_machine(machine),
     m_mode(Mode::Program)
 {
-  m_prog_parser.reset(new ProgramParser(machine.output()->getOrCreateProgram()->globalNamespace()));
+  m_prog_parser.reset(new ProgramParser(machine.output()->getOrCreateProgram()));
 }
 
 ParserFrontend::~ParserFrontend()
@@ -53,6 +53,8 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::ENDVARIABLE, CS::ENDVARIABLE},
     {Functions::TYPEDEF, CS::TYPEDEF},
     {Functions::ENDTYPEDEF, CS::ENDTYPEDEF},
+    {Functions::MACRO, CS::MACRO},
+    {Functions::ENDMACRO, CS::ENDMACRO},
     {Functions::BRIEF, CS::BRIEF},
     {Functions::SINCE, CS::SINCE},
     {Functions::PARAM, CS::PARAM},
@@ -172,6 +174,10 @@ void ParserFrontend::handle(const FunctionCall& call)
       return typedef_(call);
     case CS::ENDTYPEDEF:
       return endtypedef();
+    case CS::MACRO:
+      return macro(call);
+    case CS::ENDMACRO:
+      return endmacro();
     case CS::BRIEF:
       return fn_brief(call);
     case CS::SINCE:
@@ -316,6 +322,18 @@ void ParserFrontend::endtypedef()
 {
   m_prog_parser->endtypedef();
 }
+
+void ParserFrontend::macro(const FunctionCall& call)
+{
+  std::string decl = call.arg<std::string>(0);
+  m_prog_parser->macro(std::move(decl));
+}
+
+void ParserFrontend::endmacro()
+{
+  m_prog_parser->endmacro();
+}
+
 
 void ParserFrontend::fn_brief(const FunctionCall& call)
 {

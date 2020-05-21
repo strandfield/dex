@@ -12,6 +12,7 @@
 #include "dex/model/function-documentation.h"
 #include "dex/model/namespace-documentation.h"
 #include "dex/model/typedef-documentation.h"
+#include "dex/model/macro-documentation.h"
 #include "dex/model/variable-documentation.h"
 
 #include "dex/common/logging.h"
@@ -73,10 +74,11 @@ ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
   writer = std::make_shared<DocumentWriter>();
 }
 
-ProgramParser::ProgramParser(std::shared_ptr<cxx::Namespace> global_namespace)
+ProgramParser::ProgramParser(std::shared_ptr<cxx::Program> prog)
+  : m_program(prog)
 {
   m_state.enter<FrameType::Idle>();
-  m_state.current().node = global_namespace;
+  m_state.current().node = prog->globalNamespace();
 }
 
 ProgramParser::State& ProgramParser::state()
@@ -387,6 +389,46 @@ void ProgramParser::endtypedef()
   m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
 }
 
+void ProgramParser::macro(std::string decl)
+{
+  if (!currentFrame().node->is<cxx::Namespace>())
+    throw BadCall{ "ProgramParser::typedef()", "\\macro must be inside \\namespace" };
+
+  auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+
+  while (decl.back() == ' ')
+    decl.pop_back();
+
+  std::shared_ptr<cxx::Macro> the_macro = [&]() {
+    try
+    {
+      return cxx::parsers::RestrictedParser::parseMacro(decl);
+    }
+    catch (...)
+    {
+      LOG_INFO << "could not parse macro declaration '" << decl << "'";
+      // failing to parse a macro means its very likely the input is malformed
+      throw ParserException{"bad syntax for \\macro"};
+    }
+  }();
+
+  the_macro->documentation = std::make_shared<MacroDocumentation>();
+
+  m_program->macros.push_back(the_macro);
+
+  m_state.enter<FrameType::Macro>(the_macro);
+  m_lastblock_entity = the_macro;
+}
+
+void ProgramParser::endmacro()
+{
+  if (!currentFrame().node->is<cxx::Macro>())
+    throw BadCall{ "ProgramParser::macro()", "\\endmacro but no \\macro" };
+
+  exitFrame();
+  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+}
+
 void ProgramParser::brief(std::string brieftext)
 {
   auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
@@ -456,7 +498,8 @@ void ProgramParser::endBlock()
   auto is_terminal_node = [](const std::shared_ptr<cxx::Node>& node) -> bool{
     return node->node_kind() == cxx::NodeKind::Enum || node->node_kind() == cxx::NodeKind::Function
       || node->node_kind() == cxx::NodeKind::Variable
-      || node->node_kind() == cxx::NodeKind::Typedef;
+      || node->node_kind() == cxx::NodeKind::Typedef
+      || node->node_kind() == cxx::NodeKind::Macro;
   };
 
   while (is_terminal_node(m_state.current().node))

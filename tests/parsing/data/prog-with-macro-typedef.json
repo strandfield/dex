@@ -20,6 +20,14 @@
         }],
       "name": "",
       "type": "namespace"
-    }
+    },
+    "macros": [{
+        "documentation": {
+          "brief": "expands to 5"
+        },
+        "name": "FOO_BAR",
+        "parameters": ["x"],
+        "type": "macro"
+      }]
   }
 }

@@ -24,6 +24,7 @@ class Enum;
 class EnumValue;
 class Function;
 class FunctionParameter;
+class Macro;
 class Namespace;
 class Program;
 class Typedef;
@@ -64,6 +65,7 @@ protected:
   virtual void visit_functionparameter(const cxx::FunctionParameter& fp);
   virtual void visit_variable(const cxx::Variable& v);
   virtual void visit_typedef(const cxx::Typedef& t);
+  virtual void visit_macro(const cxx::Macro& m);
 
   virtual void visit_entitydocumentation(const EntityDocumentation& edoc);
 
