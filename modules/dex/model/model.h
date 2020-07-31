@@ -12,8 +12,7 @@
 #include "dex/model/variable-documentation.h"
 
 #include "dex/model/manual.h"
-
-#include <cxx/program.h>
+#include "dex/model/program.h"
 
 #include <variant>
 
@@ -24,7 +23,7 @@ class DEX_MODEL_API Model
 {
 private:
   std::vector<std::shared_ptr<Manual>> m_manuals;
-  std::shared_ptr<cxx::Program> m_program;
+  std::shared_ptr<dex::Program> m_program;
 
 public:
   Model() = default;
@@ -34,9 +33,9 @@ public:
   std::vector<std::shared_ptr<Manual>>& manuals();
   const std::vector<std::shared_ptr<Manual>>& manuals() const;
 
-  std::shared_ptr<cxx::Program> program() const;
-  std::shared_ptr<cxx::Program> getOrCreateProgram();  
-  void setProgram(std::shared_ptr<cxx::Program> prog);
+  std::shared_ptr<dex::Program> program() const;
+  std::shared_ptr<dex::Program> getOrCreateProgram();  
+  void setProgram(std::shared_ptr<dex::Program> prog);
 
   struct DEX_MODEL_API PathElement
   {
@@ -69,20 +68,20 @@ inline const std::vector<std::shared_ptr<Manual>>& Model::manuals() const
   return m_manuals;
 }
 
-inline std::shared_ptr<cxx::Program> Model::program() const
+inline std::shared_ptr<dex::Program> Model::program() const
 {
   return m_program;
 }
 
-inline std::shared_ptr<cxx::Program> Model::getOrCreateProgram()
+inline std::shared_ptr<dex::Program> Model::getOrCreateProgram()
 {
   if (!m_program)
-    m_program = std::make_shared<cxx::Program>();
+    m_program = std::make_shared<dex::Program>();
 
   return m_program;
 }
 
-inline void Model::setProgram(std::shared_ptr<cxx::Program> prog)
+inline void Model::setProgram(std::shared_ptr<dex::Program> prog)
 {
   m_program = prog;
 }
