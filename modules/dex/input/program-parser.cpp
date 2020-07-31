@@ -21,6 +21,7 @@
 #include <cxx/documentation.h>
 #include <cxx/enum.h>
 #include <cxx/function.h>
+#include <cxx/name.h>
 #include <cxx/namespace.h>
 #include <cxx/variable.h>
 
@@ -74,7 +75,7 @@ ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
   writer = std::make_shared<DocumentWriter>();
 }
 
-ProgramParser::ProgramParser(std::shared_ptr<cxx::Program> prog)
+ProgramParser::ProgramParser(std::shared_ptr<dex::Program> prog)
   : m_program(prog)
 {
   m_state.enter<FrameType::Idle>();
@@ -108,17 +109,7 @@ void ProgramParser::class_(std::string name)
     the_class->documentation = std::make_shared<ClassDocumentation>();
     // TODO: set source location
 
-    if (currentFrame().node->is<cxx::Class>())
-    {
-      auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
-      cla->members.push_back(the_class);
-    }
-    else
-    {
-      assert(currentFrame().node->is<cxx::Namespace>());
-      auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-      ns->entities.push_back(the_class);
-    }
+    currentFrame().node->appendChild(the_class);
   }
 
   m_state.enter<FrameType::Class>(the_class);
@@ -164,17 +155,7 @@ void ProgramParser::fn(std::string signature)
   the_fn->documentation = std::make_shared<FunctionDocumentation>();
   // TODO: set source location
 
-  if (currentFrame().node->is<cxx::Class>())
-  {
-    auto cla = std::static_pointer_cast<cxx::Class>(currentFrame().node);
-    cla->members.push_back(the_fn);
-  }
-  else if (currentFrame().node->is<cxx::Namespace>())
-  {
-    assert(currentFrame().node->is<cxx::Namespace>());
-    auto ns = std::static_pointer_cast<cxx::Namespace>(currentFrame().node);
-    ns->entities.push_back(the_fn);
-  }
+  currentFrame().node->appendChild(the_fn);
 
   m_state.enter<FrameType::Function>(the_fn);
 }
@@ -202,7 +183,7 @@ void ProgramParser::namespace_(std::string name)
     the_namespace->documentation = std::make_shared<NamespaceDocumentation>();
     // TODO: set source location
 
-    parent_ns->entities.push_back(the_namespace);
+    parent_ns->appendChild(the_namespace);
   }
 
   m_state.enter<FrameType::Namespace>(the_namespace);
@@ -473,6 +454,42 @@ void ProgramParser::returns(std::string des)
   auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
   auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation);
   doc->returnValue() = std::move(des);
+}
+
+void ProgramParser::nonmember()
+{
+  Frame& f = currentFrame();
+
+  if (f.type != FrameType::Function)
+    throw BadCall{ "ProgramParser::nonmember()", "\\nonmember must be inside \\fn" };
+
+  auto func = std::static_pointer_cast<cxx::Function>(currentFrame().node);
+
+  if(!func->parent()->is<cxx::Class>())
+    throw BadCall{ "ProgramParser::nonmember()", "\\nonmember cannot be used for \\fn outside of \\class" };
+
+  auto the_class = std::static_pointer_cast<cxx::Class>(func->parent());
+
+  m_program->related.relates(func, the_class);
+}
+
+void ProgramParser::relates(const std::string& class_name)
+{
+  Frame& f = currentFrame();
+
+  if (f.type != FrameType::Function)
+    throw BadCall{ "ProgramParser::relates()", "\\relates must be inside \\fn" };
+
+  auto func = std::static_pointer_cast<cxx::Function>(currentFrame().node);
+
+  std::shared_ptr<cxx::Entity> parent = func->parent();
+
+  auto the_class = m_program->resolve(cxx::Name::fromSimpleIdentifier(class_name), parent);
+
+  if(!the_class || !the_class->is<cxx::Class>())
+    throw BadCall{ "ProgramParser::relates()", "\\relates must specifiy a known class name" };
+
+  m_program->related.relates(func, std::static_pointer_cast<cxx::Class>(the_class));
 }
 
 void ProgramParser::beginFile()

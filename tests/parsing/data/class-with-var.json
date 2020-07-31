@@ -21,6 +21,21 @@
               "name": "y",
               "type": "variable",
               "vartype": "int"
+            }, {
+              "accessibility": "public",
+              "documentation": {
+                "brief": "compares two points for equality"
+              },
+              "name": "operator==",
+              "parameters": [{
+                  "name": "lhs",
+                  "type": "const Point&"
+                }, {
+                  "name": "rhs",
+                  "type": "const Point&"
+                }],
+              "return_type": "bool",
+              "type": "function"
             }],
           "name": "Point",
           "type": "class"

@@ -9,10 +9,11 @@
 
 #include "dex/input/document-writer.h"
 
+#include "dex/model/program.h"
+
 #include "dex/common/state.h"
 
 #include <cxx/namespace.h>
-#include <cxx/program.h>
 
 namespace dex
 {
@@ -20,7 +21,7 @@ namespace dex
 class DEX_INPUT_API ProgramParser
 {
 public:
-  explicit ProgramParser(std::shared_ptr<cxx::Program> prog);
+  explicit ProgramParser(std::shared_ptr<dex::Program> prog);
 
   enum class FrameType
   {
@@ -90,13 +91,16 @@ public:
   void param(std::string des);
   void returns(std::string des);
 
+  void nonmember();
+  void relates(const std::string& class_name);
+
 protected:
   Frame& currentFrame();
   void exitFrame();
 
 private:
   State m_state;
-  std::shared_ptr<cxx::Program> m_program;
+  std::shared_ptr<dex::Program> m_program;
   std::shared_ptr<cxx::Entity> m_lastblock_entity;
 };
 

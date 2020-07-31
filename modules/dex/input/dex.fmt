@@ -141,6 +141,10 @@
   \p@rseline\c@ll\@returns
 }
 
+\def\relates{%
+  \p@rseline\c@ll\@relates
+}
+
 \def\since{%
   \@ifnextchar[{%
     \def\@fteroptions{%

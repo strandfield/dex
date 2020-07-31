@@ -81,6 +81,8 @@ struct DEX_INPUT_API Functions
   static const std::string ENDTYPEDEF;
   static const std::string MACRO;
   static const std::string ENDMACRO;
+  static const std::string NONMEMBER;
+  static const std::string RELATES;
 
   static const std::string MANUAL;
   static const std::string PART;
