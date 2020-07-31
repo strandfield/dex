@@ -26,7 +26,6 @@ class Function;
 class FunctionParameter;
 class Macro;
 class Namespace;
-class Program;
 class Typedef;
 class Variable;
 } // namespace cxx
@@ -35,6 +34,7 @@ namespace dex
 {
 
 class DisplayMath;
+class Program;
 
 class DEX_MODEL_API ModelVisitor
 {
@@ -55,7 +55,7 @@ protected:
   virtual void visit_domparagraph(const dom::Paragraph& par);
   virtual void visit_displaymath(const dex::DisplayMath& math);
 
-  virtual void visit_program(const cxx::Program& prog);
+  virtual void visit_program(const dex::Program& prog);
   virtual void visit_entity(const cxx::Entity& e);
   virtual void visit_namespace(const cxx::Namespace& ns);
   virtual void visit_class(const cxx::Class& cla);

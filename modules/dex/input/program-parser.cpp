@@ -470,6 +470,10 @@ void ProgramParser::nonmember()
 
   auto the_class = std::static_pointer_cast<cxx::Class>(func->parent());
 
+  // perform the re-parenting
+  the_class->members.pop_back();
+  the_class->parent()->appendChild(func);
+
   m_program->related.relates(func, the_class);
 }
 

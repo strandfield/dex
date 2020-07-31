@@ -10,12 +10,12 @@ namespace dex
 namespace examples
 {
 
-std::shared_ptr<cxx::Program> prog_with_class();
+std::shared_ptr<dex::Program> prog_with_class();
 std::shared_ptr<dex::Model> prog_with_class_image_description();
 std::shared_ptr<dex::Model> prog_with_class_list_description();
-std::shared_ptr<cxx::Program> prog_with_fun();
-std::shared_ptr<cxx::Program> prog_with_var();
-std::shared_ptr<cxx::Program> prog_with_class_and_fun();
+std::shared_ptr<dex::Program> prog_with_fun();
+std::shared_ptr<dex::Program> prog_with_var();
+std::shared_ptr<dex::Program> prog_with_class_and_fun();
 std::shared_ptr<dex::Model> manual();
 
 } // namespace examples

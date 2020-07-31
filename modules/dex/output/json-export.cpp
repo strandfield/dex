@@ -220,10 +220,37 @@ void JsonExport::visit_displaymath(const dex::DisplayMath& math)
   ModelVisitor::visit_displaymath(math);
 }
 
+static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)
+{
+  json::Array result;
 
-void JsonExport::visit_program(const cxx::Program& prog)
+  for (const auto& e : rnm.class_map)
+  {
+    json::Object json_entry{};
+    json_entry["class"] = Model::to_string(model.path(e.second->the_class));
+
+    json::Array json_functions;
+
+    for (auto f : e.second->non_members)
+    {
+      json_functions.push(Model::to_string(model.path(f)));
+    }
+
+    json_entry["functions"] = json_functions;
+
+    result.push(json_entry);
+  }
+
+  return result;
+}
+
+void JsonExport::visit_program(const dex::Program& prog)
 {
   RAIIJsonExportContext context{ &m_json_stack, path().back() };
+
+  if (!prog.related.empty())
+    object()["related"] = ::dex::serialize(model(), prog.related);
+
   ModelVisitor::visit_program(prog);
 }
 

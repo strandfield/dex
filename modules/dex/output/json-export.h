@@ -44,7 +44,7 @@ protected:
   void visit_domparagraph(const dom::Paragraph& par) override;
   void visit_displaymath(const dex::DisplayMath& math) override;
 
-  void visit_program(const cxx::Program& prog) override;
+  void visit_program(const dex::Program& prog) override;
   void visit_entity(const cxx::Entity& e) override;
   void visit_namespace(const cxx::Namespace& ns) override;
   void visit_class(const cxx::Class& cla) override;

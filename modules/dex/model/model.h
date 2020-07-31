@@ -50,7 +50,9 @@ public:
 
   typedef std::variant<std::shared_ptr<cxx::Program>, std::shared_ptr<cxx::Entity>, std::shared_ptr<cxx::Documentation>, std::shared_ptr<dom::Node>> Node;
 
+  static std::string to_string(const Path& p);
   Node get(const Path& path) const;
+  Path path(const std::shared_ptr<cxx::Entity>& e) const;
 };
 
 } // namespace dex

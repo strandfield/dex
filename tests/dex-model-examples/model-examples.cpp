@@ -44,9 +44,9 @@ namespace examples
 {
 
 
-std::shared_ptr<cxx::Program> prog_with_class()
+std::shared_ptr<dex::Program> prog_with_class()
 {
-  auto prog = std::make_shared<cxx::Program>();
+  auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
   auto vector = std::make_shared<cxx::Class>("vector", global);
@@ -65,7 +65,7 @@ std::shared_ptr<dex::Model> prog_with_class_image_description()
 {
   auto model = std::make_shared<dex::Model>();
 
-  auto prog = std::make_shared<cxx::Program>();
+  auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
   auto vector = std::make_shared<cxx::Class>("vector", global);
@@ -85,7 +85,7 @@ std::shared_ptr<dex::Model> prog_with_class_list_description()
 {
   auto model = std::make_shared<dex::Model>();
 
-  auto prog = std::make_shared<cxx::Program>();
+  auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
   auto vector = std::make_shared<cxx::Class>("vector", global);
@@ -107,9 +107,9 @@ std::shared_ptr<dex::Model> prog_with_class_list_description()
   return model;
 }
 
-std::shared_ptr<cxx::Program> prog_with_fun()
+std::shared_ptr<dex::Program> prog_with_fun()
 {
-  auto prog = std::make_shared<cxx::Program>();
+  auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
   auto getenv = std::make_shared<cxx::Function>("getenv", global);
@@ -129,9 +129,9 @@ std::shared_ptr<cxx::Program> prog_with_fun()
   return prog;
 }
 
-std::shared_ptr<cxx::Program> prog_with_var()
+std::shared_ptr<dex::Program> prog_with_var()
 {
-  auto prog = std::make_shared<cxx::Program>();
+  auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
   auto variable = std::make_shared<cxx::Variable>(cxx::Type("double"), "pi", global);
@@ -145,9 +145,9 @@ std::shared_ptr<cxx::Program> prog_with_var()
   return prog;
 }
 
-std::shared_ptr<cxx::Program> prog_with_class_and_fun()
+std::shared_ptr<dex::Program> prog_with_class_and_fun()
 {
-  auto prog = std::make_shared<cxx::Program>();
+  auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
   auto complex = std::make_shared<cxx::Class>("complex", global);

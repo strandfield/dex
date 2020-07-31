@@ -7,6 +7,11 @@
 namespace dex
 {
 
+bool RelatedNonMembers::empty() const
+{
+  return class_map.empty();
+}
+
 void RelatedNonMembers::relates(const std::shared_ptr<cxx::Function>& f, const std::shared_ptr<cxx::Class>& c)
 {
   auto& entry = class_map[c];

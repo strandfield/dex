@@ -148,7 +148,7 @@ void ModelVisitor::visit_displaymath(const dex::DisplayMath& /* math */)
 
 }
 
-void ModelVisitor::visit_program(const cxx::Program& prog)
+void ModelVisitor::visit_program(const dex::Program& prog)
 {
   {
     VisitorContext context{ &m_stack, "global_namespace" };

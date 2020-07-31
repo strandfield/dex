@@ -142,6 +142,28 @@ bool Model::empty() const
   return m_program == nullptr && m_manuals.empty();
 }
 
+std::string Model::to_string(const Path& p)
+{
+  if (p.empty())
+    return "$";
+
+  std::string result = "$";
+
+  for (size_t i(0); i < p.size(); ++i)
+  {
+    if (p.at(i).index != std::numeric_limits<size_t>::max())
+    {
+      result += "." + p.at(i).name + "[" + std::to_string(p.at(i).index) + "]";
+    }
+    else
+    {
+      result += "." + p.at(i).name;
+    }
+  }
+
+  return result;
+}
+
 Model::Node Model::get(const Path& path) const
 {
   Model::Node result;
@@ -162,6 +184,47 @@ Model::Node Model::get(const Path& path) const
   {
     result = get_child_node(result, path.at(i));
   }
+
+  return result;
+}
+
+Model::Path Model::path(const std::shared_ptr<cxx::Entity>& e) const
+{
+  if (e == m_program->globalNamespace())
+    return { PathElement("program"), PathElement("global_namespace") };
+
+  Path result;
+
+  auto current_entity = e;
+  auto parent_entity = e->parent();
+
+  while (parent_entity != nullptr)
+  {
+    if (parent_entity->is<cxx::Class>())
+    {
+      const cxx::Class& parent_class = static_cast<const cxx::Class&>(*parent_entity);
+      auto it = std::find(parent_class.members.begin(), parent_class.members.end(), current_entity);
+      result.push_back(PathElement("members", std::distance(parent_class.members.begin(), it)));
+    }
+    else if (parent_entity->is<cxx::Namespace>())
+    {
+      const auto& parent_namespace = static_cast<const cxx::Namespace&>(*parent_entity);
+      auto it = std::find(parent_namespace.entities.begin(), parent_namespace.entities.end(), current_entity);
+      result.push_back(PathElement("entities", std::distance(parent_namespace.entities.begin(), it)));
+    }
+    else
+    {
+      throw std::runtime_error{ "Could not compute entitiy's path" };
+    }
+
+    current_entity = parent_entity;
+    parent_entity = current_entity->parent();
+  }
+
+  result.push_back(PathElement("global_namespace"));
+  result.push_back(PathElement("program"));
+
+  std::reverse(result.begin(), result.end());
 
   return result;
 }

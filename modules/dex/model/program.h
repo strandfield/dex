@@ -35,6 +35,8 @@ public:
   std::unordered_map<std::shared_ptr<cxx::Class>, std::shared_ptr<Entry>> class_map;
   std::unordered_map<std::shared_ptr<cxx::Function>, std::shared_ptr<Entry>> functions_map;
 
+  bool empty() const;
+
   void relates(const std::shared_ptr<cxx::Function>& f, const std::shared_ptr<cxx::Class>& c);
 
   std::shared_ptr<Entry> getRelated(const std::shared_ptr<cxx::Class>& c) const;
