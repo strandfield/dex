@@ -112,17 +112,18 @@ struct RAIIJsonExportContext
   }
 };
 
+JsonExport::JsonExport(const Model& model)
+{
+  m_json_stack.push_back(result);
+}
+
 json::Object JsonExport::serialize(const Model& model)
 {
-  json::Object result{};
-
-  JsonExport jexport;
-
-  jexport.m_json_stack.push_back(result);
+  JsonExport jexport{ model };
 
   jexport.visit(model);
 
-  return result;
+  return jexport.result;
 }
 
 json::Object& JsonExport::object()
@@ -262,6 +263,8 @@ void JsonExport::visit_entity(const cxx::Entity& e)
   object()["type"] = to_string(e.kind());
 
   write_location(object(), e.location);
+
+  mapping.bind(e, object());
 
   ModelVisitor::visit_entity(e);
 }

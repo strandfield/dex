@@ -7,6 +7,7 @@
 
 #include "dex/dex-output.h"
 
+#include "dex/output/json-export.h"
 #include "dex/output/liquid-exporter-profile.h"
 
 #include "dex/model/model.h"
@@ -110,6 +111,7 @@ protected:
   static json::Array filter_by_field(const json::Array& list, const std::string& field, const std::string& value);
   static json::Array filter_by_type(const json::Array& list, const std::string& type);
   static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
+  json::Array related_non_members(const json::Object& json_class);
 
 protected:
 
@@ -121,6 +123,7 @@ private:
   QDir m_output_dir;
   std::shared_ptr<Model> m_model;
   json::Object m_serialized_model;
+  JsonExportMapping m_model_mapping;
   Profile m_profile;
   json::Object m_user_variables;
 };

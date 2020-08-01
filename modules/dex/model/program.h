@@ -16,6 +16,7 @@
 namespace dex
 {
 
+// @TODO: could we add these informations to ClassDocumentation and FunctionDocumentation instead ?
 class DEX_MODEL_API RelatedNonMembers
 {
 public:

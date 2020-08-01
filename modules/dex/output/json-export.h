@@ -14,6 +14,8 @@
 
 #include <json-toolkit/json.h>
 
+#include <unordered_map>
+
 namespace dom
 {
 class Image;
@@ -29,9 +31,35 @@ class SourceLocation;
 namespace dex
 {
 
+struct DEX_OUTPUT_API JsonExportMapping
+{
+  std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const cxx::Entity>> backward;
+  std::unordered_map<const cxx::Entity*, json::Json> forward;
+
+  json::Json get(const cxx::Entity& n) const
+  {
+    return forward.at(&n);
+  }
+
+  std::shared_ptr<const cxx::Entity> get(const json::Json& obj) const
+  {
+    return backward.at(obj.impl());
+  }
+
+  void bind(const cxx::Entity& e, const json::Json& o)
+  {
+    backward[o.impl()] = e.shared_from_this();
+    forward[&e] = o;
+  }
+};
+
 class DEX_OUTPUT_API JsonExport : public ModelVisitor
 {
 public:
+  JsonExport(const Model& model);
+
+  json::Object result;
+  JsonExportMapping mapping;
 
   static json::Object serialize(const Model& model);
 
