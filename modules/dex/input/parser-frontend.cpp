@@ -59,6 +59,8 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::SINCE, CS::SINCE},
     {Functions::PARAM, CS::PARAM},
     {Functions::RETURNS, CS::RETURNS},
+    {Functions::NONMEMBER, CS::NONMEMBER},
+    {Functions::RELATES, CS::RELATES},
     /* Manual */
     {Functions::MANUAL, CS::manual},
     {Functions::PART, CS::part},
@@ -186,6 +188,10 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_param(call);
     case CS::RETURNS:
       return fn_returns(call);
+    case CS::NONMEMBER:
+      return cs_nonmember();
+    case CS::RELATES:
+      return fn_relates(call);
       /* Manual*/
     case CS::manual:
       return fn_manual(call);
@@ -368,6 +374,17 @@ void ParserFrontend::fn_returns(const FunctionCall& call)
 {
   std::string des = call.arg<std::string>(0);
   m_prog_parser->returns(des);
+}
+
+void ParserFrontend::cs_nonmember()
+{
+  m_prog_parser->nonmember();
+}
+
+void ParserFrontend::fn_relates(const FunctionCall& call)
+{
+  const std::string& class_name = call.arg<std::string>(0);
+  m_prog_parser->relates(class_name);
 }
 
 void ParserFrontend::fn_manual(const FunctionCall& call)

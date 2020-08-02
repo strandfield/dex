@@ -24,9 +24,27 @@
             }],
           "name": "Point",
           "type": "class"
+        }, {
+          "documentation": {
+            "brief": "compares two points for equality"
+          },
+          "name": "operator==",
+          "parameters": [{
+              "name": "lhs",
+              "type": "const Point&"
+            }, {
+              "name": "rhs",
+              "type": "const Point&"
+            }],
+          "return_type": "bool",
+          "type": "function"
         }],
       "name": "",
       "type": "namespace"
-    }
+    },
+    "related": [{
+        "class": "$.program.global_namespace.entities[0]",
+        "functions": ["$.program.global_namespace.entities[1]"]
+      }]
   }
 }

@@ -5,7 +5,6 @@
 #include "dex/output/liquid-exporter.h"
 
 #include "dex/output/json-output-annotator.h"
-#include "dex/output/json-export.h"
 
 #include "dex/common/errors.h"
 #include "dex/common/json-utils.h"
@@ -151,7 +150,11 @@ void LiquidExporter::setModel(std::shared_ptr<Model> model)
 {
   m_model = model;
   
-  m_serialized_model = JsonExport::serialize(*model).toObject();
+  JsonExport json_export{ *m_model };
+  json_export.visit(*m_model);
+
+  m_serialized_model = json_export.result;
+  m_model_mapping = std::move(json_export.mapping);
 
   JsonPathAnnotator path_annotator;
   path_annotator.annotate(m_serialized_model);
@@ -367,6 +370,10 @@ json::Json LiquidExporter::applyFilter(const std::string& name, const json::Json
   {
     return filter_by_field(array_arg(object), args.front().toString(), args.back().toString());
   }
+  else if (name == "related_non_members")
+  {
+    return related_non_members(object.toObject());
+  }
 
   return liquid::Renderer::applyFilter(name, object, args);
 }
@@ -394,6 +401,46 @@ json::Array LiquidExporter::filter_by_accessibility(const json::Array& list, con
 {
   static const std::string field = "accessibility";
   return filter_by_field(list, field, as);
+}
+
+json::Array LiquidExporter::related_non_members(const json::Object& json_class)
+{
+  auto path_it = json_class.data().find("_path");
+
+  if (path_it == json_class.data().end())
+  {
+    assert(("element has no path", false));
+    return {};
+  }
+
+  std::vector<std::variant<size_t, std::string>> json_path = JsonPathAnnotator::parse(path_it->second.toString());
+  Model::Path model_path = convertToModelPath(json_path);
+  Model::Node model_node = model()->get(model_path);
+
+  if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(model_node))
+  {
+    return {};
+  }
+
+  auto the_class = std::dynamic_pointer_cast<cxx::Class>(std::get<std::shared_ptr<cxx::Entity>>(model_node));
+
+  if (the_class == nullptr)
+    return {};
+
+  std::shared_ptr<RelatedNonMembers::Entry> entry = m_model->program()->related.getRelated(the_class);
+
+  json::Array result;
+
+  if (entry == nullptr)
+    return result;
+
+  for (auto f : entry->non_members)
+  {
+    json::Json f_json = m_model_mapping.get(*f);
+    result.push(f_json);
+  }
+
+  return result;
 }
 
 } // namespace dex

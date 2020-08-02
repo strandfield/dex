@@ -27,3 +27,13 @@ struct Point
   int x;
   int y;
 };
+
+/*!
+ * \fn bool operator==(const Point& lhs, const Point& rhs)
+ * \nonmember
+ * \brief compares two points for equality
+ */
+inline bool operator==(const Point& lhs, const Point& rhs)
+{
+  return lhs.x == rhs.y && lhs.y == rhs.y;
+}

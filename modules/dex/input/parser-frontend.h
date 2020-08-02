@@ -56,6 +56,8 @@ public:
     ENDTYPEDEF,
     MACRO,
     ENDMACRO,
+    NONMEMBER,
+    RELATES,
     /* Metadata */
     BRIEF,
     SINCE,
@@ -124,6 +126,8 @@ protected:
   void fn_since(const FunctionCall& call);
   void fn_param(const FunctionCall& call);
   void fn_returns(const FunctionCall& call);
+  void cs_nonmember();
+  void fn_relates(const FunctionCall& call);
 
   void fn_manual(const FunctionCall& call);
   void fn_part(const FunctionCall& call);
