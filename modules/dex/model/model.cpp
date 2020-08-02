@@ -164,6 +164,48 @@ std::string Model::to_string(const Path& p)
   return result;
 }
 
+inline static std::string next_token(const std::string& path, size_t index)
+{
+  auto is_delim = [](char c) { return c == '.' || c == '[' || c == ']';  };
+
+  const size_t start = index;
+
+  while (index < path.size() && !is_delim(path.at(index))) ++index;
+
+  return std::string(path.begin() + start, path.begin() + index);
+}
+
+
+Model::Path Model::parse_path(const std::string& path)
+{
+  assert(!path.empty());
+
+  Model::Path result;
+
+  if (path == "$")
+    return result;
+
+  size_t index = 2;
+  auto is_num = [](char c) { return c >= '0' && c <= '9'; };
+
+  do
+  {
+    std::string token = next_token(path, index);
+
+    index += token.size() + 1;
+
+    if (!token.empty())
+    {
+      if (!is_num(token.front()))
+        result.push_back(std::move(token));
+      else
+        result.back().index = static_cast<size_t>(std::stoi(token));
+    }
+  } while (index < path.size());
+
+  return result;
+}
+
 Model::Node Model::get(const Path& path) const
 {
   Model::Node result;

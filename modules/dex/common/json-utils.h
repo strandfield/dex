@@ -23,8 +23,6 @@ class DEX_COMMON_API JsonPathAnnotator
 {
 public:
 
-  static std::vector<std::variant<size_t, std::string>> parse(const std::string& path);
-
   void annotate(json::Object& obj);
 
 protected:

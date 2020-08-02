@@ -173,9 +173,8 @@ std::string LiquidExporter::stringify(const json::Json& val)
 
   if (path_it != obj.data().end())
   {
-    std::vector<std::variant<size_t, std::string>> json_path = JsonPathAnnotator::parse(path_it->second.toString());
-    Model::Path model_path = convertToModelPath(json_path);
-    Model::Node model_node = model()->get(model_path);
+    Model::Path path = Model::parse_path(path_it->second.toString());
+    Model::Node model_node = model()->get(path);
 
     if (std::holds_alternative<std::shared_ptr<dom::Node>>(model_node))
     {
@@ -413,9 +412,8 @@ json::Array LiquidExporter::related_non_members(const json::Object& json_class)
     return {};
   }
 
-  std::vector<std::variant<size_t, std::string>> json_path = JsonPathAnnotator::parse(path_it->second.toString());
-  Model::Path model_path = convertToModelPath(json_path);
-  Model::Node model_node = model()->get(model_path);
+  Model::Path path = Model::parse_path(path_it->second.toString());
+  Model::Node model_node = model()->get(path);
 
   if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(model_node))
   {
