@@ -65,6 +65,9 @@ public:
 
 protected:
 
+  void beginVisitArray(const char* name) override;
+  void endVisitArray() override;
+
   void visit_domnode(const dom::Node& n) override;
   void visit_domimage(const dom::Image& img) override;
   void visit_domlist(const dom::List& l) override;
@@ -96,7 +99,13 @@ protected:
   json::Object& object();
 
 private:
-  std::vector<json::Object> m_json_stack;
+  friend class RAIIJsonExportContext;
+  struct JsonStacks
+  {
+    std::vector<json::Object> objects;
+    std::vector<json::Array> arrays;
+  };
+  JsonStacks m_json_stacks;
 };
 
 } // namespace dex

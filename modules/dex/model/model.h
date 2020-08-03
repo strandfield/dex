@@ -14,6 +14,7 @@
 #include "dex/model/manual.h"
 #include "dex/model/program.h"
 
+#include <string_view>
 #include <variant>
 
 namespace dex
@@ -39,11 +40,11 @@ public:
 
   struct DEX_MODEL_API PathElement
   {
-    std::string name;
+    std::string_view name;
     size_t index = std::numeric_limits<size_t>::max();
 
-    PathElement(std::string n);
-    PathElement(std::string n, size_t i);
+    PathElement(std::string_view n);
+    PathElement(std::string_view n, size_t i);
   };
 
   typedef std::vector<PathElement> Path;

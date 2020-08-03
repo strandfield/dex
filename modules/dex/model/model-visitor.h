@@ -45,9 +45,17 @@ public:
 protected:
   const Model& model() const;
   const std::vector<Model::PathElement>& stack() const;
-  Model::Path path() const;
+  const Model::Path& path() const;
 
 protected:
+
+  friend class ModelVisitorHelper;
+
+  virtual void beginVisitObject(const char* name);
+  virtual void endVisitObject();
+  virtual void beginVisitArray(const char* name);
+  virtual void endVisitArray();
+
   virtual void visit_domnode(const dom::Node& n);
   virtual void visit_domimage(const dom::Image& img);
   virtual void visit_domlist(const dom::List& l);

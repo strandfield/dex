@@ -20,6 +20,7 @@ void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
 
   if (!url.empty())
   {
+    // @TODO: get json object from the exporter JsonExportMapping map
     json::Object obj = JsonUrlAnnotator::get(path(), serialized_model).toObject();
     obj["url"] = url;
   }

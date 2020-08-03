@@ -43,12 +43,13 @@ inline json::Json JsonUrlAnnotator::get(const Model::Path& path, const json::Jso
 {
   auto result = val;
 
+  // @TODO: try to avoid potentially costly std::string conv
   for (const auto& p : path)
   {
     if (p.index != std::numeric_limits<size_t>::max())
-      result = result[p.name][static_cast<int>(p.index)];
+      result = result[std::string(p.name)][static_cast<int>(p.index)];
     else
-      result = result[p.name];
+      result = result[std::string(p.name)];
   }
 
   return result;

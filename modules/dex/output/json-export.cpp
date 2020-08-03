@@ -81,40 +81,35 @@ void write_if(json::Object& obj, const char* field, T&& val, bool cond)
 
 struct RAIIJsonExportContext
 {
-  std::vector<json::Object>* stack;
+  JsonExport::JsonStacks* stack;
 
-  RAIIJsonExportContext(std::vector<json::Object>* s, const Model::PathElement& pe)
-    : stack(s)
+  RAIIJsonExportContext(JsonExport* exporter, const Model::PathElement& pe)
+    : stack(&exporter->m_json_stacks)
   {
     if (pe.index == std::numeric_limits<size_t>::max())
     {
       json::Object obj{};
-      stack->back()[pe.name] = obj;
-      stack->push_back(obj);
+      std::map<std::string, json::Json>& fields = stack->objects.back().toObject().data();
+      fields[std::string(pe.name)] = obj;
+      stack->objects.push_back(obj);
     }
     else
     {
       json::Object obj{};
-
-      if (pe.index == 0)
-      {
-        stack->back()[pe.name] = json::Array();
-      }
-
-      stack->back()[pe.name].push(obj);
-      stack->push_back(obj);
+      stack->arrays.back().push(obj);
+      stack->objects.push_back(obj);
     }
   }
 
   ~RAIIJsonExportContext()
   {
-    stack->pop_back();
+    stack->objects.pop_back();
   }
 };
 
 JsonExport::JsonExport(const Model& model)
 {
-  m_json_stack.push_back(result);
+  m_json_stacks.objects.push_back(result);
 }
 
 json::Object JsonExport::serialize(const Model& model)
@@ -128,7 +123,7 @@ json::Object JsonExport::serialize(const Model& model)
 
 json::Object& JsonExport::object()
 {
-  return m_json_stack.back();
+  return m_json_stacks.objects.back();
 }
 
 static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
@@ -159,9 +154,21 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   return result;
 }
 
+void JsonExport::beginVisitArray(const char* name)
+{
+  json::Array list{};
+  m_json_stacks.arrays.push_back(list);
+  object()[name] = list;
+}
+
+void JsonExport::endVisitArray()
+{
+  m_json_stacks.arrays.pop_back();
+}
+
 void JsonExport::visit_domnode(const dom::Node& n)
 {
-  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+  RAIIJsonExportContext context{ this, path().back() };
 
   object()["type"] = n.type();
 
@@ -247,7 +254,7 @@ static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)
 
 void JsonExport::visit_program(const dex::Program& prog)
 {
-  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+  RAIIJsonExportContext context{ this, path().back() };
 
   if (!prog.related.empty())
     object()["related"] = ::dex::serialize(model(), prog.related);
@@ -257,7 +264,7 @@ void JsonExport::visit_program(const dex::Program& prog)
 
 void JsonExport::visit_entity(const cxx::Entity& e)
 {
-  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+  RAIIJsonExportContext context{ this, path().back() };
 
   object()["name"] = e.name;
   object()["type"] = to_string(e.kind());
@@ -387,7 +394,7 @@ void JsonExport::visit_macro(const cxx::Macro& m)
 
 void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
 {
-  RAIIJsonExportContext context{ &m_json_stack, path().back() };
+  RAIIJsonExportContext context{ this, path().back() };
 
   if (edoc.brief().has_value())
     object()["brief"] = edoc.brief().value();

@@ -41,6 +41,7 @@ public:
   {
     if (!exporter.profile().class_template.model.nodes().empty())
     {
+      // @TODO: get json object from exporter.m_model_mapping
       json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
       exporter.dump(cla, obj);
     }
