@@ -79,8 +79,9 @@ void write_if(json::Object& obj, const char* field, T&& val, bool cond)
     obj[field] = std::forward<T>(val);
 }
 
-struct RAIIJsonExportContext
+class RAIIJsonExportContext
 {
+public:
   JsonExport::JsonStacks* stack;
 
   RAIIJsonExportContext(JsonExport* exporter, const Model::PathElement& pe)

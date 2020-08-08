@@ -80,6 +80,9 @@ protected:
   void setModel(std::shared_ptr<Model> model);
   std::shared_ptr<Model> model() const;
   json::Object serializedModel() const;
+  const JsonExportMapping& modelMapping() const;
+
+  void annotateModel(const std::string& file_suffix);
 
 protected:
   friend class LiquidExporterModelVisitor;
@@ -146,6 +149,11 @@ inline std::shared_ptr<Model> LiquidExporter::model() const
 inline json::Object LiquidExporter::serializedModel() const
 {
   return m_serialized_model;
+}
+
+inline const JsonExportMapping& LiquidExporter::modelMapping() const
+{
+  return m_model_mapping;
 }
 
 } // namespace dex

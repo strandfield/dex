@@ -7,12 +7,17 @@
 namespace dex
 {
 
-void JsonUrlAnnotator::annotate(const Model& model, json::Object& obj)
+JsonUrlAnnotator::JsonUrlAnnotator(json::Object& js_model, const JsonExportMapping& mapping)
+  : serialized_model(js_model),
+    json_mapping(mapping)
 {
-  serialized_model = obj;
-  visit(model);
+
 }
 
+void JsonUrlAnnotator::annotate(const Model& model)
+{
+  visit(model);
+}
 
 void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
 {
@@ -20,8 +25,7 @@ void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
 
   if (!url.empty())
   {
-    // @TODO: get json object from the exporter JsonExportMapping map
-    json::Object obj = JsonUrlAnnotator::get(path(), serialized_model).toObject();
+    json::Object obj = json_mapping.get(e).toObject();
     obj["url"] = url;
   }
   
