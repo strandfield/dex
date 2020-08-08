@@ -23,28 +23,90 @@
 namespace dex
 {
 
-struct VisitorContext
+class ModelVisitorHelper
 {
-  std::vector<Model::PathElement>* stack;
+public:
+  ModelVisitor& visitor;
 
-  VisitorContext(std::vector<Model::PathElement>* s, size_t n)
-    : stack(s)
+public:
+  ModelVisitorHelper(ModelVisitor* v)
+    : visitor(*v)
   {
-    stack->back().index = n;
+
   }
 
-  VisitorContext(std::vector<Model::PathElement>* s, std::string name)
-    : stack(s)
+  std::vector<Model::PathElement>& stack()
   {
-    stack->push_back(std::move(name));
+    return visitor.m_stack;
   }
 
-  ~VisitorContext()
+  void beginVisitObject(const char* name)
   {
-    if (stack->back().index != std::numeric_limits<size_t>::max())
-      stack->back().index = std::numeric_limits<size_t>::max();
-    else
-      stack->pop_back();
+    visitor.beginVisitObject(name);
+  }
+
+  void endVisitObject()
+  {
+    visitor.endVisitObject();
+  }
+
+  void beginVisitArray(const char* name)
+  {
+    visitor.beginVisitArray(name);
+  }
+
+  void endVisitArray()
+  {
+    visitor.endVisitArray();
+  }
+};
+
+class RaiiObjectVisitor : public ModelVisitorHelper
+{
+public:
+  RaiiObjectVisitor(ModelVisitor* v, const char* name)
+    : ModelVisitorHelper(v)
+  {
+    stack().push_back(std::string_view(name));
+    beginVisitObject(name);
+  }
+
+  ~RaiiObjectVisitor()
+  {
+    endVisitObject();
+    stack().pop_back();
+  }
+};
+
+class RaiiArrayVisitor : public ModelVisitorHelper
+{
+public:
+  RaiiArrayVisitor(ModelVisitor* v, const char* name)
+    : ModelVisitorHelper(v)
+  {
+    stack().push_back(std::string_view(name));
+    beginVisitArray(name);
+  }
+
+  ~RaiiArrayVisitor()
+  {
+    endVisitArray();
+    stack().pop_back();
+  }
+};
+
+class RaiiArrayElementVisitor : public ModelVisitorHelper
+{
+public:
+  RaiiArrayElementVisitor(ModelVisitor* v, size_t n)
+    : ModelVisitorHelper(v)
+  {
+    stack().back().index = n;
+  }
+
+  ~RaiiArrayElementVisitor()
+  {
+    stack().back().index = std::numeric_limits<size_t>::max();
   }
 };
 
@@ -54,17 +116,18 @@ void ModelVisitor::visit(const Model& model)
 
   if (model.program())
   {
-    VisitorContext context{ &m_stack, "program" };
+    RaiiObjectVisitor state_updater{ this, "program" };
 
     visit_program(*model.program());
   }
 
   if (!model.manuals().empty())
   {
-    VisitorContext context{ &m_stack, "manuals" };
+    RaiiArrayVisitor state_updater{ this, "manuals" };
+
     for (size_t i(0); i < model.manuals().size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
       visit_domnode(*model.manuals().at(i));
     }
   }
@@ -80,9 +143,29 @@ const std::vector<Model::PathElement>& ModelVisitor::stack() const
   return m_stack;
 }
 
-Model::Path ModelVisitor::path() const
+const Model::Path& ModelVisitor::path() const
 {
   return m_stack;
+}
+
+void ModelVisitor::beginVisitObject(const char* name)
+{
+
+}
+
+void ModelVisitor::endVisitObject() 
+{
+
+}
+
+void ModelVisitor::beginVisitArray(const char* name)
+{
+
+}
+
+void ModelVisitor::endVisitArray()
+{
+
 }
 
 void ModelVisitor::visit_domnode(const dom::Node& n)
@@ -112,11 +195,11 @@ void ModelVisitor::visit_domlist(const dom::List& l)
 {
   if (!l.items.empty())
   {
-    VisitorContext context{ &m_stack, "items" };
+    RaiiArrayVisitor state_updater{ this, "items" };
 
     for (size_t i(0); i < l.items.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_domnode(*l.items.at(i));
     }
@@ -127,11 +210,11 @@ void ModelVisitor::visit_domlistitem(const dom::ListItem& li)
 {
   if (!li.content.empty())
   {
-    VisitorContext context{ &m_stack, "content" };
+    RaiiArrayVisitor state_updater{ this, "content" };
 
     for (size_t i(0); i < li.content.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_domnode(*li.content.at(i));
     }
@@ -151,16 +234,17 @@ void ModelVisitor::visit_displaymath(const dex::DisplayMath& /* math */)
 void ModelVisitor::visit_program(const dex::Program& prog)
 {
   {
-    VisitorContext context{ &m_stack, "global_namespace" };
+    RaiiObjectVisitor state_updater{ this, "global_namespace" };
     visit_entity(*prog.globalNamespace());
   }
 
+  if(!prog.macros.empty())
   {
-    VisitorContext context{ &m_stack, "macros" };
+    RaiiArrayVisitor state_updater{ this, "macros" };
     
     for (size_t i(0); i < prog.macros.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_entity(*prog.macros.at(i));
     }
@@ -194,7 +278,7 @@ void ModelVisitor::visit_entity(const cxx::Entity& e)
 
     if (edoc)
     {
-      VisitorContext context{ &m_stack, "documentation" };
+      RaiiObjectVisitor state_updater{ this, "documentation" };
       visit_entitydocumentation(*edoc);
     }
   }
@@ -204,11 +288,11 @@ void ModelVisitor::visit_namespace(const cxx::Namespace& ns)
 {
   if (!ns.entities.empty())
   {
-    VisitorContext context{ &m_stack, "entities" };
+    RaiiArrayVisitor state_updater{ this, "entities" };
 
     for (size_t i(0); i < ns.entities.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_entity(*ns.entities.at(i));
     }
@@ -219,11 +303,11 @@ void ModelVisitor::visit_class(const cxx::Class& cla)
 {
   if (!cla.members.empty())
   {
-    VisitorContext context{ &m_stack, "members" };
+    RaiiArrayVisitor state_updater{ this, "members" };
 
     for (size_t i(0); i < cla.members.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_entity(*cla.members.at(i));
     }
@@ -234,11 +318,11 @@ void ModelVisitor::visit_enum(const cxx::Enum& en)
 {
   if (!en.values.empty())
   {
-    VisitorContext context{ &m_stack, "values" };
+    RaiiArrayVisitor state_updater{ this, "values" };
 
     for (size_t i(0); i < en.values.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_entity(*en.values.at(i));
     }
@@ -254,11 +338,11 @@ void ModelVisitor::visit_function(const cxx::Function& f)
 {
   if (!f.parameters.empty())
   {
-    VisitorContext context{ &m_stack, "parameters" };
+    RaiiArrayVisitor state_updater{ this, "parameters" };
 
     for (size_t i(0); i < f.parameters.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_entity(*f.parameters.at(i));
     }
@@ -289,10 +373,10 @@ void ModelVisitor::visit_entitydocumentation(const EntityDocumentation& edoc)
 {
   if (!edoc.description().empty())
   {
-    VisitorContext context{ &m_stack, "description" };
+    RaiiArrayVisitor state_updater{ this, "description" };
     for (size_t i(0); i < edoc.description().size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_domnode(*edoc.description().at(i));
     }
@@ -303,10 +387,10 @@ void ModelVisitor::visit_manual(const dex::Manual& man)
 {
   if (!man.content.empty())
   {
-    VisitorContext context{ &m_stack, "content" };
+    RaiiArrayVisitor state_updater{ this, "content" };
     for (size_t i(0); i < man.content.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_domnode(*man.content.at(i));
     }
@@ -317,10 +401,10 @@ void ModelVisitor::visit_sectioning(const dex::Sectioning& section)
 {
   if (!section.content.empty())
   {
-    VisitorContext context{ &m_stack, "content" };
+    RaiiArrayVisitor state_updater{ this, "content" };
     for (size_t i(0); i < section.content.size(); ++i)
     {
-      VisitorContext inner_context{ &m_stack, i };
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
 
       visit_domnode(*section.content.at(i));
     }

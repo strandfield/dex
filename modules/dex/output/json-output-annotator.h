@@ -5,7 +5,7 @@
 #ifndef DEX_OUTPUT_JSON_OUTPUT_ANNOTATOR_H
 #define DEX_OUTPUT_JSON_OUTPUT_ANNOTATOR_H
 
-#include "dex/dex-output.h"
+#include "dex/output/json-mapping.h"
 
 #include "dex/model/model-visitor.h"
 
@@ -17,10 +17,13 @@ namespace dex
 class DEX_OUTPUT_API JsonUrlAnnotator : public ModelVisitor
 {
 private:
-  json::Object serialized_model;
+  json::Object& serialized_model;
+  const JsonExportMapping& json_mapping;
 
 public:
-  void annotate(const Model& model, json::Object& obj);
+  JsonUrlAnnotator(json::Object& js_model, const JsonExportMapping& mapping);
+
+  void annotate(const Model& model);
 
   static json::Json get(const Model::Path& path, const json::Json& val);
 
@@ -31,7 +34,6 @@ protected:
 private:
   virtual std::string get_url(const cxx::Entity& e) const = 0;
   virtual std::string get_url(const dex::Manual& man) const = 0;
-
 };
 
 } // namespace dex
@@ -43,12 +45,13 @@ inline json::Json JsonUrlAnnotator::get(const Model::Path& path, const json::Jso
 {
   auto result = val;
 
+  // @TODO: try to avoid potentially costly std::string conv
   for (const auto& p : path)
   {
     if (p.index != std::numeric_limits<size_t>::max())
-      result = result[p.name][static_cast<int>(p.index)];
+      result = result[std::string(p.name)][static_cast<int>(p.index)];
     else
-      result = result[p.name];
+      result = result[std::string(p.name)];
   }
 
   return result;

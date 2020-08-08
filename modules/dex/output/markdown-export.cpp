@@ -4,7 +4,6 @@
 
 #include "dex/output/markdown-export.h"
 
-#include "dex/output/liquid-exporter-url-annotator.h"
 #include "dex/output/paragraph-converter.h"
 
 #include "dex/model/display-math.h"
@@ -86,10 +85,7 @@ void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
   LiquidExporter::setOutputDir(dir);
   LiquidExporter::setModel(model);
 
-  json::Object json_export = LiquidExporter::serializedModel();
-
-  LiquidExporterUrlAnnotator url_annotator{ profile(), ".md" };
-  url_annotator.annotate(*model, json_export);
+  LiquidExporter::annotateModel(".md");
 
   LiquidExporter::render();
 }

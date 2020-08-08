@@ -7,6 +7,48 @@
 namespace dex
 {
 
+inline static std::string next_token(const std::string& path, size_t index)
+{
+  auto is_delim = [](char c) { return c == '.' || c == '[' || c == ']';  };
+
+  const size_t start = index;
+
+  while (index < path.size() && !is_delim(path.at(index))) ++index;
+
+  return std::string(path.begin() + start, path.begin() + index);
+}
+
+static std::vector<std::variant<size_t, std::string>> parse_path(const std::string& path)
+{
+  assert(!path.empty());
+
+  std::vector<std::variant<size_t, std::string>> result;
+
+  if (path == "$")
+    return result;
+
+  size_t index = 2;
+  auto is_num = [](char c) { return c >= '0' && c <= '9'; };
+
+  do
+  {
+    std::string token = next_token(path, index);
+
+    index += token.size() + 1;
+
+    if (!token.empty())
+    {
+      if (is_num(token.front()))
+        result.push_back(static_cast<size_t>(std::stoi(token)));
+      else
+        result.push_back(std::move(token));
+    }
+  } while (index < path.size());
+
+  return result;
+}
+
+
 inline void write_path(json::Json& obj, const std::vector<std::variant<size_t, std::string>>& path, const json::Json& val)
 {
   auto result = obj;
@@ -43,22 +85,11 @@ json::Object build_json(const SettingsMap& map)
   for (const auto& entry : map)
   {
     std::string key = "$." + entry.first;
-    std::vector<std::variant<size_t, std::string>> path = JsonPathAnnotator::parse(key);
+    std::vector<std::variant<size_t, std::string>> path = parse_path(key);
     write_path(result, path, make_json_value(entry.second));
   }
 
   return result;
-}
-
-inline static std::string next_token(const std::string& path, size_t index)
-{
-  auto is_delim = [](char c) { return c == '.' || c == '[' || c == ']';  };
-
-  const size_t start = index;
-
-  while (index < path.size() && !is_delim(path.at(index))) ++index;
-
-  return std::string(path.begin() + start, path.begin() + index);
 }
 
 struct RAIIJsonPathAnnotatorContext
@@ -82,36 +113,6 @@ struct RAIIJsonPathAnnotatorContext
     stack->pop_back();
   }
 };
-
-std::vector<std::variant<size_t, std::string>> JsonPathAnnotator::parse(const std::string& path)
-{
-  assert(!path.empty());
-
-  std::vector<std::variant<size_t, std::string>> result;
-
-  if (path == "$")
-    return result;
-
-  size_t index = 2;
-  auto is_num = [](char c) { return c >= '0' && c <= '9'; };
-
-  do
-  {
-    std::string token = next_token(path, index);
-
-    index += token.size() + 1;
-
-    if (!token.empty())
-    {
-      if (is_num(token.front()))
-        result.push_back(static_cast<size_t>(std::stoi(token)));
-      else
-        result.push_back(std::move(token));
-    }
-  } while (index < path.size());
-
-  return result;
-}
 
 void JsonPathAnnotator::annotate(json::Object& obj)
 {

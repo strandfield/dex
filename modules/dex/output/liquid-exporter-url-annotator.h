@@ -17,7 +17,7 @@ public:
   const LiquidExporterProfile& profile;
   std::string suffix;
 
-  LiquidExporterUrlAnnotator(const LiquidExporterProfile& pro, std::string file_extension);
+  LiquidExporterUrlAnnotator(json::Object& js_object, const JsonExportMapping& mapping, const LiquidExporterProfile& pro, std::string file_extension);
 
 protected:
   std::string get_url(const cxx::Entity& e) const override;

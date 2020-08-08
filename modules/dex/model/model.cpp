@@ -124,15 +124,15 @@ static Model::Node get_child_node(const Model::Node& node, const Model::PathElem
 }
 
 
-Model::PathElement::PathElement(std::string n)
-  : name(std::move(n))
+Model::PathElement::PathElement(std::string_view n)
+  : name(n)
 {
 
 }
 
-Model::PathElement::PathElement(std::string n, size_t i)
-  : name(std::move(n)),
-  index(i)
+Model::PathElement::PathElement(std::string_view n, size_t i)
+  : name(n),
+   index(i)
 {
 
 }
@@ -151,15 +151,65 @@ std::string Model::to_string(const Path& p)
 
   for (size_t i(0); i < p.size(); ++i)
   {
+    result += ".";
+    result.insert(result.end(), p.at(i).name.data(), p.at(i).name.data() + p.at(i).name.size());
+
     if (p.at(i).index != std::numeric_limits<size_t>::max())
     {
-      result += "." + p.at(i).name + "[" + std::to_string(p.at(i).index) + "]";
-    }
-    else
-    {
-      result += "." + p.at(i).name;
+      result += "[" + std::to_string(p.at(i).index) + "]";
     }
   }
+
+  return result;
+}
+
+inline static std::string_view next_token(const std::string& path, size_t index)
+{
+  auto is_delim = [](char c) { return c == '.' || c == '[' || c == ']';  };
+
+  const size_t start = index;
+
+  while (index < path.size() && !is_delim(path.at(index))) ++index;
+
+  return std::string_view(path.c_str() + start, index - start);
+}
+
+inline static size_t svtoi(std::string_view v)
+{
+  size_t r = 0;
+
+  for (char c : v)
+    r = r * 10 + static_cast<size_t>(c - '0');
+
+  return r;
+}
+
+Model::Path Model::parse_path(const std::string& path)
+{
+  assert(!path.empty());
+
+  Model::Path result;
+
+  if (path == "$")
+    return result;
+
+  size_t index = 2;
+  auto is_num = [](char c) { return c >= '0' && c <= '9'; };
+
+  do
+  {
+    std::string_view token = next_token(path, index);
+
+    index += token.size() + 1;
+
+    if (!token.empty())
+    {
+      if (!is_num(token.front()))
+        result.push_back(token);
+      else
+        result.back().index = svtoi(token);
+    }
+  } while (index < path.size());
 
   return result;
 }

@@ -11,42 +11,6 @@
 
 #include <iostream>
 
-void TestDexCommon::jsonAnnotator()
-{
-  {
-    json::Object obj;
-    obj["object"]["nested"]["value"] = 5;
-
-    dex::JsonPathAnnotator annotator;
-    annotator.annotate(obj);
-
-    QVERIFY(obj["object"]["_path"] == "$.object");
-    QVERIFY(obj["object"]["nested"]["_path"] == "$.object.nested");
-
-    auto path = dex::JsonPathAnnotator::parse("$.object.nested");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("object"), std::string("nested") };
-    QVERIFY(path == expected);
-  }
-
-  {
-    json::Object obj;
-    obj["list"] = json::Array();
-    obj["list"].push(json::Object());
-    obj["list"].push(json::Object());
-    obj["list"][1]["subobject"] = json::Object();
-
-    dex::JsonPathAnnotator annotator;
-    annotator.annotate(obj);
-
-    QVERIFY(obj["list"][0]["_path"] == "$.list[0]");
-    QVERIFY(obj["list"][1]["subobject"]["_path"] == "$.list[1].subobject");
-
-    auto path = dex::JsonPathAnnotator::parse("$.list[1].subobject");
-    auto expected = std::vector<std::variant<size_t, std::string>>{ std::string("list"), 1, std::string("subobject") };
-    QVERIFY(path == expected);
-  }
-}
-
 void TestDexCommon::jsonBuilder()
 {
   dex::SettingsMap values;

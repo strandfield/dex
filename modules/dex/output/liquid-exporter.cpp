@@ -5,6 +5,7 @@
 #include "dex/output/liquid-exporter.h"
 
 #include "dex/output/json-output-annotator.h"
+#include "dex/output/liquid-exporter-url-annotator.h"
 
 #include "dex/common/errors.h"
 #include "dex/common/json-utils.h"
@@ -30,10 +31,12 @@ class LiquidExporterModelVisitor : public ModelVisitor
 public:
   LiquidExporter& exporter;
   json::Object& serializedModel;
+  JsonExportMapping& json_mapping;
 
-  LiquidExporterModelVisitor(LiquidExporter& e, json::Object& m)
+  LiquidExporterModelVisitor(LiquidExporter& e, json::Object& m, JsonExportMapping& mapping)
     : exporter{ e },
-    serializedModel{ m }
+    serializedModel{ m },
+    json_mapping(mapping)
   {
   }
 
@@ -41,7 +44,11 @@ public:
   {
     if (!exporter.profile().class_template.model.nodes().empty())
     {
-      json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
+      // We were previously fetching the json with
+      //   JsonUrlAnnotator::get(path(), serializedModel).toObject();
+      // but using the JsonExportMapping is expected to be faster.
+      // @TODO: fallback to the path method if the object is not in the map
+      json::Object obj = json_mapping.get(cla).toObject();
       exporter.dump(cla, obj);
     }
 
@@ -85,7 +92,7 @@ void LiquidExporter::render()
   if (model()->empty())
     return;
 
-  LiquidExporterModelVisitor visitor{ *this, m_serialized_model };
+  LiquidExporterModelVisitor visitor{ *this, m_serialized_model, m_model_mapping };
   visitor.visit(*model());
 
   for (const std::pair<std::string, liquid::Template>& file : profile().files)
@@ -114,6 +121,12 @@ Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
   }
 
   return result;
+}
+
+void LiquidExporter::annotateModel(const std::string& file_suffix)
+{
+  LiquidExporterUrlAnnotator url_annotator{ m_serialized_model, m_model_mapping, profile(), file_suffix };
+  url_annotator.annotate(*m_model);
 }
 
 void LiquidExporter::dump(const json::Object& obj, const char* obj_field_name, const Profile::Template& tmplt)
@@ -173,9 +186,8 @@ std::string LiquidExporter::stringify(const json::Json& val)
 
   if (path_it != obj.data().end())
   {
-    std::vector<std::variant<size_t, std::string>> json_path = JsonPathAnnotator::parse(path_it->second.toString());
-    Model::Path model_path = convertToModelPath(json_path);
-    Model::Node model_node = model()->get(model_path);
+    Model::Path path = Model::parse_path(path_it->second.toString());
+    Model::Node model_node = model()->get(path);
 
     if (std::holds_alternative<std::shared_ptr<dom::Node>>(model_node))
     {
@@ -413,9 +425,8 @@ json::Array LiquidExporter::related_non_members(const json::Object& json_class)
     return {};
   }
 
-  std::vector<std::variant<size_t, std::string>> json_path = JsonPathAnnotator::parse(path_it->second.toString());
-  Model::Path model_path = convertToModelPath(json_path);
-  Model::Node model_node = model()->get(model_path);
+  Model::Path path = Model::parse_path(path_it->second.toString());
+  Model::Node model_node = model()->get(path);
 
   if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(model_node))
   {
