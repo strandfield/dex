@@ -60,6 +60,8 @@ protected:
   void visit_manual(const Manual& man) override;
   void visit_sectioning(const Sectioning& sec) override;
 
+  void visit_group(const Group& group) override;
+
 protected:
   static void write_location(json::Object& obj, const cxx::SourceLocation& loc);
 

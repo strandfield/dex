@@ -131,6 +131,17 @@ void ModelVisitor::visit(const Model& model)
       visit_domnode(*model.manuals().at(i));
     }
   }
+
+  if (!model.groups.groups.empty())
+  {
+    RaiiArrayVisitor state_updater{ this, "groups" };
+
+    for (size_t i(0); i < model.groups.groups.size(); ++i)
+    {
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
+      visit_group(*model.groups.groups.at(i));
+    }
+  }
 }
 
 const Model& ModelVisitor::model() const
@@ -409,6 +420,11 @@ void ModelVisitor::visit_sectioning(const dex::Sectioning& section)
       visit_domnode(*section.content.at(i));
     }
   }
+}
+
+void ModelVisitor::visit_group(const dex::Group& /* group */)
+{
+
 }
 
 } // namespace dex

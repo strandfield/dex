@@ -11,6 +11,7 @@
 #include "dex/model/namespace-documentation.h"
 #include "dex/model/variable-documentation.h"
 
+#include "dex/model/group.h"
 #include "dex/model/manual.h"
 #include "dex/model/program.h"
 
@@ -22,9 +23,10 @@ namespace dex
 
 class DEX_MODEL_API Model
 {
-private:
+public:
   std::vector<std::shared_ptr<Manual>> m_manuals;
   std::shared_ptr<dex::Program> m_program;
+  GroupManager groups;
 
 public:
   Model() = default;
@@ -49,12 +51,20 @@ public:
 
   typedef std::vector<PathElement> Path;
 
-  typedef std::variant<std::shared_ptr<cxx::Program>, std::shared_ptr<cxx::Entity>, std::shared_ptr<cxx::Documentation>, std::shared_ptr<dom::Node>> Node;
+  typedef std::variant<
+    std::shared_ptr<cxx::Program>, 
+    std::shared_ptr<cxx::Entity>, 
+    std::shared_ptr<cxx::Documentation>, 
+    std::shared_ptr<dom::Node>,
+    std::shared_ptr<Group>> 
+  Node;
 
   static std::string to_string(const Path& p);
   static Path parse_path(const std::string& str);
   Node get(const Path& path) const;
   Path path(const std::shared_ptr<cxx::Entity>& e) const;
+  Path path(const std::shared_ptr<Manual>& m) const;
+  Path path(const std::shared_ptr<Group>& g) const;
 };
 
 } // namespace dex
