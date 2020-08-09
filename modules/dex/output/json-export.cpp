@@ -462,6 +462,8 @@ void JsonExport::visit_group(const Group& group)
   object()["manuals"] = serialize_paths(model(), group.content.manuals);
   object()["groups"] = serialize_paths(model(), group.content.groups);
 
+  mapping.bind(group, object());
+
   ModelVisitor::visit_group(group);
 }
 

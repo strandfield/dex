@@ -115,6 +115,9 @@ protected:
   static json::Array filter_by_type(const json::Array& list, const std::string& type);
   static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
   json::Array related_non_members(const json::Object& json_class);
+  json::Array group_get_entities(const json::Object& json_group);
+  json::Array group_get_manuals(const json::Object& json_group);
+  json::Array group_get_groups(const json::Object& json_group);
 
 protected:
 
