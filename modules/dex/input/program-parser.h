@@ -52,6 +52,8 @@ public:
   using State = state::State<Frame>;
   
   State& state();
+
+  std::shared_ptr<cxx::Entity> currentEntity() const;
   
   // @TODO: rework these, they may not belong here
   void beginFile();

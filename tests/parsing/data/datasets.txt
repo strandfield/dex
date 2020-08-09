@@ -1,6 +1,6 @@
 class-with-inline
 class-with-var
-enum-doc
+enum-in-group
 manual-simple
 manual-with-math
 prog-with-macro-typedef

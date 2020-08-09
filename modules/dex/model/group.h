@@ -29,6 +29,9 @@ public:
 
   std::shared_ptr<Group> get(const std::string& name) const;
   std::shared_ptr<Group> getOrCreate(const std::string& name);
+
+  template<typename T>
+  void multiInsert(const std::vector<std::string>& groupnames, T elem);
 };
 
 class DEX_MODEL_API Group : public std::enable_shared_from_this<Group>
@@ -47,9 +50,23 @@ public:
 
   Content content;
 
+  void insert(std::shared_ptr<cxx::Entity> e);
+  void insert(std::shared_ptr<Manual> m);
+  void insert(std::shared_ptr<Group> g);
+
 public:
   Group(size_t index, std::string n);
 };
+
+template<typename T>
+inline void GroupManager::multiInsert(const std::vector<std::string>& groupnames, T elem)
+{
+  for (const auto& gname : groupnames)
+  {
+    std::shared_ptr<Group> g = getOrCreate(gname);
+    g->insert(elem);
+  }
+}
 
 } // namespace dex
 

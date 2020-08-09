@@ -454,6 +454,8 @@ static json::Json serialize_paths(const Model& model, const std::vector<std::wea
 
 void JsonExport::visit_group(const Group& group)
 {
+  RAIIJsonExportContext context{ this, path().back() };
+
   object()["name"] = group.name;
   object()["propreties"] = group.properties;
   object()["entities"] = serialize_paths(model(), group.content.entities);

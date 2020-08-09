@@ -32,4 +32,19 @@ Group::Group(size_t i, std::string n)
 
 }
 
+void Group::insert(std::shared_ptr<cxx::Entity> e)
+{
+  content.entities.push_back(e);
+}
+
+void Group::insert(std::shared_ptr<Manual> m)
+{
+  content.manuals.push_back(m);
+}
+
+void Group::insert(std::shared_ptr<Group> g)
+{
+  content.groups.push_back(g);
+}
+
 } // namespace dex

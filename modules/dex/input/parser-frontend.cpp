@@ -13,6 +13,7 @@
 #include "dex/input/program-parser.h"
 
 #include "dex/common/logging.h"
+#include "dex/common/string-utils.h"
 
 #include <cxx/parsers/restricted-parser.h>
 
@@ -66,6 +67,8 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::PART, CS::part},
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
+    /* Grouping */
+    {Functions::INGROUP, CS::ingroup},
   };
 
   return static_instance;
@@ -201,6 +204,8 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_chapter(call);
     case CS::section:
       return fn_section(call);
+    case CS::ingroup:
+      return ingroup(call);
     default:
       throw UnexpectedControlSequence{ call.function };
     }
@@ -423,6 +428,23 @@ void ParserFrontend::fn_section(const FunctionCall& call)
   std::string name = call.arg<std::string>(0);
 
   m_manual_parser->section(std::move(name));
+}
+
+void ParserFrontend::ingroup(const FunctionCall& call)
+{
+  std::string groupnames = call.arg<std::string>(0);
+  std::vector<std::string> groups = str_split(groupnames, ',');
+
+  if (m_mode == Mode::Program)
+  {
+    std::shared_ptr<cxx::Entity> cxxe = m_prog_parser->currentEntity();
+    m_machine.output()->groups.multiInsert(groups, cxxe);
+  }
+  else if (m_mode == Mode::Manual)
+  {
+    std::shared_ptr<Manual> m = m_manual_parser->manual();
+    m_machine.output()->groups.multiInsert(groups, m);
+  }
 }
 
 void ParserFrontend::beginFile()

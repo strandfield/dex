@@ -177,3 +177,10 @@
 \def\section{%
   \p@rseline\c@ll\@section
 }
+
+
+% Dex - Grouping %
+
+\def\ingroup{%
+  \p@rseline\c@ll\@ingroup
+}

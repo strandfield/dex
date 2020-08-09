@@ -41,6 +41,8 @@ const std::string Functions::PART = "@part";
 const std::string Functions::CHAPTER = "@chapter";
 const std::string Functions::SECTION = "@section";
 
+const std::string Functions::INGROUP = "@ingroup";
+
 const std::string Functions::BOLD = "@b";
 const std::string Functions::BEGINTEXTBF = "@begintextbf";
 const std::string Functions::ENDTEXTBF = "@endtextbf";

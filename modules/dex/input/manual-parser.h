@@ -21,6 +21,8 @@ class DEX_INPUT_API ManualParser
 public:
   explicit ManualParser(std::shared_ptr<Manual> man);
 
+  const std::shared_ptr<Manual>& manual() const;
+
   enum class FrameType
   {
     Idle, // unused
@@ -67,6 +69,16 @@ private:
   State m_state;
   std::shared_ptr<Manual> m_manual;
 };
+
+} // namespace dex
+
+namespace dex
+{
+
+inline const std::shared_ptr<Manual>& ManualParser::manual() const
+{
+  return m_manual;
+}
 
 } // namespace dex
 
