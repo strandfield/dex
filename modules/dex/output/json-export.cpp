@@ -229,6 +229,16 @@ void JsonExport::visit_displaymath(const dex::DisplayMath& math)
   ModelVisitor::visit_displaymath(math);
 }
 
+void JsonExport::visit_grouptable(const dex::GroupTable& table)
+{
+  object()["groupname"] = table.groupname;
+  
+  if (!table.templatename.empty())
+    object()["templatename"] = table.templatename;
+
+  ModelVisitor::visit_grouptable(table);
+}
+
 static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)
 {
   json::Array result;
@@ -457,7 +467,7 @@ void JsonExport::visit_group(const Group& group)
   RAIIJsonExportContext context{ this, path().back() };
 
   object()["name"] = group.name;
-  object()["propreties"] = group.properties;
+  object()["properties"] = group.properties;
   object()["entities"] = serialize_paths(model(), group.content.entities);
   object()["manuals"] = serialize_paths(model(), group.content.manuals);
   object()["groups"] = serialize_paths(model(), group.content.groups);

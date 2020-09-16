@@ -5,6 +5,9 @@
  * \brief Specifies the direction of text handling.
  *
  * Right-to-left layouts are necessary for certain languages, notably Arabic and Hebrew.
+ *
+ * This enum is part of a group:
+ * \makegrouptable useful_enums
  */
 enum LayoutDirection
 {

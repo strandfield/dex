@@ -8,5 +8,6 @@
     <file>templates/markdown/class.md</file>
     <file>templates/markdown/index.md</file>
     <file>templates/markdown/manual.md</file>
+    <file>templates/markdown/groupdefault</file>
   </qresource>
 </RCC>

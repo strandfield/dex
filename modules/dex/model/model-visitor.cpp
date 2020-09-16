@@ -195,6 +195,8 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_sectioning(static_cast<const dex::Sectioning&>(n));
   else if (n.is<dex::DisplayMath>())
     visit_displaymath(static_cast<const dex::DisplayMath&>(n));
+  else if (n.is<dex::GroupTable>())
+    visit_grouptable(static_cast<const dex::GroupTable&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -238,6 +240,11 @@ void ModelVisitor::visit_domparagraph(const dom::Paragraph& /* par */)
 }
 
 void ModelVisitor::visit_displaymath(const dex::DisplayMath& /* math */)
+{
+
+}
+
+void ModelVisitor::visit_grouptable(const dex::GroupTable& /* table */)
 {
 
 }

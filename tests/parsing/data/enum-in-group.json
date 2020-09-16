@@ -4,7 +4,7 @@
       "groups": [],
       "manuals": [],
       "name": "useful_enums",
-      "propreties": {}
+      "properties": {}
     }],
   "program": {
     "global_namespace": {
@@ -14,6 +14,12 @@
             "description": [{
                 "text": "Right-to-left layouts are necessary for certain languages, notably Arabic and Hebrew.",
                 "type": "paragraph"
+              }, {
+                "text": "This enum is part of a group:",
+                "type": "paragraph"
+              }, {
+                "groupname": "useful_enums",
+                "type": "grouptable"
               }]
           },
           "name": "LayoutDirection",

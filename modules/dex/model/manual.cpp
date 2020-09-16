@@ -7,6 +7,13 @@
 namespace dex
 {
 
+const std::string GroupTable::TypeId = "grouptable";
+
+const std::string& GroupTable::type() const
+{
+  return TypeId;
+}
+
 const std::string Sectioning::TypeId = "sectioning";
 
 const std::string& Sectioning::type() const
@@ -19,6 +26,13 @@ const std::string Manual::TypeId = "manual";
 const std::string& Manual::type() const
 {
   return TypeId;
+}
+
+GroupTable::GroupTable(std::string gname, std::string tname)
+  : groupname(std::move(gname)),
+    templatename(std::move(tname))
+{
+
 }
 
 Sectioning::Sectioning(Depth d, std::string n)

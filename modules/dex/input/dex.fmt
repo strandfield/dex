@@ -88,6 +88,17 @@
   }%
 }
 
+\def\makegrouptable{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \p@rseword\c@ll\@makegrouptable
+    }%
+    \p@rseoptions
+  }{%
+    \p@rseword\c@ll\@makegrouptable
+  }%
+}
+
 % Dex - Program %
 
 \def\class{%

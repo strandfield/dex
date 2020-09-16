@@ -67,6 +67,16 @@ public:
   }
 };
 
+void LiquidExporter::setProfile(Profile pro)
+{
+  m_profile = std::move(pro);
+  
+  templates().clear();
+
+  for (const std::pair<std::string, liquid::Template>& tmplts : m_profile.liquid_templates)
+    templates()[tmplts.first] = tmplts.second;
+}
+
 QDir LiquidExporter::outputDir() const
 {
   return m_output_dir;
@@ -219,6 +229,8 @@ std::string LiquidExporter::stringify_domnode(const dom::Node& node)
     return stringify_section(static_cast<const dex::Sectioning&>(node));
   else if (node.is<dex::DisplayMath>())
     return stringify_math(static_cast<const dex::DisplayMath&>(node));
+  else if (node.is<dex::GroupTable>())
+    return stringify_grouptable(static_cast<const dex::GroupTable&>(node));
 
   assert(("dom element not implemented", false));
   return {};
@@ -234,6 +246,26 @@ std::string LiquidExporter::stringify_domcontent(const dom::Content& content)
   }
 
   return result;
+}
+
+std::string LiquidExporter::stringify_grouptable(const dex::GroupTable& table)
+{
+  auto it = templates().find(table.templatename.empty() ? "groupdefault" : table.templatename);
+
+  if (it == templates().end())
+    throw liquid::EvaluationException{ std::string("Could not find group templates: ") + table.templatename };
+
+  auto g = m_model->groups.get(table.groupname);
+
+  if(g == nullptr)
+    throw liquid::EvaluationException{ std::string("Could not find group: ") + table.groupname };
+
+  auto jsongroup = modelMapping().get(*g);
+
+  json::Object data;
+  data["group"] = jsongroup;
+
+  return capture(it->second, data);
 }
 
 std::string LiquidExporter::stringify_array(const json::Array& list)

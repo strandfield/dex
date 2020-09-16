@@ -42,6 +42,7 @@ protected:
   void visit_domlistitem(const dom::ListItem& li) override;
   void visit_domparagraph(const dom::Paragraph& par) override;
   void visit_displaymath(const dex::DisplayMath& math) override;
+  void visit_grouptable(const dex::GroupTable& table) override;
 
   void visit_program(const dex::Program& prog) override;
   void visit_entity(const cxx::Entity& e) override;

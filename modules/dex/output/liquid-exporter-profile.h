@@ -29,6 +29,7 @@ public:
   Template class_template;
   Template manual_template;
   std::vector<std::pair<std::string, liquid::Template>> files;
+  std::vector<std::pair<std::string, liquid::Template>> liquid_templates;
 
 public:
 

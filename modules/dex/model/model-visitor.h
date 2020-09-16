@@ -62,6 +62,7 @@ protected:
   virtual void visit_domlistitem(const dom::ListItem& li);
   virtual void visit_domparagraph(const dom::Paragraph& par);
   virtual void visit_displaymath(const dex::DisplayMath& math);
+  virtual void visit_grouptable(const dex::GroupTable& table);
 
   virtual void visit_program(const dex::Program& prog);
   virtual void visit_entity(const cxx::Entity& e);
