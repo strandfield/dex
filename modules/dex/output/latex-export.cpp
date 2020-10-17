@@ -139,28 +139,4 @@ std::string LatexStringifier::stringify_section(const dex::Sectioning& sec) cons
   return result;
 }
 
-LatexExport::LatexExport()
-{
-  LiquidExporterProfile prof;
-  prof.load(QDir{ ":/templates/latex" });
-  setProfile(std::move(prof));
-  m_stringifier = std::make_shared<LatexStringifier>(static_cast<LiquidExporter&>(*this));
-}
-
-void LatexExport::dump(std::shared_ptr<Model> model, const QDir& dir)
-{
-  LiquidExporter::setOutputDir(dir);
-  LiquidExporter::setModel(model);
-
-  LiquidExporter::annotateModel(".tex");
-
-  LiquidExporter::render();
-}
-
-void LatexExport::postProcess(std::string& output)
-{
-  LiquidExporter::trim_right(output);
-  LiquidExporter::simplify_empty_lines(output);
-}
-
 } // namespace dex

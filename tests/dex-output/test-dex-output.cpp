@@ -35,6 +35,21 @@ static std::shared_ptr<dom::Paragraph> make_par(const std::string& str)
   return std::make_shared<dom::Paragraph>(str);
 }
 
+class MarkdownExport : public dex::LiquidExporter
+{
+public:
+  explicit MarkdownExport(std::shared_ptr<dex::Model> m)
+  {
+    dex::LiquidExporterProfile prof;
+    prof.load(QDir{ ":/templates/markdown" });
+    setProfile(std::move(prof));
+
+    setOutputDir(QDir::current());
+
+    setModel(m);
+  }
+};
+
 void TestDexOutput::jsonExport()
 {
   {
@@ -126,9 +141,8 @@ void TestDexOutput::markdownExport()
     auto model = std::make_shared<dex::Model>();
     model->setProgram(dex::examples::prog_with_class());
 
-    dex::MarkdownExport md_export;
-
-    md_export.dump(model, QDir::current());
+    MarkdownExport md_export{ model };
+    md_export.render();
 
     std::string content = dex::file_utils::read_all("classes/vector.md");
 
@@ -144,9 +158,8 @@ void TestDexOutput::markdownExport()
   {
     auto model = dex::examples::prog_with_class_image_description();
 
-    dex::MarkdownExport md_export;
-
-    md_export.dump(model, QDir::current());
+    MarkdownExport md_export{ model };
+    md_export.render();
 
     std::string content = dex::file_utils::read_all("classes/vector.md");
 
@@ -161,9 +174,8 @@ void TestDexOutput::markdownExport()
   {
     auto model = dex::examples::prog_with_class_list_description();
 
-    dex::MarkdownExport md_export;
-
-    md_export.dump(model, QDir::current());
+    MarkdownExport md_export{ model };
+    md_export.render();
 
     std::string content = dex::file_utils::read_all("classes/vector.md");
 
@@ -180,9 +192,8 @@ void TestDexOutput::markdownExportManual()
 {
   auto model = dex::examples::manual();
 
-  dex::MarkdownExport md_export;
-
-  md_export.dump(model, QDir::current());
+  MarkdownExport md_export{ model };
+  md_export.render();
 
   std::string content = dex::file_utils::read_all("manuals/The manual.md");
 

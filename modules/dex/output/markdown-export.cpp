@@ -137,29 +137,4 @@ std::string MarkdownStringifier::stringify_section(const dex::Sectioning& sec) c
   return result;
 }
 
-
-MarkdownExport::MarkdownExport()
-{
-  LiquidExporterProfile prof;
-  prof.load(QDir{ ":/templates/markdown" });
-  setProfile(std::move(prof));
-  m_stringifier = std::make_shared<MarkdownStringifier>(static_cast<LiquidExporter&>(*this));
-}
-
-void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
-{
-  LiquidExporter::setOutputDir(dir);
-  LiquidExporter::setModel(model);
-
-  LiquidExporter::annotateModel(".md");
-
-  LiquidExporter::render();
-}
-
-void MarkdownExport::postProcess(std::string& output)
-{
-  LiquidExporter::trim_right(output);
-  LiquidExporter::simplify_empty_lines(output);
-}
-
 } // namespace dex

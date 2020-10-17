@@ -22,6 +22,7 @@ public:
   {
     liquid::Template model;
     std::string outdir;
+    std::string filesuffix;
   };
 
 public:

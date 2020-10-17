@@ -15,9 +15,8 @@ class LiquidExporterUrlAnnotator : public JsonUrlAnnotator
 {
 public:
   const LiquidExporterProfile& profile;
-  std::string suffix;
 
-  LiquidExporterUrlAnnotator(json::Object& js_object, const JsonExportMapping& mapping, const LiquidExporterProfile& pro, std::string file_extension);
+  LiquidExporterUrlAnnotator(json::Object& js_object, const JsonExportMapping& mapping, const LiquidExporterProfile& pro);
 
 protected:
   std::string get_url(const cxx::Entity& e) const override;

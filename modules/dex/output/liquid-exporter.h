@@ -16,6 +16,7 @@
 
 #include <QDir>
 
+#include <map>
 #include <variant>
 #include <vector>
 
@@ -45,6 +46,8 @@ class LiquidStringifier;
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
 {
 public:
+
+  LiquidExporter();
 
   typedef std::variant<size_t, std::string> JsonPathElement;
   typedef std::vector<JsonPathElement> JsonPath;
@@ -87,7 +90,7 @@ public:
 
 protected:
 
-  void annotateModel(const std::string& file_suffix);
+  void annotateModel();
 
 protected:
   friend class LiquidExporterModelVisitor;
@@ -114,8 +117,9 @@ protected:
 
 protected:
 
+  void selectStringifier(const std::string& filesuffix);
   void setupContext(json::Object& context);
-  virtual void postProcess(std::string& output);
+  void postProcess(std::string& output);
   void write(const std::string& data, const std::string& filepath);
 
 private:
@@ -125,7 +129,7 @@ private:
   JsonExportMapping m_model_mapping;
   Profile m_profile;
   json::Object m_user_variables;
-protected:
+  std::map<std::string, std::shared_ptr<LiquidStringifier>> m_stringifiers;
   std::shared_ptr<LiquidStringifier> m_stringifier;
 };
 

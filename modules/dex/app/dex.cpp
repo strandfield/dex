@@ -195,17 +195,23 @@ void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name,
 
     file.write(QByteArray::fromStdString(json::stringify(obj)));
   }
-  else if (info.suffix() == "md")
+  else if (info.suffix() == "md" || info.suffix() == "tex")
   {
-    dex::MarkdownExport md_export;
-    md_export.setVariables(values);
-    md_export.dump(model, info.dir());
-  }
-  else if (info.suffix() == "tex")
-  {
-    dex::LatexExport latex_export;
-    latex_export.setVariables(values);
-    latex_export.dump(model, info.dir());
+    dex::LiquidExporter exporter;
+
+    LiquidExporterProfile prof;
+    
+    if(info.suffix() == "md")
+      prof.load(QDir{ ":/templates/markdown" });
+    else
+      prof.load(QDir{ ":/templates/latex" });
+    
+    exporter.setProfile(std::move(prof));
+    exporter.setVariables(values);
+    exporter.setOutputDir(info.dir());
+    exporter.setModel(model);
+
+    exporter.render();
   }
   else
   {

@@ -11,10 +11,9 @@
 namespace dex
 {
 
-LiquidExporterUrlAnnotator::LiquidExporterUrlAnnotator(json::Object& js_object, const JsonExportMapping& mapping, const LiquidExporterProfile& pro, std::string file_extension)
+LiquidExporterUrlAnnotator::LiquidExporterUrlAnnotator(json::Object& js_object, const JsonExportMapping& mapping, const LiquidExporterProfile& pro)
   : JsonUrlAnnotator(js_object, mapping), 
-    profile(pro),
-    suffix(std::move(file_extension))
+    profile(pro)
 {
 
 }
@@ -22,7 +21,7 @@ LiquidExporterUrlAnnotator::LiquidExporterUrlAnnotator(json::Object& js_object, 
 std::string LiquidExporterUrlAnnotator::get_url(const cxx::Entity& e) const
 {
   if (e.is<cxx::Class>())
-    return profile.class_template.outdir + "/" + e.name + suffix;
+    return profile.class_template.outdir + "/" + e.name + "." + profile.class_template.filesuffix;
 
   return "";
 }
@@ -30,7 +29,7 @@ std::string LiquidExporterUrlAnnotator::get_url(const cxx::Entity& e) const
 std::string LiquidExporterUrlAnnotator::get_url(const dex::Manual& man) const
 {
   // @TODO: remove spaces and illegal characters
-  return profile.manual_template.outdir + "/" + man.title + suffix;
+  return profile.manual_template.outdir + "/" + man.title + "." + profile.manual_template.filesuffix;
 }
 
 } // namespace dex
