@@ -207,10 +207,11 @@ void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name,
       prof.load(QDir{ ":/templates/latex" });
     
     exporter.setProfile(std::move(prof));
-
     exporter.setVariables(values);
+    exporter.setOutputDir(info.dir());
+    exporter.setModel(model);
 
-    exporter.dump(model, info.dir());
+    exporter.render();
   }
   else
   {
