@@ -41,6 +41,7 @@ namespace dex
 class DisplayMath;
 class Model;
 
+class LiquidFilters;
 class LiquidStringifier;
 
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
@@ -48,6 +49,7 @@ class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
 public:
 
   LiquidExporter();
+  ~LiquidExporter();
 
   typedef std::variant<size_t, std::string> JsonPathElement;
   typedef std::vector<JsonPathElement> JsonPath;
@@ -102,18 +104,7 @@ protected:
 
 protected:
   std::string stringify(const json::Json& val) override;
-
-protected:
-
   json::Json applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) override;
-
-  static json::Array filter_by_field(const json::Array& list, const std::string& field, const std::string& value);
-  static json::Array filter_by_type(const json::Array& list, const std::string& type);
-  static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
-  json::Array related_non_members(const json::Object& json_class);
-  json::Array group_get_entities(const json::Object& json_group);
-  json::Array group_get_manuals(const json::Object& json_group);
-  json::Array group_get_groups(const json::Object& json_group);
 
 protected:
 
@@ -131,6 +122,7 @@ private:
   json::Object m_user_variables;
   std::map<std::string, std::shared_ptr<LiquidStringifier>> m_stringifiers;
   std::shared_ptr<LiquidStringifier> m_stringifier;
+  std::unique_ptr<LiquidFilters> m_filters;
 };
 
 } // namespace dex
