@@ -137,12 +137,4 @@ std::string MarkdownStringifier::stringify_section(const dex::Sectioning& sec) c
   return result;
 }
 
-
-MarkdownExport::MarkdownExport()
-{
-  LiquidExporterProfile prof;
-  prof.load(QDir{ ":/templates/markdown" });
-  setProfile(std::move(prof));
-}
-
 } // namespace dex

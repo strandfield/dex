@@ -30,18 +30,6 @@ protected:
   std::string stringify_section(const dex::Sectioning& sec) const override;
 };
 
-class DEX_OUTPUT_API MarkdownExport : protected LiquidExporter
-{
-public:
-  MarkdownExport();
-
-  using LiquidExporter::setVariables;
-  using LiquidExporter::dump;
-
-protected:
-
-};
-
 } // namespace dex
 
 #endif // DEX_OUTPUT_MARKDOWN_EXPORT_H
