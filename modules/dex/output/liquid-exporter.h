@@ -76,12 +76,14 @@ public:
   static void trim_right(std::string& str);
   static void simplify_empty_lines(std::string& str);
 
-protected:
-
   void setModel(std::shared_ptr<Model> model);
   std::shared_ptr<Model> model() const;
   json::Object serializedModel() const;
   const JsonExportMapping& modelMapping() const;
+
+  std::string capture(const liquid::Template& tmplt, const json::Object& data);
+
+protected:
 
   void annotateModel(const std::string& file_suffix);
 
