@@ -68,6 +68,8 @@ public:
     part,
     chapter,
     section,
+    /* Grouping */
+    ingroup,
   };
 
   static const std::map<std::string, CS>& csmap();
@@ -133,6 +135,8 @@ protected:
   void fn_part(const FunctionCall& call);
   void fn_chapter(const FunctionCall& call);
   void fn_section(const FunctionCall& call);
+
+  void ingroup(const FunctionCall& call);
 
 private:
   ParserMachine& m_machine;

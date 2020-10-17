@@ -23,20 +23,44 @@ public:
   struct BackwardMaps
   {
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const cxx::Entity>> entities;
+    std::unordered_map<std::shared_ptr<json::details::Node>, const Manual*> manuals;
+    std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const Group>> groups;
   };
 
   BackwardMaps backward_maps;
-  std::unordered_map<const cxx::Entity*, json::Json> forward;
+  std::unordered_map<const void*, json::Json> forward;
 
   json::Json get(const cxx::Entity& n) const
   {
     return forward.at(&n);
   }
 
+  json::Json get(const Manual& m) const
+  {
+    return forward.at(&m);
+  }
+
+  json::Json get(const Group& g) const
+  {
+    return forward.at(&g);
+  }
+
   void bind(const cxx::Entity& e, const json::Json& o)
   {
     backward_maps.entities[o.impl()] = e.shared_from_this();
     forward[&e] = o;
+  }
+
+  void bind(const Manual& m, const json::Json& o)
+  {
+    backward_maps.manuals[o.impl()] = &m;
+    forward[&m] = o;
+  }
+
+  void bind(const Group& g, const json::Json& o)
+  {
+    backward_maps.groups[o.impl()] = g.shared_from_this();
+    forward[&g] = o;
   }
 
   template<typename T>
@@ -55,6 +79,15 @@ protected:
     return backward_maps.entities.at(obj.impl());
   }
 
+  const Manual* get_impl(const json::Json& obj, get_helper_t<Manual>) const
+  {
+    return backward_maps.manuals.at(obj.impl());
+  }
+
+  std::shared_ptr<const Group> get_impl(const json::Json& obj, get_helper_t<Group>) const
+  {
+    return backward_maps.groups.at(obj.impl());
+  }
 };
 
 } // namespace dex

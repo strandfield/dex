@@ -42,6 +42,7 @@ protected:
   void visit_domlistitem(const dom::ListItem& li) override;
   void visit_domparagraph(const dom::Paragraph& par) override;
   void visit_displaymath(const dex::DisplayMath& math) override;
+  void visit_grouptable(const dex::GroupTable& table) override;
 
   void visit_program(const dex::Program& prog) override;
   void visit_entity(const cxx::Entity& e) override;
@@ -59,6 +60,8 @@ protected:
 
   void visit_manual(const Manual& man) override;
   void visit_sectioning(const Sectioning& sec) override;
+
+  void visit_group(const Group& group) override;
 
 protected:
   static void write_location(json::Object& obj, const cxx::SourceLocation& loc);

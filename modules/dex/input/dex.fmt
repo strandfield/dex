@@ -88,6 +88,17 @@
   }%
 }
 
+\def\makegrouptable{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \p@rseword\c@ll\@makegrouptable
+    }%
+    \p@rseoptions
+  }{%
+    \p@rseword\c@ll\@makegrouptable
+  }%
+}
+
 % Dex - Program %
 
 \def\class{%
@@ -176,4 +187,11 @@
 
 \def\section{%
   \p@rseline\c@ll\@section
+}
+
+
+% Dex - Grouping %
+
+\def\ingroup{%
+  \p@rseline\c@ll\@ingroup
 }

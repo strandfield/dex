@@ -62,7 +62,8 @@ public:
 
   typedef LiquidExporterProfile Profile;
 
-  Profile& profile();
+  const Profile& profile() const;
+  void setProfile(Profile pro);
 
   QDir outputDir() const;
   void setOutputDir(const QDir& dir);
@@ -104,6 +105,7 @@ protected:
   virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
   virtual std::string stringify_image(const dom::Image& img) = 0;
   virtual std::string stringify_math(const dex::DisplayMath& math) = 0;
+  virtual std::string stringify_grouptable(const dex::GroupTable& table);
 
   virtual std::string stringify_section(const dex::Sectioning& sec) = 0;
 
@@ -115,6 +117,9 @@ protected:
   static json::Array filter_by_type(const json::Array& list, const std::string& type);
   static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
   json::Array related_non_members(const json::Object& json_class);
+  json::Array group_get_entities(const json::Object& json_group);
+  json::Array group_get_manuals(const json::Object& json_group);
+  json::Array group_get_groups(const json::Object& json_group);
 
 protected:
 
@@ -136,7 +141,7 @@ private:
 namespace dex
 {
 
-inline LiquidExporterProfile& LiquidExporter::profile()
+inline const LiquidExporterProfile& LiquidExporter::profile() const
 {
   return m_profile;
 }

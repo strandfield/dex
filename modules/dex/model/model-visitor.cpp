@@ -131,6 +131,17 @@ void ModelVisitor::visit(const Model& model)
       visit_domnode(*model.manuals().at(i));
     }
   }
+
+  if (!model.groups.groups.empty())
+  {
+    RaiiArrayVisitor state_updater{ this, "groups" };
+
+    for (size_t i(0); i < model.groups.groups.size(); ++i)
+    {
+      RaiiArrayElementVisitor inner_state_updater{ this, i };
+      visit_group(*model.groups.groups.at(i));
+    }
+  }
 }
 
 const Model& ModelVisitor::model() const
@@ -184,6 +195,8 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_sectioning(static_cast<const dex::Sectioning&>(n));
   else if (n.is<dex::DisplayMath>())
     visit_displaymath(static_cast<const dex::DisplayMath&>(n));
+  else if (n.is<dex::GroupTable>())
+    visit_grouptable(static_cast<const dex::GroupTable&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -227,6 +240,11 @@ void ModelVisitor::visit_domparagraph(const dom::Paragraph& /* par */)
 }
 
 void ModelVisitor::visit_displaymath(const dex::DisplayMath& /* math */)
+{
+
+}
+
+void ModelVisitor::visit_grouptable(const dex::GroupTable& /* table */)
 {
 
 }
@@ -409,6 +427,11 @@ void ModelVisitor::visit_sectioning(const dex::Sectioning& section)
       visit_domnode(*section.content.at(i));
     }
   }
+}
+
+void ModelVisitor::visit_group(const dex::Group& /* group */)
+{
+
 }
 
 } // namespace dex

@@ -5,8 +5,8 @@
     <file>data/class-with-inline.json</file>
     <file>data/class-with-var.txt</file>
     <file>data/class-with-var.json</file>
-    <file>data/enum-doc.txt</file>
-    <file>data/enum-doc.json</file>
+    <file>data/enum-in-group.txt</file>
+    <file>data/enum-in-group.json</file>
     <file>data/manual-simple.txt</file>
     <file>data/manual-simple.json</file>
     <file>data/manual-with-math.txt</file>

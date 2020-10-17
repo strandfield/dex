@@ -68,7 +68,7 @@ LatexExport::LatexExport()
 {
   LiquidExporterProfile prof;
   prof.load(QDir{ ":/templates/latex" });
-  profile() = std::move(prof);
+  setProfile(std::move(prof));
 }
 
 void LatexExport::dump(std::shared_ptr<Model> model, const QDir& dir)

@@ -49,7 +49,7 @@ Parameters:
 {% if f.parameters and f.parameters.size > 0 %}
 Parameters:
 {% for p in f.parameters %}
-- {{ p.documentation }}
+- {{ p.documentation }}{% newline %}
 {% endfor %}
 {% endif %}
 

@@ -41,6 +41,8 @@ const std::string Functions::PART = "@part";
 const std::string Functions::CHAPTER = "@chapter";
 const std::string Functions::SECTION = "@section";
 
+const std::string Functions::INGROUP = "@ingroup";
+
 const std::string Functions::BOLD = "@b";
 const std::string Functions::BEGINTEXTBF = "@begintextbf";
 const std::string Functions::ENDTEXTBF = "@endtextbf";
@@ -60,6 +62,8 @@ const std::string Functions::IMAGE = "@image";
 const std::string Functions::LIST = "@list";
 const std::string Functions::ENDLIST = "endlist";
 const std::string Functions::LI = "@li";
+
+const std::string Functions::MAKEGROUPTABLE = "@makegrouptable";
 
 const std::string Functions::BACKSLASH_LBRACKET = "[";
 const std::string Functions::BACKSLASH_RBRACKET = "]";

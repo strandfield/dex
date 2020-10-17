@@ -7,6 +7,7 @@
 #include "dex/common/errors.h"
 #include "dex/common/file-utils.h"
 #include "dex/common/settings.h"
+#include "dex/common/string-utils.h"
 
 #include <QDirIterator>
 
@@ -62,7 +63,25 @@ protected:
       path = directory.absolutePath().toStdString() + "/" + path;
       exclude(path);
       tmplt.model = open_liquid_template(path);
+      tmplt.model.skipWhitespacesAfterTag();
       tmplt.outdir = dex::settings::read(settings, "output/" + name, std::move(default_out));
+    }
+  }
+
+  void list_templates()
+  {
+    std::string pathlist = dex::settings::read(settings, "templates/others", std::string());
+
+    std::vector<std::string> paths = dex::str_split(pathlist, ',');
+
+    for (std::string p : paths)
+    {
+      p = directory.absolutePath().toStdString() + "/" + p;
+      exclude(p);
+      liquid::Template tmplt = open_liquid_template(p);
+      tmplt.skipWhitespacesAfterTag();
+      p.erase(p.begin(), p.begin() + profile.profile_path.length() + 1);
+      profile.liquid_templates.emplace_back(std::move(p), std::move(tmplt));
     }
   }
 
@@ -78,6 +97,7 @@ protected:
         continue;
 
       liquid::Template tmplt = open_liquid_template(path);
+      tmplt.skipWhitespacesAfterTag();
 
       path.erase(path.begin(), path.begin() + profile.profile_path.length() + 1);
       profile.files.emplace_back(std::move(path), std::move(tmplt));
@@ -100,6 +120,7 @@ public:
     read_template("class", profile.class_template, "classes");
     read_template("manual", profile.manual_template, "manuals");
 
+    list_templates();
     list_files();
   }
 };

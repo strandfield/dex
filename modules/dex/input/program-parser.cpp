@@ -87,6 +87,11 @@ ProgramParser::State& ProgramParser::state()
   return m_state;
 }
 
+std::shared_ptr<cxx::Entity> ProgramParser::currentEntity() const
+{
+  return std::static_pointer_cast<cxx::Entity>(m_state.current().node);
+}
+
 std::shared_ptr<DocumentWriter> ProgramParser::contentWriter()
 {
   return currentFrame().writer;
@@ -122,7 +127,7 @@ void ProgramParser::endclass()
     throw BadCall{ "ProgramParser::endclass()", "\\endclass but no \\class" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  m_lastblock_entity = currentEntity();
 }
 
 void ProgramParser::fn(std::string signature)

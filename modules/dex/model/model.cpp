@@ -115,6 +115,11 @@ struct ChildNodeGetter
 
     throw std::runtime_error{ "Invalid model path" };
   }
+
+  Model::Node operator()(std::shared_ptr<Group>)
+  {
+    throw std::runtime_error{ "Invalid model path" };
+  }
 };
 
 static Model::Node get_child_node(const Model::Node& node, const Model::PathElement& pe)
@@ -229,6 +234,10 @@ Model::Node Model::get(const Path& path) const
   {
     result = manuals().at(path.front().index);
   }
+  else if (path.front().name == "groups")
+  {
+    result = groups.groups.at(path.front().index);
+  }
   
   for (size_t i(1); i < path.size(); ++i)
   {
@@ -276,6 +285,24 @@ Model::Path Model::path(const std::shared_ptr<cxx::Entity>& e) const
 
   std::reverse(result.begin(), result.end());
 
+  return result;
+}
+
+Model::Path Model::path(const std::shared_ptr<Manual>& m) const
+{
+  auto it = std::find(m_manuals.begin(), m_manuals.end(), m);
+
+  Model::Path result;
+  result.push_back(PathElement("manuals"));
+  result.back().index = std::distance(m_manuals.begin(), it);
+  return result;
+}
+
+Model::Path Model::path(const std::shared_ptr<Group>& g) const
+{
+  Model::Path result;
+  result.push_back(PathElement("groups"));
+  result.back().index = g->index;
   return result;
 }
 

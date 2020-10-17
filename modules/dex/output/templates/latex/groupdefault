@@ -1,0 +1,7 @@
+\begin{itemize}
+{% for e in group | group_get_entities  %}
+  {% if e.type == 'function' %}
+\item {{ e.name }}(){% newline %}
+  {% endif %}
+{% endfor %}
+\end{itemize}

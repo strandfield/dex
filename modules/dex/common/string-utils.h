@@ -6,6 +6,7 @@
 #define DEX_COMMON_STRINGUTILS_H
 
 #include <string>
+#include <vector>
 
 namespace dex
 {
@@ -53,9 +54,29 @@ public:
   }
 };
 
-StdStringCRef StdString(const std::string& str)
+inline StdStringCRef StdString(const std::string& str)
 {
   return StdStringCRef{ str };
+}
+
+inline std::vector<std::string> str_split(const std::string& str, char sep)
+{
+  std::vector<std::string> r;
+
+  auto it = str.begin();
+  auto next = std::find(str.begin(), str.end(), sep);
+
+  while (next != str.end())
+  {
+    r.push_back(std::string(it, next));
+    it = next + 1;
+    next = std::find(it, str.end(), sep);
+  }
+
+  if (it != next)
+    r.push_back(std::string(it, next));
+
+  return r;
 }
 
 } // namespace dex

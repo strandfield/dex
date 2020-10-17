@@ -83,12 +83,15 @@ public:
   void displaymath();
   void enddisplaymath();
 
+  void makegrouptable(std::string groupname, std::string templatename);
+
   bool isIdle() const;
 
   bool isWritingParagraph() const;
   ParagraphWriter& paragraphWriter();
 
   bool isWritingList() const;
+  bool isWritingListItem() const;
   bool isWritingMath() const;
   
   void beginSinceBlock(const std::string& version);

@@ -77,7 +77,7 @@ MarkdownExport::MarkdownExport()
 {
   LiquidExporterProfile prof;
   prof.load(QDir{ ":/templates/markdown" });
-  profile() = std::move(prof);
+  setProfile(std::move(prof));
 }
 
 void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)

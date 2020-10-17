@@ -229,6 +229,16 @@ void JsonExport::visit_displaymath(const dex::DisplayMath& math)
   ModelVisitor::visit_displaymath(math);
 }
 
+void JsonExport::visit_grouptable(const dex::GroupTable& table)
+{
+  object()["groupname"] = table.groupname;
+  
+  if (!table.templatename.empty())
+    object()["templatename"] = table.templatename;
+
+  ModelVisitor::visit_grouptable(table);
+}
+
 static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)
 {
   json::Array result;
@@ -418,6 +428,8 @@ void JsonExport::visit_manual(const Manual& man)
 {
   object()["title"] = man.title;
 
+  mapping.bind(man, object());
+
   ModelVisitor::visit_manual(man);
 }
 
@@ -427,6 +439,42 @@ void JsonExport::visit_sectioning(const Sectioning& sec)
   object()["depth"] = Sectioning::depth2str(sec.depth);
 
   ModelVisitor::visit_sectioning(sec);
+}
+
+template<typename T>
+static json::Json serialize_paths(const Model& model, const std::vector<T>& elems)
+{
+  json::Array result;
+
+  for (const auto& e : elems)
+    result.push(Model::to_string(model.path(e)));
+
+  return result;
+}
+
+static json::Json serialize_paths(const Model& model, const std::vector<std::weak_ptr<Group>>& groups)
+{
+  json::Array result;
+
+  for (const auto& e : groups)
+    result.push(Model::to_string(model.path(e.lock())));
+
+  return result;
+}
+
+void JsonExport::visit_group(const Group& group)
+{
+  RAIIJsonExportContext context{ this, path().back() };
+
+  object()["name"] = group.name;
+  object()["properties"] = group.properties;
+  object()["entities"] = serialize_paths(model(), group.content.entities);
+  object()["manuals"] = serialize_paths(model(), group.content.manuals);
+  object()["groups"] = serialize_paths(model(), group.content.groups);
+
+  mapping.bind(group, object());
+
+  ModelVisitor::visit_group(group);
 }
 
 void JsonExport::write_location(json::Object& obj, const cxx::SourceLocation& loc)

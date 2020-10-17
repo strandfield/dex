@@ -62,6 +62,7 @@ protected:
   virtual void visit_domlistitem(const dom::ListItem& li);
   virtual void visit_domparagraph(const dom::Paragraph& par);
   virtual void visit_displaymath(const dex::DisplayMath& math);
+  virtual void visit_grouptable(const dex::GroupTable& table);
 
   virtual void visit_program(const dex::Program& prog);
   virtual void visit_entity(const cxx::Entity& e);
@@ -79,6 +80,8 @@ protected:
 
   virtual void visit_manual(const dex::Manual& man);
   virtual void visit_sectioning(const dex::Sectioning& section);
+
+  virtual void visit_group(const dex::Group& group);
 
 private:
   const Model* m_model = nullptr;

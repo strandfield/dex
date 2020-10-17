@@ -1,6 +1,7 @@
 
 /*!
  * \fn int min(int a, int b)
+ * \ingroup math
  * \brief returns the minimum of two integers
  */
 inline int min(int a, int b)
@@ -10,6 +11,7 @@ inline int min(int a, int b)
 
 /*!
  * \fn int max(int a, int b)
+ * \ingroup math
  * \brief returns the maximum of two integers
  */
 inline int max(int a, int b)
@@ -21,6 +23,9 @@ inline int max(int a, int b)
 /*!
  * \class Point
  * \brief provides a 2D-point with integer coordinates
+ * 
+ * See also the following math related functions:
+ * \makegrouptable math
  */
 struct Point
 {

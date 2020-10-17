@@ -5,6 +5,7 @@
 #include "dex/input/document-writer.h"
 
 #include "dex/model/since.h"
+#include "dex/model/manual.h"
 
 #include "dex/input/math-writer.h"
 #include "dex/input/paragraph-writer.h"
@@ -324,6 +325,18 @@ void DocumentWriter::enddisplaymath()
   adjustState();
 }
 
+void DocumentWriter::makegrouptable(std::string groupname, std::string templatename)
+{
+  if (isWritingParagraph())
+    endParagraph();
+  
+  if (isWritingMath() || isWritingList())
+    throw std::runtime_error{ "DocumentWriter::makegrouptable() not available in this mode" };
+
+  auto node = std::make_shared<dex::GroupTable>(std::move(groupname), std::move(templatename));
+  m_cur_content->push_back(node);
+}
+
 void DocumentWriter::beginSinceBlock(const std::string& version)
 {
   if(m_since.has_value())
@@ -421,6 +434,11 @@ ParagraphWriter& DocumentWriter::paragraphWriter()
 bool DocumentWriter::isWritingList() const
 {
   return m_state == State::WritingList;
+}
+
+bool DocumentWriter::isWritingListItem() const
+{
+  return m_state == State::WritingListItem;
 }
 
 bool DocumentWriter::isWritingMath() const
