@@ -4,9 +4,10 @@
 
 #include "dex/output/liquid-exporter.h"
 
-#include "dex/output/json-output-annotator.h"
 #include "dex/output/liquid-exporter-url-annotator.h"
-#include "dex/output/liquid-stringifier.h"
+
+#include "dex/output/markdown-export.h"
+#include "dex/output/latex-export.h"
 
 #include "dex/common/errors.h"
 #include "dex/common/json-utils.h"
@@ -50,6 +51,7 @@ public:
       // but using the JsonExportMapping is expected to be faster.
       // @TODO: fallback to the path method if the object is not in the map
       json::Object obj = json_mapping.get(cla).toObject();
+      exporter.selectStringifier(exporter.profile().class_template.filesuffix);
       exporter.dump(cla, obj);
     }
 
@@ -61,12 +63,19 @@ public:
     if (!exporter.profile().manual_template.model.nodes().empty())
     {
       json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
+      exporter.selectStringifier(exporter.profile().manual_template.filesuffix);
       exporter.dump(man, obj);
     }
 
     ModelVisitor::visit_manual(man);
   }
 };
+
+LiquidExporter::LiquidExporter()
+{
+  m_stringifiers["md"] = std::make_shared<MarkdownStringifier>(*this);
+  m_stringifiers["tex"] = std::make_shared<LatexStringifier>(*this);
+}
 
 void LiquidExporter::setProfile(Profile pro)
 {
@@ -112,6 +121,8 @@ void LiquidExporter::render()
   {
     json::Object context;
     setupContext(context);
+
+    selectStringifier(QFileInfo(QString::fromStdString(file.first)).suffix().toStdString());
 
     std::string output = liquid::Renderer::render(file.second, context);
 
@@ -194,6 +205,11 @@ void LiquidExporter::setModel(std::shared_ptr<Model> model)
 std::string LiquidExporter::stringify(const json::Json& val)
 {
   return m_stringifier->stringify(val);
+}
+
+void LiquidExporter::selectStringifier(const std::string& filesuffix)
+{
+  m_stringifier = m_stringifiers[filesuffix];
 }
 
 void LiquidExporter::setupContext(json::Object& context)

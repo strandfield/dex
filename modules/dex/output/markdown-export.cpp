@@ -143,7 +143,6 @@ MarkdownExport::MarkdownExport()
   LiquidExporterProfile prof;
   prof.load(QDir{ ":/templates/markdown" });
   setProfile(std::move(prof));
-  m_stringifier = std::make_shared<MarkdownStringifier>(static_cast<LiquidExporter&>(*this));
 }
 
 void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
