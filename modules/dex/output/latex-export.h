@@ -25,16 +25,6 @@ protected:
   std::string stringify_section(const dex::Sectioning& sec) const override;
 };
 
-class DEX_OUTPUT_API LatexExport : protected LiquidExporter
-{
-public:
-  LatexExport();
-
-  using LiquidExporter::setVariables;
-
-  void dump(std::shared_ptr<Model> model, const QDir& dir);
-};
-
 } // namespace dex
 
 #endif // DEX_OUTPUT_LATEX_EXPORT_H

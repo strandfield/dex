@@ -78,6 +78,14 @@ public:
 
   void render();
 
+  // @TODO: remove this convenience function
+  void dump(std::shared_ptr<Model> model, const QDir& dir)
+  {
+    setOutputDir(dir);
+    setModel(model);
+    render();
+  }
+
   static void trim_right(std::string& str);
   static void simplify_empty_lines(std::string& str);
 

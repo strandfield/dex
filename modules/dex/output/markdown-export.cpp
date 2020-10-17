@@ -145,12 +145,4 @@ MarkdownExport::MarkdownExport()
   setProfile(std::move(prof));
 }
 
-void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
-{
-  LiquidExporter::setOutputDir(dir);
-  LiquidExporter::setModel(model);
-
-  LiquidExporter::render();
-}
-
 } // namespace dex

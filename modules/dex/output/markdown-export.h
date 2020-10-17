@@ -36,8 +36,7 @@ public:
   MarkdownExport();
 
   using LiquidExporter::setVariables;
-
-  void dump(std::shared_ptr<Model> model, const QDir& dir);
+  using LiquidExporter::dump;
 
 protected:
 
