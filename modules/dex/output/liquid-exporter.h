@@ -115,7 +115,7 @@ protected:
 protected:
 
   void setupContext(json::Object& context);
-  virtual void postProcess(std::string& output);
+  void postProcess(std::string& output);
   void write(const std::string& data, const std::string& filepath);
 
 private:

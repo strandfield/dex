@@ -206,7 +206,8 @@ void LiquidExporter::setupContext(json::Object& context)
 
 void LiquidExporter::postProcess(std::string& output)
 {
-  /* no-op */
+  LiquidExporter::trim_right(output);
+  LiquidExporter::simplify_empty_lines(output);
 }
 
 void LiquidExporter::write(const std::string& data, const std::string& filepath)

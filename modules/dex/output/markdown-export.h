@@ -40,9 +40,6 @@ public:
   void dump(std::shared_ptr<Model> model, const QDir& dir);
 
 protected:
-  void postProcess(std::string& output) override;
-
-protected:
 
 };
 

@@ -156,10 +156,4 @@ void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
   LiquidExporter::render();
 }
 
-void MarkdownExport::postProcess(std::string& output)
-{
-  LiquidExporter::trim_right(output);
-  LiquidExporter::simplify_empty_lines(output);
-}
-
 } // namespace dex
