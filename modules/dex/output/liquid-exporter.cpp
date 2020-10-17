@@ -103,6 +103,8 @@ void LiquidExporter::render()
   if (model()->empty())
     return;
 
+  annotateModel();
+
   LiquidExporterModelVisitor visitor{ *this, m_serialized_model, m_model_mapping };
   visitor.visit(*model());
 

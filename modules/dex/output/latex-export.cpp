@@ -152,8 +152,6 @@ void LatexExport::dump(std::shared_ptr<Model> model, const QDir& dir)
   LiquidExporter::setOutputDir(dir);
   LiquidExporter::setModel(model);
 
-  LiquidExporter::annotateModel();
-
   LiquidExporter::render();
 }
 
