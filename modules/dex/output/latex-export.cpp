@@ -64,30 +64,13 @@ public:
   }
 };
 
-LatexExport::LatexExport()
+LatexStringifier::LatexStringifier(LiquidExporter& exp)
+  : LiquidStringifier(exp)
 {
-  LiquidExporterProfile prof;
-  prof.load(QDir{ ":/templates/latex" });
-  setProfile(std::move(prof));
+
 }
 
-void LatexExport::dump(std::shared_ptr<Model> model, const QDir& dir)
-{
-  LiquidExporter::setOutputDir(dir);
-  LiquidExporter::setModel(model);
-
-  LiquidExporter::annotateModel(".tex");
-
-  LiquidExporter::render();
-}
-
-void LatexExport::postProcess(std::string& output)
-{
-  LiquidExporter::trim_right(output);
-  LiquidExporter::simplify_empty_lines(output);
-}
-
-std::string LatexExport::stringify_list(const dom::List& list)
+std::string LatexStringifier::stringify_list(const dom::List& list) const
 {
   std::string result = "\\begin{itemize}\n";
 
@@ -101,24 +84,24 @@ std::string LatexExport::stringify_list(const dom::List& list)
   return result;
 }
 
-std::string LatexExport::stringify_listitem(const dom::ListItem& li)
+std::string LatexStringifier::stringify_listitem(const dom::ListItem& li) const
 {
   return stringify_domcontent(li.content);
 }
 
-std::string LatexExport::stringify_paragraph(const dom::Paragraph& par)
+std::string LatexStringifier::stringify_paragraph(const dom::Paragraph& par) const
 {
   LatexParagraphConverter converter{ par };
   converter.process();
   return std::string(std::move(converter.result));
 }
 
-std::string LatexExport::stringify_image(const dom::Image& img)
+std::string LatexStringifier::stringify_image(const dom::Image& img) const
 {
   return "\\includegraphics{" + img.src + "}";
 }
 
-std::string LatexExport::stringify_math(const dex::DisplayMath& math)
+std::string LatexStringifier::stringify_math(const dex::DisplayMath& math) const
 {
   std::string result = "\\[";
   result += math.source;
@@ -126,7 +109,7 @@ std::string LatexExport::stringify_math(const dex::DisplayMath& math)
   return result;
 }
 
-std::string LatexExport::stringify_section(const dex::Sectioning& sec)
+std::string LatexStringifier::stringify_section(const dex::Sectioning& sec) const
 {
   std::string result;
 
@@ -145,7 +128,7 @@ std::string LatexExport::stringify_section(const dex::Sectioning& sec)
     result += "{";
     break;
   }
-  
+
   result += sec.name + "}\n\n";
 
   for (const auto& c : sec.content)
@@ -154,6 +137,30 @@ std::string LatexExport::stringify_section(const dex::Sectioning& sec)
   }
 
   return result;
+}
+
+LatexExport::LatexExport()
+{
+  LiquidExporterProfile prof;
+  prof.load(QDir{ ":/templates/latex" });
+  setProfile(std::move(prof));
+  m_stringifier = std::make_shared<LatexStringifier>(static_cast<LiquidExporter&>(*this));
+}
+
+void LatexExport::dump(std::shared_ptr<Model> model, const QDir& dir)
+{
+  LiquidExporter::setOutputDir(dir);
+  LiquidExporter::setModel(model);
+
+  LiquidExporter::annotateModel(".tex");
+
+  LiquidExporter::render();
+}
+
+void LatexExport::postProcess(std::string& output)
+{
+  LiquidExporter::trim_right(output);
+  LiquidExporter::simplify_empty_lines(output);
 }
 
 } // namespace dex

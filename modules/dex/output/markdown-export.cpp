@@ -73,11 +73,77 @@ public:
   }
 };
 
+MarkdownStringifier::MarkdownStringifier(LiquidExporter& exp)
+  : LiquidStringifier(exp)
+{
+
+}
+
+std::string MarkdownStringifier::stringify_list(const dom::List& list) const
+{
+  // @TODO: handle nested list
+
+  std::string result;
+
+  for (const auto& li : list.items)
+  {
+    result += "- " + stringify_listitem(*li) + "\n";
+  }
+
+  return result;
+}
+
+std::string MarkdownStringifier::stringify_listitem(const dom::ListItem& li) const
+{
+  return stringify_domcontent(li.content);
+}
+
+std::string MarkdownStringifier::stringify_paragraph(const dom::Paragraph& par) const
+{
+  MarkdownParagraphConverter converter{ par };
+  converter.process();
+  return std::string(std::move(converter.result));
+}
+
+std::string MarkdownStringifier::stringify_image(const dom::Image& img) const
+{
+  return "![image](" + img.src + ")";
+}
+
+std::string MarkdownStringifier::stringify_math(const dex::DisplayMath& math) const
+{
+  std::string result = "```tex\n";
+  result += math.source;
+  result += "\n```\n";
+  return result;
+}
+
+std::string MarkdownStringifier::stringify_section(const dex::Sectioning& sec) const
+{
+  std::string result;
+
+  for (int i(0); i < (sec.depth - dex::Sectioning::Part) + 1; ++i)
+    result.push_back('#');
+
+  result.push_back(' ');
+
+  result += sec.name + "\n\n";
+
+  for (const auto& c : sec.content)
+  {
+    result += stringify_domnode(*c) + "\n\n";
+  }
+
+  return result;
+}
+
+
 MarkdownExport::MarkdownExport()
 {
   LiquidExporterProfile prof;
   prof.load(QDir{ ":/templates/markdown" });
   setProfile(std::move(prof));
+  m_stringifier = std::make_shared<MarkdownStringifier>(static_cast<LiquidExporter&>(*this));
 }
 
 void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
@@ -94,64 +160,6 @@ void MarkdownExport::postProcess(std::string& output)
 {
   LiquidExporter::trim_right(output);
   LiquidExporter::simplify_empty_lines(output);
-}
-
-std::string MarkdownExport::stringify_list(const dom::List& list)
-{
-  // @TODO: handle nested list
-
-  std::string result;
-
-  for (const auto& li : list.items)
-  {
-    result += "- " + stringify_listitem(*li) + "\n";
-  }
-
-  return result;
-}
-
-std::string MarkdownExport::stringify_listitem(const dom::ListItem& li)
-{
-  return stringify_domcontent(li.content);
-}
-
-std::string MarkdownExport::stringify_paragraph(const dom::Paragraph& par)
-{
-  MarkdownParagraphConverter converter{ par };
-  converter.process();
-  return std::string(std::move(converter.result));
-}
-
-std::string MarkdownExport::stringify_image(const dom::Image& img)
-{
-  return "![image](" + img.src + ")";
-}
-
-std::string MarkdownExport::stringify_math(const dex::DisplayMath& math)
-{
-  std::string result = "```tex\n";
-  result += math.source;
-  result += "\n```\n";
-  return result;
-}
-
-std::string MarkdownExport::stringify_section(const dex::Sectioning& sec)
-{
-  std::string result;
-  
-  for (int i(0); i < (sec.depth - dex::Sectioning::Part) + 1; ++i)
-    result.push_back('#');
-
-  result.push_back(' ');
-
-  result += sec.name + "\n\n";
-
-  for (const auto& c : sec.content)
-  {
-    result += stringify_domnode(*c) + "\n\n";
-  }
-
-  return result;
 }
 
 } // namespace dex
