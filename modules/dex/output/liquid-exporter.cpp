@@ -6,6 +6,7 @@
 
 #include "dex/output/json-output-annotator.h"
 #include "dex/output/liquid-exporter-url-annotator.h"
+#include "dex/output/liquid-stringifier.h"
 
 #include "dex/common/errors.h"
 #include "dex/common/json-utils.h"
@@ -190,100 +191,7 @@ void LiquidExporter::setModel(std::shared_ptr<Model> model)
 
 std::string LiquidExporter::stringify(const json::Json& val)
 {
-  if (!val.isObject() && !val.isArray())
-    return Renderer::stringify(val);
-  else if (val.isArray())
-    return stringify_array(val.toArray());
-
-  json::Object obj = val.toObject();
-
-  auto path_it = obj.data().find("_path");
-
-  if (path_it != obj.data().end())
-  {
-    Model::Path path = Model::parse_path(path_it->second.toString());
-    Model::Node model_node = model()->get(path);
-
-    if (std::holds_alternative<std::shared_ptr<dom::Node>>(model_node))
-    {
-      auto dom_node = std::get< std::shared_ptr<dom::Node>>(model_node);
-      return stringify_domnode(*dom_node);
-    }
-  }
-  else
-  {
-    assert(("element has no path", false));
-    return {};
-  }
-
-  assert(("Not implemented", false));
-  return {};
-}
-
-std::string LiquidExporter::stringify_domnode(const dom::Node& node)
-{
-  if (node.is<dom::Paragraph>())
-    return stringify_paragraph(static_cast<const dom::Paragraph&>(node));
-  else if (node.is<dom::List>())
-    return stringify_list(static_cast<const dom::List&>(node));
-  else if (node.is<dom::ListItem>())
-    return stringify_listitem(static_cast<const dom::ListItem&>(node));
-  else if (node.is<dom::Image>())
-    return stringify_image(static_cast<const dom::Image&>(node));
-  else if (node.is<dex::Sectioning>())
-    return stringify_section(static_cast<const dex::Sectioning&>(node));
-  else if (node.is<dex::DisplayMath>())
-    return stringify_math(static_cast<const dex::DisplayMath&>(node));
-  else if (node.is<dex::GroupTable>())
-    return stringify_grouptable(static_cast<const dex::GroupTable&>(node));
-
-  assert(("dom element not implemented", false));
-  return {};
-}
-
-std::string LiquidExporter::stringify_domcontent(const dom::Content& content)
-{
-  std::string result;
-
-  for (const auto& node : content)
-  {
-    result += stringify_domnode(*node);
-  }
-
-  return result;
-}
-
-std::string LiquidExporter::stringify_grouptable(const dex::GroupTable& table)
-{
-  auto it = templates().find(table.templatename.empty() ? "groupdefault" : table.templatename);
-
-  if (it == templates().end())
-    throw liquid::EvaluationException{ std::string("Could not find group templates: ") + table.templatename };
-
-  auto g = m_model->groups.get(table.groupname);
-
-  if(g == nullptr)
-    throw liquid::EvaluationException{ std::string("Could not find group: ") + table.groupname };
-
-  auto jsongroup = modelMapping().get(*g);
-
-  json::Object data;
-  data["group"] = jsongroup;
-
-  return capture(it->second, data);
-}
-
-std::string LiquidExporter::stringify_array(const json::Array& list)
-{
-  std::string result;
-
-  for (const auto& val : list.data())
-  {
-    result += stringify(val);
-    result += "\n\n";
-  }
-
-  return result;
+  return m_stringifier->stringify(val);
 }
 
 void LiquidExporter::setupContext(json::Object& context)

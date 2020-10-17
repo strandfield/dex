@@ -40,6 +40,8 @@ namespace dex
 class DisplayMath;
 class Model;
 
+class LiquidStringifier;
+
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
 {
 public:
@@ -98,19 +100,6 @@ protected:
 protected:
   std::string stringify(const json::Json& val) override;
 
-  virtual std::string stringify_domnode(const dom::Node& node);
-  virtual std::string stringify_domcontent(const dom::Content& content);
-
-  virtual std::string stringify_array(const json::Array& list);
-  virtual std::string stringify_list(const dom::List& list) = 0;
-  virtual std::string stringify_listitem(const dom::ListItem& li) = 0;
-  virtual std::string stringify_paragraph(const dom::Paragraph& par) = 0;
-  virtual std::string stringify_image(const dom::Image& img) = 0;
-  virtual std::string stringify_math(const dex::DisplayMath& math) = 0;
-  virtual std::string stringify_grouptable(const dex::GroupTable& table);
-
-  virtual std::string stringify_section(const dex::Sectioning& sec) = 0;
-
 protected:
 
   json::Json applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) override;
@@ -136,6 +125,8 @@ private:
   JsonExportMapping m_model_mapping;
   Profile m_profile;
   json::Object m_user_variables;
+protected:
+  std::shared_ptr<LiquidStringifier> m_stringifier;
 };
 
 } // namespace dex
