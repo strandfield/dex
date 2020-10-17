@@ -151,7 +151,7 @@ void MarkdownExport::dump(std::shared_ptr<Model> model, const QDir& dir)
   LiquidExporter::setOutputDir(dir);
   LiquidExporter::setModel(model);
 
-  LiquidExporter::annotateModel(".md");
+  LiquidExporter::annotateModel();
 
   LiquidExporter::render();
 }

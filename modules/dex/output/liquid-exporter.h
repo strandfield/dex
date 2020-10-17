@@ -87,7 +87,7 @@ public:
 
 protected:
 
-  void annotateModel(const std::string& file_suffix);
+  void annotateModel();
 
 protected:
   friend class LiquidExporterModelVisitor;

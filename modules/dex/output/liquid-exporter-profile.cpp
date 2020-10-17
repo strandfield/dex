@@ -10,6 +10,7 @@
 #include "dex/common/string-utils.h"
 
 #include <QDirIterator>
+#include <QFileInfo>
 
 #include <set>
 
@@ -65,6 +66,7 @@ protected:
       tmplt.model = open_liquid_template(path);
       tmplt.model.skipWhitespacesAfterTag();
       tmplt.outdir = dex::settings::read(settings, "output/" + name, std::move(default_out));
+      tmplt.filesuffix = QFileInfo(directory.absolutePath() + "/" + QString::fromStdString(path)).suffix().toStdString();
     }
   }
 

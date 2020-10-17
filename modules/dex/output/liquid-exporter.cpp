@@ -139,9 +139,9 @@ std::string LiquidExporter::capture(const liquid::Template& tmplt, const json::O
   return liquid::Renderer::capture(tmplt, data);
 }
 
-void LiquidExporter::annotateModel(const std::string& file_suffix)
+void LiquidExporter::annotateModel()
 {
-  LiquidExporterUrlAnnotator url_annotator{ m_serialized_model, m_model_mapping, profile(), file_suffix };
+  LiquidExporterUrlAnnotator url_annotator{ m_serialized_model, m_model_mapping, profile() };
   url_annotator.annotate(*m_model);
 }
 
