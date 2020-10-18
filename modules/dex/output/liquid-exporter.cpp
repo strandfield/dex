@@ -15,17 +15,10 @@
 #include "dex/common/json-utils.h"
 #include "dex/common/settings.h"
 
-#include "dex/model/display-math.h"
 #include "dex/model/model.h"
 
 #include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/function.h>
-#include <cxx/namespace.h>
 #include <cxx/program.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
 
 namespace dex
 {

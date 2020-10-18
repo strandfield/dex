@@ -20,25 +20,14 @@
 #include <variant>
 #include <vector>
 
-namespace dom
-{
-class Image;
-class List;
-class ListItem;
-class Paragraph;
-} // namespace dom
-
 namespace cxx
 {
-class Entity;
 class Class;
-class Program;
 } // namespace cxx
 
 namespace dex
 {
 
-class DisplayMath;
 class Model;
 
 class LiquidFilters;

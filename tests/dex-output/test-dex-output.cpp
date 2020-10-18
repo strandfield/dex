@@ -12,7 +12,7 @@
 #include "dex/common/json-utils.h"
 
 #include "dex/output/json-export.h"
-#include "dex/output/markdown-export.h"
+#include "dex/output/liquid-exporter.h"
 
 #include <cxx/class.h>
 #include <cxx/documentation.h>
