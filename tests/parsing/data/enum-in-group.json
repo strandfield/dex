@@ -1,7 +1,6 @@
 {
   "groups": [{
       "entities": ["$.program.global_namespace.entities[0]"],
-      "groups": [],
       "manuals": [],
       "name": "useful_enums",
       "properties": {}
