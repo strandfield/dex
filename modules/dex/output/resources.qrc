@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="/">
+    <file>templates/json/config.ini</file>
+    <file>templates/tex/config.ini</file>
+    <file>templates/md/config.ini</file>
     <file>templates/latex/config.ini</file>
     <file>templates/latex/api-reference.tex</file>
     <file>templates/latex/macros.tex</file>

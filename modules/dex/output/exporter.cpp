@@ -9,9 +9,11 @@
 #include "dex/output/markdown-export.h"
 
 #include "dex/common/errors.h"
+#include "dex/common/settings.h"
 
 #include <json-toolkit/stringify.h>
 
+#include <QDir>
 #include <QFileInfo>
 
 namespace dex
@@ -26,38 +28,54 @@ void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& 
 {
   QFileInfo info{ name };
 
-  if (info.suffix() == "json")
+  QString profile = info.suffix();
+
+  std::string profile_config_file = QDir{ ":/templates/" + profile }.absoluteFilePath("config.ini").toStdString();
+  dex::SettingsMap config = dex::settings::load(profile_config_file);
+  std::string engine = std::get<std::string>(config["engine"]);
+
+  for (;;)
   {
-    auto obj = dex::JsonExport::serialize(*model);
+    if (engine == "delegate")
+    {
+      profile = QString::fromStdString(std::get<std::string>(config["profile"]));
+      profile_config_file = QDir{ ":/templates/" + profile }.absoluteFilePath("config.ini").toStdString();
+      config = dex::settings::load(profile_config_file);
+      engine = std::get<std::string>(config["engine"]);
+    }
+    else if (engine == "json")
+    {
+      auto obj = dex::JsonExport::serialize(*model);
 
-    QFile file{ name };
+      QFile file{ name };
 
-    if (!file.open(QIODevice::WriteOnly))
-      throw IOException{ name.toStdString(), "could not open file for writing" };
+      if (!file.open(QIODevice::WriteOnly))
+        throw IOException{ name.toStdString(), "could not open file for writing" };
 
-    file.write(QByteArray::fromStdString(json::stringify(obj)));
-  }
-  else if (info.suffix() == "md" || info.suffix() == "tex")
-  {
-    dex::LiquidExporter exporter;
+      file.write(QByteArray::fromStdString(json::stringify(obj)));
 
-    LiquidExporterProfile prof;
+      return;
+    }
+    else if (engine == "liquid")
+    {
+      dex::LiquidExporter exporter;
 
-    if (info.suffix() == "md")
-      prof.load(QDir{ ":/templates/markdown" });
+      LiquidExporterProfile prof;
+      prof.load(QDir{ ":/templates/" + profile });
+
+      exporter.setProfile(std::move(prof));
+      exporter.setVariables(values);
+      exporter.setOutputDir(info.dir());
+      exporter.setModel(model);
+
+      exporter.render();
+
+      return;
+    }
     else
-      prof.load(QDir{ ":/templates/latex" });
-
-    exporter.setProfile(std::move(prof));
-    exporter.setVariables(values);
-    exporter.setOutputDir(info.dir());
-    exporter.setModel(model);
-
-    exporter.render();
-  }
-  else
-  {
-    throw std::runtime_error{ "Unknown export type" };
+    {
+      throw std::runtime_error{ "Unknown export type" };
+    }
   }
 }
 
