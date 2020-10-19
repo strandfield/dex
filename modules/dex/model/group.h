@@ -39,7 +39,6 @@ class DEX_MODEL_API Group : public std::enable_shared_from_this<Group>
 public:
   size_t index;
   std::string name;
-  json::Object properties;
 
   struct Content
   {

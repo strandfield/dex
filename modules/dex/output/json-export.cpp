@@ -457,7 +457,6 @@ void JsonExport::visit_group(const Group& group)
   RAIIJsonExportContext context{ this, path().back() };
 
   object()["name"] = group.name;
-  object()["properties"] = group.properties;
   object()["entities"] = serialize_paths(model(), group.content.entities);
   object()["manuals"] = serialize_paths(model(), group.content.manuals);
 
