@@ -6,6 +6,8 @@
 
 #include "dex/output/liquid-exporter-url-annotator.h"
 
+#include "dex/output/liquid-filters.h"
+
 #include "dex/output/markdown-export.h"
 #include "dex/output/latex-export.h"
 
@@ -13,17 +15,10 @@
 #include "dex/common/json-utils.h"
 #include "dex/common/settings.h"
 
-#include "dex/model/display-math.h"
 #include "dex/model/model.h"
 
 #include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/function.h>
-#include <cxx/namespace.h>
 #include <cxx/program.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
 
 namespace dex
 {
@@ -75,6 +70,13 @@ LiquidExporter::LiquidExporter()
 {
   m_stringifiers["md"] = std::make_shared<MarkdownStringifier>(*this);
   m_stringifiers["tex"] = std::make_shared<LatexStringifier>(*this);
+
+  m_filters = std::make_unique<LiquidFilters>(*this);
+}
+
+LiquidExporter::~LiquidExporter()
+{
+
 }
 
 void LiquidExporter::setProfile(Profile pro)
@@ -322,172 +324,9 @@ void LiquidExporter::simplify_empty_lines(std::string& str)
   str.resize(w);
 }
 
-static json::Array array_arg(const json::Json& object)
-{
-  if (object.isNull())
-    return json::Array();
-  else if (object.isArray())
-    return object.toArray();
-  else
-    throw std::runtime_error{ "Object is not an array" };
-}
-
 json::Json LiquidExporter::applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args)
 {
-  if (name == "filter_by_type")
-  {
-    return filter_by_type(array_arg(object), args.front().toString());
-  }
-  else if (name == "filter_by_accessibility")
-  {
-    return filter_by_accessibility(array_arg(object), args.front().toString());
-  }
-  else if (name == "filter_by_field")
-  {
-    return filter_by_field(array_arg(object), args.front().toString(), args.back().toString());
-  }
-  else if (name == "related_non_members")
-  {
-    return related_non_members(object.toObject());
-  }
-  else if (name == "group_get_entities")
-  {
-    return group_get_entities(object.toObject());
-  }
-  else if (name == "group_get_manuals")
-  {
-    return group_get_manuals(object.toObject());
-  }
-  else if (name == "group_get_groups")
-  {
-    return group_get_groups(object.toObject());
-  }
-
-  return liquid::Renderer::applyFilter(name, object, args);
-}
-
-json::Array LiquidExporter::filter_by_field(const json::Array& list, const std::string& field, const std::string& value)
-{
-  json::Array result;
-
-  for (const auto& obj : list.data())
-  {
-    if (obj[field] == value)
-      result.push(obj);
-  }
-
-  return result;
-}
-
-json::Array LiquidExporter::filter_by_type(const json::Array& list, const std::string& type)
-{
-  static const std::string field = "type";
-  return filter_by_field(list, field, type);
-}
-
-json::Array LiquidExporter::filter_by_accessibility(const json::Array& list, const std::string& as)
-{
-  static const std::string field = "accessibility";
-  return filter_by_field(list, field, as);
-}
-
-json::Array LiquidExporter::related_non_members(const json::Object& json_class)
-{
-  auto path_it = json_class.data().find("_path");
-
-  if (path_it == json_class.data().end())
-  {
-    assert(("element has no path", false));
-    return {};
-  }
-
-  Model::Path path = Model::parse_path(path_it->second.toString());
-  Model::Node model_node = model()->get(path);
-
-  if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(model_node))
-  {
-    return {};
-  }
-
-  auto the_class = std::dynamic_pointer_cast<cxx::Class>(std::get<std::shared_ptr<cxx::Entity>>(model_node));
-
-  if (the_class == nullptr)
-    return {};
-
-  std::shared_ptr<RelatedNonMembers::Entry> entry = m_model->program()->related.getRelated(the_class);
-
-  json::Array result;
-
-  if (entry == nullptr)
-    return result;
-
-  for (auto f : entry->non_members)
-  {
-    json::Json f_json = m_model_mapping.get(*f);
-    result.push(f_json);
-  }
-
-  return result;
-}
-
-json::Array LiquidExporter::group_get_entities(const json::Object& json_group)
-{
-  json::Array result;
-
-  auto g = m_model_mapping.get<Group>(json_group);
-
-  if (g == nullptr)
-  {
-    // @TODO: maybe log something
-    return result;
-  }
-
-  for (auto e : g->content.entities)
-  {
-    result.push(m_model_mapping.get(*e));
-  }
-
-  return result;
-}
-
-json::Array LiquidExporter::group_get_manuals(const json::Object& json_group)
-{
-  json::Array result;
-
-  auto g = m_model_mapping.get<Group>(json_group);
-
-  if (g == nullptr)
-  {
-    // @TODO: maybe log something
-    return result;
-  }
-
-  for (auto m : g->content.manuals)
-  {
-    result.push(m_model_mapping.get(*m));
-  }
-
-  return result;
-}
-
-json::Array LiquidExporter::group_get_groups(const json::Object& json_group)
-{
-  json::Array result;
-
-  auto g = m_model_mapping.get<Group>(json_group);
-
-  if (g == nullptr)
-  {
-    // @TODO: maybe log something
-    return result;
-  }
-
-  for (auto child_group : g->content.groups)
-  {
-    result.push(m_model_mapping.get(*child_group.lock()));
-  }
-
-  return result;
+  return m_filters->apply(name, object, args);
 }
 
 } // namespace dex

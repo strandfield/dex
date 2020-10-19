@@ -5,7 +5,6 @@
 #ifndef DEX_OUTPUT_MARKDOWN_EXPORT_H
 #define DEX_OUTPUT_MARKDOWN_EXPORT_H
 
-#include "dex/output/liquid-exporter.h"
 #include "dex/output/liquid-stringifier.h"
 
 namespace dom
