@@ -46,7 +46,6 @@ protected:
   json::Array related_non_members(const json::Object& json_class) const;
   json::Array group_get_entities(const json::Object& json_group) const;
   json::Array group_get_manuals(const json::Object& json_group) const;
-  json::Array group_get_groups(const json::Object& json_group) const;
 };
 
 } // namespace dex

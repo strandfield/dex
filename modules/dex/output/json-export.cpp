@@ -452,25 +452,13 @@ static json::Json serialize_paths(const Model& model, const std::vector<T>& elem
   return result;
 }
 
-static json::Json serialize_paths(const Model& model, const std::vector<std::weak_ptr<Group>>& groups)
-{
-  json::Array result;
-
-  for (const auto& e : groups)
-    result.push(Model::to_string(model.path(e.lock())));
-
-  return result;
-}
-
 void JsonExport::visit_group(const Group& group)
 {
   RAIIJsonExportContext context{ this, path().back() };
 
   object()["name"] = group.name;
-  object()["properties"] = group.properties;
   object()["entities"] = serialize_paths(model(), group.content.entities);
   object()["manuals"] = serialize_paths(model(), group.content.manuals);
-  object()["groups"] = serialize_paths(model(), group.content.groups);
 
   mapping.bind(group, object());
 

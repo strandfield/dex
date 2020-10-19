@@ -39,20 +39,17 @@ class DEX_MODEL_API Group : public std::enable_shared_from_this<Group>
 public:
   size_t index;
   std::string name;
-  json::Object properties;
 
   struct Content
   {
     std::vector<std::shared_ptr<cxx::Entity>> entities;
     std::vector<std::shared_ptr<Manual>> manuals;
-    std::vector<std::weak_ptr<Group>> groups;
   };
 
   Content content;
 
   void insert(std::shared_ptr<cxx::Entity> e);
   void insert(std::shared_ptr<Manual> m);
-  void insert(std::shared_ptr<Group> g);
 
 public:
   Group(size_t index, std::string n);

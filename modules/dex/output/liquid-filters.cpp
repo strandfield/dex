@@ -58,10 +58,6 @@ json::Json LiquidFilters::apply(const std::string& name, const json::Json& objec
   {
     return group_get_manuals(object.toObject());
   }
-  else if (name == "group_get_groups")
-  {
-    return group_get_groups(object.toObject());
-  }
 
   return liquid::BuiltinFilters::apply(name, object, args);
 }
@@ -165,26 +161,6 @@ json::Array LiquidFilters::group_get_manuals(const json::Object& json_group) con
   for (auto m : g->content.manuals)
   {
     result.push(renderer.modelMapping().get(*m));
-  }
-
-  return result;
-}
-
-json::Array LiquidFilters::group_get_groups(const json::Object& json_group) const
-{
-  json::Array result;
-
-  auto g = renderer.modelMapping().get<Group>(json_group);
-
-  if (g == nullptr)
-  {
-    // @TODO: maybe log something
-    return result;
-  }
-
-  for (auto child_group : g->content.groups)
-  {
-    result.push(renderer.modelMapping().get(*child_group.lock()));
   }
 
   return result;

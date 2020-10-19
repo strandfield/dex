@@ -42,9 +42,4 @@ void Group::insert(std::shared_ptr<Manual> m)
   content.manuals.push_back(m);
 }
 
-void Group::insert(std::shared_ptr<Group> g)
-{
-  content.groups.push_back(g);
-}
-
 } // namespace dex
