@@ -74,10 +74,11 @@ void Exporter::copyProfiles()
   }
 
   auto cp = [dest](const QString& src) {
-    if(!QFileInfo(dest + "/profiles/" + src).exists())
+    if(!QFileInfo::exists(dest + "/profiles/" + src))
       recursive_copy(":/templates/" + src, dest + "/profiles/" + src);
   };
 
+  cp("default");
   cp("json");
   cp("md");
   cp("markdown");
@@ -90,6 +91,10 @@ void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& 
   QFileInfo info{ name };
 
   QString profile = info.suffix();
+
+  if (profile.isEmpty())
+    profile = "default";
+
   const QString profiles_dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/profiles";
   QString profile_dir = profiles_dir + "/" + profile;
 
@@ -129,7 +134,7 @@ void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& 
 
       exporter.setProfile(std::move(prof));
       exporter.setVariables(values);
-      exporter.setOutputDir(info.dir());
+      exporter.setOutputDir(info.suffix().isEmpty() ? name : info.dir());
       exporter.setModel(model);
 
       exporter.render();

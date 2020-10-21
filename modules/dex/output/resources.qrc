@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>templates/default/config.ini</file>
     <file>templates/json/config.ini</file>
     <file>templates/tex/config.ini</file>
     <file>templates/md/config.ini</file>
