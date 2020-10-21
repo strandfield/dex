@@ -179,6 +179,7 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
 {
   Exporter exporter;
+  exporter.copyProfiles();
   exporter.process(model, name, values);
 }
 
