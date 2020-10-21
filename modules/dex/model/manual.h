@@ -17,10 +17,9 @@ class DEX_MODEL_API GroupTable : public dom::Element
 {
 public:
   std::string groupname;
-  std::string templatename;
 
 public:
-  explicit GroupTable(std::string gname, std::string tname = "");
+  explicit GroupTable(std::string gname);
 
   static const std::string TypeId;
   const std::string& type() const override;

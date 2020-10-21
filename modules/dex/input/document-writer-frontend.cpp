@@ -210,7 +210,7 @@ void DocumentWriterFrontend::enddisplaymath(const FunctionCall&)
 void DocumentWriterFrontend::makegrouptable(const FunctionCall& c)
 {
   std::string groupname = c.arg<std::string>(0);
-  m_writer->makegrouptable(groupname, c.opt<std::string>("", ""));
+  m_writer->makegrouptable(groupname);
 }
 
 

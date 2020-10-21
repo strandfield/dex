@@ -28,9 +28,8 @@ const std::string& Manual::type() const
   return TypeId;
 }
 
-GroupTable::GroupTable(std::string gname, std::string tname)
-  : groupname(std::move(gname)),
-    templatename(std::move(tname))
+GroupTable::GroupTable(std::string gname)
+  : groupname(std::move(gname))
 {
 
 }
