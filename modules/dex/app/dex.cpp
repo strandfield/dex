@@ -8,13 +8,9 @@
 
 #include "dex/common/json-utils.h"
 #include "dex/input/parser-machine.h"
-#include "dex/output/json-export.h"
-#include "dex/output/latex-export.h"
-#include "dex/output/markdown-export.h"
+#include "dex/output/exporter.h"
 
 #include <cxx/libclang.h>
-
-#include <json-toolkit/stringify.h>
 
 #include <QDir>
 
@@ -182,41 +178,8 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
 
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
 {
-  QFileInfo info{ name };
-
-  if (info.suffix() == "json")
-  {
-    auto obj = dex::JsonExport::serialize(*model);
-    
-    QFile file{ name };
-    
-    if (!file.open(QIODevice::WriteOnly))
-      throw IOException{ name.toStdString(), "could not open file for writing" };
-
-    file.write(QByteArray::fromStdString(json::stringify(obj)));
-  }
-  else if (info.suffix() == "md" || info.suffix() == "tex")
-  {
-    dex::LiquidExporter exporter;
-
-    LiquidExporterProfile prof;
-    
-    if(info.suffix() == "md")
-      prof.load(QDir{ ":/templates/markdown" });
-    else
-      prof.load(QDir{ ":/templates/latex" });
-    
-    exporter.setProfile(std::move(prof));
-    exporter.setVariables(values);
-    exporter.setOutputDir(info.dir());
-    exporter.setModel(model);
-
-    exporter.render();
-  }
-  else
-  {
-    throw std::runtime_error{ "Unknown export type" };
-  }
+  Exporter exporter;
+  exporter.process(model, name, values);
 }
 
 } // namespace dex
