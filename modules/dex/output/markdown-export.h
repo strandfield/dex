@@ -7,10 +7,15 @@
 
 #include "dex/output/liquid-stringifier.h"
 
+namespace cxx
+{
+class Entity;
+} // namespace cxx
+
 namespace dom
 {
 class ParagraphIterator;
-} // namespace dom;
+} // namespace dom
 
 namespace dex
 {
@@ -26,6 +31,10 @@ protected:
   std::string stringify_paragraph(const dom::Paragraph& par) const override;
   std::string stringify_image(const dom::Image& img) const override;
   std::string stringify_math(const dex::DisplayMath& math) const override;
+
+  std::string format_group_item(const std::shared_ptr<cxx::Entity>& e) const;
+  std::string stringify_grouptable(const dex::GroupTable& table) const override;
+
   std::string stringify_section(const dex::Sectioning& sec) const override;
 };
 

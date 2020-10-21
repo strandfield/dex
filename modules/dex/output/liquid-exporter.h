@@ -77,8 +77,6 @@ public:
   json::Object serializedModel() const;
   const JsonExportMapping& modelMapping() const;
 
-  std::string capture(const liquid::Template& tmplt, const json::Object& data);
-
 protected:
 
   void annotateModel();

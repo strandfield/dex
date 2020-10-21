@@ -49,7 +49,7 @@ protected:
   virtual std::string stringify_paragraph(const dom::Paragraph& par) const = 0;
   virtual std::string stringify_image(const dom::Image& img) const = 0;
   virtual std::string stringify_math(const dex::DisplayMath& math) const = 0;
-  virtual std::string stringify_grouptable(const dex::GroupTable& table) const;
+  virtual std::string stringify_grouptable(const dex::GroupTable& table) const = 0;
 
   virtual std::string stringify_section(const dex::Sectioning& sec) const = 0;
 };
