@@ -325,7 +325,7 @@ void DocumentWriter::enddisplaymath()
   adjustState();
 }
 
-void DocumentWriter::makegrouptable(std::string groupname, std::string templatename)
+void DocumentWriter::makegrouptable(std::string groupname)
 {
   if (isWritingParagraph())
     endParagraph();
@@ -333,7 +333,7 @@ void DocumentWriter::makegrouptable(std::string groupname, std::string templaten
   if (isWritingMath() || isWritingList())
     throw std::runtime_error{ "DocumentWriter::makegrouptable() not available in this mode" };
 
-  auto node = std::make_shared<dex::GroupTable>(std::move(groupname), std::move(templatename));
+  auto node = std::make_shared<dex::GroupTable>(std::move(groupname));
   m_cur_content->push_back(node);
 }
 

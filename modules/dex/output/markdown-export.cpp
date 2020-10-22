@@ -111,6 +111,48 @@ std::string MarkdownStringifier::stringify_math(const dex::DisplayMath& math) co
   return result;
 }
 
+std::string MarkdownStringifier::format_group_item(const std::shared_ptr<cxx::Entity>& e) const
+{
+  const std::string url = [&]() -> std::string {
+    json::Object json_obj = renderer.modelMapping().get(*e).toObject();
+    auto it = json_obj.data().find("url");
+
+    if (it != json_obj.data().end())
+      return json_obj["url"].toString();
+    else
+      return "";
+  }();
+
+  std::string result = [&]() -> std::string {
+    if (e->is<cxx::Function>())
+      return e->name + "()";
+    else
+      return e->name;
+  }();
+
+  if (!url.empty())
+    return "- [" + result + "](" + url + ")";
+  else
+    return "- " + result;
+}
+
+std::string MarkdownStringifier::stringify_grouptable(const dex::GroupTable& table) const
+{
+  std::shared_ptr<Group> group = renderer.model()->groups.get(table.groupname);
+
+  if (!group)
+    return "";
+
+  std::string result;
+
+  for (const auto& e : group->content.entities)
+  {
+    result += format_group_item(e) + "\n";
+  }
+
+  return result;
+}
+
 std::string MarkdownStringifier::stringify_section(const dex::Sectioning& sec) const
 {
   std::string result;

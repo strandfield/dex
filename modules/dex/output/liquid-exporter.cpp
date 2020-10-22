@@ -149,11 +149,6 @@ Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
   return result;
 }
 
-std::string LiquidExporter::capture(const liquid::Template& tmplt, const json::Object& data)
-{
-  return liquid::Renderer::capture(tmplt, data);
-}
-
 void LiquidExporter::annotateModel()
 {
   LiquidExporterUrlAnnotator url_annotator{ m_serialized_model, m_model_mapping, profile() };

@@ -83,7 +83,7 @@ public:
   void displaymath();
   void enddisplaymath();
 
-  void makegrouptable(std::string groupname, std::string templatename);
+  void makegrouptable(std::string groupname);
 
   bool isIdle() const;
 

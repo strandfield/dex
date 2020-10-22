@@ -232,10 +232,6 @@ void JsonExport::visit_displaymath(const dex::DisplayMath& math)
 void JsonExport::visit_grouptable(const dex::GroupTable& table)
 {
   object()["groupname"] = table.groupname;
-  
-  if (!table.templatename.empty())
-    object()["templatename"] = table.templatename;
-
   ModelVisitor::visit_grouptable(table);
 }
 

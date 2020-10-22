@@ -101,6 +101,39 @@ std::string LatexStringifier::stringify_math(const dex::DisplayMath& math) const
   return result;
 }
 
+std::string LatexStringifier::format_group_item(const std::shared_ptr<cxx::Entity>& e) const
+{
+  std::string result = [&]() -> std::string {
+    if (e->is<cxx::Function>())
+      return e->name + "()";
+    else
+      return e->name;
+  }();
+
+  return result;
+}
+
+std::string LatexStringifier::stringify_grouptable(const dex::GroupTable& table) const
+{
+  std::shared_ptr<Group> group = renderer.model()->groups.get(table.groupname);
+
+  if (!group)
+    return "";
+
+  std::string result;
+
+  result += "\\begin{itemize}\n";
+
+  for (const auto& e : group->content.entities)
+  {
+    result += "  \\item " + format_group_item(e) + "\n";
+  }
+
+  result += "\\end{itemize}\n";
+
+  return result;
+}
+
 std::string LatexStringifier::stringify_section(const dex::Sectioning& sec) const
 {
   std::string result;

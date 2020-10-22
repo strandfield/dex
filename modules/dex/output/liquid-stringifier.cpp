@@ -93,26 +93,6 @@ std::string LiquidStringifier::stringify_domcontent(const dom::Content& content)
   return result;
 }
 
-std::string LiquidStringifier::stringify_grouptable(const dex::GroupTable& table) const
-{
-  auto it = renderer.templates().find(table.templatename.empty() ? "groupdefault" : table.templatename);
-
-  if (it == renderer.templates().end())
-    throw liquid::EvaluationException{ std::string("Could not find group templates: ") + table.templatename };
-
-  auto g = renderer.model()->groups.get(table.groupname);
-
-  if(g == nullptr)
-    throw liquid::EvaluationException{ std::string("Could not find group: ") + table.groupname };
-
-  auto jsongroup = renderer.modelMapping().get(*g);
-
-  json::Object data;
-  data["group"] = jsongroup;
-
-  return renderer.capture(it->second, data);
-}
-
 std::string LiquidStringifier::stringify_array(const json::Array& list) const
 {
   std::string result;

@@ -8,11 +8,9 @@
     <file>templates/latex/api-reference.tex</file>
     <file>templates/latex/macros.tex</file>
     <file>templates/latex/manual.tex</file>
-    <file>templates/latex/groupdefault</file>
     <file>templates/markdown/config.ini</file>
     <file>templates/markdown/class.md</file>
     <file>templates/markdown/index.md</file>
     <file>templates/markdown/manual.md</file>
-    <file>templates/markdown/groupdefault</file>
   </qresource>
 </RCC>
