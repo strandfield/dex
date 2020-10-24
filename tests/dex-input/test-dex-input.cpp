@@ -230,15 +230,15 @@ void TestDexInput::documentWriterList()
 
   QVERIFY(list->items.size() == 2);
 
-  QVERIFY(list->items.front()->content.size() == 1);
-  QVERIFY(list->items.back()->content.size() == 1);
+  QVERIFY(list->items.front()->childNodes().size() == 1);
+  QVERIFY(list->items.back()->childNodes().size() == 1);
 
-  QVERIFY(list->items.front()->content.front()->is<dom::Paragraph>());
+  QVERIFY(list->items.front()->childNodes().front()->is<dom::Paragraph>());
 
-  auto par = std::static_pointer_cast<dom::Paragraph>(list->items.front()->content.front());
+  auto par = std::static_pointer_cast<dom::Paragraph>(list->items.front()->childNodes().front());
   QVERIFY(par->text() == "List item number 1");
 
-  par = std::static_pointer_cast<dom::Paragraph>(list->items.back()->content.front());
+  par = std::static_pointer_cast<dom::Paragraph>(list->items.back()->childNodes().front());
   QVERIFY(par->text() == "Number 2");
 }
 
@@ -328,15 +328,15 @@ void TestDexInput::parserMachineList()
   auto lst = std::static_pointer_cast<dom::List>(doc->description().front());
   
   QVERIFY(lst->items.size() == 2);
-  QVERIFY(lst->items.back()->content.size() == 2);
-  QVERIFY(lst->items.back()->content.back()->is<dom::List>());
+  QVERIFY(lst->items.back()->childNodes().size() == 2);
+  QVERIFY(lst->items.back()->childNodes().back()->is<dom::List>());
 
-  lst = std::static_pointer_cast<dom::List>(lst->items.back()->content.back());
+  lst = std::static_pointer_cast<dom::List>(lst->items.back()->childNodes().back());
   QVERIFY(lst->items.size() == 1);
-  QVERIFY(lst->items.front()->content.size() == 1);
-  QVERIFY(lst->items.front()->content.front()->is<dom::Paragraph>());
+  QVERIFY(lst->items.front()->childNodes().size() == 1);
+  QVERIFY(lst->items.front()->childNodes().front()->is<dom::Paragraph>());
 
-  auto par = std::static_pointer_cast<dom::Paragraph>(lst->items.front()->content.front());
+  auto par = std::static_pointer_cast<dom::Paragraph>(lst->items.front()->childNodes().front());
   QVERIFY(par->text() == "nested item");
 }
 

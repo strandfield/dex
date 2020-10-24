@@ -11,7 +11,6 @@
 
 #include "dex/input/dom-writer.h"
 
-#include <dom/content.h>
 #include <dom/paragraph.h>
 
 #include <optional>
@@ -101,7 +100,7 @@ public:
 
   void write(const std::shared_ptr<dom::Node>& node);
 
-  dom::Content& output();
+  dom::NodeList& output();
 
 protected:
 
@@ -118,7 +117,7 @@ protected:
   void pushNode(std::shared_ptr<dom::Node> n);
   void popNode();
 
-  void pushContent(dom::Content& c);
+  void pushContent(dom::NodeList& c);
   void popContent();
 
 private:
@@ -126,9 +125,9 @@ private:
   std::unique_ptr<ParagraphWriter> m_paragraph_writer;
   std::unique_ptr<MathWriter> m_math_writer;
   std::optional<std::string> m_since;
-  dom::Content m_result;
-  std::vector<dom::Content*> m_contents;
-  dom::Content* m_cur_content;
+  dom::NodeList m_result;
+  std::vector<dom::NodeList*> m_contents;
+  dom::NodeList* m_cur_content;
   std::vector<std::shared_ptr<dom::Node>> m_nodes;
 };
 
@@ -142,7 +141,7 @@ inline DocumentWriter::State DocumentWriter::state() const
   return m_state;
 }
 
-inline dom::Content& DocumentWriter::output()
+inline dom::NodeList& DocumentWriter::output()
 {
   return m_result;
 }

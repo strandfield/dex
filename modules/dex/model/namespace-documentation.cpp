@@ -9,7 +9,7 @@ namespace dex
 
 const std::string NamespaceDocumentation::TypeId = "namespace-documentation";
 
-const std::string& NamespaceDocumentation::type() const
+const std::string& NamespaceDocumentation::className() const
 {
   return TypeId;
 }

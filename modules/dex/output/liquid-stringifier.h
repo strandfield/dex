@@ -7,7 +7,7 @@
 
 #include "dex/dex-output.h"
 
-#include <dom/content.h>
+#include <dom/node.h>
 
 #include <json-toolkit/json.h>
 
@@ -41,7 +41,7 @@ public:
 
 protected:
   virtual std::string stringify_domnode(const dom::Node& node) const;
-  virtual std::string stringify_domcontent(const dom::Content& content) const;
+  virtual std::string stringify_domcontent(const dom::NodeList& content) const;
 
   virtual std::string stringify_array(const json::Array& list) const;
   virtual std::string stringify_list(const dom::List& list) const = 0;

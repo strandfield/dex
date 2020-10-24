@@ -80,7 +80,7 @@ std::string MarkdownStringifier::stringify_list(const dom::List& list) const
 
   for (const auto& li : list.items)
   {
-    result += "- " + stringify_listitem(*li) + "\n";
+    result += "- " + stringify_listitem(static_cast<dom::ListItem&>(*li)) + "\n";
   }
 
   return result;

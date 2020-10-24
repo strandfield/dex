@@ -31,7 +31,7 @@ private:
 public:
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 
   const std::optional<std::string>& returnValue() const;
   std::optional<std::string>& returnValue();

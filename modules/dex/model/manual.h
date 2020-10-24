@@ -7,7 +7,6 @@
 
 #include "dex/dex-model.h"
 
-#include <dom/content.h>
 #include <dom/element.h>
 
 namespace dex
@@ -22,7 +21,7 @@ public:
   explicit GroupTable(std::string gname);
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 };
 
 class DEX_MODEL_API Sectioning : public dom::Element
@@ -39,13 +38,13 @@ public:
 public:
   Depth depth;
   std::string name;
-  dom::Content content;
+  dom::NodeList content;
 
 public:
   Sectioning(Depth d, std::string n);
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 
   static std::string depth2str(Depth d);
   static Depth str2depth(const std::string& str);
@@ -55,13 +54,13 @@ class DEX_MODEL_API Manual : public dom::Node
 {
 public:
   std::string title;
-  dom::Content content;
+  dom::NodeList content;
 
 public:
   explicit Manual(std::string t);
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 };
 
 } // namespace dex

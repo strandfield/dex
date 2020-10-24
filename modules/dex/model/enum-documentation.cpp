@@ -10,12 +10,12 @@ namespace dex
 const std::string EnumDocumentation::TypeId = "enum-documentation";
 const std::string EnumValueDocumentation::TypeId = "enum-value-documentation";
 
-const std::string& EnumDocumentation::type() const
+const std::string& EnumDocumentation::className() const
 {
   return TypeId;
 }
 
-const std::string& EnumValueDocumentation::type() const
+const std::string& EnumValueDocumentation::className() const
 {
   return TypeId;
 }

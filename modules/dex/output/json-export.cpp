@@ -131,7 +131,7 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
 {
   json::Json result;
 
-  result["type"] = pmd.type();
+  result["type"] = pmd.className();
   result["begin"] = static_cast<int>(pmd.range().begin());
   result["end"] = static_cast<int>(pmd.range().end());
 
@@ -171,7 +171,7 @@ void JsonExport::visit_domnode(const dom::Node& n)
 {
   RAIIJsonExportContext context{ this, path().back() };
 
-  object()["type"] = n.type();
+  object()["type"] = n.className();
 
   ModelVisitor::visit_domnode(n);
 }

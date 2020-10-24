@@ -15,7 +15,6 @@
 #include <cxx/program.h>
 #include <cxx/variable.h>
 
-#include <dom/content.h>
 #include <dom/image.h>
 #include <dom/list.h>
 #include <dom/paragraph.h>

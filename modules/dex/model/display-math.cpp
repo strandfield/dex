@@ -9,7 +9,7 @@ namespace dex
 
 const std::string DisplayMath::TypeId = "math";
 
-const std::string& DisplayMath::type() const
+const std::string& DisplayMath::className() const
 {
   return TypeId;
 }

@@ -17,7 +17,7 @@ class DEX_MODEL_API NamespaceDocumentation : public EntityDocumentation
 public:
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 
 };
 

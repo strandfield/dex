@@ -9,7 +9,7 @@ namespace dex
 
 const std::string MacroDocumentation::TypeId = "macro-documentation";
 
-const std::string& MacroDocumentation::type() const
+const std::string& MacroDocumentation::className() const
 {
   return TypeId;
 }

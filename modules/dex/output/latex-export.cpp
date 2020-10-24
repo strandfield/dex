@@ -68,7 +68,7 @@ std::string LatexStringifier::stringify_list(const dom::List& list) const
 
   for (const auto& li : list.items)
   {
-    result += "  \\item " + stringify_listitem(*li) + "\n";
+    result += "  \\item " + stringify_listitem(static_cast<dom::ListItem&>(*li)) + "\n";
   }
 
   result += "\\end{itemize}";

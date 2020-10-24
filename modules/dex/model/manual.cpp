@@ -9,21 +9,21 @@ namespace dex
 
 const std::string GroupTable::TypeId = "grouptable";
 
-const std::string& GroupTable::type() const
+const std::string& GroupTable::className() const
 {
   return TypeId;
 }
 
 const std::string Sectioning::TypeId = "sectioning";
 
-const std::string& Sectioning::type() const
+const std::string& Sectioning::className() const
 {
   return TypeId;
 }
 
 const std::string Manual::TypeId = "manual";
 
-const std::string& Manual::type() const
+const std::string& Manual::className() const
 {
   return TypeId;
 }

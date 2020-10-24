@@ -9,7 +9,7 @@
 
 #include "dex/model/since.h"
 
-#include <dom/content.h>
+#include <dom/element.h>
 
 #include <optional>
 
@@ -23,7 +23,7 @@ public:
 
 public:
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 };
 
 class DEX_MODEL_API EnumDocumentation : public EntityDocumentation
@@ -31,7 +31,7 @@ class DEX_MODEL_API EnumDocumentation : public EntityDocumentation
 public:
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 };
 
 } // namespace dex

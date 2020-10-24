@@ -43,7 +43,7 @@ void ParagraphConverter::process(const dom::ParagraphIterator begin, const dom::
       {
         process_link(it, std::static_pointer_cast<dom::Link>(*it)->url());
       }
-      else if((*it)->type() == dex::InlineMath::TypeId)
+      else if((*it)->className() == dex::InlineMath::TypeId)
       {
         process_math(it);
       }
