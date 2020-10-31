@@ -403,14 +403,14 @@ void ModelVisitor::visit_entitydocumentation(const EntityDocumentation& edoc)
 
 void ModelVisitor::visit_manual(const dex::Manual& man)
 {
-  if (!man.content.empty())
+  if (!man.childNodes().empty())
   {
     RaiiArrayVisitor state_updater{ this, "content" };
-    for (size_t i(0); i < man.content.size(); ++i)
+    for (size_t i(0); i < man.childNodes().size(); ++i)
     {
       RaiiArrayElementVisitor inner_state_updater{ this, i };
 
-      visit_domnode(*man.content.at(i));
+      visit_domnode(*man.childNodes().at(i));
     }
   }
 }

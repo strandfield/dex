@@ -78,7 +78,11 @@ void ManualParser::beginFile()
 void ManualParser::endFile()
 {
   endBlock();
-  m_manual->content = std::move(currentFrame().writer->output());
+
+  for (auto e : currentFrame().writer->output())
+    m_manual->appendChild(e);
+
+  currentFrame().writer->output().clear();
 }
 
 void ManualParser::beginBlock()

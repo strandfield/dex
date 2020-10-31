@@ -571,10 +571,10 @@ void TestDexInput::parserMachineManual()
 
   std::shared_ptr<dex::Manual> man = parser.output()->manuals().front();
 
-  QVERIFY(man->content.size() == 1);
-  QVERIFY(man->content.front()->is<dex::Sectioning>());
+  QVERIFY(man->childNodes().size() == 1);
+  QVERIFY(man->childNodes().front()->is<dex::Sectioning>());
 
-  auto part = std::dynamic_pointer_cast<dex::Sectioning>(man->content.front());
+  auto part = std::dynamic_pointer_cast<dex::Sectioning>(man->childNodes().front());
   QVERIFY(part->depth == dex::Sectioning::Part);
   QVERIFY(part->content.size() == 2);
 

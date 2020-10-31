@@ -113,7 +113,7 @@ void TestDexOutput::jsonExportManual()
   model->manuals().push_back(man);
 
   auto sec = std::make_shared<dex::Sectioning>(dex::Sectioning::Part, "Part 1");
-  man->content.push_back(sec);
+  man->appendChild(sec);
 
   sec->content.push_back(make_par("Hello World!"));
 

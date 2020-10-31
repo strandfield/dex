@@ -61,7 +61,7 @@
           "type": "sectioning"
         }],
       "title": "A simple manual",
-      "type": "manual"
+      "type": "document"
     }],
   "program": {
     "global_namespace": {

@@ -7,7 +7,7 @@
 
 #include "dex/dex-model.h"
 
-#include <dom/element.h>
+#include <dom/document.h>
 
 namespace dex
 {
@@ -46,21 +46,18 @@ public:
   static const std::string TypeId;
   const std::string& className() const override;
 
+  const dom::NodeList& childNodes() const override;
+  void appendChild(std::shared_ptr<Node> n) override;
+  void removeChild(std::shared_ptr<Node> n) override;
+
   static std::string depth2str(Depth d);
   static Depth str2depth(const std::string& str);
 };
 
-class DEX_MODEL_API Manual : public dom::Node
+class DEX_MODEL_API Manual : public dom::Document
 {
 public:
-  std::string title;
-  dom::NodeList content;
-
-public:
-  explicit Manual(std::string t);
-
-  static const std::string TypeId;
-  const std::string& className() const override;
+  explicit Manual(std::string title = "");
 };
 
 } // namespace dex

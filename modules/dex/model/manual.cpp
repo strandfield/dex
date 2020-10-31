@@ -21,13 +21,6 @@ const std::string& Sectioning::className() const
   return TypeId;
 }
 
-const std::string Manual::TypeId = "manual";
-
-const std::string& Manual::className() const
-{
-  return TypeId;
-}
-
 GroupTable::GroupTable(std::string gname)
   : groupname(std::move(gname))
 {
@@ -39,6 +32,23 @@ Sectioning::Sectioning(Depth d, std::string n)
     name(std::move(n))
 {
 
+}
+
+const dom::NodeList& Sectioning::childNodes() const
+{
+  return content;
+}
+
+void Sectioning::appendChild(std::shared_ptr<Node> n)
+{
+  removeFromParent(n);
+  append(content, n);
+  registerChild(n);
+}
+
+void Sectioning::removeChild(std::shared_ptr<Node> n)
+{
+  remove(content, n);
 }
 
 std::string Sectioning::depth2str(Depth d)
@@ -66,9 +76,9 @@ Sectioning::Depth Sectioning::str2depth(const std::string& str)
 }
 
 Manual::Manual(std::string t)
-  : title(std::move(t))
+  : Document(std::move(t))
 {
-
+  doctype = "manual";
 }
 
 

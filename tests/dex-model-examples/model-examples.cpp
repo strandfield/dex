@@ -167,7 +167,7 @@ std::shared_ptr<dex::Model> manual()
 
   {
     auto part = make<dex::Sectioning>(dex::Sectioning::Part, "First part");
-    man->content.push_back(part);
+    man->appendChild(part);
 
     {
       auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 1");
@@ -187,7 +187,7 @@ std::shared_ptr<dex::Model> manual()
 
   {
     auto part = make<dex::Sectioning>(dex::Sectioning::Part, "Second part");
-    man->content.push_back(part);
+    man->appendChild(part);
 
     {
       auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 3");

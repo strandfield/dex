@@ -98,12 +98,17 @@ struct ChildNodeGetter
       if (path.name == "content")
         return listitem->content.at(path.index);
     }
-    else if (node->is<dex::Manual>())
+    else if (node->is<dom::Document>())
     {
-      auto man = std::static_pointer_cast<dex::Manual>(node);
+      auto document = std::static_pointer_cast<dom::Document>(node);
 
-      if (path.name == "content")
-        return man->content.at(path.index);
+      if (document->doctype == "manual")
+      {
+        auto man = std::static_pointer_cast<dex::Manual>(node);
+
+        if (path.name == "content")
+          return man->childNodes().at(path.index);
+      }
     }
     else if (node->is<dex::Sectioning>())
     {
