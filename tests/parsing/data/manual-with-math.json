@@ -17,6 +17,7 @@
           "name": "Example",
           "type": "sectioning"
         }],
+      "doctype": "manual",
       "title": "Manual with math",
       "type": "document"
     }],

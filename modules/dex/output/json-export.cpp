@@ -423,6 +423,7 @@ void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
 void JsonExport::visit_manual(const Manual& man)
 {
   object()["title"] = man.title;
+  object()["doctype"] = man.doctype;
 
   mapping.bind(man, object());
 

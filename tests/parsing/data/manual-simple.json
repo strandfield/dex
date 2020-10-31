@@ -60,6 +60,7 @@
           "name": "Usage",
           "type": "sectioning"
         }],
+      "doctype": "manual",
       "title": "A simple manual",
       "type": "document"
     }],
