@@ -29,11 +29,11 @@ public:
 
 protected:
   void visit_entity(const cxx::Entity& e) override;
-  void visit_manual(const dex::Manual& man) override;
+  void visit_document(const dex::Document& man) override;
 
 private:
   virtual std::string get_url(const cxx::Entity& e) const = 0;
-  virtual std::string get_url(const dex::Manual& man) const = 0;
+  virtual std::string get_url(const dex::Document& doc) const = 0;
 };
 
 } // namespace dex

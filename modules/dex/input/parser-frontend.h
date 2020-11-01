@@ -52,7 +52,7 @@ public:
     ENDENUMVALUE,
     VARIABLE,
     ENDVARIABLE,
-    TYPEDEF, 
+    TYPEDEF,
     ENDTYPEDEF,
     MACRO,
     ENDMACRO,
@@ -63,7 +63,7 @@ public:
     SINCE,
     PARAM,
     RETURNS,
-    /* Manual */
+    /* Documents */
     manual,
     part,
     chapter,

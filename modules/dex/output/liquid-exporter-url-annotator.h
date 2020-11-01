@@ -20,7 +20,7 @@ public:
 
 protected:
   std::string get_url(const cxx::Entity& e) const override;
-  std::string get_url(const dex::Manual& man) const override;
+  std::string get_url(const dex::Document& doc) const override;
 };
 
 } // namespace dex

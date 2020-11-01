@@ -420,14 +420,14 @@ void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
   ModelVisitor::visit_entitydocumentation(edoc);
 }
 
-void JsonExport::visit_manual(const Manual& man)
+void JsonExport::visit_document(const Document& doc)
 {
-  object()["title"] = man.title;
-  object()["doctype"] = man.doctype;
+  object()["title"] = doc.title;
+  object()["doctype"] = doc.doctype;
 
-  mapping.bind(man, object());
+  mapping.bind(doc, object());
 
-  ModelVisitor::visit_manual(man);
+  ModelVisitor::visit_document(doc);
 }
 
 void JsonExport::visit_sectioning(const Sectioning& sec)

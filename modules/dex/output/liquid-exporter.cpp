@@ -53,16 +53,16 @@ public:
     ModelVisitor::visit_class(cla);
   }
 
-  void visit_manual(const dex::Manual& man) override
+  void visit_document(const dex::Document& doc) override
   {
     if (!exporter.profile().document_template.model.nodes().empty())
     {
       json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
       exporter.selectStringifier(exporter.profile().document_template.filesuffix);
-      exporter.dump(man, obj);
+      exporter.dump(doc, obj);
     }
 
-    ModelVisitor::visit_manual(man);
+    ModelVisitor::visit_document(doc);
   }
 };
 
@@ -180,7 +180,7 @@ void LiquidExporter::dump(const cxx::Class& /* cla */, const json::Object& obj)
   dump(obj, "class", m_profile.class_template);
 }
 
-void LiquidExporter::dump(const dex::Manual& /* man */, const json::Object& obj)
+void LiquidExporter::dump(const dex::Document& /* doc */, const json::Object& obj)
 {
   dump(obj, "document", m_profile.document_template);
 }

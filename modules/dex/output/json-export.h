@@ -58,7 +58,7 @@ protected:
 
   void visit_entitydocumentation(const EntityDocumentation& edoc) override;
 
-  void visit_manual(const Manual& man) override;
+  void visit_document(const Document& doc) override;
   void visit_sectioning(const Sectioning& sec) override;
 
   void visit_group(const Group& group) override;

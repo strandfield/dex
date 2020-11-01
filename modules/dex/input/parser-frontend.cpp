@@ -195,7 +195,7 @@ void ParserFrontend::handle(const FunctionCall& call)
       return cs_nonmember();
     case CS::RELATES:
       return fn_relates(call);
-      /* Manual*/
+      /* Documents */
     case CS::manual:
       return fn_manual(call);
     case CS::part:
@@ -442,8 +442,8 @@ void ParserFrontend::ingroup(const FunctionCall& call)
   }
   else if (m_mode == Mode::Manual)
   {
-    std::shared_ptr<Manual> m = m_manual_parser->manual();
-    m_machine.output()->groups.multiInsert(groups, m);
+    std::shared_ptr<Document> doc = m_manual_parser->document();
+    m_machine.output()->groups.multiInsert(groups, doc);
   }
 }
 

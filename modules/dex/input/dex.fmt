@@ -171,7 +171,7 @@
   }%
 }
 
-% Dex - Manual %
+% Dex - Documents %
 
 \def\manual{%
   \p@rseline\c@ll\@manual

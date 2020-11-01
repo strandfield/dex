@@ -101,14 +101,8 @@ struct ChildNodeGetter
     else if (node->is<dom::Document>())
     {
       auto document = std::static_pointer_cast<dom::Document>(node);
-
-      if (document->doctype == "manual")
-      {
-        auto man = std::static_pointer_cast<dex::Manual>(node);
-
-        if (path.name == "content")
-          return man->childNodes().at(path.index);
-      }
+      if (path.name == "content")
+        return document->childNodes().at(path.index);
     }
     else if (node->is<dex::Sectioning>())
     {
