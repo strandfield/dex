@@ -10,3 +10,7 @@ if (WIN32)
 endif()
 
 add_test(NAME TEST_dex_common COMMAND TEST_dex_common)
+
+if (WIN32)
+  set_tests_properties(TEST_dex_common PROPERTIES ENVIRONMENT "PATH=${Qt5_DIR}/../../../bin;%PATH%")
+endif()

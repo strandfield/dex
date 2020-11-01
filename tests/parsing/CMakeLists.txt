@@ -12,3 +12,7 @@ if (WIN32)
 endif()
 
 add_test(NAME TEST_parsing COMMAND TEST_parsing)
+
+if (WIN32)
+  set_tests_properties(TEST_parsing PROPERTIES ENVIRONMENT "PATH=${Qt5_DIR}/../../../bin;%PATH%")
+endif()
