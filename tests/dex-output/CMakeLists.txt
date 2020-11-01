@@ -9,6 +9,7 @@ target_include_directories(TEST_dex_output PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..
 if (WIN32)
   set_target_properties(TEST_dex_output PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
   set_target_properties(TEST_dex_output PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+  set_target_properties(TEST_dex_output PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=${Qt5_DIR}/../../../bin;%PATH%")
 endif()
 
 add_test(NAME TEST_dex_output COMMAND TEST_dex_output)
