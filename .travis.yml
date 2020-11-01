@@ -30,8 +30,7 @@ matrix:
       - cmake ..
       - make
       - cd tests
-      - ./dex-input/TEST_dex_input
-      - ./dex-output/TEST_dex_output
+      - ctest
   - os: linux
     env:
       - TEST="GCC 8 (coverage)"
@@ -49,8 +48,7 @@ matrix:
       - cmake -DENABLE_COVERAGE=ON ..
       - make
       - cd tests
-      - ./dex-input/TEST_dex_input
-      - ./dex-output/TEST_dex_output
+      - ctest
       - cd ..
       - cd ..
       - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-8 10
