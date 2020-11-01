@@ -64,6 +64,7 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::RELATES, CS::RELATES},
     /* Manual */
     {Functions::MANUAL, CS::manual},
+    {Functions::PAGE, CS::page},
     {Functions::PART, CS::part},
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
@@ -198,6 +199,8 @@ void ParserFrontend::handle(const FunctionCall& call)
       /* Documents */
     case CS::manual:
       return fn_manual(call);
+    case CS::page:
+      return fn_page(call);
     case CS::part:
       return fn_part(call);
     case CS::chapter:
@@ -396,6 +399,17 @@ void ParserFrontend::fn_manual(const FunctionCall& call)
 {
   std::string name = call.arg<std::string>(0);
   auto man = std::make_shared<Manual>(std::move(name));
+
+  m_machine.output()->documents.push_back(man);
+
+  m_mode = Mode::Manual;
+  m_manual_parser.reset(new ManualParser(man));
+}
+
+void ParserFrontend::fn_page(const FunctionCall& call)
+{
+  std::string name = call.arg<std::string>(0);
+  auto man = std::make_shared<Page>(std::move(name));
 
   m_machine.output()->documents.push_back(man);
 

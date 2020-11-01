@@ -177,6 +177,10 @@
   \p@rseline\c@ll\@manual
 }
 
+\def\page{%
+  \p@rseline\c@ll\@page
+}
+
 \def\part{%
   \p@rseline\c@ll\@part
 }

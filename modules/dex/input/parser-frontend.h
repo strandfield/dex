@@ -65,6 +65,7 @@ public:
     RETURNS,
     /* Documents */
     manual,
+    page,
     part,
     chapter,
     section,
@@ -132,6 +133,7 @@ protected:
   void fn_relates(const FunctionCall& call);
 
   void fn_manual(const FunctionCall& call);
+  void fn_page(const FunctionCall& call);
   void fn_part(const FunctionCall& call);
   void fn_chapter(const FunctionCall& call);
   void fn_section(const FunctionCall& call);

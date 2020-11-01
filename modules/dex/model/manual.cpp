@@ -81,5 +81,10 @@ Manual::Manual(std::string t)
   doctype = "manual";
 }
 
+Page::Page(std::string t)
+  : Document(std::move(t))
+{
+  doctype = "page";
+}
 
 } // namespace dex

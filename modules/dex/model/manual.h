@@ -66,6 +66,12 @@ public:
   explicit Manual(std::string title = "");
 };
 
+class DEX_MODEL_API Page : public Document
+{
+public:
+  explicit Page(std::string title = "");
+};
+
 } // namespace dex
 
 #endif // DEX_MODEL_MANUAL_H
