@@ -60,7 +60,7 @@ void ParagraphWriter::mathshift()
 
     auto data = m_pending_metadata.back();
 
-    if (data->type() != dex::InlineMath::TypeId)
+    if (data->className() != dex::InlineMath::TypeId)
       throw std::runtime_error{ "ParagraphWriter::mathshift() mismatch" };
 
     m_pending_metadata.pop_back();

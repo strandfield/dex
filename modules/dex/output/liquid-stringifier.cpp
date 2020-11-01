@@ -81,7 +81,7 @@ std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
   return {};
 }
 
-std::string LiquidStringifier::stringify_domcontent(const dom::Content& content) const
+std::string LiquidStringifier::stringify_domcontent(const dom::NodeList& content) const
 {
   std::string result;
 

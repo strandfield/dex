@@ -37,9 +37,9 @@ void Group::insert(std::shared_ptr<cxx::Entity> e)
   content.entities.push_back(e);
 }
 
-void Group::insert(std::shared_ptr<Manual> m)
+void Group::insert(std::shared_ptr<dex::Document> doc)
 {
-  content.manuals.push_back(m);
+  content.documents.push_back(doc);
 }
 
 } // namespace dex

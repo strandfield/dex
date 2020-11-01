@@ -29,7 +29,7 @@ public:
 
   explicit EntityDocumentation(const cxx::SourceLocation& loc);
 
-  virtual const std::string& type() const = 0;
+  virtual const std::string& className() const = 0;
 
   template<typename T>
   bool is() const;
@@ -47,7 +47,7 @@ public:
 template<typename T>
 bool test_documentation_type(const EntityDocumentation& doc)
 {
-  return T::TypeId == doc.type();
+  return T::TypeId == doc.className();
 }
 
 template<typename T>

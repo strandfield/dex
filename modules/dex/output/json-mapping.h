@@ -23,7 +23,7 @@ public:
   struct BackwardMaps
   {
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const cxx::Entity>> entities;
-    std::unordered_map<std::shared_ptr<json::details::Node>, const Manual*> manuals;
+    std::unordered_map<std::shared_ptr<json::details::Node>, const Document*> documents;
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const Group>> groups;
   };
 
@@ -35,9 +35,9 @@ public:
     return forward.at(&n);
   }
 
-  json::Json get(const Manual& m) const
+  json::Json get(const Document& doc) const
   {
-    return forward.at(&m);
+    return forward.at(&doc);
   }
 
   json::Json get(const Group& g) const
@@ -51,10 +51,10 @@ public:
     forward[&e] = o;
   }
 
-  void bind(const Manual& m, const json::Json& o)
+  void bind(const Document& doc, const json::Json& o)
   {
-    backward_maps.manuals[o.impl()] = &m;
-    forward[&m] = o;
+    backward_maps.documents[o.impl()] = &doc;
+    forward[&doc] = o;
   }
 
   void bind(const Group& g, const json::Json& o)
@@ -79,9 +79,9 @@ protected:
     return backward_maps.entities.at(obj.impl());
   }
 
-  const Manual* get_impl(const json::Json& obj, get_helper_t<Manual>) const
+  const Document* get_impl(const json::Json& obj, get_helper_t<Document>) const
   {
-    return backward_maps.manuals.at(obj.impl());
+    return backward_maps.documents.at(obj.impl());
   }
 
   std::shared_ptr<const Group> get_impl(const json::Json& obj, get_helper_t<Group>) const

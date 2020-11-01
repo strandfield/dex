@@ -16,12 +16,13 @@
 namespace dex
 {
 
+// @TODO rename to DocumentParser
 class DEX_INPUT_API ManualParser
 {
 public:
-  explicit ManualParser(std::shared_ptr<Manual> man);
+  explicit ManualParser(std::shared_ptr<Document> doc);
 
-  const std::shared_ptr<Manual>& manual() const;
+  const std::shared_ptr<Document>& document() const;
 
   enum class FrameType
   {
@@ -39,7 +40,7 @@ public:
     explicit Frame(FrameType ft);
     Frame(FrameType ft, std::shared_ptr<dex::Sectioning> sec);
 
-    std::shared_ptr<dex::Manual> manual;
+    std::shared_ptr<dex::Document> document;
     std::shared_ptr<dex::Sectioning> section;
     std::shared_ptr<DocumentWriter> writer;
   };
@@ -67,7 +68,7 @@ protected:
 
 private:
   State m_state;
-  std::shared_ptr<Manual> m_manual;
+  std::shared_ptr<Document> m_document;
 };
 
 } // namespace dex
@@ -75,9 +76,9 @@ private:
 namespace dex
 {
 
-inline const std::shared_ptr<Manual>& ManualParser::manual() const
+inline const std::shared_ptr<Document>& ManualParser::document() const
 {
-  return m_manual;
+  return m_document;
 }
 
 } // namespace dex

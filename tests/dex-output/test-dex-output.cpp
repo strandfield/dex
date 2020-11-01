@@ -110,10 +110,10 @@ void TestDexOutput::jsonExportManual()
 {
   auto model = std::make_shared<dex::Model>();
   auto man = std::make_shared<dex::Manual>("The manual");
-  model->manuals().push_back(man);
+  model->documents.push_back(man);
 
   auto sec = std::make_shared<dex::Sectioning>(dex::Sectioning::Part, "Part 1");
-  man->content.push_back(sec);
+  man->appendChild(sec);
 
   sec->content.push_back(make_par("Hello World!"));
 
@@ -121,7 +121,7 @@ void TestDexOutput::jsonExportManual()
 
   QVERIFY(jexport.data().size() == 1);
 
-  jexport = jexport["manuals"][0].toObject();
+  jexport = jexport["documents"][0].toObject();
 
   QVERIFY(jexport.data().at("title").toString() == "The manual");
   QVERIFY(jexport.data().at("content").toArray().length() == 1);
@@ -195,7 +195,7 @@ void TestDexOutput::markdownExportManual()
   MarkdownExport md_export{ model };
   md_export.render();
 
-  std::string content = dex::file_utils::read_all("manuals/The manual.md");
+  std::string content = dex::file_utils::read_all("documents/The manual.md");
 
   const std::string expected =
     "\n"

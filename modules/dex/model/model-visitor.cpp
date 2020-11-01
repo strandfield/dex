@@ -121,14 +121,14 @@ void ModelVisitor::visit(const Model& model)
     visit_program(*model.program());
   }
 
-  if (!model.manuals().empty())
+  if (!model.documents.empty())
   {
-    RaiiArrayVisitor state_updater{ this, "manuals" };
+    RaiiArrayVisitor state_updater{ this, "documents" };
 
-    for (size_t i(0); i < model.manuals().size(); ++i)
+    for (size_t i(0); i < model.documents.size(); ++i)
     {
       RaiiArrayElementVisitor inner_state_updater{ this, i };
-      visit_domnode(*model.manuals().at(i));
+      visit_domnode(*model.documents.at(i));
     }
   }
 
@@ -189,8 +189,8 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_domlistitem(static_cast<const dom::ListItem&>(n));
   else if (n.is<dom::Paragraph>())
     visit_domparagraph(static_cast<const dom::Paragraph&>(n));
-  else if (n.is<dex::Manual>())
-    visit_manual(static_cast<const dex::Manual&>(n));
+  else if (n.is<dom::Document>())
+    visit_document(static_cast<const dex::Document&>(n));
   else if (n.is<dex::Sectioning>())
     visit_sectioning(static_cast<const dex::Sectioning&>(n));
   else if (n.is<dex::DisplayMath>())
@@ -401,16 +401,16 @@ void ModelVisitor::visit_entitydocumentation(const EntityDocumentation& edoc)
   }
 }
 
-void ModelVisitor::visit_manual(const dex::Manual& man)
+void ModelVisitor::visit_document(const dex::Document& doc)
 {
-  if (!man.content.empty())
+  if (!doc.childNodes().empty())
   {
     RaiiArrayVisitor state_updater{ this, "content" };
-    for (size_t i(0); i < man.content.size(); ++i)
+    for (size_t i(0); i < doc.childNodes().size(); ++i)
     {
       RaiiArrayElementVisitor inner_state_updater{ this, i };
 
-      visit_domnode(*man.content.at(i));
+      visit_domnode(*doc.childNodes().at(i));
     }
   }
 }

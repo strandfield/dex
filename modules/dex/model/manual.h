@@ -7,8 +7,7 @@
 
 #include "dex/dex-model.h"
 
-#include <dom/content.h>
-#include <dom/element.h>
+#include <dom/document.h>
 
 namespace dex
 {
@@ -22,7 +21,7 @@ public:
   explicit GroupTable(std::string gname);
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
 };
 
 class DEX_MODEL_API Sectioning : public dom::Element
@@ -39,29 +38,38 @@ public:
 public:
   Depth depth;
   std::string name;
-  dom::Content content;
+  dom::NodeList content;
 
 public:
   Sectioning(Depth d, std::string n);
 
   static const std::string TypeId;
-  const std::string& type() const override;
+  const std::string& className() const override;
+
+  const dom::NodeList& childNodes() const override;
+  void appendChild(std::shared_ptr<Node> n) override;
+  void removeChild(std::shared_ptr<Node> n) override;
 
   static std::string depth2str(Depth d);
   static Depth str2depth(const std::string& str);
 };
 
-class DEX_MODEL_API Manual : public dom::Node
+class DEX_MODEL_API Document : public dom::Document
 {
 public:
-  std::string title;
-  dom::Content content;
+  using dom::Document::Document;
+};
 
+class DEX_MODEL_API Manual : public Document
+{
 public:
-  explicit Manual(std::string t);
+  explicit Manual(std::string title = "");
+};
 
-  static const std::string TypeId;
-  const std::string& type() const override;
+class DEX_MODEL_API Page : public Document
+{
+public:
+  explicit Page(std::string title = "");
 };
 
 } // namespace dex

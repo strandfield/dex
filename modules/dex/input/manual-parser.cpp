@@ -25,11 +25,11 @@ ManualParser::Frame::Frame(FrameType ft, std::shared_ptr<dex::Sectioning> sec)
   writer = std::make_shared<DocumentWriter>();
 }
 
-ManualParser::ManualParser(std::shared_ptr<Manual> man)
-  : m_manual(man)
+ManualParser::ManualParser(std::shared_ptr<Document> doc)
+  : m_document(doc)
 {
   m_state.enter<FrameType::WritingManual>();
-  m_state.current().manual = man;
+  m_state.current().document = doc;
   m_state.current().writer = std::make_shared<DocumentWriter>();
 }
 
@@ -78,7 +78,11 @@ void ManualParser::beginFile()
 void ManualParser::endFile()
 {
   endBlock();
-  m_manual->content = std::move(currentFrame().writer->output());
+
+  for (auto e : currentFrame().writer->output())
+    m_document->appendChild(e);
+
+  currentFrame().writer->output().clear();
 }
 
 void ManualParser::beginBlock()

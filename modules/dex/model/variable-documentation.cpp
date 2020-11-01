@@ -9,7 +9,7 @@ namespace dex
 
 const std::string VariableDocumentation::TypeId = "variable-documentation";
 
-const std::string& VariableDocumentation::type() const
+const std::string& VariableDocumentation::className() const
 {
   return TypeId;
 }

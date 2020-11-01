@@ -78,7 +78,7 @@ protected:
 
   virtual void visit_entitydocumentation(const EntityDocumentation& edoc);
 
-  virtual void visit_manual(const dex::Manual& man);
+  virtual void visit_document(const dex::Document& doc);
   virtual void visit_sectioning(const dex::Sectioning& section);
 
   virtual void visit_group(const dex::Group& group);

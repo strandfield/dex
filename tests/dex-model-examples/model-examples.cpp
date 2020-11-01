@@ -15,7 +15,6 @@
 #include <cxx/program.h>
 #include <cxx/variable.h>
 
-#include <dom/content.h>
 #include <dom/image.h>
 #include <dom/list.h>
 #include <dom/paragraph.h>
@@ -164,11 +163,11 @@ std::shared_ptr<dex::Model> manual()
   auto model = make<dex::Model>();
 
   auto man = make<dex::Manual>("The manual");
-  model->manuals().push_back(man);
+  model->documents.push_back(man);
 
   {
     auto part = make<dex::Sectioning>(dex::Sectioning::Part, "First part");
-    man->content.push_back(part);
+    man->appendChild(part);
 
     {
       auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 1");
@@ -188,7 +187,7 @@ std::shared_ptr<dex::Model> manual()
 
   {
     auto part = make<dex::Sectioning>(dex::Sectioning::Part, "Second part");
-    man->content.push_back(part);
+    man->appendChild(part);
 
     {
       auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 3");

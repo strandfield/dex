@@ -32,9 +32,9 @@ void JsonUrlAnnotator::visit_entity(const cxx::Entity& e)
   ModelVisitor::visit_entity(e);
 }
 
-void JsonUrlAnnotator::visit_manual(const dex::Manual& man)
+void JsonUrlAnnotator::visit_document(const dex::Document& doc)
 {
-  std::string url = get_url(man);
+  std::string url = get_url(doc);
 
   if (!url.empty())
   {
@@ -42,7 +42,7 @@ void JsonUrlAnnotator::visit_manual(const dex::Manual& man)
     obj["url"] = url;
   }
 
-  ModelVisitor::visit_manual(man);
+  ModelVisitor::visit_document(doc);
 }
 
 } // namespace dex

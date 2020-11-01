@@ -2,5 +2,5 @@ class-with-inline
 class-with-var
 enum-in-group
 manual-simple
-manual-with-math
+page-with-math
 prog-with-macro-typedef

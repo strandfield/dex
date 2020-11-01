@@ -33,7 +33,7 @@ public:
 
   void finish();
 
-  dom::Content& output();
+  dom::NodeList& output();
 
 protected:
   void par(const FunctionCall& c);
@@ -74,7 +74,7 @@ public:
 
   void finish();
 
-  dom::Content& output();
+  dom::NodeList& output();
 
 private:
   DocumentWriter m_backend;
@@ -91,7 +91,7 @@ inline DocumentWriter::State DocumentWriterFrontend::state() const
   return m_writer->state();
 }
 
-inline dom::Content& DocumentWriterFrontend::output()
+inline dom::NodeList& DocumentWriterFrontend::output()
 {
   return m_writer->output();
 }
@@ -101,7 +101,7 @@ inline DocumentWriter::State DocumentWriterToolchain::state() const
   return m_frontend.state();
 }
 
-inline dom::Content& DocumentWriterToolchain::output()
+inline dom::NodeList& DocumentWriterToolchain::output()
 {
   return m_frontend.output();
 }

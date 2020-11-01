@@ -487,7 +487,7 @@ void DocumentWriter::adjustState()
   }
 }
 
-void DocumentWriter::pushContent(dom::Content& c)
+void DocumentWriter::pushContent(dom::NodeList& c)
 {
   m_contents.push_back(&c);
   m_cur_content = &c;

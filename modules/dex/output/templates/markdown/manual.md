@@ -1,4 +1,0 @@
-
-# {{ manual.title }}
-
-{{ manual.content }}

@@ -28,7 +28,7 @@ public:
 public:
   std::string profile_path;
   Template class_template;
-  Template manual_template;
+  Template document_template;
   std::vector<std::pair<std::string, liquid::Template>> files;
   std::vector<std::pair<std::string, liquid::Template>> liquid_templates;
 

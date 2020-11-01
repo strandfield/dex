@@ -9,7 +9,7 @@ namespace dex
 
 const std::string FunctionDocumentation::TypeId = "function-documentation";
 
-const std::string& FunctionDocumentation::type() const
+const std::string& FunctionDocumentation::className() const
 {
   return TypeId;
 }

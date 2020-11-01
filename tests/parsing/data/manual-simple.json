@@ -1,5 +1,5 @@
 {
-  "manuals": [{
+  "documents": [{
       "content": [{
           "content": [{
               "text": "This is an introduction.",
@@ -60,8 +60,9 @@
           "name": "Usage",
           "type": "sectioning"
         }],
+      "doctype": "manual",
       "title": "A simple manual",
-      "type": "manual"
+      "type": "document"
     }],
   "program": {
     "global_namespace": {

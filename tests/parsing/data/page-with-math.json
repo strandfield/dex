@@ -1,5 +1,5 @@
 {
-  "manuals": [{
+  "documents": [{
       "content": [{
           "content": [{
               "metadata": [{
@@ -13,12 +13,13 @@
               "source": " \\gamma + \\frac{1 + \\sqrt{2}}{\\alpha} ",
               "type": "math"
             }],
-          "depth": "chapter",
+          "depth": "section",
           "name": "Example",
           "type": "sectioning"
         }],
-      "title": "Manual with math",
-      "type": "manual"
+      "doctype": "page",
+      "title": "Page with math",
+      "type": "document"
     }],
   "program": {
     "global_namespace": {

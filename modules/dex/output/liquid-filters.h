@@ -7,7 +7,7 @@
 
 #include "dex/dex-output.h"
 
-#include <dom/content.h>
+#include <dom/element.h>
 
 #include <json-toolkit/json.h>
 

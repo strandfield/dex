@@ -64,6 +64,7 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::RELATES, CS::RELATES},
     /* Manual */
     {Functions::MANUAL, CS::manual},
+    {Functions::PAGE, CS::page},
     {Functions::PART, CS::part},
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
@@ -195,9 +196,11 @@ void ParserFrontend::handle(const FunctionCall& call)
       return cs_nonmember();
     case CS::RELATES:
       return fn_relates(call);
-      /* Manual*/
+      /* Documents */
     case CS::manual:
       return fn_manual(call);
+    case CS::page:
+      return fn_page(call);
     case CS::part:
       return fn_part(call);
     case CS::chapter:
@@ -397,7 +400,18 @@ void ParserFrontend::fn_manual(const FunctionCall& call)
   std::string name = call.arg<std::string>(0);
   auto man = std::make_shared<Manual>(std::move(name));
 
-  m_machine.output()->manuals().push_back(man);
+  m_machine.output()->documents.push_back(man);
+
+  m_mode = Mode::Manual;
+  m_manual_parser.reset(new ManualParser(man));
+}
+
+void ParserFrontend::fn_page(const FunctionCall& call)
+{
+  std::string name = call.arg<std::string>(0);
+  auto man = std::make_shared<Page>(std::move(name));
+
+  m_machine.output()->documents.push_back(man);
 
   m_mode = Mode::Manual;
   m_manual_parser.reset(new ManualParser(man));
@@ -442,8 +456,8 @@ void ParserFrontend::ingroup(const FunctionCall& call)
   }
   else if (m_mode == Mode::Manual)
   {
-    std::shared_ptr<Manual> m = m_manual_parser->manual();
-    m_machine.output()->groups.multiInsert(groups, m);
+    std::shared_ptr<Document> doc = m_manual_parser->document();
+    m_machine.output()->groups.multiInsert(groups, doc);
   }
 }
 
