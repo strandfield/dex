@@ -24,7 +24,7 @@ namespace dex
 class DEX_MODEL_API Model
 {
 public:
-  std::vector<std::shared_ptr<Manual>> m_manuals;
+  std::vector<std::shared_ptr<dex::Document>> documents;
   std::shared_ptr<dex::Program> m_program;
   GroupManager groups;
 
@@ -32,9 +32,6 @@ public:
   Model() = default;
 
   bool empty() const;
-
-  std::vector<std::shared_ptr<Manual>>& manuals();
-  const std::vector<std::shared_ptr<Manual>>& manuals() const;
 
   std::shared_ptr<dex::Program> program() const;
   std::shared_ptr<dex::Program> getOrCreateProgram();  
@@ -63,7 +60,7 @@ public:
   static Path parse_path(const std::string& str);
   Node get(const Path& path) const;
   Path path(const std::shared_ptr<cxx::Entity>& e) const;
-  Path path(const std::shared_ptr<Manual>& m) const;
+  Path path(const std::shared_ptr<dex::Document>& doc) const;
   Path path(const std::shared_ptr<Group>& g) const;
 };
 
@@ -71,16 +68,6 @@ public:
 
 namespace dex
 {
-
-inline std::vector<std::shared_ptr<Manual>>& Model::manuals()
-{
-  return m_manuals;
-}
-
-inline const std::vector<std::shared_ptr<Manual>>& Model::manuals() const
-{
-  return m_manuals;
-}
 
 inline std::shared_ptr<dex::Program> Model::program() const
 {

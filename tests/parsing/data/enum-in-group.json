@@ -1,7 +1,7 @@
 {
   "groups": [{
+      "documents": [],
       "entities": ["$.program.global_namespace.entities[0]"],
-      "manuals": [],
       "name": "useful_enums"
     }],
   "program": {

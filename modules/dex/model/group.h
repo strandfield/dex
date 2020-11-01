@@ -17,7 +17,7 @@
 namespace dex
 {
 
-class Manual;
+class Document;
 
 class Group;
 
@@ -43,13 +43,13 @@ public:
   struct Content
   {
     std::vector<std::shared_ptr<cxx::Entity>> entities;
-    std::vector<std::shared_ptr<Manual>> manuals;
+    std::vector<std::shared_ptr<dex::Document>> documents;
   };
 
   Content content;
 
   void insert(std::shared_ptr<cxx::Entity> e);
-  void insert(std::shared_ptr<Manual> m);
+  void insert(std::shared_ptr<dex::Document> doc);
 
 public:
   Group(size_t index, std::string n);

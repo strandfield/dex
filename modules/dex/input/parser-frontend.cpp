@@ -397,7 +397,7 @@ void ParserFrontend::fn_manual(const FunctionCall& call)
   std::string name = call.arg<std::string>(0);
   auto man = std::make_shared<Manual>(std::move(name));
 
-  m_machine.output()->manuals().push_back(man);
+  m_machine.output()->documents.push_back(man);
 
   m_mode = Mode::Manual;
   m_manual_parser.reset(new ManualParser(man));

@@ -163,7 +163,7 @@ std::shared_ptr<dex::Model> manual()
   auto model = make<dex::Model>();
 
   auto man = make<dex::Manual>("The manual");
-  model->manuals().push_back(man);
+  model->documents.push_back(man);
 
   {
     auto part = make<dex::Sectioning>(dex::Sectioning::Part, "First part");

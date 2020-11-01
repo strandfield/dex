@@ -158,9 +158,9 @@ json::Array LiquidFilters::group_get_manuals(const json::Object& json_group) con
     return result;
   }
 
-  for (auto m : g->content.manuals)
+  for (auto doc : g->content.documents)
   {
-    result.push(renderer.modelMapping().get(*m));
+    result.push(renderer.modelMapping().get(*doc));
   }
 
   return result;

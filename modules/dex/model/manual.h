@@ -54,7 +54,13 @@ public:
   static Depth str2depth(const std::string& str);
 };
 
-class DEX_MODEL_API Manual : public dom::Document
+class DEX_MODEL_API Document : public dom::Document
+{
+public:
+  using dom::Document::Document;
+};
+
+class DEX_MODEL_API Manual : public Document
 {
 public:
   explicit Manual(std::string title = "");

@@ -567,9 +567,9 @@ void TestDexInput::parserMachineManual()
   QFile::remove("test.dex");
   QFile::remove("toast.dex");
 
-  QVERIFY(parser.output()->manuals().size() == 1);
+  QVERIFY(parser.output()->documents.size() == 1);
 
-  std::shared_ptr<dex::Manual> man = parser.output()->manuals().front();
+  std::shared_ptr<dex::Document> man = parser.output()->documents.front();
 
   QVERIFY(man->childNodes().size() == 1);
   QVERIFY(man->childNodes().front()->is<dex::Sectioning>());

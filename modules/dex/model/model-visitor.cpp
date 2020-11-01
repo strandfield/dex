@@ -121,14 +121,14 @@ void ModelVisitor::visit(const Model& model)
     visit_program(*model.program());
   }
 
-  if (!model.manuals().empty())
+  if (!model.documents.empty())
   {
-    RaiiArrayVisitor state_updater{ this, "manuals" };
+    RaiiArrayVisitor state_updater{ this, "documents" };
 
-    for (size_t i(0); i < model.manuals().size(); ++i)
+    for (size_t i(0); i < model.documents.size(); ++i)
     {
       RaiiArrayElementVisitor inner_state_updater{ this, i };
-      visit_domnode(*model.manuals().at(i));
+      visit_domnode(*model.documents.at(i));
     }
   }
 

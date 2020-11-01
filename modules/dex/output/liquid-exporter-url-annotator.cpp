@@ -29,7 +29,7 @@ std::string LiquidExporterUrlAnnotator::get_url(const cxx::Entity& e) const
 std::string LiquidExporterUrlAnnotator::get_url(const dex::Manual& man) const
 {
   // @TODO: remove spaces and illegal characters
-  return profile.manual_template.outdir + "/" + man.title + "." + profile.manual_template.filesuffix;
+  return profile.document_template.outdir + "/" + man.title + "." + profile.document_template.filesuffix;
 }
 
 } // namespace dex

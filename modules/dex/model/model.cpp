@@ -149,7 +149,7 @@ Model::PathElement::PathElement(std::string_view n, size_t i)
 
 bool Model::empty() const
 {
-  return m_program == nullptr && m_manuals.empty();
+  return m_program == nullptr && documents.empty();
 }
 
 std::string Model::to_string(const Path& p)
@@ -235,9 +235,9 @@ Model::Node Model::get(const Path& path) const
   {
     result = program();
   }
-  else if (path.front().name == "manuals")
+  else if (path.front().name == "documents")
   {
-    result = manuals().at(path.front().index);
+    result = documents.at(path.front().index);
   }
   else if (path.front().name == "groups")
   {
@@ -293,13 +293,13 @@ Model::Path Model::path(const std::shared_ptr<cxx::Entity>& e) const
   return result;
 }
 
-Model::Path Model::path(const std::shared_ptr<Manual>& m) const
+Model::Path Model::path(const std::shared_ptr<dex::Document>& doc) const
 {
-  auto it = std::find(m_manuals.begin(), m_manuals.end(), m);
+  auto it = std::find(documents.begin(), documents.end(), doc);
 
   Model::Path result;
-  result.push_back(PathElement("manuals"));
-  result.back().index = std::distance(m_manuals.begin(), it);
+  result.push_back(PathElement("documents"));
+  result.back().index = std::distance(documents.begin(), it);
   return result;
 }
 
