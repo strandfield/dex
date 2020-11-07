@@ -19,7 +19,7 @@
 namespace dex
 {
 
-Dex::Dex(int argc, char* argv[])
+Dex::Dex(int& argc, char* argv[])
   : QCoreApplication(argc, argv)
 {
   setApplicationName("dex");

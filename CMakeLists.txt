@@ -11,6 +11,16 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 ##################################################################
+###### install config
+##################################################################
+
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+
+##################################################################
 ###### C++17 clang (Travis CI)
 ##################################################################
 
@@ -61,3 +71,13 @@ add_subdirectory(apps)
 ##################################################################
 
 add_subdirectory(tests)
+
+##################################################################
+###### install
+##################################################################
+
+message("Install RPATH is: ${CMAKE_INSTALL_RPATH}")
+
+install(TARGETS dom liquid cxxast typeset LIBRARY DESTINATION lib)
+install(TARGETS dex-common dex-model dex-input dex-output dex-app LIBRARY DESTINATION lib)
+install(TARGETS dex RUNTIME DESTINATION bin)

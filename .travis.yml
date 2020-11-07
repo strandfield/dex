@@ -22,8 +22,7 @@ matrix:
   include:
   - os: linux
     dist: bionic
-    env:
-      - TEST="Clang 7.0"
+    name: Clang 7.0
     compiler: clang
     addons:
       apt:
@@ -38,10 +37,15 @@ matrix:
       - make
       - cd tests
       - ctest
+      - cd ..
+      - echo 'cmake --install' does not exists until v3.15
+      - sudo env PATH=$PATH cmake --build . --target install
+      - cd ..
+      - dex --version
   - os: linux
     dist: bionic
+    name: GCC 8 (coverage)
     env:
-      - TEST="GCC 8 (coverage)"
       - CC=gcc-8
       - CXX=g++-8
     compiler: gcc-8
