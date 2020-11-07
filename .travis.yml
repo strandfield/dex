@@ -38,6 +38,10 @@ matrix:
       - make
       - cd tests
       - ctest
+      - cd ..
+      - cmake --install .
+      - cd ..
+      - dex --version
   - os: linux
     dist: bionic
     env:
