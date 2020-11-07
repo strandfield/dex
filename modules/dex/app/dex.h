@@ -24,7 +24,7 @@ class ParserMachine;
 class DEX_APP_API Dex : public QCoreApplication
 {
 public:
-  Dex(int argc, char* argv[]);
+  Dex(int& argc, char* argv[]);
 
   int exec();
 

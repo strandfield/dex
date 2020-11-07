@@ -78,6 +78,6 @@ add_subdirectory(tests)
 
 message("Install RPATH is: ${CMAKE_INSTALL_RPATH}")
 
-install(TARGETS dynlib dom liquid cxxast typeset LIBRARY DESTINATION lib)
+install(TARGETS dom liquid cxxast typeset LIBRARY DESTINATION lib)
 install(TARGETS dex-common dex-model dex-input dex-output dex-app LIBRARY DESTINATION lib)
 install(TARGETS dex RUNTIME DESTINATION bin)
