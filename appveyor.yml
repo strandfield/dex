@@ -21,7 +21,6 @@ install:
 before_build:
   - mkdir build
   - cd build
-  - dir
   - cmake -D Qt5_DIR=C:\Qt\5.15.1\msvc2019_64\lib\cmake\Qt5 ..
 
 build_script:
