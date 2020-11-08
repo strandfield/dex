@@ -81,3 +81,7 @@ message("Install RPATH is: ${CMAKE_INSTALL_RPATH}")
 install(TARGETS dom liquid cxxast typeset LIBRARY DESTINATION lib)
 install(TARGETS dex-common dex-model dex-input dex-output dex-app LIBRARY DESTINATION lib)
 install(TARGETS dex RUNTIME DESTINATION bin)
+
+if (WIN32)
+  configure_file("make-release.bat.in" "${CMAKE_BINARY_DIR}/make-release.bat")
+endif()

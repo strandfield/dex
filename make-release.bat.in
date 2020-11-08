@@ -1,0 +1,14 @@
+
+set QT_DIR=${Qt5_DIR}\..\..\..
+
+cd ..
+
+if exist "release" rd /s /q "release""
+mkdir release
+
+copy "build\Release\*.dll" "release"
+copy "build\Release\dex.exe" "release"
+
+copy "%QT_DIR%\bin\Qt5Core.dll" "release"
+
+cd build

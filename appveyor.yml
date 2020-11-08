@@ -26,6 +26,12 @@ before_build:
 build_script:
   - cmake --build . --config Release -- %MSBUILD_ARGS%
 
+after_build:
+  - make-release.bat
+  - cd ..\release
+  - dex --version
+  - cd ..\build
+
 test_script:
   - cd tests
   - ctest . -C Release
