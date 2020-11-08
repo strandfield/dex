@@ -1,0 +1,2 @@
+
+makensis installer.nsi

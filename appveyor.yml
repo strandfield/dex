@@ -26,11 +26,18 @@ before_build:
 build_script:
   - cmake --build . --config Release -- %MSBUILD_ARGS%
 
+artifacts:
+  - path: release\dex-setup.exe
+    name: dex-setup.exe
+
 after_build:
   - make-release.bat
   - cd ..\release
   - dex --version
-  - cd ..\build
+  - cd ..
+  - set "PATH=C:\Program Files (x86)\NSIS;%PATH%"
+  - create-installer.bat
+  - cd build
 
 test_script:
   - cd tests
