@@ -28,4 +28,5 @@ build_script:
   - cmake --build . --config Release -- %MSBUILD_ARGS%
 
 test_script:
+  - cd tests
   - ctest . -C Release
