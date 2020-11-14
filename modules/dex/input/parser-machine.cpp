@@ -32,6 +32,11 @@ void send_token(tex::parsing::Token&& tok, C& c, Components& ... rest)
     send_token(tex::parsing::read(c.output()), rest...);
 }
 
+inline bool is_space(char c)
+{
+  return c == ' ' || c == '\t' || c == '\r';
+}
+
 BlockBasedDocument::BlockBasedDocument(std::string text, std::string path)
   : block_delimiters{ "/*!", "*/" },
     filepath(std::move(path)),
@@ -124,7 +129,7 @@ char InputStream::readChar()
     line++;
 
     if (stackSize() == 1 && pos < currentDocument().length())
-      beginLine();
+      beginLineInBlock();
   }
 
   if (pos == currentDocument().length() && stackSize() > 1)
@@ -146,9 +151,16 @@ std::string_view InputStream::peekLine() const
   const size_t index = currentDocument().content.find('\n', static_cast<size_t>(currentDocument().pos));
 
   if (index == std::string::npos)
-    return peek(currentDocument().length() - currentPos());
+    return peek(currentDocument().length() - 1 - currentPos());
   else
     return peek(static_cast<int>(index - currentPos()));
+}
+
+std::string_view InputStream::readLine()
+{
+  auto result = peekLine();
+  discard(result.size() + 1);
+  return result;
 }
 
 bool InputStream::read(const std::string_view& text)
@@ -176,8 +188,23 @@ bool InputStream::seekBlock()
 {
   assert(isBlockBased());
 
-  while (!atEnd() && !read(m_block_delimiters.first))
-    readChar();
+  // The previous code was:
+  //    while (!atEnd() && !read(m_block_delimiters.first))
+  //      readChar();
+  // but it would read the delimiter in the middle of a string constant,
+  // e.g. "/*!", which is not what we want.
+  // We assume that a block is at the beginning of a line, minus the 
+  // possible whitespaces before.
+
+  while (!atEnd())
+  {
+    discardSpaces();
+
+    if (read(m_block_delimiters.first))
+      break;
+
+    readLine();
+  }
 
   m_inside_block = !atEnd();
   return isInsideBlock();
@@ -208,14 +235,10 @@ void InputStream::exitBlock()
   }
 }
 
-void InputStream::beginLine()
+void InputStream::beginLineInBlock()
 {
   if (stackSize() > 1 || !isBlockBased())
     return;
-
-  auto is_space = [](char c) -> bool {
-    return c == ' ' || c == '\t' || c == '\r';
-  };
 
   auto line = peekLine();
 
@@ -237,6 +260,12 @@ void InputStream::beginLine()
   {
     discard(static_cast<int>(n+1));
   }
+}
+
+void InputStream::discardSpaces()
+{
+  while (!atEnd() && is_space(peekChar()))
+    readChar();
 }
 
 InputStream::Document & InputStream::currentDocument()

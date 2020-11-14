@@ -58,6 +58,7 @@ public:
 
   std::string_view peek(int n) const;
   std::string_view peekLine() const;
+  std::string_view readLine();
 
   bool read(const std::string_view& text);
 
@@ -95,7 +96,8 @@ public:
   InputStream& operator=(const QFileInfo& file);
 
 protected:
-  void beginLine();
+  void beginLineInBlock();
+  void discardSpaces();
 
 private:
   std::stack<Document> m_documents;
