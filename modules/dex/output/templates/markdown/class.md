@@ -13,7 +13,7 @@
 
 {% for f in class.members | filter_by_type: 'function' %}
 
-### {{ f.name }}
+### {{ f | funsig }}
 
 {% if f.documentation.brief %}
 **Brief:** {{ f.documentation.brief }}
@@ -40,7 +40,7 @@ Parameters:
 
 {% for f in non_members %}
 
-### {{ f.name }}
+### {{ f | funsig }}
 
 {% if f.documentation.brief %}
 **Brief:** {{ f.documentation.brief }}

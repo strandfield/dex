@@ -7,10 +7,6 @@
 
 #include "dex/dex-input.h"
 
-#include "dex/common/state.h"
-
-#include "dex/input/dom-writer.h"
-
 #include <dom/paragraph.h>
 
 namespace tex

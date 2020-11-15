@@ -46,7 +46,11 @@ void ParagraphWriter::write(const std::string& str)
 
 void ParagraphWriter::writeCs(const std::string& str)
 {
+  if (!m_math_parser)
+    throw std::runtime_error{ "Unknown control sequence outside of math mode" };
+
   m_math_parser->writeControlSequence(str);
+
   write("\\" + str);
   write(' ');
 }
@@ -79,7 +83,7 @@ void ParagraphWriter::mathshift()
   {
     dom::Paragraph& par = *output();
     size_t start = par.length();
-    dom::ParagraphRange range{par, start, par.length() };
+    dom::ParagraphRange range{ par, start, par.length() };
 
     auto data = std::make_shared<dom::GenericParagraphMetaData<dex::InlineMath>>(range, dex::InlineMath());
     m_pending_metadata.push_back(data);

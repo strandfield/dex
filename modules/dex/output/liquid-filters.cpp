@@ -46,6 +46,10 @@ json::Json LiquidFilters::apply(const std::string& name, const json::Json& objec
   {
     return filter_by_field(array_arg(object), args.front().toString(), args.back().toString());
   }
+  else if (name == "funsig")
+  {
+    return funsig(object.toObject());
+  }
   else if (name == "related_non_members")
   {
     return related_non_members(object.toObject());
@@ -85,6 +89,13 @@ json::Array LiquidFilters::filter_by_accessibility(const json::Array& list, cons
 {
   static const std::string field = "accessibility";
   return filter_by_field(list, field, as);
+}
+
+std::string LiquidFilters::funsig(const json::Object& json_fun) const
+{
+  auto fun_entity = renderer.modelMapping().get<cxx::Entity>(json_fun);
+  auto fun = std::static_pointer_cast<const cxx::Function>(fun_entity);
+  return fun->signature();
 }
 
 json::Array LiquidFilters::related_non_members(const json::Object& json_class) const

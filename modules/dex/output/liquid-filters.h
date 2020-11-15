@@ -43,6 +43,7 @@ protected:
   static json::Array filter_by_field(const json::Array& list, const std::string& field, const std::string& value);
   static json::Array filter_by_type(const json::Array& list, const std::string& type);
   static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
+  std::string funsig(const json::Object& json_fun) const;
   json::Array related_non_members(const json::Object& json_class) const;
   json::Array group_get_entities(const json::Object& json_group) const;
   json::Array group_get_manuals(const json::Object& json_group) const;
