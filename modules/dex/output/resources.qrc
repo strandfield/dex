@@ -12,5 +12,6 @@
     <file>templates/markdown/class.md</file>
     <file>templates/markdown/index.md</file>
     <file>templates/markdown/document.md</file>
+	<file>templates/markdown/namespace.md</file>
   </qresource>
 </RCC>

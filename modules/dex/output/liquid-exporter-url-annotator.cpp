@@ -7,6 +7,7 @@
 #include <dex/model/manual.h>
 
 #include <cxx/class.h>
+#include <cxx/namespace.h>
 
 namespace dex
 {
@@ -21,7 +22,16 @@ LiquidExporterUrlAnnotator::LiquidExporterUrlAnnotator(json::Object& js_object, 
 std::string LiquidExporterUrlAnnotator::get_url(const cxx::Entity& e) const
 {
   if (e.is<cxx::Class>())
+  {
     return profile.class_template.outdir + "/" + e.name + "." + profile.class_template.filesuffix;
+  }
+  else if (e.is<cxx::Namespace>())
+  {
+    if(e.name.empty())
+      return profile.namespace_template.outdir + "/global." + profile.namespace_template.filesuffix;
+    else
+      return profile.namespace_template.outdir + "/" + e.name + "." + profile.namespace_template.filesuffix;
+  }
 
   return "";
 }

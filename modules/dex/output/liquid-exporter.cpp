@@ -18,6 +18,7 @@
 #include "dex/model/model.h"
 
 #include <cxx/class.h>
+#include <cxx/namespace.h>
 #include <cxx/program.h>
 
 namespace dex
@@ -51,6 +52,18 @@ public:
     }
 
     ModelVisitor::visit_class(cla);
+  }
+
+  void visit_namespace(const cxx::Namespace& ns) override
+  {
+    if (!exporter.profile().namespace_template.model.nodes().empty())
+    {
+      json::Object obj = json_mapping.get(ns).toObject();
+      exporter.selectStringifier(exporter.profile().namespace_template.filesuffix);
+      exporter.dump(ns, obj);
+    }
+
+    ModelVisitor::visit_namespace(ns);
   }
 
   void visit_document(const dex::Document& doc) override
@@ -178,6 +191,11 @@ void LiquidExporter::dump(const json::Object& obj, const char* obj_field_name, c
 void LiquidExporter::dump(const cxx::Class& /* cla */, const json::Object& obj)
 {
   dump(obj, "class", m_profile.class_template);
+}
+
+void LiquidExporter::dump(const cxx::Namespace& /* ns */, const json::Object& obj)
+{
+  dump(obj, "namespace", m_profile.namespace_template);
 }
 
 void LiquidExporter::dump(const dex::Document& /* doc */, const json::Object& obj)

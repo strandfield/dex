@@ -120,6 +120,7 @@ public:
     settings = dex::settings::load(profile_config_file);
 
     read_template("class", profile.class_template, "classes");
+    read_template("namespace", profile.namespace_template, "namespaces");
     read_template("document", profile.document_template, "documents");
 
     list_templates();
