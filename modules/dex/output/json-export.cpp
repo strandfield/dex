@@ -4,6 +4,7 @@
 
 #include "dex/output/json-export.h"
 
+#include "dex/model/code-block.h"
 #include "dex/model/display-math.h"
 #include "dex/model/since.h"
 
@@ -233,6 +234,13 @@ void JsonExport::visit_grouptable(const dex::GroupTable& table)
 {
   object()["groupname"] = table.groupname;
   ModelVisitor::visit_grouptable(table);
+}
+
+void JsonExport::visit_codeblock(const dex::CodeBlock& codeblock)
+{
+  object()["lang"] = codeblock.lang;
+  object()["code"] = codeblock.code;
+  ModelVisitor::visit_codeblock(codeblock);
 }
 
 static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)

@@ -6,6 +6,7 @@
 
 #include "dex/output/liquid-exporter.h"
 
+#include "dex/model/code-block.h"
 #include "dex/model/display-math.h"
 #include "dex/model/model.h"
 
@@ -76,6 +77,8 @@ std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
     return stringify_math(static_cast<const dex::DisplayMath&>(node));
   else if (node.is<dex::GroupTable>())
     return stringify_grouptable(static_cast<const dex::GroupTable&>(node));
+  else if (node.is<dex::CodeBlock>())
+    return stringify_codeblock(static_cast<const dex::CodeBlock&>(node));
 
   assert(("dom element not implemented", false));
   return {};

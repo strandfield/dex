@@ -31,6 +31,8 @@ protected:
   std::string format_group_item(const std::shared_ptr<cxx::Entity>& e) const;
   std::string stringify_grouptable(const dex::GroupTable& table) const override;
 
+  std::string stringify_codeblock(const dex::CodeBlock& codeblock) const override;
+
   std::string stringify_section(const dex::Sectioning& sec) const override;
 };
 

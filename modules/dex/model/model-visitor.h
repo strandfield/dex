@@ -33,6 +33,7 @@ class Variable;
 namespace dex
 {
 
+class CodeBlock;
 class DisplayMath;
 class Program;
 
@@ -63,6 +64,7 @@ protected:
   virtual void visit_domparagraph(const dom::Paragraph& par);
   virtual void visit_displaymath(const dex::DisplayMath& math);
   virtual void visit_grouptable(const dex::GroupTable& table);
+  virtual void visit_codeblock(const dex::CodeBlock& codeblock);
 
   virtual void visit_program(const dex::Program& prog);
   virtual void visit_entity(const cxx::Entity& e);
