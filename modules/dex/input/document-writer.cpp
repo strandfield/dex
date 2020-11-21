@@ -4,6 +4,7 @@
 
 #include "dex/input/document-writer.h"
 
+#include "dex/model/code-block.h"
 #include "dex/model/since.h"
 #include "dex/model/manual.h"
 
@@ -49,6 +50,10 @@ void DocumentWriter::write(char c)
   {
     currentMath().write(c);
   }
+  else if (isWritingCode())
+  {
+    static_cast<CodeBlock&>(currentNode()).code.push_back(c);
+  }
   else
   {
     if (!is_space(c))
@@ -61,6 +66,10 @@ void DocumentWriter::write(const std::string& str)
   if (isWritingParagraph())
   {
     paragraphWriter().write(str);
+  }
+  else if (isWritingCode())
+  {
+    static_cast<CodeBlock&>(currentNode()).code += str;
   }
   else
   {
@@ -325,6 +334,38 @@ void DocumentWriter::enddisplaymath()
   adjustState();
 }
 
+void DocumentWriter::code(const std::string& lang)
+{
+  if (isWritingParagraph())
+    endParagraph();
+
+  if (isWritingMath() || isWritingList())
+    throw std::runtime_error{ "DocumentWriter::code() not available in this mode" };
+
+  auto codeblock = std::make_shared<CodeBlock>();
+  codeblock->lang = lang;
+
+  pushNode(codeblock);
+  m_cur_content->push_back(codeblock);
+  // @TODO: maybe push 'invalid' content
+
+  m_state = State::WritingCode;
+}
+
+void DocumentWriter::endcode()
+{
+  if (!isWritingCode())
+    throw std::runtime_error{ "DocumentWriter::endcode()" };
+
+  if (m_since.has_value())
+  {
+    // TODO: handle since
+  }
+
+  popNode();
+  adjustState();
+}
+
 void DocumentWriter::makegrouptable(std::string groupname)
 {
   if (isWritingParagraph())
@@ -444,6 +485,11 @@ bool DocumentWriter::isWritingListItem() const
 bool DocumentWriter::isWritingMath() const
 {
   return m_state == State::WritingMath;
+}
+
+bool DocumentWriter::isWritingCode() const
+{
+  return m_state == State::WritingCode;
 }
 
 MathWriter& DocumentWriter::currentMath()

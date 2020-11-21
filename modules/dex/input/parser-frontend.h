@@ -27,6 +27,8 @@ public:
   explicit ParserFrontend(ParserMachine& machine);
   ~ParserFrontend();
 
+  ParserMachine& machine() const;
+
   enum class Mode
   {
     Idle,
@@ -69,6 +71,9 @@ public:
     part,
     chapter,
     section,
+    /* DOM elements */
+    code,
+    endcode,
     /* Grouping */
     ingroup,
   };
@@ -140,6 +145,9 @@ protected:
 
   void ingroup(const FunctionCall& call);
 
+  void code(const FunctionCall& call);
+  void endcode(const FunctionCall& call);
+
 private:
   ParserMachine& m_machine;
   Mode m_mode;
@@ -148,5 +156,15 @@ private:
 };
 
 } // namespace dex
+
+namespace dex
+{
+
+inline ParserMachine& ParserFrontend::machine() const
+{
+  return m_machine;
+}
+
+}
 
 #endif // DEX_INPUT_PARSER_FRONTEND_H

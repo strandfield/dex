@@ -62,12 +62,15 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::RETURNS, CS::RETURNS},
     {Functions::NONMEMBER, CS::NONMEMBER},
     {Functions::RELATES, CS::RELATES},
-    /* Manual */
+    /* Documents */
     {Functions::MANUAL, CS::manual},
     {Functions::PAGE, CS::page},
     {Functions::PART, CS::part},
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
+    /* DOM elements */
+    {Functions::CODE, CS::code},
+    {Functions::ENDCODE, CS::endcode},
     /* Grouping */
     {Functions::INGROUP, CS::ingroup},
   };
@@ -209,6 +212,11 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_section(call);
     case CS::ingroup:
       return ingroup(call);
+      /* DOM elements */
+    case CS::code:
+      return code(call);
+    case CS::endcode:
+      return endcode(call);
     default:
       throw UnexpectedControlSequence{ call.function };
     }
@@ -459,6 +467,26 @@ void ParserFrontend::ingroup(const FunctionCall& call)
     std::shared_ptr<Document> doc = m_manual_parser->document();
     m_machine.output()->groups.multiInsert(groups, doc);
   }
+}
+
+void ParserFrontend::code(const FunctionCall& call)
+{
+  // @TODO: maybe this could be set using macros in dex.fmt
+  machine().lexer().catcodes()['\n'] = tex::parsing::CharCategory::Other;
+  machine().lexer().catcodes()[' '] = tex::parsing::CharCategory::Other;
+
+  DocumentWriterFrontend writer{ currentWriter() };
+  writer.handle(call);
+}
+
+void ParserFrontend::endcode(const FunctionCall& call)
+{
+  DocumentWriterFrontend writer{ currentWriter() };
+  writer.handle(call);
+
+  // @TODO: maybe this could be set using macros in dex.fmt
+  machine().lexer().catcodes()['\n'] = tex::parsing::CharCategory::EndOfLine;
+  machine().lexer().catcodes()[' '] = tex::parsing::CharCategory::Space;
 }
 
 void ParserFrontend::beginFile()

@@ -99,6 +99,17 @@
   }%
 }
 
+\def\code{%
+  \@ifnextchar[{%
+    \def\@fteroptions{%
+      \c@ll\@code
+    }%
+    \p@rseoptions
+  }{%
+    \c@ll\@code
+  }%
+}
+
 % Dex - Program %
 
 \def\class{%

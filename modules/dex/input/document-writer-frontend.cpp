@@ -60,6 +60,8 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
     {Functions::BACKSLASH_LBRACKET, &DocumentWriterFrontend::displaymath},
     {Functions::BACKSLASH_RBRACKET, &DocumentWriterFrontend::enddisplaymath},
     {Functions::MAKEGROUPTABLE, &DocumentWriterFrontend::makegrouptable},
+    {Functions::CODE, &DocumentWriterFrontend::code},
+    {Functions::ENDCODE, &DocumentWriterFrontend::endcode},
   };
 
   auto it = fn_map.find(call.function);
@@ -211,6 +213,17 @@ void DocumentWriterFrontend::makegrouptable(const FunctionCall& c)
 {
   std::string groupname = c.arg<std::string>(0);
   m_writer->makegrouptable(groupname);
+}
+
+void DocumentWriterFrontend::code(const FunctionCall& c)
+{
+  std::string lang = c.opt<std::string>("", "");
+  m_writer->code(lang);
+}
+
+void DocumentWriterFrontend::endcode(const FunctionCall& c)
+{
+  m_writer->endcode();
 }
 
 

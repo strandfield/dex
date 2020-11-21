@@ -66,6 +66,9 @@ const std::string Functions::LI = "@li";
 
 const std::string Functions::MAKEGROUPTABLE = "@makegrouptable";
 
+const std::string Functions::CODE = "@code";
+const std::string Functions::ENDCODE = "endcode";
+
 const std::string Functions::BACKSLASH_LBRACKET = "[";
 const std::string Functions::BACKSLASH_RBRACKET = "]";
 
