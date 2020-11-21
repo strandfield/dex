@@ -159,7 +159,7 @@ std::string_view InputStream::peekLine() const
 std::string_view InputStream::readLine()
 {
   auto result = peekLine();
-  discard(result.size() + 1);
+  discard(static_cast<int>(result.size()) + 1);
   return result;
 }
 
