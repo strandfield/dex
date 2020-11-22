@@ -1,0 +1,11 @@
+
+/*!
+ * \namespace dex
+ *
+ * This is the dex namespace.
+ *
+ * \begin{code}[cpp]
+ *   dex::init();
+ * \end{code}
+ */
+ 

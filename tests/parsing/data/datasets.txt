@@ -2,5 +2,6 @@ class-with-inline
 class-with-var
 enum-in-group
 manual-simple
+namespace-with-code
 page-with-math
 prog-with-macro-typedef
