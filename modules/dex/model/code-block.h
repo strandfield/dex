@@ -23,6 +23,8 @@ public:
 
   static const std::string TypeId;
   const std::string& className() const override;
+
+  void normalize();
 };
 
 } // namespace dex

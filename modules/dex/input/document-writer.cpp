@@ -362,6 +362,8 @@ void DocumentWriter::endcode()
     // TODO: handle since
   }
 
+  static_cast<CodeBlock&>(currentNode()).normalize();
+
   popNode();
   adjustState();
 }

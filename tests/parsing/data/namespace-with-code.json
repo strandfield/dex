@@ -7,7 +7,7 @@
                 "text": "This is the dex namespace.",
                 "type": "paragraph"
               }, {
-                "code": "\n   dex::init();\n ",
+                "code": "dex::init();",
                 "lang": "cpp",
                 "type": "CodeBlock"
               }]
