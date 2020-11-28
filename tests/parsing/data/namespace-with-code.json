@@ -1,0 +1,22 @@
+{
+  "program": {
+    "global_namespace": {
+      "entities": [{
+          "documentation": {
+            "description": [{
+                "text": "This is the dex namespace.",
+                "type": "paragraph"
+              }, {
+                "code": "dex::init();",
+                "lang": "cpp",
+                "type": "CodeBlock"
+              }]
+          },
+          "name": "dex",
+          "type": "namespace"
+        }],
+      "name": "",
+      "type": "namespace"
+    }
+  }
+}

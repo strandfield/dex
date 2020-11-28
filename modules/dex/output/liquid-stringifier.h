@@ -22,6 +22,7 @@ class Paragraph;
 namespace dex
 {
 
+class CodeBlock;
 class DisplayMath;
 class GroupTable;
 class Sectioning;
@@ -50,6 +51,7 @@ protected:
   virtual std::string stringify_image(const dom::Image& img) const = 0;
   virtual std::string stringify_math(const dex::DisplayMath& math) const = 0;
   virtual std::string stringify_grouptable(const dex::GroupTable& table) const = 0;
+  virtual std::string stringify_codeblock(const dex::CodeBlock& codeblock) const = 0;
 
   virtual std::string stringify_section(const dex::Sectioning& sec) const = 0;
 };

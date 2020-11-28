@@ -26,6 +26,11 @@ inline int max(int a, int b)
  * 
  * See also the following math related functions:
  * \makegrouptable math
+ *
+ * \begin{code}[cpp]
+ *   Point p;
+ *   p.x = 5;
+ * \end{code}
  */
 struct Point
 {

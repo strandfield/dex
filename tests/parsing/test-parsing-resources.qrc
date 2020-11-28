@@ -9,6 +9,8 @@
     <file>data/enum-in-group.json</file>
     <file>data/manual-simple.txt</file>
     <file>data/manual-simple.json</file>
+	<file>data/namespace-with-code.txt</file>
+    <file>data/namespace-with-code.json</file>
     <file>data/page-with-math.txt</file>
     <file>data/page-with-math.json</file>
     <file>data/prog-with-macro-typedef.txt</file>

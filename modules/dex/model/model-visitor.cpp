@@ -4,6 +4,7 @@
 
 #include "dex/model/model-visitor.h"
 
+#include <dex/model/code-block.h>
 #include <dex/model/display-math.h>
 
 #include <cxx/class.h>
@@ -197,6 +198,8 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_displaymath(static_cast<const dex::DisplayMath&>(n));
   else if (n.is<dex::GroupTable>())
     visit_grouptable(static_cast<const dex::GroupTable&>(n));
+  else if (n.is<dex::CodeBlock>())
+    visit_codeblock(static_cast<const dex::CodeBlock&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -245,6 +248,11 @@ void ModelVisitor::visit_displaymath(const dex::DisplayMath& /* math */)
 }
 
 void ModelVisitor::visit_grouptable(const dex::GroupTable& /* table */)
+{
+
+}
+
+void ModelVisitor::visit_codeblock(const dex::CodeBlock& /* codeblock */)
 {
 
 }

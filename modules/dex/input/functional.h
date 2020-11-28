@@ -112,6 +112,9 @@ struct DEX_INPUT_API Functions
 
   static const std::string MAKEGROUPTABLE;
 
+  static const std::string CODE;
+  static const std::string ENDCODE;
+
   static const std::string BACKSLASH_LBRACKET;
   static const std::string BACKSLASH_RBRACKET;
 };

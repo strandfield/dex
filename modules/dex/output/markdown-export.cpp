@@ -7,6 +7,7 @@
 #include "dex/output/liquid-exporter.h"
 #include "dex/output/paragraph-converter.h"
 
+#include "dex/model/code-block.h"
 #include "dex/model/display-math.h"
 #include "dex/model/inline-math.h"
 #include "dex/model/since.h"
@@ -150,6 +151,23 @@ std::string MarkdownStringifier::stringify_grouptable(const dex::GroupTable& tab
     result += format_group_item(e) + "\n";
   }
 
+  return result;
+}
+
+std::string MarkdownStringifier::stringify_codeblock(const dex::CodeBlock& codeblock) const
+{
+  std::string result = "```";
+
+  if (!codeblock.lang.empty())
+    result += codeblock.lang;
+
+  result += "\n";
+  result += codeblock.code;
+  
+  if (result.back() != '\n')
+    result.push_back('\n');
+
+  result += "```";
   return result;
 }
 

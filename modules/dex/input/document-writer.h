@@ -37,6 +37,7 @@ public:
     WritingList,
     WritingListItem,
     WritingMath,
+    WritingCode,
   };
 
   State state() const;
@@ -84,6 +85,9 @@ public:
 
   void makegrouptable(std::string groupname);
 
+  void code(const std::string& lang = "");
+  void endcode();
+
   bool isIdle() const;
 
   bool isWritingParagraph() const;
@@ -92,7 +96,8 @@ public:
   bool isWritingList() const;
   bool isWritingListItem() const;
   bool isWritingMath() const;
-  
+  bool isWritingCode() const;
+
   void beginSinceBlock(const std::string& version);
   void endSinceBlock();
 

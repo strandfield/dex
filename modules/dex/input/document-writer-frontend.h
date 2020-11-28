@@ -57,6 +57,8 @@ protected:
   void displaymath(const FunctionCall& c);
   void enddisplaymath(const FunctionCall& c);
   void makegrouptable(const FunctionCall& c);
+  void code(const FunctionCall& c);
+  void endcode(const FunctionCall& c);
 };
 
 class DEX_INPUT_API DocumentWriterToolchain

@@ -6,6 +6,7 @@
 
 #include "dex/output/paragraph-converter.h"
 
+#include "dex/model/code-block.h"
 #include "dex/model/display-math.h"
 #include "dex/model/since.h"
 
@@ -130,6 +131,20 @@ std::string LatexStringifier::stringify_grouptable(const dex::GroupTable& table)
   }
 
   result += "\\end{itemize}\n";
+
+  return result;
+}
+
+std::string LatexStringifier::stringify_codeblock(const dex::CodeBlock& codeblock) const
+{
+  std::string result = "\\begin{lstlisting}\n";
+
+  result += codeblock.code;
+
+  if (result.back() != '\n')
+    result.push_back('\n');
+
+  result += "\\end{lstlisting}";
 
   return result;
 }
