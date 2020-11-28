@@ -298,11 +298,6 @@ void DocumentWriter::endlist()
   if (!isWritingList())
     throw std::runtime_error{ "DocumentWriter::endlist()" };
 
-  if (m_since.has_value())
-  {
-    // TODO: handle since
-  }
-
   popNode();
   adjustState();
 }
@@ -357,11 +352,6 @@ void DocumentWriter::endcode()
   if (!isWritingCode())
     throw std::runtime_error{ "DocumentWriter::endcode()" };
 
-  if (m_since.has_value())
-  {
-    // TODO: handle since
-  }
-
   static_cast<CodeBlock&>(currentNode()).normalize();
 
   popNode();
@@ -382,21 +372,24 @@ void DocumentWriter::makegrouptable(std::string groupname)
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
 {
-  if(m_since.has_value())
+  if(m_since)
     throw std::runtime_error{ "Cannot have nested since block" };
 
   if (isWritingParagraph())
     endParagraph();
 
-  m_since = version;
+  m_since = std::make_shared<BeginSince>(version);
+  m_cur_content->push_back(m_since);
 }
 
 void DocumentWriter::endSinceBlock()
 {
-  assert(m_since.has_value());
+  assert(m_since != nullptr);
 
   if (isWritingParagraph())
     endParagraph();
+
+  m_cur_content->push_back(std::make_shared<EndSince>(m_since));
 
   m_since.reset();
 }
@@ -428,11 +421,6 @@ void DocumentWriter::endParagraph()
 
   paragraphWriter().finish();
   auto par = paragraphWriter().output();
-
-  if (m_since.has_value())
-  {
-    par->add<dex::Since>(dom::ParagraphRange(*par), m_since.value());
-  }
 
   m_cur_content->push_back(par);  
   m_paragraph_writer.reset();

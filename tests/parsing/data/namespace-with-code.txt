@@ -7,5 +7,9 @@
  * \begin{code}[cpp]
  *   dex::init();
  * \end{code}
+ *
+ * \begin{since}[v1.2.3]
+ * Calling the init method is no longer required.
+ * \end{since}
  */
  
