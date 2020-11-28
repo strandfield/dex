@@ -102,6 +102,17 @@ std::string LatexStringifier::stringify_math(const dex::DisplayMath& math) const
   return result;
 }
 
+std::string LatexStringifier::stringify_beginsince(const dex::BeginSince& bsince) const
+{
+  return "[Since:" + bsince.version + " --- ";
+}
+
+std::string LatexStringifier::stringify_endsince(const dex::EndSince& esince) const
+{
+  return "---endsince]\n";
+}
+
+
 std::string LatexStringifier::format_group_item(const std::shared_ptr<cxx::Entity>& e) const
 {
   std::string result = [&]() -> std::string {

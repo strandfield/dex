@@ -71,6 +71,10 @@ std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
     return stringify_listitem(static_cast<const dom::ListItem&>(node));
   else if (node.is<dom::Image>())
     return stringify_image(static_cast<const dom::Image&>(node));
+  else if (node.is<dex::BeginSince>())
+    return stringify_beginsince(static_cast<const dex::BeginSince&>(node));
+  else if (node.is<dex::EndSince>())
+    return stringify_endsince(static_cast<const dex::EndSince&>(node));
   else if (node.is<dex::Sectioning>())
     return stringify_section(static_cast<const dex::Sectioning&>(node));
   else if (node.is<dex::DisplayMath>())
