@@ -30,6 +30,8 @@ protected:
   std::string stringify_listitem(const dom::ListItem& li) const override;
   std::string stringify_paragraph(const dom::Paragraph& par) const override;
   std::string stringify_image(const dom::Image& img) const override;
+  std::string stringify_beginsince(const dex::BeginSince& bsince) const override;
+  std::string stringify_endsince(const dex::EndSince& esince) const override;
   std::string stringify_math(const dex::DisplayMath& math) const override;
 
   std::string format_group_item(const std::shared_ptr<cxx::Entity>& e) const;

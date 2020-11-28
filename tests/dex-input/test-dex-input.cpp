@@ -192,22 +192,20 @@ void TestDexInput::documentWriterParagraph()
   writer.paragraphWriter().writeLink("#more", "...");
   writer.endSinceBlock();
 
-  QVERIFY(writer.output().size() == 2);
+  QVERIFY(writer.output().size() == 4);
 
-  QVERIFY(writer.output().front()->is<dom::Paragraph>());
-  QVERIFY(writer.output().back()->is<dom::Paragraph>());
+  QVERIFY(writer.output().at(0)->is<dom::Paragraph>());
+  QVERIFY(writer.output().at(2)->is<dom::Paragraph>());
 
-  auto par = std::static_pointer_cast<dom::Paragraph>(writer.output().front());
+  auto par = std::static_pointer_cast<dom::Paragraph>(writer.output().at(0));
   QVERIFY(par->text() == "std::vector is a sequence container that encapsulates dynamic size arrays.");
   QVERIFY(par->metadata().size() == 1);
   QVERIFY(par->metadata().front()->is<dom::TextStyle>());
   QVERIFY(std::static_pointer_cast<dom::TextStyle>(par->metadata().front())->style() == "code");
 
-  par = std::static_pointer_cast<dom::Paragraph>(writer.output().back());
+  par = std::static_pointer_cast<dom::Paragraph>(writer.output().at(2));
   QVERIFY(par->text() == "The elements are stored contiguously, ...");
-  QVERIFY(par->metadata().size() == 2);
-  QVERIFY(par->metadata().front()->is<dex::Since>());
-  QVERIFY(par->metadata().front()->range().text() == "The elements are stored contiguously, ...");
+  QVERIFY(par->metadata().size() == 1);
   QVERIFY(par->metadata().back()->is<dom::Link>());
   QVERIFY(par->metadata().back()->range().text() == "...");
 }

@@ -10,6 +10,15 @@
                 "code": "dex::init();",
                 "lang": "cpp",
                 "type": "CodeBlock"
+              }, {
+                "type": "BeginSince",
+                "version": "v1.2.3"
+              }, {
+                "text": "Calling the init method is no longer required.",
+                "type": "paragraph"
+              }, {
+                "type": "EndSince",
+                "version": "v1.2.3"
               }]
           },
           "name": "dex",

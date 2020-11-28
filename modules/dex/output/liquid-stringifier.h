@@ -22,8 +22,10 @@ class Paragraph;
 namespace dex
 {
 
+class BeginSince;
 class CodeBlock;
 class DisplayMath;
+class EndSince;
 class GroupTable;
 class Sectioning;
 
@@ -48,6 +50,8 @@ protected:
   virtual std::string stringify_list(const dom::List& list) const = 0;
   virtual std::string stringify_listitem(const dom::ListItem& li) const = 0;
   virtual std::string stringify_paragraph(const dom::Paragraph& par) const = 0;
+  virtual std::string stringify_beginsince(const dex::BeginSince& bsince) const = 0;
+  virtual std::string stringify_endsince(const dex::EndSince& esince) const = 0;
   virtual std::string stringify_image(const dom::Image& img) const = 0;
   virtual std::string stringify_math(const dex::DisplayMath& math) const = 0;
   virtual std::string stringify_grouptable(const dex::GroupTable& table) const = 0;

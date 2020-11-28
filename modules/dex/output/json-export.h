@@ -41,6 +41,8 @@ protected:
   void visit_domlist(const dom::List& l) override;
   void visit_domlistitem(const dom::ListItem& li) override;
   void visit_domparagraph(const dom::Paragraph& par) override;
+  void visit_beginsince(const dex::BeginSince& bsince) override;
+  void visit_endsince(const dex::EndSince& esince) override;
   void visit_displaymath(const dex::DisplayMath& math) override;
   void visit_grouptable(const dex::GroupTable& table) override;
   void visit_codeblock(const dex::CodeBlock& codeblock) override;

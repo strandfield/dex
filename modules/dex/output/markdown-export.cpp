@@ -104,6 +104,16 @@ std::string MarkdownStringifier::stringify_image(const dom::Image& img) const
   return "![image](" + img.src + ")";
 }
 
+std::string MarkdownStringifier::stringify_beginsince(const dex::BeginSince& bsince) const
+{
+  return "[since:" + bsince.version + " --- ";
+}
+
+std::string MarkdownStringifier::stringify_endsince(const dex::EndSince& esince) const
+{
+  return " ---endsince]\n";
+}
+
 std::string MarkdownStringifier::stringify_math(const dex::DisplayMath& math) const
 {
   std::string result = "```tex\n";

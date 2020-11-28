@@ -19,10 +19,13 @@
 namespace dex
 {
 
+class BeginSince;
+
 class DomWriter;
 class MathWriter;
 class ParagraphWriter;
 
+// @TODO: specify output node instead of writing in output() vec
 class DEX_INPUT_API DocumentWriter
 {
 public:
@@ -129,7 +132,7 @@ private:
   State m_state = State::Idle;
   std::unique_ptr<ParagraphWriter> m_paragraph_writer;
   std::unique_ptr<MathWriter> m_math_writer;
-  std::optional<std::string> m_since;
+  std::shared_ptr<BeginSince> m_since;
   dom::NodeList m_result;
   std::vector<dom::NodeList*> m_contents;
   dom::NodeList* m_cur_content;

@@ -24,8 +24,10 @@ inline int max(int a, int b)
  * \class Point
  * \brief provides a 2D-point with integer coordinates
  * 
+ * \begin{since}[v0.1.0]
  * See also the following math related functions:
  * \makegrouptable math
+ * \end{since}
  *
  * \begin{code}[cpp]
  *   Point p;

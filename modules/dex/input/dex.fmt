@@ -173,7 +173,7 @@
       \@ifleftbrace{%
         \p@rseword\c@ll\@since
       }{%
-        \beginsince
+        \c@ll\beginsince
       }%
     }%
     \p@rseoptions

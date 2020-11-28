@@ -223,6 +223,16 @@ void JsonExport::visit_domparagraph(const dom::Paragraph& par)
   ModelVisitor::visit_domparagraph(par);
 }
 
+void JsonExport::visit_beginsince(const dex::BeginSince& bsince)
+{
+  object()["version"] = bsince.version;
+}
+
+void JsonExport::visit_endsince(const dex::EndSince& esince)
+{
+  object()["version"] = esince.beginsince.lock()->version;
+}
+
 void JsonExport::visit_displaymath(const dex::DisplayMath& math)
 {
   object()["source"] = math.source;

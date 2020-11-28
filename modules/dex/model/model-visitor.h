@@ -33,8 +33,10 @@ class Variable;
 namespace dex
 {
 
+class BeginSince;
 class CodeBlock;
 class DisplayMath;
+class EndSince;
 class Program;
 
 class DEX_MODEL_API ModelVisitor
@@ -62,6 +64,8 @@ protected:
   virtual void visit_domlist(const dom::List& l);
   virtual void visit_domlistitem(const dom::ListItem& li);
   virtual void visit_domparagraph(const dom::Paragraph& par);
+  virtual void visit_beginsince(const dex::BeginSince& bsince);
+  virtual void visit_endsince(const dex::EndSince& esince);
   virtual void visit_displaymath(const dex::DisplayMath& math);
   virtual void visit_grouptable(const dex::GroupTable& table);
   virtual void visit_codeblock(const dex::CodeBlock& codeblock);

@@ -190,6 +190,10 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_domlistitem(static_cast<const dom::ListItem&>(n));
   else if (n.is<dom::Paragraph>())
     visit_domparagraph(static_cast<const dom::Paragraph&>(n));
+  else if (n.is<dex::BeginSince>())
+    visit_beginsince(static_cast<const dex::BeginSince&>(n));
+  else if (n.is<dex::EndSince>())
+    visit_endsince(static_cast<const dex::EndSince&>(n));
   else if (n.is<dom::Document>())
     visit_document(static_cast<const dex::Document&>(n));
   else if (n.is<dex::Sectioning>())
@@ -238,6 +242,16 @@ void ModelVisitor::visit_domlistitem(const dom::ListItem& li)
 }
 
 void ModelVisitor::visit_domparagraph(const dom::Paragraph& /* par */)
+{
+
+}
+
+void ModelVisitor::visit_beginsince(const dex::BeginSince& /* bsince */)
+{
+
+}
+
+void ModelVisitor::visit_endsince(const dex::EndSince& /* esince */)
 {
 
 }
