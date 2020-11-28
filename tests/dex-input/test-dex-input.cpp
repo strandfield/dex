@@ -192,18 +192,18 @@ void TestDexInput::documentWriterParagraph()
   writer.paragraphWriter().writeLink("#more", "...");
   writer.endSinceBlock();
 
-  QVERIFY(writer.output().size() == 4);
+  QVERIFY(writer.output()->childNodes().size() == 4);
 
-  QVERIFY(writer.output().at(0)->is<dom::Paragraph>());
-  QVERIFY(writer.output().at(2)->is<dom::Paragraph>());
+  QVERIFY(writer.output()->childNodes().at(0)->is<dom::Paragraph>());
+  QVERIFY(writer.output()->childNodes().at(2)->is<dom::Paragraph>());
 
-  auto par = std::static_pointer_cast<dom::Paragraph>(writer.output().at(0));
+  auto par = std::static_pointer_cast<dom::Paragraph>(writer.output()->childNodes().at(0));
   QVERIFY(par->text() == "std::vector is a sequence container that encapsulates dynamic size arrays.");
   QVERIFY(par->metadata().size() == 1);
   QVERIFY(par->metadata().front()->is<dom::TextStyle>());
   QVERIFY(std::static_pointer_cast<dom::TextStyle>(par->metadata().front())->style() == "code");
 
-  par = std::static_pointer_cast<dom::Paragraph>(writer.output().at(2));
+  par = std::static_pointer_cast<dom::Paragraph>(writer.output()->childNodes().at(2));
   QVERIFY(par->text() == "The elements are stored contiguously, ...");
   QVERIFY(par->metadata().size() == 1);
   QVERIFY(par->metadata().back()->is<dom::Link>());
@@ -221,10 +221,10 @@ void TestDexInput::documentWriterList()
   writer.write("Number 2");
   writer.endlist();
 
-  QVERIFY(writer.output().size() == 1);
-  QVERIFY(writer.output().at(0)->is<dom::List>());
+  QVERIFY(writer.output()->childNodes().size() == 1);
+  QVERIFY(writer.output()->childNodes().at(0)->is<dom::List>());
 
-  auto list = std::static_pointer_cast<dom::List>(writer.output().at(0));
+  auto list = std::static_pointer_cast<dom::List>(writer.output()->childNodes().at(0));
 
   QVERIFY(list->items.size() == 2);
 
@@ -270,19 +270,19 @@ void TestDexInput::parserMachineImage()
   auto vec = std::static_pointer_cast<cxx::Class>(ns->entities.front());
   QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation) != nullptr);
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation);
-  QVERIFY(doc->description().size() == 3);
+  QVERIFY(doc->description->childNodes().size() == 3);
 
-  QVERIFY(doc->description().at(0)->is<dom::Paragraph>());
-  auto par = std::static_pointer_cast<dom::Paragraph>(doc->description().at(0));
+  QVERIFY(doc->description->childNodes().at(0)->is<dom::Paragraph>());
+  auto par = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().at(0));
   QVERIFY(par->text() == "This is a first paragraph.");
 
-  QVERIFY(doc->description().at(1)->is<dom::Image>());
-  auto img = std::static_pointer_cast<dom::Image>(doc->description().at(1));
+  QVERIFY(doc->description->childNodes().at(1)->is<dom::Image>());
+  auto img = std::static_pointer_cast<dom::Image>(doc->description->childNodes().at(1));
   QVERIFY(img->src == "test.png");
   QVERIFY(img->width == 66);
 
-  QVERIFY(doc->description().at(2)->is<dom::Paragraph>());
-  par = std::static_pointer_cast<dom::Paragraph>(doc->description().at(2));
+  QVERIFY(doc->description->childNodes().at(2)->is<dom::Paragraph>());
+  par = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().at(2));
   QVERIFY(par->text() == "This is a second paragraph.");
 }
 
@@ -320,10 +320,10 @@ void TestDexInput::parserMachineList()
   auto vec = std::static_pointer_cast<cxx::Class>(ns->entities.front());
   QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation) != nullptr);
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation);
-  QVERIFY(doc->description().size() == 1);
-  QVERIFY(doc->description().front()->is<dom::List>());
+  QVERIFY(doc->description->childNodes().size() == 1);
+  QVERIFY(doc->description->childNodes().front()->is<dom::List>());
 
-  auto lst = std::static_pointer_cast<dom::List>(doc->description().front());
+  auto lst = std::static_pointer_cast<dom::List>(doc->description->childNodes().front());
   
   QVERIFY(lst->items.size() == 2);
   QVERIFY(lst->items.back()->childNodes().size() == 2);
@@ -368,9 +368,9 @@ void TestDexInput::parserMachineClass()
   QVERIFY(std::dynamic_pointer_cast<dex::ClassDocumentation>(vec->documentation) != nullptr);
   auto doc = std::static_pointer_cast<dex::ClassDocumentation>(vec->documentation);
   QVERIFY(doc->brief().value() == "sequence container that encapsulates dynamic size arrays");
-  QVERIFY(doc->description().size() == 1);
-  QVERIFY(doc->description().front()->is<dom::Paragraph>());
-  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
+  QVERIFY(doc->description->childNodes().size() == 1);
+  QVERIFY(doc->description->childNodes().front()->is<dom::Paragraph>());
+  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().front());
   QVERIFY(paragraph->text() == "The elements are stored contiguously, ...");
 
   QFile::remove("test.cpp");
@@ -416,12 +416,12 @@ void TestDexInput::parserMachineFunction()
   auto funparamdoc = std::static_pointer_cast<dex::FunctionParameterDocumentation>(getenv->parameters.front()->documentation);
   QVERIFY(funparamdoc->brief == "name of the environment variable");
   QVERIFY(doc->returnValue().value_or("") == "value of environment variable");
-  QVERIFY(doc->description().size() == 2);
-  QVERIFY(doc->description().front()->is<dom::Paragraph>());
-  QVERIFY(doc->description().back()->is<dom::Paragraph>());
-  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
+  QVERIFY(doc->description->childNodes().size() == 2);
+  QVERIFY(doc->description->childNodes().front()->is<dom::Paragraph>());
+  QVERIFY(doc->description->childNodes().back()->is<dom::Paragraph>());
+  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().front());
   QVERIFY(paragraph->text() == "Searches the environment list provided by the host environment...");
-  paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().back());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().back());
   QVERIFY(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior.");
 
   QFile::remove("test.cpp");
@@ -464,25 +464,25 @@ void TestDexInput::parserMachineEnum()
   QVERIFY(std::dynamic_pointer_cast<dex::EnumDocumentation>(corner->documentation) != nullptr);
   auto doc = std::static_pointer_cast<dex::EnumDocumentation>(corner->documentation);
   QVERIFY(doc->brief().value() == "describes a corner");
-  QVERIFY(doc->description().size() == 1);
-  QVERIFY(doc->description().front()->is<dom::Paragraph>());
-  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
+  QVERIFY(doc->description->childNodes().size() == 1);
+  QVERIFY(doc->description->childNodes().front()->is<dom::Paragraph>());
+  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().front());
   QVERIFY(paragraph->text() == "This is not that useful.");
 
   auto top_left = corner->values.at(0);
   auto valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(top_left->documentation);
   QVERIFY(top_left->name == "TopLeft");
-  QVERIFY(valdoc->description().size() == 1);
-  QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
-  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
+  QVERIFY(valdoc->description->childNodes().size() == 1);
+  QVERIFY(valdoc->description->childNodes().front()->is<dom::Paragraph>());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description->childNodes().front());
   QVERIFY(paragraph->text() == "the top left corner");
 
   auto bottom_right = corner->values.at(3);
   valdoc = std::static_pointer_cast<dex::EnumValueDocumentation>(bottom_right->documentation);
   QVERIFY(bottom_right->name == "BottomRight");
-  QVERIFY(valdoc->description().size() == 1);
-  QVERIFY(valdoc->description().front()->is<dom::Paragraph>());
-  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description().front());
+  QVERIFY(valdoc->description->childNodes().size() == 1);
+  QVERIFY(valdoc->description->childNodes().front()->is<dom::Paragraph>());
+  paragraph = std::static_pointer_cast<dom::Paragraph>(valdoc->description->childNodes().front());
   QVERIFY(paragraph->text() == "the bottom right corner");
 }
 
@@ -517,9 +517,9 @@ void TestDexInput::parserMachineVariable()
   QVERIFY(doc->brief().value() == "the name of the program");
   QVERIFY(doc->since().value().version() == "2020");
  
-  QVERIFY(doc->description().size() == 1);
-  QVERIFY(doc->description().front()->is<dom::Paragraph>());
-  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description().front());
+  QVERIFY(doc->description->childNodes().size() == 1);
+  QVERIFY(doc->description->childNodes().front()->is<dom::Paragraph>());
+  auto paragraph = std::static_pointer_cast<dom::Paragraph>(doc->description->childNodes().front());
   QVERIFY(paragraph->text() == "Stores the name of the program.");
 
   QFile::remove("test.cpp");

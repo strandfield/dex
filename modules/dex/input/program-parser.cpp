@@ -72,7 +72,13 @@ ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
   : state::Frame<FrameType>(ft)
 {
   node = cxxent;
-  writer = std::make_shared<DocumentWriter>();
+
+  auto entdoc = std::static_pointer_cast<EntityDocumentation>(cxxent->documentation);
+
+  if (!entdoc->description)
+    entdoc->description = std::make_shared<dom::Document>();
+
+  writer = std::make_shared<DocumentWriter>(entdoc->description);
 }
 
 ProgramParser::ProgramParser(std::shared_ptr<dex::Program> prog)
@@ -547,9 +553,6 @@ void ProgramParser::exitFrame()
   {
     auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
     f.writer->finish();
-
-    if(!f.writer->output().empty())
-      doc(ent->documentation).description() = std::move(f.writer->output());
   }
 
   m_state.leave();

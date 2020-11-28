@@ -411,14 +411,15 @@ void ModelVisitor::visit_macro(const cxx::Macro& /* m */)
 
 void ModelVisitor::visit_entitydocumentation(const EntityDocumentation& edoc)
 {
-  if (!edoc.description().empty())
+  if (edoc.description && !edoc.description->childNodes().empty())
   {
     RaiiArrayVisitor state_updater{ this, "description" };
-    for (size_t i(0); i < edoc.description().size(); ++i)
+    const auto& childnodes = edoc.description->childNodes();
+    for (size_t i(0); i < childnodes.size(); ++i)
     {
       RaiiArrayElementVisitor inner_state_updater{ this, i };
 
-      visit_domnode(*edoc.description().at(i));
+      visit_domnode(*childnodes.at(i));
     }
   }
 }

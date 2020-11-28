@@ -25,11 +25,10 @@ class DomWriter;
 class MathWriter;
 class ParagraphWriter;
 
-// @TODO: specify output node instead of writing in output() vec
 class DEX_INPUT_API DocumentWriter
 {
 public:
-  DocumentWriter();
+  explicit DocumentWriter(std::shared_ptr<dom::Node> out = nullptr);
   DocumentWriter(DocumentWriter&&) = delete;
   ~DocumentWriter();
 
@@ -108,7 +107,8 @@ public:
 
   void write(const std::shared_ptr<dom::Node>& node);
 
-  dom::NodeList& output();
+  const std::shared_ptr<dom::Node>& output();
+  void setOutput(std::shared_ptr<dom::Node> out);
 
 protected:
 
@@ -125,17 +125,12 @@ protected:
   void pushNode(std::shared_ptr<dom::Node> n);
   void popNode();
 
-  void pushContent(dom::NodeList& c);
-  void popContent();
-
 private:
   State m_state = State::Idle;
   std::unique_ptr<ParagraphWriter> m_paragraph_writer;
   std::unique_ptr<MathWriter> m_math_writer;
   std::shared_ptr<BeginSince> m_since;
-  dom::NodeList m_result;
-  std::vector<dom::NodeList*> m_contents;
-  dom::NodeList* m_cur_content;
+  std::shared_ptr<dom::Node> m_result;
   std::vector<std::shared_ptr<dom::Node>> m_nodes;
 };
 
@@ -149,7 +144,7 @@ inline DocumentWriter::State DocumentWriter::state() const
   return m_state;
 }
 
-inline dom::NodeList& DocumentWriter::output()
+inline const std::shared_ptr<dom::Node>& DocumentWriter::output()
 {
   return m_result;
 }

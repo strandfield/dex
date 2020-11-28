@@ -21,11 +21,14 @@
 namespace dex
 {
 
-DocumentWriter::DocumentWriter()
-  : m_state(State::Idle)
+DocumentWriter::DocumentWriter(std::shared_ptr<dom::Node> out)
+  : m_state(State::Idle),
+    m_result(out)
 {
-  m_contents.push_back(&m_result);
-  m_cur_content = &m_result;
+  if (!m_result)
+    m_result = std::make_shared<dom::Document>();
+
+  pushNode(m_result);
 }
 
 DocumentWriter::~DocumentWriter()
@@ -230,7 +233,7 @@ void DocumentWriter::image(std::string src, std::optional<int> width, std::optio
   auto img = std::make_shared<dom::Image>(std::move(src));
   img->height = height.value_or(img->height);
   img->width = width.value_or(img->width);
-  m_cur_content->push_back(img);
+  currentNode().appendChild(img);
 }
 
 void DocumentWriter::list()
@@ -254,8 +257,8 @@ void DocumentWriter::list(const std::optional<std::string>& marker, std::optiona
   list->ordered = ordered.value_or(false);
   list->reversed = reversed.value_or(false);
 
-  m_nodes.push_back(list);
-  m_cur_content->push_back(list);
+  currentNode().appendChild(list);
+  pushNode(list);
 }
 
 void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> value)
@@ -265,7 +268,6 @@ void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> va
 
   if (m_state == State::WritingListItem)
   {
-    popContent();
     popNode();
     m_state = State::WritingList;
   }
@@ -276,10 +278,9 @@ void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> va
   item->value = value.value_or(item->value);
 
   assert(currentNode().is<dom::List>());
-  static_cast<dom::List&>(currentNode()).items.push_back(item);
+  currentNode().appendChild(item);
 
   pushNode(item);
-  pushContent(item->content);
   m_state = State::WritingListItem;
 }
 
@@ -290,7 +291,6 @@ void DocumentWriter::endlist()
 
   if (m_state == State::WritingListItem)
   {
-    popContent();
     popNode();
     m_state = State::WritingList;
   }
@@ -321,8 +321,9 @@ void DocumentWriter::enddisplaymath()
 
   m_math_writer->finish();
 
-  m_cur_content->push_back(currentNodeShared());
+  auto mathnode = currentNodeShared();
   popNode();
+  currentNode().appendChild(mathnode);
 
   m_math_writer.reset();
 
@@ -340,9 +341,8 @@ void DocumentWriter::code(const std::string& lang)
   auto codeblock = std::make_shared<CodeBlock>();
   codeblock->lang = lang;
 
+  currentNode().appendChild(codeblock);
   pushNode(codeblock);
-  m_cur_content->push_back(codeblock);
-  // @TODO: maybe push 'invalid' content
 
   m_state = State::WritingCode;
 }
@@ -367,7 +367,7 @@ void DocumentWriter::makegrouptable(std::string groupname)
     throw std::runtime_error{ "DocumentWriter::makegrouptable() not available in this mode" };
 
   auto node = std::make_shared<dex::GroupTable>(std::move(groupname));
-  m_cur_content->push_back(node);
+  currentNode().appendChild(node);
 }
 
 void DocumentWriter::beginSinceBlock(const std::string& version)
@@ -379,7 +379,7 @@ void DocumentWriter::beginSinceBlock(const std::string& version)
     endParagraph();
 
   m_since = std::make_shared<BeginSince>(version);
-  m_cur_content->push_back(m_since);
+  currentNode().appendChild(m_since);
 }
 
 void DocumentWriter::endSinceBlock()
@@ -389,7 +389,7 @@ void DocumentWriter::endSinceBlock()
   if (isWritingParagraph())
     endParagraph();
 
-  m_cur_content->push_back(std::make_shared<EndSince>(m_since));
+  currentNode().appendChild(std::make_shared<EndSince>(m_since));
 
   m_since.reset();
 }
@@ -399,7 +399,15 @@ void DocumentWriter::write(const std::shared_ptr<dom::Node>& node)
   if (isWritingParagraph())
     endParagraph();
 
-  m_result.push_back(node);
+  currentNode().appendChild(node);
+}
+
+void DocumentWriter::setOutput(std::shared_ptr<dom::Node> out)
+{
+  assert(m_nodes.size() == 1);
+  m_nodes.clear();
+  m_result = out;
+  pushNode(out);
 }
 
 void DocumentWriter::startParagraph()
@@ -422,10 +430,9 @@ void DocumentWriter::endParagraph()
   paragraphWriter().finish();
   auto par = paragraphWriter().output();
 
-  m_cur_content->push_back(par);  
-  m_paragraph_writer.reset();
-
   popNode();
+
+  currentNode().appendChild(par);
 
   adjustState();
 }
@@ -510,7 +517,7 @@ std::shared_ptr<dom::Node> DocumentWriter::currentNodeShared()
 
 void DocumentWriter::adjustState()
 {
-  if (m_nodes.empty())
+  if (m_nodes.size() == 1)
   {
     m_state = State::Idle;
   }
@@ -521,18 +528,6 @@ void DocumentWriter::adjustState()
     else
       m_state = State::WritingListItem;
   }
-}
-
-void DocumentWriter::pushContent(dom::NodeList& c)
-{
-  m_contents.push_back(&c);
-  m_cur_content = &c;
-}
-
-void DocumentWriter::popContent()
-{
-  m_contents.pop_back();
-  m_cur_content = m_contents.back();
 }
 
 } // namespace dex
