@@ -33,7 +33,7 @@ public:
 
   void finish();
 
-  dom::NodeList& output();
+  std::shared_ptr<dom::Node> output();
 
 protected:
   void par(const FunctionCall& c);
@@ -76,7 +76,7 @@ public:
 
   void finish();
 
-  dom::NodeList& output();
+  std::shared_ptr<dom::Node> output();
 
 private:
   DocumentWriter m_backend;
@@ -93,7 +93,7 @@ inline DocumentWriter::State DocumentWriterFrontend::state() const
   return m_writer->state();
 }
 
-inline dom::NodeList& DocumentWriterFrontend::output()
+inline std::shared_ptr<dom::Node> DocumentWriterFrontend::output()
 {
   return m_writer->output();
 }
@@ -103,7 +103,7 @@ inline DocumentWriter::State DocumentWriterToolchain::state() const
   return m_frontend.state();
 }
 
-inline dom::NodeList& DocumentWriterToolchain::output()
+inline std::shared_ptr<dom::Node> DocumentWriterToolchain::output()
 {
   return m_frontend.output();
 }

@@ -76,7 +76,7 @@ struct ChildNodeGetter
       auto entdoc = std::static_pointer_cast<dex::EntityDocumentation>(doc);
 
       if (path.name == "description")
-        return entdoc->description().at(path.index);
+        return entdoc->description->childNodes().at(path.index);
     }
 
     throw std::runtime_error{ "Invalid model path" };

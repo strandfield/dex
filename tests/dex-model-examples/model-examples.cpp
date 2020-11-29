@@ -50,9 +50,10 @@ std::shared_ptr<dex::Program> prog_with_class()
 
   auto vector = std::make_shared<cxx::Class>("vector", global);
   auto doc = std::make_shared<dex::ClassDocumentation>();
-  doc->brief() = "sequence container that encapsulates dynamic size arrays";
-  doc->description().push_back(make_par("The elements are stored contiguously, ..."));
-  doc->description().push_back(make_par("The storage of the vector is handled automatically, ..."));
+  doc->brief() = "sequence container that encapsulates dynamic size arrays"; 
+  doc->description = std::make_shared<dom::Document>();
+  doc->description->appendChild(make_par("The elements are stored contiguously, ..."));
+  doc->description->appendChild(make_par("The storage of the vector is handled automatically, ..."));
   vector->documentation = doc;
 
   global->entities.push_back(vector);
@@ -70,7 +71,8 @@ std::shared_ptr<dex::Model> prog_with_class_image_description()
   auto vector = std::make_shared<cxx::Class>("vector", global);
   auto doc = std::make_shared<dex::ClassDocumentation>();
   auto img = make<dom::Image>("test.jpg");
-  doc->description().push_back(img);
+  doc->description = std::make_shared<dom::Document>();
+  doc->description->appendChild(img);
   vector->documentation = doc;
 
   global->entities.push_back(vector);
@@ -96,7 +98,8 @@ std::shared_ptr<dex::Model> prog_with_class_list_description()
   listitem = make<dom::ListItem>();
   listitem->content.push_back(make<dom::Paragraph>("second item"));
   list->items.push_back(listitem);
-  doc->description().push_back(list);
+  doc->description = std::make_shared<dom::Document>();
+  doc->description->appendChild(list);
   vector->documentation = doc;
 
   global->entities.push_back(vector);
@@ -116,8 +119,9 @@ std::shared_ptr<dex::Program> prog_with_fun()
   doc->brief() = "get value from environment variables";
   doc->returnValue() = "value of environment variable";
   doc->since() = dex::Since{ "C++98" };
-  doc->description().push_back(make_par("Searches the environment list provided by the host environment..."));
-  doc->description().push_back(make_par("Modifying the string returned by getenv invokes undefined behavior."));
+  doc->description = std::make_shared<dom::Document>();
+  doc->description->appendChild(make_par("Searches the environment list provided by the host environment..."));
+  doc->description->appendChild(make_par("Modifying the string returned by getenv invokes undefined behavior."));
   getenv->documentation = doc;
 
   getenv->parameters.push_back(make<cxx::FunctionParameter>(cxx::Type("std::string"), "str"));
@@ -136,7 +140,8 @@ std::shared_ptr<dex::Program> prog_with_var()
   auto variable = std::make_shared<cxx::Variable>(cxx::Type("double"), "pi", global);
   auto doc = std::make_shared<dex::VariableDocumentation>();
   doc->brief() = "the math constant pi";
-  doc->description().push_back(make_par("This mathematical constant is roughly equal to 3."));
+  doc->description = std::make_shared<dom::Document>();
+  doc->description->appendChild(make_par("This mathematical constant is roughly equal to 3."));
   variable->documentation = doc;
 
   global->entities.push_back(variable);

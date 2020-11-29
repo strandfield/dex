@@ -9,7 +9,7 @@
 
 #include "dex/model/since.h"
 
-#include <dom/node.h>
+#include <dom/document.h>
 #include <cxx/documentation.h>
 
 #include <optional>
@@ -22,7 +22,9 @@ class DEX_MODEL_API EntityDocumentation : public cxx::Documentation
 private:
   std::optional<std::string> m_brief;
   std::optional<Since> m_since;
-  std::vector<std::shared_ptr<dom::Node>> m_description;
+
+public:
+  std::shared_ptr<dom::Document> description;
 
 public:
   EntityDocumentation() = default;
@@ -39,9 +41,6 @@ public:
 
   std::optional<Since>& since();
   const std::optional<Since>& since() const;
-
-  std::vector<std::shared_ptr<dom::Node>>& description();
-  const std::vector<std::shared_ptr<dom::Node>>& description() const;
 };
 
 template<typename T>
@@ -85,16 +84,6 @@ inline std::optional<Since>& EntityDocumentation::since()
 inline const std::optional<Since>& EntityDocumentation::since() const
 {
   return m_since;
-}
-
-inline std::vector<std::shared_ptr<dom::Node>>& EntityDocumentation::description()
-{
-  return m_description;
-}
-
-inline const std::vector<std::shared_ptr<dom::Node>>& EntityDocumentation::description() const
-{
-  return m_description;
 }
 
 } // namespace dex
