@@ -12,6 +12,8 @@
 #include "dex/model/inline-math.h"
 #include "dex/model/since.h"
 
+#include "dex/common/logging.h"
+
 #include <dom/image.h>
 #include <dom/list.h>
 #include <dom/paragraph.h>
@@ -198,6 +200,12 @@ std::string MarkdownStringifier::stringify_section(const dex::Sectioning& sec) c
   }
 
   return result;
+}
+
+std::string MarkdownStringifier::stringify_tableofcontents(const dex::TableOfContents& toc) const
+{
+  LOG_WARNING << "Table of contents not supported in Markdown output";
+  return std::string();
 }
 
 } // namespace dex

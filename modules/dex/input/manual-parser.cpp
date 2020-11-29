@@ -70,6 +70,11 @@ void ManualParser::section(std::string name)
   m_state.enter<FrameType::WritingSection>(sec);
 }
 
+void ManualParser::tableofcontents()
+{
+  currentFrame().writer->write(std::make_shared<dex::TableOfContents>());
+}
+
 void ManualParser::beginFile()
 {
   /* no-op */

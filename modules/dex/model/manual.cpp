@@ -75,6 +75,18 @@ Sectioning::Depth Sectioning::str2depth(const std::string& str)
   return Chapter;
 }
 
+TableOfContents::TableOfContents()
+{
+
+}
+
+const std::string TableOfContents::TypeId = "TableOfContents";
+
+const std::string& TableOfContents::className() const
+{
+  return TypeId;
+}
+
 Manual::Manual(std::string t)
   : Document(std::move(t))
 {

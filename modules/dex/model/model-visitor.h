@@ -37,6 +37,8 @@ class BeginSince;
 class CodeBlock;
 class DisplayMath;
 class EndSince;
+class TableOfContents;
+
 class Program;
 
 class DEX_MODEL_API ModelVisitor
@@ -86,6 +88,7 @@ protected:
 
   virtual void visit_document(const dex::Document& doc);
   virtual void visit_sectioning(const dex::Sectioning& section);
+  virtual void visit_tableofcontents(const dex::TableOfContents& toc);
 
   virtual void visit_group(const dex::Group& group);
 

@@ -54,6 +54,15 @@ public:
   static Depth str2depth(const std::string& str);
 };
 
+class DEX_MODEL_API TableOfContents : public dom::Element
+{
+public:
+  TableOfContents();
+
+  static const std::string TypeId;
+  const std::string& className() const override;
+};
+
 class DEX_MODEL_API Document : public dom::Document
 {
 public:

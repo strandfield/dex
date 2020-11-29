@@ -28,6 +28,7 @@ class DisplayMath;
 class EndSince;
 class GroupTable;
 class Sectioning;
+class TableOfContents;
 
 class LiquidExporter;
 
@@ -58,6 +59,7 @@ protected:
   virtual std::string stringify_codeblock(const dex::CodeBlock& codeblock) const = 0;
 
   virtual std::string stringify_section(const dex::Sectioning& sec) const = 0;
+  virtual std::string stringify_tableofcontents(const dex::TableOfContents& toc) const = 0;
 };
 
 } // namespace dex

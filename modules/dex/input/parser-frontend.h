@@ -71,6 +71,7 @@ public:
     part,
     chapter,
     section,
+    tableofcontents,
     /* DOM elements */
     code,
     endcode,
@@ -142,6 +143,7 @@ protected:
   void fn_part(const FunctionCall& call);
   void fn_chapter(const FunctionCall& call);
   void fn_section(const FunctionCall& call);
+  void tableofcontents();
 
   void ingroup(const FunctionCall& call);
 

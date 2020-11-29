@@ -190,4 +190,9 @@ std::string LatexStringifier::stringify_section(const dex::Sectioning& sec) cons
   return result;
 }
 
+std::string LatexStringifier::stringify_tableofcontents(const dex::TableOfContents& toc) const
+{
+  return "\\tableofcontents";
+}
+
 } // namespace dex

@@ -60,6 +60,7 @@ public:
   void part(std::string name);
   void chapter(std::string name);
   void section(std::string name);
+  void tableofcontents();
 
 protected:
   Frame& currentFrame();

@@ -1,6 +1,8 @@
 
 /*!
  * \manual A simple manual
+ *
+ * \tableofcontents
  * 
  * \chapter Introduction
  *

@@ -253,6 +253,11 @@ void JsonExport::visit_codeblock(const dex::CodeBlock& codeblock)
   ModelVisitor::visit_codeblock(codeblock);
 }
 
+void JsonExport::visit_tableofcontents(const dex::TableOfContents& /* toc */)
+{
+  // no-op
+}
+
 static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)
 {
   json::Array result;

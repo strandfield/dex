@@ -46,6 +46,7 @@ protected:
   void visit_displaymath(const dex::DisplayMath& math) override;
   void visit_grouptable(const dex::GroupTable& table) override;
   void visit_codeblock(const dex::CodeBlock& codeblock) override;
+  void visit_tableofcontents(const dex::TableOfContents& toc) override;
 
   void visit_program(const dex::Program& prog) override;
   void visit_entity(const cxx::Entity& e) override;

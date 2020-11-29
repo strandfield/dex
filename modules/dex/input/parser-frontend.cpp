@@ -68,6 +68,7 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::PART, CS::part},
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
+    {Functions::TABLEOFCONTENTS, CS::tableofcontents},
     /* DOM elements */
     {Functions::CODE, CS::code},
     {Functions::ENDCODE, CS::endcode},
@@ -210,6 +211,8 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_chapter(call);
     case CS::section:
       return fn_section(call);
+    case CS::tableofcontents:
+      return tableofcontents();
     case CS::ingroup:
       return ingroup(call);
       /* DOM elements */
@@ -450,6 +453,12 @@ void ParserFrontend::fn_section(const FunctionCall& call)
   std::string name = call.arg<std::string>(0);
 
   m_manual_parser->section(std::move(name));
+}
+
+void ParserFrontend::tableofcontents()
+{
+  checkMode(Mode::Manual);
+  m_manual_parser->tableofcontents();
 }
 
 void ParserFrontend::ingroup(const FunctionCall& call)

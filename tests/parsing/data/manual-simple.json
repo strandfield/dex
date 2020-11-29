@@ -1,6 +1,8 @@
 {
   "documents": [{
       "content": [{
+          "type": "TableOfContents"
+        }, {
           "content": [{
               "text": "This is an introduction.",
               "type": "paragraph"

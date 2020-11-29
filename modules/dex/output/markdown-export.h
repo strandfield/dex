@@ -40,6 +40,7 @@ protected:
   std::string stringify_codeblock(const dex::CodeBlock& codeblock) const override;
 
   std::string stringify_section(const dex::Sectioning& sec) const override;
+  std::string stringify_tableofcontents(const dex::TableOfContents& toc) const override;
 };
 
 } // namespace dex

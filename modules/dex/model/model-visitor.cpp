@@ -204,6 +204,8 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_grouptable(static_cast<const dex::GroupTable&>(n));
   else if (n.is<dex::CodeBlock>())
     visit_codeblock(static_cast<const dex::CodeBlock&>(n));
+  else if (n.is<dex::TableOfContents>())
+    visit_tableofcontents(static_cast<const dex::TableOfContents&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -450,6 +452,11 @@ void ModelVisitor::visit_sectioning(const dex::Sectioning& section)
       visit_domnode(*section.content.at(i));
     }
   }
+}
+
+void ModelVisitor::visit_tableofcontents(const dex::TableOfContents& /* toc */)
+{
+
 }
 
 void ModelVisitor::visit_group(const dex::Group& /* group */)

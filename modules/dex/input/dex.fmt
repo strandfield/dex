@@ -204,6 +204,9 @@
   \p@rseline\c@ll\@section
 }
 
+\def\tableofcontents{%
+  \@tableofcontents
+}
 
 % Dex - Grouping %
 

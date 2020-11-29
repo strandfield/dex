@@ -41,6 +41,7 @@ const std::string Functions::PAGE = "@page";
 const std::string Functions::PART = "@part";
 const std::string Functions::CHAPTER = "@chapter";
 const std::string Functions::SECTION = "@section";
+const std::string Functions::TABLEOFCONTENTS = "@tableofcontents";
 
 const std::string Functions::INGROUP = "@ingroup";
 
