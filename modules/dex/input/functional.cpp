@@ -42,6 +42,9 @@ const std::string Functions::PART = "@part";
 const std::string Functions::CHAPTER = "@chapter";
 const std::string Functions::SECTION = "@section";
 const std::string Functions::TABLEOFCONTENTS = "@tableofcontents";
+const std::string Functions::MAKEINDEX = "@makeindex";
+const std::string Functions::INDEX = "@index";
+const std::string Functions::PRINTINDEX = "@printindex";
 
 const std::string Functions::INGROUP = "@ingroup";
 

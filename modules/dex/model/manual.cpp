@@ -87,6 +87,18 @@ const std::string& TableOfContents::className() const
   return TypeId;
 }
 
+Index::Index()
+{
+
+}
+
+const std::string Index::TypeId = "Index";
+
+const std::string& Index::className() const
+{
+  return TypeId;
+}
+
 Manual::Manual(std::string t)
   : Document(std::move(t))
 {

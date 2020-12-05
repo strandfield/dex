@@ -61,6 +61,9 @@ public:
   void chapter(std::string name);
   void section(std::string name);
   void tableofcontents();
+  void makeindex();
+  void index(std::string key);
+  void printindex();
 
 protected:
   Frame& currentFrame();

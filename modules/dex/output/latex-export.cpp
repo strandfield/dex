@@ -55,6 +55,13 @@ public:
     process(it);
     result += "}";
   }
+
+  void process_index(const dom::ParagraphIterator it, const std::string& key) override
+  {
+    result += "\\index{";
+    result += key;
+    result += "}";
+  }
 };
 
 LatexStringifier::LatexStringifier(LiquidExporter& exp)

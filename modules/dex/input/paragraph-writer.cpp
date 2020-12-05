@@ -6,7 +6,7 @@
 
 #include "dex/model/inline-math.h"
 #include "dex/model/display-math.h"
-#include "dex/model/since.h"
+#include "dex/model/paragraph-annotations.h"
 
 #include "dex/input/parser-errors.h"
 
@@ -171,6 +171,12 @@ void ParagraphWriter::writeSince(const std::string& version, const std::string& 
   par.add<dex::Since>(dom::ParagraphRange(par, start, par.length()), version);
 }
 
+void ParagraphWriter::index(std::string key)
+{
+  dom::Paragraph& par = out();
+  par.add<dex::ParIndexEntry>(dom::ParagraphRange(par, par.length(), par.length()), std::move(key));
+}
+
 void ParagraphWriter::finish()
 {
   dom::Paragraph& par = *output();
@@ -194,6 +200,11 @@ void ParagraphWriter::finish()
 std::shared_ptr<dom::Paragraph> ParagraphWriter::output() const
 {
   return m_output;
+}
+
+dom::Paragraph& ParagraphWriter::out()
+{
+  return *m_output;
 }
 
 

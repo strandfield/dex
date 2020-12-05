@@ -225,6 +225,11 @@ void DocumentWriter::href(std::string link, const std::string& text)
   paragraphWriter().writeLink(std::move(link), text);
 }
 
+void DocumentWriter::index(std::string key)
+{
+  paragraphWriter().index(std::move(key));
+}
+
 void DocumentWriter::image(std::string src, std::optional<int> width, std::optional<int> height)
 {
   if (isWritingParagraph())

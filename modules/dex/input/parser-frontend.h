@@ -72,6 +72,9 @@ public:
     chapter,
     section,
     tableofcontents,
+    makeindex,
+    index,
+    printindex,
     /* DOM elements */
     code,
     endcode,
@@ -144,6 +147,9 @@ protected:
   void fn_chapter(const FunctionCall& call);
   void fn_section(const FunctionCall& call);
   void tableofcontents();
+  void makeindex();
+  void index(const FunctionCall& call);
+  void printindex();
 
   void ingroup(const FunctionCall& call);
 

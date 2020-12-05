@@ -5,7 +5,7 @@
 #include "dex/output/paragraph-converter.h"
 
 #include "dex/model/inline-math.h"
-#include "dex/model/since.h"
+#include "dex/model/paragraph-annotations.h"
 
 #include <dom/paragraph/iterator.h>
 #include <dom/paragraph/link.h>
@@ -46,6 +46,11 @@ void ParagraphConverter::process(const dom::ParagraphIterator begin, const dom::
       else if((*it)->className() == dex::InlineMath::TypeId)
       {
         process_math(it);
+      }
+      else if ((*it)->className() == dex::ParIndexEntry::TypeId)
+      {
+        std::shared_ptr<dom::ParagraphMetaData> metad = *it;
+        process_index(it, static_cast<const dom::GenericParagraphMetaData<dex::ParIndexEntry>&>(*metad).value().key);
       }
       else
       {
@@ -88,6 +93,11 @@ void ParagraphConverter::process_link(const dom::ParagraphIterator it, const std
 }
 
 void ParagraphConverter::process_math(const dom::ParagraphIterator it)
+{
+  process(it);
+}
+
+void ParagraphConverter::process_index(const dom::ParagraphIterator it, const std::string& /* key */)
 {
   process(it);
 }

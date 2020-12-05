@@ -12,6 +12,12 @@
           "type": "sectioning"
         }, {
           "content": [{
+              "metadata": [{
+                  "begin": 34,
+                  "end": 34,
+                  "key": "prog",
+                  "type": "ParIndexEntry"
+                }],
               "text": "This is how to install the program.",
               "type": "paragraph"
             }],
@@ -57,6 +63,8 @@
                 }],
               "text": "This is a link to cppreference.",
               "type": "paragraph"
+            }, {
+              "type": "Index"
             }],
           "depth": "chapter",
           "name": "Usage",

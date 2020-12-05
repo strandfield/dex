@@ -63,6 +63,15 @@ public:
   const std::string& className() const override;
 };
 
+class DEX_MODEL_API Index : public dom::Element
+{
+public:
+  Index();
+
+  static const std::string TypeId;
+  const std::string& className() const override;
+};
+
 class DEX_MODEL_API Document : public dom::Document
 {
 public:

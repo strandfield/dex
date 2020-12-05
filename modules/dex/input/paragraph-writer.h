@@ -50,11 +50,16 @@ public:
 
   void writeSince(const std::string& version, const std::string& text);
 
+  void index(std::string key);
+
   void finish();
 
   std::shared_ptr<dom::Paragraph> output() const;
 
 protected:
+
+  dom::Paragraph& out();
+
   void beginStyledText(std::string style);
   void endStyledText(const char* style);
 

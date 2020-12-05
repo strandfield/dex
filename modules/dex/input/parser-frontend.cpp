@@ -69,6 +69,9 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
     {Functions::TABLEOFCONTENTS, CS::tableofcontents},
+    {Functions::MAKEINDEX, CS::makeindex},
+    {Functions::INDEX, CS::index},
+    {Functions::PRINTINDEX, CS::printindex},
     /* DOM elements */
     {Functions::CODE, CS::code},
     {Functions::ENDCODE, CS::endcode},
@@ -213,6 +216,12 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_section(call);
     case CS::tableofcontents:
       return tableofcontents();
+    case CS::makeindex:
+      return makeindex();
+    case CS::index:
+      return index(call);
+    case CS::printindex:
+      return printindex();
     case CS::ingroup:
       return ingroup(call);
       /* DOM elements */
@@ -459,6 +468,25 @@ void ParserFrontend::tableofcontents()
 {
   checkMode(Mode::Manual);
   m_manual_parser->tableofcontents();
+}
+
+void ParserFrontend::makeindex()
+{
+  checkMode(Mode::Manual);
+  m_manual_parser->makeindex();
+}
+
+void ParserFrontend::index(const FunctionCall& call)
+{
+  checkMode(Mode::Manual);
+  std::string key = call.arg<std::string>(0);
+  m_manual_parser->index(std::move(key));
+}
+
+void ParserFrontend::printindex()
+{
+  checkMode(Mode::Manual);
+  m_manual_parser->printindex();
 }
 
 void ParserFrontend::ingroup(const FunctionCall& call)

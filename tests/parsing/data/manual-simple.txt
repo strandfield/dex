@@ -2,6 +2,7 @@
 /*!
  * \manual A simple manual
  *
+ * \makeindex
  * \tableofcontents
  * 
  * \chapter Introduction
@@ -10,7 +11,7 @@
  *
  * \chapter Installation
  *
- * This is how to install the program.
+ * This is how to install the program\index{prog}.
  *
  * \chapter Usage
  *
@@ -19,4 +20,6 @@
  * but also inline \c code.
  *
  * This is a link to \href{en.cppreference.com}{cppreference}.
+ *
+ * \printindex
  */

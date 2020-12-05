@@ -90,6 +90,9 @@ struct DEX_INPUT_API Functions
   static const std::string CHAPTER;
   static const std::string SECTION;
   static const std::string TABLEOFCONTENTS;
+  static const std::string MAKEINDEX;
+  static const std::string INDEX;
+  static const std::string PRINTINDEX;
 
   static const std::string INGROUP;
   
