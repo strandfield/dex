@@ -41,6 +41,7 @@ protected:
 
   std::string stringify_section(const dex::Sectioning& sec) const override;
   std::string stringify_tableofcontents(const dex::TableOfContents& toc) const override;
+  std::string stringify_index(const dex::Index& idx) const override;
 };
 
 } // namespace dex

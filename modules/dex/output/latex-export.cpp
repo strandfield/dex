@@ -202,4 +202,9 @@ std::string LatexStringifier::stringify_tableofcontents(const dex::TableOfConten
   return "\\tableofcontents";
 }
 
+std::string LatexStringifier::stringify_index(const dex::Index& /* idx */) const
+{
+  return "\\printindex";
+}
+
 } // namespace dex

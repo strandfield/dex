@@ -7,6 +7,7 @@
     <file>templates/latex/config.ini</file>
     <file>templates/latex/api-reference.tex</file>
     <file>templates/latex/macros.tex</file>
+    <file>templates/latex/preamble.tex</file>
     <file>templates/latex/document.tex</file>
     <file>templates/markdown/config.ini</file>
     <file>templates/markdown/class.md</file>

@@ -208,4 +208,10 @@ std::string MarkdownStringifier::stringify_tableofcontents(const dex::TableOfCon
   return std::string();
 }
 
+std::string MarkdownStringifier::stringify_index(const dex::Index& idx) const
+{
+  LOG_WARNING << "Index not supported in Markdown output";
+  return std::string();
+}
+
 } // namespace dex
