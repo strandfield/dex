@@ -3,8 +3,13 @@
  * \manual A simple manual
  *
  * \makeindex
+ *
+ * \frontmatter
+ *
  * \tableofcontents
  * 
+ * \mainmatter
+ *
  * \chapter Introduction
  *
  * This is an introduction.

@@ -64,6 +64,9 @@ protected:
   void visit_entitydocumentation(const EntityDocumentation& edoc) override;
 
   void visit_document(const Document& doc) override;
+  void visit_frontmatter(const dex::FrontMatter& fm) override;
+  void visit_mainmatter(const dex::MainMatter& mm) override;
+  void visit_backmatter(const dex::BackMatter& bm) override;
   void visit_sectioning(const Sectioning& sec) override;
 
   void visit_group(const Group& group) override;

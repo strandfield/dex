@@ -22,12 +22,15 @@ class Paragraph;
 namespace dex
 {
 
+class BackMatter;
 class BeginSince;
 class CodeBlock;
 class DisplayMath;
 class EndSince;
+class FrontMatter;
 class GroupTable;
 class Index;
+class MainMatter;
 class Sectioning;
 class TableOfContents;
 
@@ -59,6 +62,9 @@ protected:
   virtual std::string stringify_grouptable(const dex::GroupTable& table) const = 0;
   virtual std::string stringify_codeblock(const dex::CodeBlock& codeblock) const = 0;
 
+  virtual std::string stringify_frontmatter(const dex::FrontMatter& fm) const = 0;
+  virtual std::string stringify_mainmatter(const dex::MainMatter& mm) const = 0;
+  virtual std::string stringify_backmatter(const dex::BackMatter& bm) const = 0;
   virtual std::string stringify_section(const dex::Sectioning& sec) const = 0;
   virtual std::string stringify_tableofcontents(const dex::TableOfContents& toc) const = 0;
   virtual std::string stringify_index(const dex::Index& idx) const = 0;

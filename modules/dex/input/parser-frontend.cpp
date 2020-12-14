@@ -65,6 +65,9 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
     /* Documents */
     {Functions::MANUAL, CS::manual},
     {Functions::PAGE, CS::page},
+    {Functions::FRONTMATTER, CS::frontmatter},
+    {Functions::MAINMATTER, CS::mainmatter},
+    {Functions::BACKMATTER, CS::backmatter},
     {Functions::PART, CS::part},
     {Functions::CHAPTER, CS::chapter},
     {Functions::SECTION, CS::section},
@@ -208,6 +211,12 @@ void ParserFrontend::handle(const FunctionCall& call)
       return fn_manual(call);
     case CS::page:
       return fn_page(call);
+    case CS::frontmatter:
+      return frontmatter();
+    case CS::mainmatter:
+      return mainmatter();
+    case CS::backmatter:
+      return backmatter();
     case CS::part:
       return fn_part(call);
     case CS::chapter:
@@ -435,6 +444,24 @@ void ParserFrontend::fn_page(const FunctionCall& call)
 
   m_mode = Mode::Manual;
   m_manual_parser.reset(new ManualParser(man));
+}
+
+void ParserFrontend::frontmatter()
+{
+  checkMode(Mode::Manual);
+  m_manual_parser->frontmatter();
+}
+
+void ParserFrontend::mainmatter()
+{
+  checkMode(Mode::Manual);
+  m_manual_parser->mainmatter();
+}
+
+void ParserFrontend::backmatter()
+{
+  checkMode(Mode::Manual);
+  m_manual_parser->backmatter();
 }
 
 void ParserFrontend::fn_part(const FunctionCall& call)

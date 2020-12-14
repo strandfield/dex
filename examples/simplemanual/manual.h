@@ -3,7 +3,12 @@
  * \manual Simple manual
  *
  * \makeindex
+ *
+ * \frontmatter
+ *
  * \tableofcontents
+ * 
+ * \mainmatter
  * 
  * \chapter Introduction
  *

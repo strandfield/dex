@@ -192,6 +192,18 @@
   \p@rseline\c@ll\@page
 }
 
+\def\frontmatter{%
+  \@frontmatter
+}
+
+\def\mainmatter{%
+  \@mainmatter
+}
+
+\def\backmatter{%
+  \@backmatter
+}
+
 \def\part{%
   \p@rseline\c@ll\@part
 }

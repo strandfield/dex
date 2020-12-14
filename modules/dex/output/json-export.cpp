@@ -463,6 +463,21 @@ void JsonExport::visit_document(const Document& doc)
   ModelVisitor::visit_document(doc);
 }
 
+void JsonExport::visit_frontmatter(const dex::FrontMatter& /* fm */)
+{
+  // no-op
+}
+
+void JsonExport::visit_mainmatter(const dex::MainMatter& /* mm */)
+{
+  // no-op
+}
+
+void JsonExport::visit_backmatter(const dex::BackMatter& /* bm */)
+{
+  // no-op
+}
+
 void JsonExport::visit_sectioning(const Sectioning& sec)
 {
   object()["name"] = sec.name;

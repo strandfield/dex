@@ -27,6 +27,42 @@ GroupTable::GroupTable(std::string gname)
 
 }
 
+FrontMatter::FrontMatter()
+{
+
+}
+
+const std::string FrontMatter::TypeId = "FrontMatter";
+
+const std::string& FrontMatter::className() const
+{
+  return TypeId;
+}
+
+MainMatter::MainMatter()
+{
+
+}
+
+const std::string MainMatter::TypeId = "MainMatter";
+
+const std::string& MainMatter::className() const
+{
+  return TypeId;
+}
+
+BackMatter::BackMatter()
+{
+
+}
+
+const std::string BackMatter::TypeId = "BackMatter";
+
+const std::string& BackMatter::className() const
+{
+  return TypeId;
+}
+
 Sectioning::Sectioning(Depth d, std::string n)
   : depth(d),
     name(std::move(n))

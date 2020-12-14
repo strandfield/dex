@@ -24,6 +24,33 @@ public:
   const std::string& className() const override;
 };
 
+class DEX_MODEL_API FrontMatter : public dom::Element
+{
+public:
+  FrontMatter();
+
+  static const std::string TypeId;
+  const std::string& className() const override;
+};
+
+class DEX_MODEL_API MainMatter : public dom::Element
+{
+public:
+  MainMatter();
+
+  static const std::string TypeId;
+  const std::string& className() const override;
+};
+
+class DEX_MODEL_API BackMatter : public dom::Element
+{
+public:
+  BackMatter();
+
+  static const std::string TypeId;
+  const std::string& className() const override;
+};
+
 class DEX_MODEL_API Sectioning : public dom::Element
 {
 public:

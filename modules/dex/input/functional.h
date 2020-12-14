@@ -86,6 +86,9 @@ struct DEX_INPUT_API Functions
 
   static const std::string MANUAL;
   static const std::string PAGE;
+  static const std::string FRONTMATTER;
+  static const std::string MAINMATTER;
+  static const std::string BACKMATTER;
   static const std::string PART;
   static const std::string CHAPTER;
   static const std::string SECTION;

@@ -183,6 +183,24 @@ std::string MarkdownStringifier::stringify_codeblock(const dex::CodeBlock& codeb
   return result;
 }
 
+std::string MarkdownStringifier::stringify_frontmatter(const dex::FrontMatter& fm) const
+{
+  LOG_WARNING << "\\frontmatter not supported in Markdown output";
+  return std::string();
+}
+
+std::string MarkdownStringifier::stringify_mainmatter(const dex::MainMatter& mm) const
+{
+  LOG_WARNING << "\\mainmatter not supported in Markdown output";
+  return std::string();
+}
+
+std::string MarkdownStringifier::stringify_backmatter(const dex::BackMatter& bm) const
+{
+  LOG_WARNING << "\\backmatter not supported in Markdown output";
+  return std::string();
+}
+
 std::string MarkdownStringifier::stringify_section(const dex::Sectioning& sec) const
 {
   std::string result;

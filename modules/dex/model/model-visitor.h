@@ -33,11 +33,14 @@ class Variable;
 namespace dex
 {
 
+class BackMatter;
 class BeginSince;
 class CodeBlock;
 class DisplayMath;
 class EndSince;
+class FrontMatter;
 class Index;
+class MainMatter;
 class TableOfContents;
 
 class Program;
@@ -88,6 +91,9 @@ protected:
   virtual void visit_entitydocumentation(const EntityDocumentation& edoc);
 
   virtual void visit_document(const dex::Document& doc);
+  virtual void visit_frontmatter(const dex::FrontMatter& fm);
+  virtual void visit_mainmatter(const dex::MainMatter& mm);
+  virtual void visit_backmatter(const dex::BackMatter& bm);
   virtual void visit_sectioning(const dex::Sectioning& section);
   virtual void visit_tableofcontents(const dex::TableOfContents& toc);
   virtual void visit_index(const dex::Index& idx);

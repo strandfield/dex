@@ -38,6 +38,9 @@ const std::string Functions::RELATES = "@relates";
 
 const std::string Functions::MANUAL = "@manual";
 const std::string Functions::PAGE = "@page";
+const std::string Functions::FRONTMATTER = "@frontmatter";
+const std::string Functions::MAINMATTER = "@mainmatter";
+const std::string Functions::BACKMATTER = "@backmatter";
 const std::string Functions::PART = "@part";
 const std::string Functions::CHAPTER = "@chapter";
 const std::string Functions::SECTION = "@section";

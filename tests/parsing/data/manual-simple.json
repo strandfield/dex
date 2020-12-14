@@ -1,7 +1,11 @@
 {
   "documents": [{
       "content": [{
+          "type": "FrontMatter"
+        }, {
           "type": "TableOfContents"
+        }, {
+          "type": "MainMatter"
         }, {
           "content": [{
               "text": "This is an introduction.",

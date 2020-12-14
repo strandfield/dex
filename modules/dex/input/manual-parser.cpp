@@ -43,6 +43,22 @@ std::shared_ptr<DocumentWriter> ManualParser::contentWriter()
   return currentFrame().writer;
 }
 
+
+void ManualParser::frontmatter()
+{
+  currentFrame().writer->write(std::make_shared<dex::FrontMatter>());
+}
+
+void ManualParser::mainmatter()
+{
+  currentFrame().writer->write(std::make_shared<dex::MainMatter>());
+}
+
+void ManualParser::backmatter()
+{
+  currentFrame().writer->write(std::make_shared<dex::BackMatter>());
+}
+
 void ManualParser::part(std::string name)
 {
   exitFrame(Sectioning::Part);

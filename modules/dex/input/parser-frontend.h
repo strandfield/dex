@@ -68,6 +68,9 @@ public:
     /* Documents */
     manual,
     page,
+    frontmatter,
+    mainmatter,
+    backmatter,
     part,
     chapter,
     section,
@@ -143,6 +146,9 @@ protected:
 
   void fn_manual(const FunctionCall& call);
   void fn_page(const FunctionCall& call);
+  void frontmatter();
+  void mainmatter();
+  void backmatter();
   void fn_part(const FunctionCall& call);
   void fn_chapter(const FunctionCall& call);
   void fn_section(const FunctionCall& call);

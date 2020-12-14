@@ -196,6 +196,12 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
     visit_endsince(static_cast<const dex::EndSince&>(n));
   else if (n.is<dom::Document>())
     visit_document(static_cast<const dex::Document&>(n));
+  else if (n.is<dex::FrontMatter>())
+    visit_frontmatter(static_cast<const dex::FrontMatter&>(n));
+  else if (n.is<dex::MainMatter>())
+    visit_mainmatter(static_cast<const dex::MainMatter&>(n));
+  else if (n.is<dex::BackMatter>())
+    visit_backmatter(static_cast<const dex::BackMatter&>(n));
   else if (n.is<dex::Sectioning>())
     visit_sectioning(static_cast<const dex::Sectioning&>(n));
   else if (n.is<dex::DisplayMath>())
@@ -440,6 +446,21 @@ void ModelVisitor::visit_document(const dex::Document& doc)
       visit_domnode(*doc.childNodes().at(i));
     }
   }
+}
+
+void ModelVisitor::visit_frontmatter(const dex::FrontMatter& /* fm */)
+{
+
+}
+
+void ModelVisitor::visit_mainmatter(const dex::MainMatter& /* mm */)
+{
+
+}
+
+void ModelVisitor::visit_backmatter(const dex::BackMatter& /* bm */)
+{
+
 }
 
 void ModelVisitor::visit_sectioning(const dex::Sectioning& section)

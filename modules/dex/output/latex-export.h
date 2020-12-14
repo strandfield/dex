@@ -35,6 +35,9 @@ protected:
 
   std::string stringify_codeblock(const dex::CodeBlock& codeblock) const override;
 
+  std::string stringify_frontmatter(const dex::FrontMatter& fm) const override;
+  std::string stringify_mainmatter(const dex::MainMatter& mm) const override;
+  std::string stringify_backmatter(const dex::BackMatter& bm) const override;
   std::string stringify_section(const dex::Sectioning& sec) const override;
   std::string stringify_tableofcontents(const dex::TableOfContents& toc) const override;
   std::string stringify_index(const dex::Index& idx) const override;

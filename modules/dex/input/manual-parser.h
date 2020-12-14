@@ -57,6 +57,9 @@ public:
 
   std::shared_ptr<DocumentWriter> contentWriter();
 
+  void frontmatter();
+  void mainmatter();
+  void backmatter();
   void part(std::string name);
   void chapter(std::string name);
   void section(std::string name);

@@ -167,6 +167,21 @@ std::string LatexStringifier::stringify_codeblock(const dex::CodeBlock& codebloc
   return result;
 }
 
+std::string LatexStringifier::stringify_frontmatter(const dex::FrontMatter& fm) const
+{
+  return "\\frontmatter";
+}
+
+std::string LatexStringifier::stringify_mainmatter(const dex::MainMatter& mm) const
+{
+  return "\\mainmatter";
+}
+
+std::string LatexStringifier::stringify_backmatter(const dex::BackMatter& bm) const
+{
+  return "\\backmatter";
+}
+
 std::string LatexStringifier::stringify_section(const dex::Sectioning& sec) const
 {
   std::string result;
