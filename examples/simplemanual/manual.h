@@ -1,6 +1,6 @@
 
 /*!
- * \manual A simple manual
+ * \manual Simple manual
  *
  * \makeindex
  * \tableofcontents
@@ -22,4 +22,5 @@
  * This is a link to \href{en.cppreference.com}{cppreference}.
  *
  * \printindex
+ *
  */

@@ -75,6 +75,8 @@ public:
 
   void href(std::string link, const std::string& text);
 
+  void index(std::string key);
+
   void image(std::string src, std::optional<int> width, std::optional<int> height);
 
   void list();

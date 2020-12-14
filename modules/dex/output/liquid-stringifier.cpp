@@ -85,6 +85,8 @@ std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
     return stringify_codeblock(static_cast<const dex::CodeBlock&>(node));  
   else if (node.is<dex::TableOfContents>())
     return stringify_tableofcontents(static_cast<const dex::TableOfContents&>(node));
+  else if (node.is<dex::Index>())
+    return stringify_index(static_cast<const dex::Index&>(node));
 
   assert(("dom element not implemented", false));
   return {};

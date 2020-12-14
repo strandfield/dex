@@ -205,7 +205,9 @@ void ModelVisitor::visit_domnode(const dom::Node& n)
   else if (n.is<dex::CodeBlock>())
     visit_codeblock(static_cast<const dex::CodeBlock&>(n));
   else if (n.is<dex::TableOfContents>())
-    visit_tableofcontents(static_cast<const dex::TableOfContents&>(n));
+    visit_tableofcontents(static_cast<const dex::TableOfContents&>(n));  
+  else if (n.is<dex::Index>())
+    visit_index(static_cast<const dex::Index&>(n));
 }
 
 void ModelVisitor::visit_domimage(const dom::Image& /* img */)
@@ -455,6 +457,11 @@ void ModelVisitor::visit_sectioning(const dex::Sectioning& section)
 }
 
 void ModelVisitor::visit_tableofcontents(const dex::TableOfContents& /* toc */)
+{
+
+}
+
+void ModelVisitor::visit_index(const dex::Index& /* idx */)
 {
 
 }

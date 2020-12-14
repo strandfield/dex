@@ -208,6 +208,18 @@
   \@tableofcontents
 }
 
+\def\makeindex{%
+  \@makeindex
+}
+
+\def\index{%
+  \p@rseword\c@ll\@index
+}
+
+\def\printindex{%
+  \@printindex
+}
+
 % Dex - Grouping %
 
 \def\ingroup{%

@@ -55,6 +55,13 @@ public:
     process(it);
     result += "}";
   }
+
+  void process_index(const dom::ParagraphIterator it, const std::string& key) override
+  {
+    result += "\\index{";
+    result += key;
+    result += "}";
+  }
 };
 
 LatexStringifier::LatexStringifier(LiquidExporter& exp)
@@ -193,6 +200,11 @@ std::string LatexStringifier::stringify_section(const dex::Sectioning& sec) cons
 std::string LatexStringifier::stringify_tableofcontents(const dex::TableOfContents& toc) const
 {
   return "\\tableofcontents";
+}
+
+std::string LatexStringifier::stringify_index(const dex::Index& /* idx */) const
+{
+  return "\\printindex";
 }
 
 } // namespace dex

@@ -6,6 +6,7 @@
 
 #include "dex/model/code-block.h"
 #include "dex/model/display-math.h"
+#include "dex/model/paragraph-annotations.h"
 #include "dex/model/since.h"
 
 #include <cxx/class.h>
@@ -148,6 +149,10 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   {
     result["url"] = static_cast<const dom::Link&>(pmd).url();
   }
+  else if (pmd.is<dex::ParIndexEntry>())
+  {
+    result["key"] = pmd.get<dex::ParIndexEntry>().key;
+  }
   else
   {
     // TODO: log or throw ?
@@ -254,6 +259,11 @@ void JsonExport::visit_codeblock(const dex::CodeBlock& codeblock)
 }
 
 void JsonExport::visit_tableofcontents(const dex::TableOfContents& /* toc */)
+{
+  // no-op
+}
+
+void JsonExport::visit_index(const dex::Index& /* idx */)
 {
   // no-op
 }

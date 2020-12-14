@@ -75,6 +75,21 @@ void ManualParser::tableofcontents()
   currentFrame().writer->write(std::make_shared<dex::TableOfContents>());
 }
 
+void ManualParser::makeindex()
+{
+  // no-op (for now)
+}
+
+void ManualParser::index(std::string key)
+{
+  currentFrame().writer->index(std::move(key));
+}
+
+void ManualParser::printindex()
+{
+  currentFrame().writer->write(std::make_shared<dex::Index>());
+}
+
 void ManualParser::beginFile()
 {
   /* no-op */
