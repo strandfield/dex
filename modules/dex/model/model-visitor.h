@@ -105,6 +105,29 @@ private:
   std::vector<Model::PathElement> m_stack;
 };
 
+class DEX_MODEL_API ProgramVisitor
+{
+public:
+
+  void visit(cxx::Program& prog);
+
+protected:
+  virtual void visit(cxx::Entity& e);
+
+  void dispatch(cxx::Entity& e);
+
+protected:
+  virtual void visit(cxx::Namespace& ns);
+  virtual void visit(cxx::Class& cla);
+  virtual void visit(cxx::Enum& en);
+  virtual void visit(cxx::EnumValue& ev);
+  virtual void visit(cxx::Function& f);
+  virtual void visit(cxx::FunctionParameter& fp);
+  virtual void visit(cxx::Variable& v);
+  virtual void visit(cxx::Typedef& t);
+  virtual void visit(cxx::Macro& m);
+};
+
 } // namespace dex
 
 #endif // DEX_MODEL_MODELVISITOR_H

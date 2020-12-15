@@ -492,4 +492,113 @@ void ModelVisitor::visit_group(const dex::Group& /* group */)
 
 }
 
+void ProgramVisitor::visit(cxx::Program& prog)
+{
+  visit(*prog.globalNamespace());
+
+  for (auto m : prog.macros)
+    visit(*m);
+}
+
+void ProgramVisitor::visit(cxx::Entity& e)
+{
+  dispatch(e);
+}
+
+
+void ProgramVisitor::dispatch(cxx::Entity& e)
+{
+  switch (e.kind())
+  {
+  case cxx::NodeKind::Class:
+    return visit(static_cast<cxx::Class&>(e));
+  case cxx::NodeKind::Enum:
+    return visit(static_cast<cxx::Enum&>(e));
+  case cxx::NodeKind::EnumValue:
+    return visit(static_cast<cxx::EnumValue&>(e));
+  case cxx::NodeKind::Function:
+    return visit(static_cast<cxx::Function&>(e));
+  case cxx::NodeKind::FunctionParameter:
+    return visit(static_cast<cxx::FunctionParameter&>(e));
+  case cxx::NodeKind::Namespace:
+    return visit(static_cast<cxx::Namespace&>(e));
+  case cxx::NodeKind::Typedef:
+    return visit(static_cast<cxx::Typedef&>(e));
+  case cxx::NodeKind::Variable:
+    return visit(static_cast<cxx::Variable&>(e));
+  default: 
+    break;
+  }
+}
+
+
+void ProgramVisitor::visit(cxx::Namespace& ns)
+{
+  if (!ns.entities.empty())
+  {
+    for (size_t i(0); i < ns.entities.size(); ++i)
+    {
+      visit(*ns.entities.at(i));
+    }
+  }
+}
+
+void ProgramVisitor::visit(cxx::Class& cla)
+{
+  if (!cla.members.empty())
+  {
+    for (size_t i(0); i < cla.members.size(); ++i)
+    {
+      visit(*cla.members.at(i));
+    }
+  }
+}
+
+void ProgramVisitor::visit(cxx::Enum& en)
+{
+  if (!en.values.empty())
+  {
+    for (size_t i(0); i < en.values.size(); ++i)
+    {
+      visit(*en.values.at(i));
+    }
+  }
+}
+
+void ProgramVisitor::visit(cxx::EnumValue& ev)
+{
+
+}
+
+void ProgramVisitor::visit(cxx::Function& f)
+{
+  if (!f.parameters.empty())
+  {
+    for (size_t i(0); i < f.parameters.size(); ++i)
+    {
+      visit(*f.parameters.at(i));
+    }
+  }
+}
+
+void ProgramVisitor::visit(cxx::FunctionParameter& fp)
+{
+
+}
+
+void ProgramVisitor::visit(cxx::Variable& v)
+{
+
+}
+
+void ProgramVisitor::visit(cxx::Typedef& t)
+{
+
+}
+
+void ProgramVisitor::visit(cxx::Macro& m)
+{
+
+}
+
 } // namespace dex

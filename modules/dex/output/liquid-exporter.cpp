@@ -70,7 +70,7 @@ public:
   {
     if (!exporter.profile().document_template.model.nodes().empty())
     {
-      json::Object obj = JsonUrlAnnotator::get(path(), serializedModel).toObject();
+      json::Object obj = json_mapping.get(doc).toObject();
       exporter.selectStringifier(exporter.profile().document_template.filesuffix);
       exporter.dump(doc, obj);
     }
