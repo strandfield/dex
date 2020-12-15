@@ -128,6 +128,36 @@ protected:
   virtual void visit(cxx::Macro& m);
 };
 
+class DEX_MODEL_API DocumentVisitor
+{
+public:
+
+  void visitDocument(const dex::Document& doc);
+
+protected:
+  virtual void visitNode(dom::Node& n);
+
+  void dispatch(dom::Node& n);
+
+protected:
+  virtual void visit(dom::Image& img);
+  virtual void visit(dom::List& l);
+  virtual void visit(dom::ListItem& li);
+  virtual void visit(dom::Paragraph& par);
+  virtual void visit(dex::BeginSince& bsince);
+  virtual void visit(dex::EndSince& esince);
+  virtual void visit(dex::DisplayMath& math);
+  virtual void visit(dex::GroupTable& table);
+  virtual void visit(dex::CodeBlock& codeblock);
+
+  virtual void visit(dex::FrontMatter& fm);
+  virtual void visit(dex::MainMatter& mm);
+  virtual void visit(dex::BackMatter& bm);
+  virtual void visit(dex::Sectioning& section);
+  virtual void visit(dex::TableOfContents& toc);
+  virtual void visit(dex::Index& idx);
+};
+
 } // namespace dex
 
 #endif // DEX_MODEL_MODELVISITOR_H

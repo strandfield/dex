@@ -601,4 +601,127 @@ void ProgramVisitor::visit(cxx::Macro& m)
 
 }
 
+void DocumentVisitor::visitDocument(const dex::Document& doc)
+{
+  for (auto n : doc.childNodes())
+    visitNode(*n);
+}
+
+void DocumentVisitor::visitNode(dom::Node& n)
+{
+  dispatch(n);
+
+  for (auto child : n.childNodes())
+    visitNode(*child);
+}
+
+void DocumentVisitor::dispatch(dom::Node& n)
+{
+  if (n.is<dom::Image>())
+    visit(static_cast<dom::Image&>(n));
+  else if (n.is<dom::List>())
+    visit(static_cast<dom::List&>(n));
+  else if (n.is<dom::ListItem>())
+    visit(static_cast<dom::ListItem&>(n));
+  else if (n.is<dom::Paragraph>())
+    visit(static_cast<dom::Paragraph&>(n));
+  else if (n.is<dex::BeginSince>())
+    visit(static_cast<dex::BeginSince&>(n));
+  else if (n.is<dex::EndSince>())
+    visit(static_cast<dex::EndSince&>(n));
+  else if (n.is<dex::FrontMatter>())
+    visit(static_cast<dex::FrontMatter&>(n));
+  else if (n.is<dex::MainMatter>())
+    visit(static_cast<dex::MainMatter&>(n));
+  else if (n.is<dex::BackMatter>())
+    visit(static_cast<dex::BackMatter&>(n));
+  else if (n.is<dex::Sectioning>())
+    visit(static_cast<dex::Sectioning&>(n));
+  else if (n.is<dex::DisplayMath>())
+    visit(static_cast<dex::DisplayMath&>(n));
+  else if (n.is<dex::GroupTable>())
+    visit(static_cast<dex::GroupTable&>(n));
+  else if (n.is<dex::CodeBlock>())
+    visit(static_cast<dex::CodeBlock&>(n));
+  else if (n.is<dex::TableOfContents>())
+    visit(static_cast<dex::TableOfContents&>(n));
+  else if (n.is<dex::Index>())
+    visit(static_cast<dex::Index&>(n));
+}
+
+void DocumentVisitor::visit(dom::Image& img)
+{
+
+}
+
+void DocumentVisitor::visit(dom::List& l)
+{
+
+}
+
+void DocumentVisitor::visit(dom::ListItem& li)
+{
+
+}
+
+void DocumentVisitor::visit(dom::Paragraph& par)
+{
+
+}
+
+void DocumentVisitor::visit(dex::BeginSince& bsince)
+{
+
+}
+
+void DocumentVisitor::visit(dex::EndSince& esince)
+{
+
+}
+
+void DocumentVisitor::visit(dex::DisplayMath& math)
+{
+
+}
+
+void DocumentVisitor::visit(dex::GroupTable& table)
+{
+
+}
+
+void DocumentVisitor::visit(dex::CodeBlock& codeblock)
+{
+
+}
+
+void DocumentVisitor::visit(dex::FrontMatter& fm)
+{
+
+}
+
+void DocumentVisitor::visit(dex::MainMatter& mm)
+{
+
+}
+
+void DocumentVisitor::visit(dex::BackMatter& bm)
+{
+
+}
+
+void DocumentVisitor::visit(dex::Sectioning& section)
+{
+
+}
+
+void DocumentVisitor::visit(dex::TableOfContents& toc)
+{
+
+}
+
+void DocumentVisitor::visit(dex::Index& idx)
+{
+
+}
+
 } // namespace dex
