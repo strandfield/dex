@@ -24,7 +24,7 @@
 namespace dex
 {
 
-class LiquidExporterModelVisitor : public ModelVisitor
+class LiquidExporterModelVisitor : public ProgramVisitor
 {
 public:
   LiquidExporter& exporter;
@@ -38,23 +38,30 @@ public:
   {
   }
 
-  void visit_class(const cxx::Class& cla) override
+  void visitModel(const dex::Model& model)
+  {
+    for (auto d : model.documents)
+      visit_document(*d);
+
+    if (model.program())
+    {
+      ProgramVisitor::visit(*model.program());
+    }
+  }
+
+  void visit(cxx::Class& cla) override
   {
     if (!exporter.profile().class_template.model.nodes().empty())
     {
-      // We were previously fetching the json with
-      //   JsonUrlAnnotator::get(path(), serializedModel).toObject();
-      // but using the JsonExportMapping is expected to be faster.
-      // @TODO: fallback to the path method if the object is not in the map
       json::Object obj = json_mapping.get(cla).toObject();
       exporter.selectStringifier(exporter.profile().class_template.filesuffix);
       exporter.dump(cla, obj);
     }
 
-    ModelVisitor::visit_class(cla);
+    ProgramVisitor::visit(cla);
   }
 
-  void visit_namespace(const cxx::Namespace& ns) override
+  void visit(cxx::Namespace& ns) override
   {
     if (!exporter.profile().namespace_template.model.nodes().empty())
     {
@@ -63,10 +70,26 @@ public:
       exporter.dump(ns, obj);
     }
 
-    ModelVisitor::visit_namespace(ns);
+    ProgramVisitor::visit(ns);
   }
 
-  void visit_document(const dex::Document& doc) override
+  void visit(cxx::Enum& /* enm */) override
+  {
+    // @TODO: one page per enum ?
+
+    // do not visit enum values
+    // ProgramVisitor::visit(enm);
+  }
+
+  void visit(cxx::Function& /* fn */) override
+  {
+    // @TODO: one page per function ?
+
+    // do not visit function parameters
+    // ProgramVisitor::visit(fn);
+  }
+
+  void visit_document(const dex::Document& doc)
   {
     if (!exporter.profile().document_template.model.nodes().empty())
     {
@@ -74,8 +97,6 @@ public:
       exporter.selectStringifier(exporter.profile().document_template.filesuffix);
       exporter.dump(doc, obj);
     }
-
-    ModelVisitor::visit_document(doc);
   }
 };
 
@@ -130,7 +151,7 @@ void LiquidExporter::render()
   annotateModel();
 
   LiquidExporterModelVisitor visitor{ *this, m_serialized_model, m_model_mapping };
-  visitor.visit(*model());
+  visitor.visitModel(*model());
 
   for (const std::pair<std::string, liquid::Template>& file : profile().files)
   {
