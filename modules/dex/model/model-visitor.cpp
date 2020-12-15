@@ -494,7 +494,7 @@ void ModelVisitor::visit_group(const dex::Group& /* group */)
 
 void ProgramVisitor::visit(cxx::Program& prog)
 {
-  visit(*prog.globalNamespace());
+  visit(static_cast<cxx::Entity&>(*prog.globalNamespace()));
 
   for (auto m : prog.macros)
     visit(*m);
