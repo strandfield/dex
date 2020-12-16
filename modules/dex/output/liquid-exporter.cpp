@@ -168,21 +168,6 @@ void LiquidExporter::render()
   }
 }
 
-Model::Path LiquidExporter::convertToModelPath(const JsonPath& jspath)
-{
-  Model::Path result;
-
-  for (const JsonPathElement& jspath_elem : jspath)
-  {
-    if (std::holds_alternative<size_t>(jspath_elem))
-      result.back().index = std::get<size_t>(jspath_elem);
-    else
-      result.push_back(Model::PathElement(std::get<std::string>(jspath_elem)));
-  }
-
-  return result;
-}
-
 void LiquidExporter::annotateModel()
 {
   LiquidExporterUrlAnnotator url_annotator{ m_serialized_model, m_model_mapping, profile() };

@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2020 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -36,32 +36,6 @@ public:
   std::shared_ptr<dex::Program> program() const;
   std::shared_ptr<dex::Program> getOrCreateProgram();  
   void setProgram(std::shared_ptr<dex::Program> prog);
-
-  struct DEX_MODEL_API PathElement
-  {
-    std::string_view name;
-    size_t index = std::numeric_limits<size_t>::max();
-
-    PathElement(std::string_view n);
-    PathElement(std::string_view n, size_t i);
-  };
-
-  typedef std::vector<PathElement> Path;
-
-  typedef std::variant<
-    std::shared_ptr<cxx::Program>, 
-    std::shared_ptr<cxx::Entity>, 
-    std::shared_ptr<cxx::Documentation>, 
-    std::shared_ptr<dom::Node>,
-    std::shared_ptr<Group>> 
-  Node;
-
-  static std::string to_string(const Path& p);
-  static Path parse_path(const std::string& str);
-  Node get(const Path& path) const;
-  //Path path(const std::shared_ptr<cxx::Entity>& e) const;
-  Path path(const std::shared_ptr<dex::Document>& doc) const;
-  Path path(const std::shared_ptr<Group>& g) const;
 };
 
 } // namespace dex

@@ -53,8 +53,6 @@ public:
 
 protected:
   const Model& model() const;
-  const std::vector<Model::PathElement>& stack() const;
-  const Model::Path& path() const;
 
 protected:
 
@@ -102,7 +100,6 @@ protected:
 
 private:
   const Model* m_model = nullptr;
-  std::vector<Model::PathElement> m_stack;
 };
 
 class DEX_MODEL_API ProgramVisitor

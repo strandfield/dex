@@ -36,11 +36,6 @@ public:
 
   }
 
-  std::vector<Model::PathElement>& stack()
-  {
-    return visitor.m_stack;
-  }
-
   void beginVisitObject(const char* name)
   {
     visitor.beginVisitObject(name);
@@ -68,14 +63,14 @@ public:
   RaiiObjectVisitor(ModelVisitor* v, const char* name)
     : ModelVisitorHelper(v)
   {
-    stack().push_back(std::string_view(name));
+    //stack().push_back(std::string_view(name));
     beginVisitObject(name);
   }
 
   ~RaiiObjectVisitor()
   {
     endVisitObject();
-    stack().pop_back();
+    //stack().pop_back();
   }
 };
 
@@ -85,14 +80,14 @@ public:
   RaiiArrayVisitor(ModelVisitor* v, const char* name)
     : ModelVisitorHelper(v)
   {
-    stack().push_back(std::string_view(name));
+    //stack().push_back(std::string_view(name));
     beginVisitArray(name);
   }
 
   ~RaiiArrayVisitor()
   {
     endVisitArray();
-    stack().pop_back();
+    //stack().pop_back();
   }
 };
 
@@ -102,12 +97,12 @@ public:
   RaiiArrayElementVisitor(ModelVisitor* v, size_t n)
     : ModelVisitorHelper(v)
   {
-    stack().back().index = n;
+    //stack().back().index = n;
   }
 
   ~RaiiArrayElementVisitor()
   {
-    stack().back().index = std::numeric_limits<size_t>::max();
+    //stack().back().index = std::numeric_limits<size_t>::max();
   }
 };
 
@@ -150,15 +145,6 @@ const Model& ModelVisitor::model() const
   return *m_model;
 }
 
-const std::vector<Model::PathElement>& ModelVisitor::stack() const
-{
-  return m_stack;
-}
-
-const Model::Path& ModelVisitor::path() const
-{
-  return m_stack;
-}
 
 void ModelVisitor::beginVisitObject(const char* name)
 {

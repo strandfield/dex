@@ -40,11 +40,6 @@ public:
   LiquidExporter();
   ~LiquidExporter();
 
-  typedef std::variant<size_t, std::string> JsonPathElement;
-  typedef std::vector<JsonPathElement> JsonPath;
-
-  static Model::Path convertToModelPath(const JsonPath& jspath);
-
   struct Settings
   {
     liquid::Template class_template;
