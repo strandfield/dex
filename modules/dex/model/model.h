@@ -15,9 +15,6 @@
 #include "dex/model/manual.h"
 #include "dex/model/program.h"
 
-#include <string_view>
-#include <variant>
-
 namespace dex
 {
 
