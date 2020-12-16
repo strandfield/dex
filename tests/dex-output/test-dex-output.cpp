@@ -56,7 +56,7 @@ void TestDexOutput::jsonExport()
     auto model = std::make_shared<dex::Model>();
     model->setProgram(dex::examples::prog_with_class());
 
-    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
+    json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
 
     QVERIFY(jexport.data().size() == 1);
 
@@ -72,7 +72,7 @@ void TestDexOutput::jsonExport()
     auto model = std::make_shared<dex::Model>();
     model->setProgram(dex::examples::prog_with_fun());
 
-    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
+    json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
     jexport = jexport["program"]["global_namespace"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
@@ -92,7 +92,7 @@ void TestDexOutput::jsonExport()
     auto model = std::make_shared<dex::Model>();
     model->setProgram(dex::examples::prog_with_var());
 
-    json::Object jexport = dex::JsonExport::serialize(*model).toObject();
+    json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
     jexport = jexport["program"]["global_namespace"].toObject();
 
     QVERIFY(jexport.data().size() == 3);
@@ -117,7 +117,7 @@ void TestDexOutput::jsonExportManual()
 
   sec->content.push_back(make_par("Hello World!"));
 
-  json::Object jexport = dex::JsonExport::serialize(*model).toObject();
+  json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
 
   QVERIFY(jexport.data().size() == 1);
 

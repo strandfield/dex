@@ -526,6 +526,8 @@ void ProgramVisitor::dispatch(cxx::Entity& e)
     return visit(static_cast<cxx::Typedef&>(e));
   case cxx::NodeKind::Variable:
     return visit(static_cast<cxx::Variable&>(e));
+  case cxx::NodeKind::Macro:
+    return visit(static_cast<cxx::Macro&>(e));
   default: 
     break;
   }

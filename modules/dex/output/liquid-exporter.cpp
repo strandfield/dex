@@ -228,10 +228,9 @@ void LiquidExporter::setModel(std::shared_ptr<Model> model)
 {
   m_model = model;
   
-  JsonExport json_export{ *m_model };
-  json_export.visit(*m_model);
+  JsonExporter json_export{ *m_model };
 
-  m_serialized_model = json_export.result;
+  m_serialized_model = json_export.serialize();
   m_model_mapping = std::move(json_export.mapping);
 
   JsonPathAnnotator path_annotator;

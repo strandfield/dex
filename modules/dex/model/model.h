@@ -59,7 +59,7 @@ public:
   static std::string to_string(const Path& p);
   static Path parse_path(const std::string& str);
   Node get(const Path& path) const;
-  Path path(const std::shared_ptr<cxx::Entity>& e) const;
+  //Path path(const std::shared_ptr<cxx::Entity>& e) const;
   Path path(const std::shared_ptr<dex::Document>& doc) const;
   Path path(const std::shared_ptr<Group>& g) const;
 };

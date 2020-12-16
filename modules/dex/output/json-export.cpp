@@ -94,55 +94,6 @@ static void write_location(json::Object& obj, const cxx::SourceLocation& loc)
   obj["loc"] = result;
 }
 
-
-class RAIIJsonExportContext
-{
-public:
-  JsonExport::JsonStacks* stack;
-
-  RAIIJsonExportContext(JsonExport* exporter, const Model::PathElement& pe)
-    : stack(&exporter->m_json_stacks)
-  {
-    if (pe.index == std::numeric_limits<size_t>::max())
-    {
-      json::Object obj{};
-      std::map<std::string, json::Json>& fields = stack->objects.back().toObject().data();
-      fields[std::string(pe.name)] = obj;
-      stack->objects.push_back(obj);
-    }
-    else
-    {
-      json::Object obj{};
-      stack->arrays.back().push(obj);
-      stack->objects.push_back(obj);
-    }
-  }
-
-  ~RAIIJsonExportContext()
-  {
-    stack->objects.pop_back();
-  }
-};
-
-JsonExport::JsonExport(const Model& model)
-{
-  m_json_stacks.objects.push_back(result);
-}
-
-json::Object JsonExport::serialize(const Model& model)
-{
-  JsonExport jexport{ model };
-
-  jexport.visit(model);
-
-  return jexport.result;
-}
-
-json::Object& JsonExport::object()
-{
-  return m_json_stacks.objects.back();
-}
-
 static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
 {
   json::Json result;
@@ -175,366 +126,19 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   return result;
 }
 
-void JsonExport::beginVisitArray(const char* name)
-{
-  json::Array list{};
-  m_json_stacks.arrays.push_back(list);
-  object()[name] = list;
-}
-
-void JsonExport::endVisitArray()
-{
-  m_json_stacks.arrays.pop_back();
-}
-
-void JsonExport::visit_domnode(const dom::Node& n)
-{
-  RAIIJsonExportContext context{ this, path().back() };
-
-  object()["type"] = n.className();
-
-  ModelVisitor::visit_domnode(n);
-}
-
-void JsonExport::visit_domimage(const dom::Image& img)
-{
-  object()["src"] = img.src;
-
-  write_if(object(), "height", img.height, img.height != -1);
-  write_if(object(), "width", img.width, img.width != -1);
-}
-
-void JsonExport::visit_domlist(const dom::List& l)
-{
-  write_if(object(), "marker", l.marker, !l.marker.empty());
-
-  object()["ordered"] = l.ordered;
-
-  write_if(object(), "reversed", l.reversed, l.ordered);
-
-  ModelVisitor::visit_domlist(l);
-}
-
-void JsonExport::visit_domlistitem(const dom::ListItem& li)
-{
-  write_if(object(), "marker", li.marker, !li.marker.empty());
-  write_if(object(), "value", li.value, li.value != -1);
-
-  ModelVisitor::visit_domlistitem(li);
-}
-
-void JsonExport::visit_domparagraph(const dom::Paragraph& par)
-{
-  object()["text"] = par.text();
-
-  if (!par.metadata().empty())
-  {
-    json::Array metadatas;
-
-    for (const auto& md : par.metadata())
-    {
-      metadatas.push(serialize_par_metadata(*md));
-    }
-
-    object()["metadata"] = metadatas;
-  }
-
-  ModelVisitor::visit_domparagraph(par);
-}
-
-void JsonExport::visit_beginsince(const dex::BeginSince& bsince)
-{
-  object()["version"] = bsince.version;
-}
-
-void JsonExport::visit_endsince(const dex::EndSince& esince)
-{
-  object()["version"] = esince.beginsince.lock()->version;
-}
-
-void JsonExport::visit_displaymath(const dex::DisplayMath& math)
-{
-  object()["source"] = math.source;
-
-  ModelVisitor::visit_displaymath(math);
-}
-
-void JsonExport::visit_grouptable(const dex::GroupTable& table)
-{
-  object()["groupname"] = table.groupname;
-  ModelVisitor::visit_grouptable(table);
-}
-
-void JsonExport::visit_codeblock(const dex::CodeBlock& codeblock)
-{
-  object()["lang"] = codeblock.lang;
-  object()["code"] = codeblock.code;
-  ModelVisitor::visit_codeblock(codeblock);
-}
-
-void JsonExport::visit_tableofcontents(const dex::TableOfContents& /* toc */)
-{
-  // no-op
-}
-
-void JsonExport::visit_index(const dex::Index& /* idx */)
-{
-  // no-op
-}
-
-static json::Json serialize(const Model& model, const RelatedNonMembers& rnm)
-{
-  json::Array result;
-
-  for (const auto& e : rnm.class_map)
-  {
-    json::Object json_entry{};
-    json_entry["class"] = Model::to_string(model.path(e.second->the_class));
-
-    json::Array json_functions;
-
-    for (auto f : e.second->non_members)
-    {
-      json_functions.push(Model::to_string(model.path(f)));
-    }
-
-    json_entry["functions"] = json_functions;
-
-    result.push(json_entry);
-  }
-
-  return result;
-}
-
-void JsonExport::visit_program(const dex::Program& prog)
-{
-  RAIIJsonExportContext context{ this, path().back() };
-
-  if (!prog.related.empty())
-    object()["related"] = ::dex::serialize(model(), prog.related);
-
-  ModelVisitor::visit_program(prog);
-}
-
-void JsonExport::visit_entity(const cxx::Entity& e)
-{
-  RAIIJsonExportContext context{ this, path().back() };
-
-  object()["name"] = e.name;
-  object()["type"] = to_string(e.kind());
-
-  write_location(object(), e.location);
-
-  mapping.bind(e, object());
-
-  ModelVisitor::visit_entity(e);
-}
-
-void JsonExport::visit_namespace(const cxx::Namespace& ns)
-{
-  ModelVisitor::visit_namespace(ns);
-}
-
-void JsonExport::visit_class(const cxx::Class& cla)
-{
-  ModelVisitor::visit_class(cla);
-
-  if (!cla.members.empty())
-  {
-    json::Array members = object()["members"].toArray();
-
-    for (size_t i(0); i < cla.members.size(); ++i)
-    {
-      members[static_cast<int>(i)]["accessibility"] = to_string(cla.members.at(i)->getAccessSpecifier());
-    }
-  }
-}
-
-void JsonExport::visit_enum(const cxx::Enum& en)
-{
-  ModelVisitor::visit_enum(en);
-}
-
-void JsonExport::visit_enumvalue(const cxx::EnumValue& ev)
-{
-  write_if(object(), "value", ev.value(), !ev.value().empty());
-
-  ModelVisitor::visit_enumvalue(ev);
-}
-
-void JsonExport::visit_function(const cxx::Function& f)
-{
-  ModelVisitor::visit_function(f);
-
-  object()["return_type"] = f.return_type.toString();
-
-  if (f.specifiers != 0)
-  {
-    std::string specifiers;
-
-    if (f.specifiers & cxx::FunctionSpecifier::Inline)
-      specifiers += "inline,";
-    if (f.specifiers & cxx::FunctionSpecifier::Static)
-      specifiers += "static,";
-    if (f.specifiers & cxx::FunctionSpecifier::Constexpr)
-      specifiers += "constexpr,";
-    if (f.specifiers & cxx::FunctionSpecifier::Virtual)
-      specifiers += "virtual,";
-    if (f.specifiers & cxx::FunctionSpecifier::Override)
-      specifiers += "override,";
-    if (f.specifiers & cxx::FunctionSpecifier::Final)
-      specifiers += "final,";
-    if (f.specifiers & cxx::FunctionSpecifier::Const)
-      specifiers += "const,";
-    
-    specifiers.pop_back();
-
-    object()["specifiers"] = specifiers;
-  }
-}
-
-void JsonExport::visit_functionparameter(const cxx::FunctionParameter& fp)
-{
-  ModelVisitor::visit_functionparameter(fp);
-
-  object()["type"] = fp.type.toString();
-  write_if(object(), "default_value", fp.default_value.toString(), fp.default_value != cxx::Expression());
-  
-  if (fp.documentation != nullptr)
-    object()["documentation"] = static_cast<dex::FunctionParameterDocumentation*>(fp.documentation.get())->brief;
-}
-
-void JsonExport::visit_variable(const cxx::Variable& v)
-{
-  ModelVisitor::visit_variable(v);
-
-  object()["vartype"] = v.type().toString();
-  write_if(object(), "default_value", v.defaultValue().toString(), v.defaultValue() != cxx::Expression());
-
-  if (v.specifiers() != 0)
-  {
-    std::string specifiers;
-
-    if (v.specifiers() & cxx::VariableSpecifier::Inline)
-      specifiers += "inline,";
-    if (v.specifiers() & cxx::VariableSpecifier::Static)
-      specifiers += "static,";
-    if (v.specifiers() & cxx::VariableSpecifier::Constexpr)
-      specifiers += "constexpr,";
-
-    specifiers.pop_back();
-
-    object()["specifiers"] = specifiers;
-  }
-}
-
-void JsonExport::visit_typedef(const cxx::Typedef& t)
-{
-  ModelVisitor::visit_typedef(t);
-  object()["typedef"] = t.type.toString();
-}
-
-void JsonExport::visit_macro(const cxx::Macro& m)
-{
-  ModelVisitor::visit_macro(m);
-
-  json::Array params;
-
-  for (const std::string& p : m.parameters)
-    params.push(p);
-
-  object()["parameters"] = params;
-}
-
-void JsonExport::visit_entitydocumentation(const EntityDocumentation& edoc)
-{
-  RAIIJsonExportContext context{ this, path().back() };
-
-  if (edoc.brief().has_value())
-    object()["brief"] = edoc.brief().value();
-
-  if (edoc.since().has_value())
-    object()["since"] = edoc.since().value().version();
-
-  if (edoc.is<FunctionDocumentation>())
-  {
-    const auto& fndoc = static_cast<const FunctionDocumentation&>(edoc);
-
-    if (fndoc.returnValue().has_value())
-      object()["returns"] = fndoc.returnValue().value();
-  }
-
-  ModelVisitor::visit_entitydocumentation(edoc);
-}
-
-void JsonExport::visit_document(const Document& doc)
-{
-  object()["title"] = doc.title;
-  object()["doctype"] = doc.doctype;
-
-  mapping.bind(doc, object());
-
-  ModelVisitor::visit_document(doc);
-}
-
-void JsonExport::visit_frontmatter(const dex::FrontMatter& /* fm */)
-{
-  // no-op
-}
-
-void JsonExport::visit_mainmatter(const dex::MainMatter& /* mm */)
-{
-  // no-op
-}
-
-void JsonExport::visit_backmatter(const dex::BackMatter& /* bm */)
-{
-  // no-op
-}
-
-void JsonExport::visit_sectioning(const Sectioning& sec)
-{
-  object()["name"] = sec.name;
-  object()["depth"] = Sectioning::depth2str(sec.depth);
-
-  ModelVisitor::visit_sectioning(sec);
-}
-
-template<typename T>
-static json::Json serialize_paths(const Model& model, const std::vector<T>& elems)
-{
-  json::Array result;
-
-  for (const auto& e : elems)
-    result.push(Model::to_string(model.path(e)));
-
-  return result;
-}
-
-void JsonExport::visit_group(const Group& group)
-{
-  RAIIJsonExportContext context{ this, path().back() };
-
-  object()["name"] = group.name;
-  object()["entities"] = serialize_paths(model(), group.content.entities);
-  object()["documents"] = serialize_paths(model(), group.content.documents);
-
-  mapping.bind(group, object());
-
-  ModelVisitor::visit_group(group);
-}
-
-void JsonExport::write_location(json::Object& obj, const cxx::SourceLocation& loc)
-{
-  dex::write_location(obj, loc);
-}
-
-JsonExporter::JsonExporter()
+JsonExporter::JsonExporter(const Model& m)
+  : model(m)
 {
 
 }
 
-json::Object JsonExporter::serialize(const Model& model)
+json::Object JsonExporter::serialize(const Model& m)
+{
+  JsonExporter ex{ m };
+  return ex.serialize();
+}
+
+json::Object JsonExporter::serialize()
 {
   json::Object result;
 
@@ -563,7 +167,7 @@ json::Object JsonExporter::serialize(const Model& model)
 
     for (size_t i(0); i < model.groups.groups.size(); ++i)
     {
-      groups.push(serializeGroup(*model.groups.groups.at(i), model));
+      groups.push(serializeGroup(*model.groups.groups.at(i)));
     }
 
     result["groups"] = groups;
@@ -572,7 +176,7 @@ json::Object JsonExporter::serialize(const Model& model)
   return result;
 }
 
-json::Object JsonExporter::serializeGroup(const Group& group, const Model& model)
+json::Object JsonExporter::serializeGroup(const Group& group)
 {
   json::Object res;
 
@@ -613,6 +217,7 @@ json::Object JsonExporter::serializeGroup(const Group& group, const Model& model
 
 json::Object JsonDocumentSerializer::serialize(dex::Document& doc)
 {
+  result["type"] = doc.className();
   result["title"] = doc.title;
   result["doctype"] = doc.doctype;
   result["content"] = serializeArray(doc.childNodes());
@@ -775,7 +380,7 @@ json::Object JsonProgramSerializer::serialize(cxx::Entity& e)
 {
   json::Object ret{};
   std::swap(this->result, ret);
-  ProgramVisitor::visit(e);
+  visit(e);
   std::swap(this->result, ret);
 
   return ret;
@@ -918,7 +523,8 @@ void JsonProgramSerializer::visit(cxx::Entity& e)
 
 void JsonProgramSerializer::visit(cxx::Namespace& ns)
 {
-  result["entities"] = serializeArray(ns.entities);
+  if(!ns.entities.empty())
+    result["entities"] = serializeArray(ns.entities);
 }
 
 void JsonProgramSerializer::visit(cxx::Class& cla)
