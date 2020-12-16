@@ -22,7 +22,7 @@ public:
 
   struct BackwardMaps
   {
-    std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const cxx::Entity>> entities;
+    std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<cxx::Entity>> entities;
     std::unordered_map<std::shared_ptr<json::details::Node>, const Document*> documents;
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const Group>> groups;
   };
@@ -45,7 +45,7 @@ public:
     return forward.at(&g);
   }
 
-  void bind(const cxx::Entity& e, const json::Json& o)
+  void bind(cxx::Entity& e, const json::Json& o)
   {
     backward_maps.entities[o.impl()] = e.shared_from_this();
     forward[&e] = o;
@@ -74,7 +74,7 @@ public:
 
 protected:
 
-  std::shared_ptr<const cxx::Entity> get_impl(const json::Json& obj, get_helper_t<cxx::Entity>) const
+  std::shared_ptr<cxx::Entity> get_impl(const json::Json& obj, get_helper_t<cxx::Entity>) const
   {
     return backward_maps.entities.at(obj.impl());
   }
