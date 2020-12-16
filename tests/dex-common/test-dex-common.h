@@ -12,4 +12,5 @@ public:
 
 private Q_SLOTS:
   void jsonBuilder();
+  void jsonPathAnnotator();
 };

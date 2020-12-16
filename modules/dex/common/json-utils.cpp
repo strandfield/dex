@@ -137,7 +137,7 @@ void JsonPathAnnotator::visit(json::Json val)
   else if (val.isObject())
   {
     json::Object obj = val.toObject();
-    obj["_path"] = build_path();
+    obj[field_name] = build_path();
 
     for (std::pair<const std::string, json::Json>& entry : obj.data())
     {

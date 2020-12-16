@@ -22,6 +22,9 @@ DEX_COMMON_API json::Object build_json(const SettingsMap& map);
 class DEX_COMMON_API JsonPathAnnotator
 {
 public:
+  std::string field_name = "_path";
+
+public:
 
   void annotate(json::Object& obj);
 
