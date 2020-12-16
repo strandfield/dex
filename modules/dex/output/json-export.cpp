@@ -252,6 +252,7 @@ void JsonDocumentSerializer::visitNode(dom::Node& n)
 {
   result["type"] = n.className();
   dispatch(n);
+  mapping.bind(n, result);
 }
 
 
