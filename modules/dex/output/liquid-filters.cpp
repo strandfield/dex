@@ -100,23 +100,7 @@ std::string LiquidFilters::funsig(const json::Object& json_fun) const
 
 json::Array LiquidFilters::related_non_members(const json::Object& json_class) const
 {
-  auto path_it = json_class.data().find("_path");
-
-  if (path_it == json_class.data().end())
-  {
-    assert(("element has no path", false));
-    return {};
-  }
-
-  Model::Path path = Model::parse_path(path_it->second.toString());
-  Model::Node model_node = renderer.model()->get(path);
-
-  if (!std::holds_alternative<std::shared_ptr<cxx::Entity>>(model_node))
-  {
-    return {};
-  }
-
-  auto the_class = std::dynamic_pointer_cast<cxx::Class>(std::get<std::shared_ptr<cxx::Entity>>(model_node));
+  auto the_class = std::dynamic_pointer_cast<cxx::Class>(renderer.modelMapping().get<cxx::Entity>(json_class));
 
   if (the_class == nullptr)
     return {};

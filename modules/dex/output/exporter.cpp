@@ -114,7 +114,7 @@ void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& 
     }
     else if (engine == "json")
     {
-      auto obj = dex::JsonExport::serialize(*model);
+      auto obj = dex::JsonExporter::serialize(*model);
 
       QFile file{ name };
 

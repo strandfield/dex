@@ -36,7 +36,7 @@ void TestParsing::all()
 
     std::shared_ptr<dex::Model> parse_result = machine.output();
 
-    json::Object jexport = dex::JsonExport::serialize(*parse_result).toObject();
+    json::Object jexport = dex::JsonExporter::serialize(*parse_result);
     
     std::string serialized_result = json::stringify(jexport);
 

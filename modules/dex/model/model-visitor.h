@@ -45,64 +45,57 @@ class TableOfContents;
 
 class Program;
 
-class DEX_MODEL_API ModelVisitor
+class DEX_MODEL_API ProgramVisitor
 {
 public:
 
-  void visit(const Model& model);
+  void visit(cxx::Program& prog);
 
 protected:
-  const Model& model() const;
-  const std::vector<Model::PathElement>& stack() const;
-  const Model::Path& path() const;
+  virtual void visit(cxx::Entity& e);
+
+  void dispatch(cxx::Entity& e);
 
 protected:
+  virtual void visit(cxx::Namespace& ns);
+  virtual void visit(cxx::Class& cla);
+  virtual void visit(cxx::Enum& en);
+  virtual void visit(cxx::EnumValue& ev);
+  virtual void visit(cxx::Function& f);
+  virtual void visit(cxx::FunctionParameter& fp);
+  virtual void visit(cxx::Variable& v);
+  virtual void visit(cxx::Typedef& t);
+  virtual void visit(cxx::Macro& m);
+};
 
-  friend class ModelVisitorHelper;
+class DEX_MODEL_API DocumentVisitor
+{
+public:
 
-  virtual void beginVisitObject(const char* name);
-  virtual void endVisitObject();
-  virtual void beginVisitArray(const char* name);
-  virtual void endVisitArray();
+  void visitDocument(const dex::Document& doc);
 
-  virtual void visit_domnode(const dom::Node& n);
-  virtual void visit_domimage(const dom::Image& img);
-  virtual void visit_domlist(const dom::List& l);
-  virtual void visit_domlistitem(const dom::ListItem& li);
-  virtual void visit_domparagraph(const dom::Paragraph& par);
-  virtual void visit_beginsince(const dex::BeginSince& bsince);
-  virtual void visit_endsince(const dex::EndSince& esince);
-  virtual void visit_displaymath(const dex::DisplayMath& math);
-  virtual void visit_grouptable(const dex::GroupTable& table);
-  virtual void visit_codeblock(const dex::CodeBlock& codeblock);
+protected:
+  virtual void visitNode(dom::Node& n);
 
-  virtual void visit_program(const dex::Program& prog);
-  virtual void visit_entity(const cxx::Entity& e);
-  virtual void visit_namespace(const cxx::Namespace& ns);
-  virtual void visit_class(const cxx::Class& cla);
-  virtual void visit_enum(const cxx::Enum& en);
-  virtual void visit_enumvalue(const cxx::EnumValue& ev);
-  virtual void visit_function(const cxx::Function& f);
-  virtual void visit_functionparameter(const cxx::FunctionParameter& fp);
-  virtual void visit_variable(const cxx::Variable& v);
-  virtual void visit_typedef(const cxx::Typedef& t);
-  virtual void visit_macro(const cxx::Macro& m);
+  void dispatch(dom::Node& n);
 
-  virtual void visit_entitydocumentation(const EntityDocumentation& edoc);
+protected:
+  virtual void visit(dom::Image& img);
+  virtual void visit(dom::List& l);
+  virtual void visit(dom::ListItem& li);
+  virtual void visit(dom::Paragraph& par);
+  virtual void visit(dex::BeginSince& bsince);
+  virtual void visit(dex::EndSince& esince);
+  virtual void visit(dex::DisplayMath& math);
+  virtual void visit(dex::GroupTable& table);
+  virtual void visit(dex::CodeBlock& codeblock);
 
-  virtual void visit_document(const dex::Document& doc);
-  virtual void visit_frontmatter(const dex::FrontMatter& fm);
-  virtual void visit_mainmatter(const dex::MainMatter& mm);
-  virtual void visit_backmatter(const dex::BackMatter& bm);
-  virtual void visit_sectioning(const dex::Sectioning& section);
-  virtual void visit_tableofcontents(const dex::TableOfContents& toc);
-  virtual void visit_index(const dex::Index& idx);
-
-  virtual void visit_group(const dex::Group& group);
-
-private:
-  const Model* m_model = nullptr;
-  std::vector<Model::PathElement> m_stack;
+  virtual void visit(dex::FrontMatter& fm);
+  virtual void visit(dex::MainMatter& mm);
+  virtual void visit(dex::BackMatter& bm);
+  virtual void visit(dex::Sectioning& section);
+  virtual void visit(dex::TableOfContents& toc);
+  virtual void visit(dex::Index& idx);
 };
 
 } // namespace dex

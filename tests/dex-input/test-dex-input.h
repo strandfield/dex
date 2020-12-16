@@ -22,5 +22,4 @@ private Q_SLOTS:
   void parserMachineEnum();
   void parserMachineVariable();
   void parserMachineManual();
-  void modelPath();
 };

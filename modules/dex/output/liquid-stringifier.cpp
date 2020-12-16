@@ -38,24 +38,10 @@ std::string LiquidStringifier::stringify(const json::Json& val) const
 
   json::Object obj = val.toObject();
 
-  auto path_it = obj.data().find("_path");
+  auto dom_node = renderer.modelMapping().get<dom::Node>(val);
 
-  if (path_it != obj.data().end())
-  {
-    Model::Path path = Model::parse_path(path_it->second.toString());
-    Model::Node model_node = renderer.model()->get(path);
-
-    if (std::holds_alternative<std::shared_ptr<dom::Node>>(model_node))
-    {
-      auto dom_node = std::get< std::shared_ptr<dom::Node>>(model_node);
-      return stringify_domnode(*dom_node);
-    }
-  }
-  else
-  {
-    assert(("element has no path", false));
-    return {};
-  }
+  if (dom_node)
+    return stringify_domnode(*dom_node);
 
   assert(("Not implemented", false));
   return {};
