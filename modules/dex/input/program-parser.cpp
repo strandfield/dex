@@ -120,7 +120,7 @@ void ProgramParser::class_(std::string name)
     the_class->documentation = std::make_shared<ClassDocumentation>();
     // TODO: set source location
 
-    currentFrame().node->appendChild(the_class);
+    appendChild(the_class);
   }
 
   m_state.enter<FrameType::Class>(the_class);
@@ -166,7 +166,7 @@ void ProgramParser::fn(std::string signature)
   the_fn->documentation = std::make_shared<FunctionDocumentation>();
   // TODO: set source location
 
-  currentFrame().node->appendChild(the_fn);
+  appendChild(the_fn);
 
   m_state.enter<FrameType::Function>(the_fn);
 }
@@ -194,7 +194,7 @@ void ProgramParser::namespace_(std::string name)
     the_namespace->documentation = std::make_shared<NamespaceDocumentation>();
     // TODO: set source location
 
-    parent_ns->appendChild(the_namespace);
+    appendChild(parent_ns, the_namespace);
   }
 
   m_state.enter<FrameType::Namespace>(the_namespace);
@@ -483,7 +483,7 @@ void ProgramParser::nonmember()
 
   // perform the re-parenting
   the_class->members.pop_back();
-  the_class->parent()->appendChild(func);
+  appendChild(the_class->parent(), func);
 
   m_program->related.relates(func, the_class);
 }
@@ -556,6 +556,31 @@ void ProgramParser::exitFrame()
   }
 
   m_state.leave();
+}
+
+void ProgramParser::appendChild(std::shared_ptr<cxx::Entity> e)
+{
+  appendChild(currentFrame().node, e);
+}
+
+void ProgramParser::appendChild(std::shared_ptr<cxx::Node> parent, std::shared_ptr<cxx::Entity> child)
+{
+  switch (parent->kind())
+  {
+  case cxx::NodeKind::Namespace:
+    parent->get<cxx::Namespace::Entities>().push_back(child);
+    break;
+  case cxx::NodeKind::Class:
+    parent->get<cxx::Class::Members>().push_back(child);
+    break;
+  case cxx::NodeKind::Enum:
+    parent->get<cxx::Enum::Values>().push_back(std::static_pointer_cast<cxx::EnumValue>(child));
+    break;
+  default:
+    throw std::runtime_error("ProgramParser::appendChild() failed");
+  }
+  
+  child->weak_parent = std::static_pointer_cast<cxx::Entity>(parent);
 }
 
 } // namespace dex

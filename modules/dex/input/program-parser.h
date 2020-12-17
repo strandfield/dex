@@ -99,6 +99,8 @@ public:
 protected:
   Frame& currentFrame();
   void exitFrame();
+  void appendChild(std::shared_ptr<cxx::Entity> e);
+  static void appendChild(std::shared_ptr<cxx::Node> parent, std::shared_ptr<cxx::Entity> child);
 
 private:
   State m_state;
