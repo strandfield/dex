@@ -24,7 +24,7 @@ public:
   {
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<cxx::Entity>> entities;
     std::unordered_map<std::shared_ptr<json::details::Node>, const Document*> documents;
-    std::unordered_map<std::shared_ptr<json::details::Node>, dom::Node*> domnodes;
+    std::unordered_map<std::shared_ptr<json::details::Node>, dex::DocumentNode*> domnodes;
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const Group>> groups;
   };
 
@@ -41,7 +41,7 @@ public:
     return forward.at(&doc);
   }
 
-  json::Json get(const dom::Node& n) const
+  json::Json get(const dex::DocumentNode& n) const
   {
     return forward.at(&n);
   }
@@ -63,7 +63,7 @@ public:
     forward[&doc] = o;
   }
 
-  void bind(dom::Node& n, const json::Json& o)
+  void bind(dex::DocumentNode& n, const json::Json& o)
   {
     backward_maps.domnodes[o.impl()] = &n;
     forward[&n] = o;
@@ -96,9 +96,9 @@ protected:
     return backward_maps.documents.at(obj.impl());
   }
 
-  std::shared_ptr<dom::Node> get_impl(const json::Json& obj, get_helper_t<dom::Node>) const
+  std::shared_ptr<dex::DocumentNode> get_impl(const json::Json& obj, get_helper_t<dex::DocumentNode>) const
   {
-    return backward_maps.domnodes.at(obj.impl())->shared_from_this();
+    return std::static_pointer_cast<dex::DocumentNode>(backward_maps.domnodes.at(obj.impl())->shared_from_this());
   }
 
   std::shared_ptr<const Group> get_impl(const json::Json& obj, get_helper_t<Group>) const

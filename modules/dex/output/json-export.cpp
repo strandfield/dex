@@ -94,7 +94,7 @@ static void write_location(json::Object& obj, const cxx::SourceLocation& loc)
   obj["loc"] = result;
 }
 
-static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
+static json::Json serialize_par_metadata(const dex::ParagraphMetaData& pmd)
 {
   json::Json result;
 
@@ -106,13 +106,13 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   {
     result["version"] = pmd.get<dex::Since>().version();
   }
-  else if (pmd.is<dom::TextStyle>())
+  else if (pmd.is<dex::TextStyle>())
   {
-    result["style"] = static_cast<const dom::TextStyle&>(pmd).style();
+    result["style"] = static_cast<const dex::TextStyle&>(pmd).style();
   }
-  else if (pmd.is<dom::Link>())
+  else if (pmd.is<dex::Link>())
   {
-    result["url"] = static_cast<const dom::Link&>(pmd).url();
+    result["url"] = static_cast<const dex::Link&>(pmd).url();
   }
   else if (pmd.is<dex::ParIndexEntry>())
   {
@@ -227,7 +227,7 @@ json::Object JsonDocumentSerializer::serialize(dex::Document& doc)
   return result;
 }
 
-json::Object JsonDocumentSerializer::serialize(dom::Node& n)
+json::Object JsonDocumentSerializer::serialize(dex::DocumentNode& n)
 {
   json::Object ret{};
   std::swap(this->result, ret);
@@ -237,7 +237,7 @@ json::Object JsonDocumentSerializer::serialize(dom::Node& n)
   return ret;
 }
 
-json::Array JsonDocumentSerializer::serializeArray(const dom::NodeList& nodes)
+json::Array JsonDocumentSerializer::serializeArray(const DomNodeList& nodes)
 {
   json::Array res;
 
@@ -248,7 +248,7 @@ json::Array JsonDocumentSerializer::serializeArray(const dom::NodeList& nodes)
 }
 
 
-void JsonDocumentSerializer::visitNode(dom::Node& n)
+void JsonDocumentSerializer::visitNode(dex::DocumentNode& n)
 {
   result["type"] = n.className();
   dispatch(n);
@@ -256,7 +256,7 @@ void JsonDocumentSerializer::visitNode(dom::Node& n)
 }
 
 
-void JsonDocumentSerializer::visit(dom::Image& img)
+void JsonDocumentSerializer::visit(dex::Image& img)
 {
   result["src"] = img.src;
 
@@ -264,7 +264,7 @@ void JsonDocumentSerializer::visit(dom::Image& img)
   write_if(result, "width", img.width, img.width != -1);
 }
 
-void JsonDocumentSerializer::visit(dom::List& l)
+void JsonDocumentSerializer::visit(dex::List& l)
 {
   write_if(result, "marker", l.marker, !l.marker.empty());
 
@@ -275,7 +275,7 @@ void JsonDocumentSerializer::visit(dom::List& l)
   result["items"] = serializeArray(l.childNodes());
 }
 
-void JsonDocumentSerializer::visit(dom::ListItem& li)
+void JsonDocumentSerializer::visit(dex::ListItem& li)
 {
   write_if(result, "marker", li.marker, !li.marker.empty());
   write_if(result, "value", li.value, li.value != -1);
@@ -283,7 +283,7 @@ void JsonDocumentSerializer::visit(dom::ListItem& li)
   result["content"] = serializeArray(li.childNodes());
 }
 
-void JsonDocumentSerializer::visit(dom::Paragraph& par)
+void JsonDocumentSerializer::visit(dex::Paragraph& par)
 {
   result["text"] = par.text();
 

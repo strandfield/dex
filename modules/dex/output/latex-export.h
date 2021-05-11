@@ -22,10 +22,10 @@ public:
   explicit LatexStringifier(LiquidExporter& exp);
 
 protected:
-  std::string stringify_list(const dom::List& list) const override;
-  std::string stringify_listitem(const dom::ListItem& li) const override;
-  std::string stringify_paragraph(const dom::Paragraph& par) const override;
-  std::string stringify_image(const dom::Image& img) const override;
+  std::string stringify_list(const dex::List& list) const override;
+  std::string stringify_listitem(const dex::ListItem& li) const override;
+  std::string stringify_paragraph(const dex::Paragraph& par) const override;
+  std::string stringify_image(const dex::Image& img) const override;
   std::string stringify_math(const dex::DisplayMath& math) const override;
   std::string stringify_beginsince(const dex::BeginSince& bsince) const override;
   std::string stringify_endsince(const dex::EndSince& esince) const override;

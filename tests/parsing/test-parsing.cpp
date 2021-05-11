@@ -47,6 +47,8 @@ void TestParsing::all()
     {
       ++num_failure;
 
+      std::cout << "FAIL!" << "\n";
+      std::cout << "File: " << entry.toStdString()  << "\n";
       std::cout << "Expected:" << "\n";
       std::cout << expected << std::endl;
       std::cout << "Got:" << "\n";

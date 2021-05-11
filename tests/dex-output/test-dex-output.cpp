@@ -30,9 +30,9 @@
 
 #include <iostream>
 
-static std::shared_ptr<dom::Paragraph> make_par(const std::string& str)
+static std::shared_ptr<dex::Paragraph> make_par(const std::string& str)
 {
-  return std::make_shared<dom::Paragraph>(str);
+  return std::make_shared<dex::Paragraph>(str);
 }
 
 class MarkdownExport : public dex::LiquidExporter

@@ -11,13 +11,15 @@
 
 #include "dex/input/dom-writer.h"
 
-#include <dom/paragraph.h>
+#include "dex/model/document.h"
 
 #include <optional>
 #include <variant>
 
 namespace dex
 {
+
+class DocumentNode;
 
 class BeginSince;
 
@@ -28,7 +30,7 @@ class ParagraphWriter;
 class DEX_INPUT_API DocumentWriter
 {
 public:
-  explicit DocumentWriter(std::shared_ptr<dom::Node> out = nullptr);
+  explicit DocumentWriter(std::shared_ptr<dex::DocumentNode> out = nullptr);
   DocumentWriter(DocumentWriter&&) = delete;
   ~DocumentWriter();
 
@@ -107,10 +109,10 @@ public:
 
   void finish();
 
-  void write(const std::shared_ptr<dom::Node>& node);
+  void write(const std::shared_ptr<dex::DocumentNode>& node);
 
-  const std::shared_ptr<dom::Node>& output();
-  void setOutput(std::shared_ptr<dom::Node> out);
+  const std::shared_ptr<dex::DocumentNode>& output();
+  void setOutput(std::shared_ptr<dex::DocumentNode> out);
 
 protected:
 
@@ -119,12 +121,12 @@ protected:
 
   MathWriter& currentMath();
 
-  dom::Node& currentNode();
-  std::shared_ptr<dom::Node> currentNodeShared();
+  dex::DocumentNode& currentNode();
+  std::shared_ptr<dex::DocumentNode> currentNodeShared();
 
   void adjustState();
 
-  void pushNode(std::shared_ptr<dom::Node> n);
+  void pushNode(std::shared_ptr<dex::DocumentNode> n);
   void popNode();
 
 private:
@@ -132,8 +134,8 @@ private:
   std::unique_ptr<ParagraphWriter> m_paragraph_writer;
   std::unique_ptr<MathWriter> m_math_writer;
   std::shared_ptr<BeginSince> m_since;
-  std::shared_ptr<dom::Node> m_result;
-  std::vector<std::shared_ptr<dom::Node>> m_nodes;
+  std::shared_ptr<dex::DocumentNode> m_result;
+  std::vector<std::shared_ptr<dex::DocumentNode>> m_nodes;
 };
 
 } // namespace dex
@@ -146,7 +148,7 @@ inline DocumentWriter::State DocumentWriter::state() const
   return m_state;
 }
 
-inline const std::shared_ptr<dom::Node>& DocumentWriter::output()
+inline const std::shared_ptr<dex::DocumentNode>& DocumentWriter::output()
 {
   return m_result;
 }

@@ -26,28 +26,28 @@ public:
 
   using ParagraphConverter::ParagraphConverter;
 
-  void process_bold(const dom::ParagraphIterator it) override
+  void process_bold(const dex::ParagraphIterator it) override
   {
     result += "\\textbf{";
     process(it);
     result += "}";
   }
 
-  void process_italic(const dom::ParagraphIterator it) override
+  void process_italic(const dex::ParagraphIterator it) override
   {
     result += "\\textit{";
     process(it);
     result += "}";
   }
 
-  void process_typewriter(const dom::ParagraphIterator it) override
+  void process_typewriter(const dex::ParagraphIterator it) override
   {
     result += "\\texttt{";
     process(it);
     result += "}";
   }
 
-  void process_link(const dom::ParagraphIterator it, const std::string& url) override
+  void process_link(const dex::ParagraphIterator it, const std::string& url) override
   {
     result += "\\href{";
     result += url;
@@ -56,7 +56,7 @@ public:
     result += "}";
   }
 
-  void process_index(const dom::ParagraphIterator it, const std::string& key) override
+  void process_index(const dex::ParagraphIterator it, const std::string& key) override
   {
     result += "\\index{";
     result += key;
@@ -70,13 +70,13 @@ LatexStringifier::LatexStringifier(LiquidExporter& exp)
 
 }
 
-std::string LatexStringifier::stringify_list(const dom::List& list) const
+std::string LatexStringifier::stringify_list(const dex::List& list) const
 {
   std::string result = "\\begin{itemize}\n";
 
   for (const auto& li : list.items)
   {
-    result += "  \\item " + stringify_listitem(static_cast<dom::ListItem&>(*li)) + "\n";
+    result += "  \\item " + stringify_listitem(static_cast<dex::ListItem&>(*li)) + "\n";
   }
 
   result += "\\end{itemize}";
@@ -84,19 +84,19 @@ std::string LatexStringifier::stringify_list(const dom::List& list) const
   return result;
 }
 
-std::string LatexStringifier::stringify_listitem(const dom::ListItem& li) const
+std::string LatexStringifier::stringify_listitem(const dex::ListItem& li) const
 {
   return stringify_domcontent(li.content);
 }
 
-std::string LatexStringifier::stringify_paragraph(const dom::Paragraph& par) const
+std::string LatexStringifier::stringify_paragraph(const dex::Paragraph& par) const
 {
   LatexParagraphConverter converter{ par };
   converter.process();
   return std::string(std::move(converter.result));
 }
 
-std::string LatexStringifier::stringify_image(const dom::Image& img) const
+std::string LatexStringifier::stringify_image(const dex::Image& img) const
 {
   return "\\includegraphics{" + img.src + "}";
 }

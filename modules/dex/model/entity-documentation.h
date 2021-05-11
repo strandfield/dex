@@ -24,7 +24,7 @@ private:
   std::optional<Since> m_since;
 
 public:
-  std::shared_ptr<dom::Document> description;
+  std::shared_ptr<dex::Document> description;
 
 public:
   EntityDocumentation() = default;

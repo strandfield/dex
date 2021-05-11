@@ -14,7 +14,7 @@
 namespace dex
 {
 
-ParagraphConverter::ParagraphConverter(const dom::Paragraph& par)
+ParagraphConverter::ParagraphConverter(const dex::Paragraph& par)
   : paragraph(par)
 {
 
@@ -25,7 +25,7 @@ void ParagraphConverter::process()
   process(paragraph.begin(), paragraph.end());
 }
 
-void ParagraphConverter::process(const dom::ParagraphIterator begin, const dom::ParagraphIterator end)
+void ParagraphConverter::process(const dex::ParagraphIterator begin, const dex::ParagraphIterator end)
 {
   for (auto it = begin; it != end; ++it)
   {
@@ -35,22 +35,22 @@ void ParagraphConverter::process(const dom::ParagraphIterator begin, const dom::
     }
     else
     {
-      if ((*it)->is<dom::TextStyle>())
+      if ((*it)->is<dex::TextStyle>())
       {
-        process_style(it, std::static_pointer_cast<dom::TextStyle>(*it)->style());
+        process_style(it, std::static_pointer_cast<dex::TextStyle>(*it)->style());
       }
-      else if ((*it)->is<dom::Link>())
+      else if ((*it)->is<dex::Link>())
       {
-        process_link(it, std::static_pointer_cast<dom::Link>(*it)->url());
+        process_link(it, std::static_pointer_cast<dex::Link>(*it)->url());
       }
-      else if((*it)->className() == dex::InlineMath::TypeId)
+      else if((*it)->is<dex::InlineMath>())
       {
         process_math(it);
       }
-      else if ((*it)->className() == dex::ParIndexEntry::TypeId)
+      else if ((*it)->is<dex::ParIndexEntry>())
       {
-        std::shared_ptr<dom::ParagraphMetaData> metad = *it;
-        process_index(it, static_cast<const dom::GenericParagraphMetaData<dex::ParIndexEntry>&>(*metad).value().key);
+        std::shared_ptr<dex::ParagraphMetaData> metad = *it;
+        process_index(it, static_cast<const dex::GenericParagraphMetaData<dex::ParIndexEntry>&>(*metad).value().key);
       }
       else
       {
@@ -60,7 +60,7 @@ void ParagraphConverter::process(const dom::ParagraphIterator begin, const dom::
   }
 }
 
-void ParagraphConverter::process_style(const dom::ParagraphIterator it, const std::string& style)
+void ParagraphConverter::process_style(const dex::ParagraphIterator it, const std::string& style)
 {
   if (style == "bold")
     process_bold(it);
@@ -72,37 +72,37 @@ void ParagraphConverter::process_style(const dom::ParagraphIterator it, const st
     process(it);
 }
 
-void ParagraphConverter::process_bold(const dom::ParagraphIterator it)
+void ParagraphConverter::process_bold(const dex::ParagraphIterator it)
 {
   process(it);
 }
 
-void ParagraphConverter::process_italic(const dom::ParagraphIterator it)
+void ParagraphConverter::process_italic(const dex::ParagraphIterator it)
 {
   process(it);
 }
 
-void ParagraphConverter::process_typewriter(const dom::ParagraphIterator it)
+void ParagraphConverter::process_typewriter(const dex::ParagraphIterator it)
 {
   process(it);
 }
 
-void ParagraphConverter::process_link(const dom::ParagraphIterator it, const std::string& /* url */)
+void ParagraphConverter::process_link(const dex::ParagraphIterator it, const std::string& /* url */)
 {
   process(it);
 }
 
-void ParagraphConverter::process_math(const dom::ParagraphIterator it)
+void ParagraphConverter::process_math(const dex::ParagraphIterator it)
 {
   process(it);
 }
 
-void ParagraphConverter::process_index(const dom::ParagraphIterator it, const std::string& /* key */)
+void ParagraphConverter::process_index(const dex::ParagraphIterator it, const std::string& /* key */)
 {
   process(it);
 }
 
-void ParagraphConverter::process(const dom::ParagraphIterator it)
+void ParagraphConverter::process(const dex::ParagraphIterator it)
 {
   if (it.hasChild())
   {

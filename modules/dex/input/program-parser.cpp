@@ -76,7 +76,7 @@ ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
   auto entdoc = std::static_pointer_cast<EntityDocumentation>(cxxent->documentation);
 
   if (!entdoc->description)
-    entdoc->description = std::make_shared<dom::Document>();
+    entdoc->description = std::make_shared<dex::Document>();
 
   writer = std::make_shared<DocumentWriter>(entdoc->description);
 }

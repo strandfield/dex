@@ -75,15 +75,18 @@ public:
   void visitDocument(const dex::Document& doc);
 
 protected:
-  virtual void visitNode(dom::Node& n);
+  virtual void visitNode(dex::DocumentNode& n);
 
-  void dispatch(dom::Node& n);
+  void dispatch(dex::DocumentNode& n);
 
 protected:
-  virtual void visit(dom::Image& img);
-  virtual void visit(dom::List& l);
-  virtual void visit(dom::ListItem& li);
-  virtual void visit(dom::Paragraph& par);
+  void visitAll(const DomNodeList& nodes);
+
+protected:
+  virtual void visit(dex::Image& img);
+  virtual void visit(dex::List& l);
+  virtual void visit(dex::ListItem& li);
+  virtual void visit(dex::Paragraph& par);
   virtual void visit(dex::BeginSince& bsince);
   virtual void visit(dex::EndSince& esince);
   virtual void visit(dex::DisplayMath& math);

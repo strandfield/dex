@@ -38,7 +38,7 @@ std::string LiquidStringifier::stringify(const json::Json& val) const
 
   json::Object obj = val.toObject();
 
-  auto dom_node = renderer.modelMapping().get<dom::Node>(val);
+  auto dom_node = renderer.modelMapping().get<dex::DocumentNode>(val);
 
   if (dom_node)
     return stringify_domnode(*dom_node);
@@ -47,16 +47,16 @@ std::string LiquidStringifier::stringify(const json::Json& val) const
   return {};
 }
 
-std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
+std::string LiquidStringifier::stringify_domnode(const dex::DocumentNode& node) const
 {
-  if (node.is<dom::Paragraph>())
-    return stringify_paragraph(static_cast<const dom::Paragraph&>(node));
-  else if (node.is<dom::List>())
-    return stringify_list(static_cast<const dom::List&>(node));
-  else if (node.is<dom::ListItem>())
-    return stringify_listitem(static_cast<const dom::ListItem&>(node));
-  else if (node.is<dom::Image>())
-    return stringify_image(static_cast<const dom::Image&>(node));
+  if (node.is<dex::Paragraph>())
+    return stringify_paragraph(static_cast<const dex::Paragraph&>(node));
+  else if (node.is<dex::List>())
+    return stringify_list(static_cast<const dex::List&>(node));
+  else if (node.is<dex::ListItem>())
+    return stringify_listitem(static_cast<const dex::ListItem&>(node));
+  else if (node.is<dex::Image>())
+    return stringify_image(static_cast<const dex::Image&>(node));
   else if (node.is<dex::BeginSince>())
     return stringify_beginsince(static_cast<const dex::BeginSince&>(node));
   else if (node.is<dex::EndSince>())
@@ -84,7 +84,7 @@ std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
   return {};
 }
 
-std::string LiquidStringifier::stringify_domcontent(const dom::NodeList& content) const
+std::string LiquidStringifier::stringify_domcontent(const dex::DomNodeList& content) const
 {
   std::string result;
 

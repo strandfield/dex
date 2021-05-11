@@ -7,21 +7,17 @@
 
 #include "dex/dex-output.h"
 
-#include <dom/node.h>
+#include "dex/model/document.h"
 
 #include <json-toolkit/json.h>
-
-namespace dom
-{
-class Image;
-class List;
-class ListItem;
-class Paragraph;
-} // namespace dom
 
 namespace dex
 {
 
+class Image;
+class List;
+class ListItem;
+class Paragraph;
 class BackMatter;
 class BeginSince;
 class CodeBlock;
@@ -48,16 +44,16 @@ public:
   std::string stringify(const json::Json& val) const;
 
 protected:
-  virtual std::string stringify_domnode(const dom::Node& node) const;
-  virtual std::string stringify_domcontent(const dom::NodeList& content) const;
+  virtual std::string stringify_domnode(const dex::DocumentNode& node) const;
+  virtual std::string stringify_domcontent(const dex::DomNodeList& content) const;
 
   virtual std::string stringify_array(const json::Array& list) const;
-  virtual std::string stringify_list(const dom::List& list) const = 0;
-  virtual std::string stringify_listitem(const dom::ListItem& li) const = 0;
-  virtual std::string stringify_paragraph(const dom::Paragraph& par) const = 0;
+  virtual std::string stringify_list(const dex::List& list) const = 0;
+  virtual std::string stringify_listitem(const dex::ListItem& li) const = 0;
+  virtual std::string stringify_paragraph(const dex::Paragraph& par) const = 0;
   virtual std::string stringify_beginsince(const dex::BeginSince& bsince) const = 0;
   virtual std::string stringify_endsince(const dex::EndSince& esince) const = 0;
-  virtual std::string stringify_image(const dom::Image& img) const = 0;
+  virtual std::string stringify_image(const dex::Image& img) const = 0;
   virtual std::string stringify_math(const dex::DisplayMath& math) const = 0;
   virtual std::string stringify_grouptable(const dex::GroupTable& table) const = 0;
   virtual std::string stringify_codeblock(const dex::CodeBlock& codeblock) const = 0;

@@ -30,28 +30,28 @@ public:
 
   using ParagraphConverter::ParagraphConverter;
 
-  void process_bold(const dom::ParagraphIterator it) override
+  void process_bold(const dex::ParagraphIterator it) override
   {
     result += "**";
     process(it);
     result += "**";
   }
 
-  void process_italic(const dom::ParagraphIterator it) override
+  void process_italic(const dex::ParagraphIterator it) override
   {
     result += "*";
     process(it);
     result += "*";
   }
 
-  void process_typewriter(const dom::ParagraphIterator it) override
+  void process_typewriter(const dex::ParagraphIterator it) override
   {
     result += "`";
     process(it);
     result += "`";
   }
 
-  void process_link(const dom::ParagraphIterator it, const std::string& url) override
+  void process_link(const dex::ParagraphIterator it, const std::string& url) override
   {
     result += "[";
     process(it);
@@ -60,7 +60,7 @@ public:
     result += ")";
   }
 
-  void process_math(const dom::ParagraphIterator it) override
+  void process_math(const dex::ParagraphIterator it) override
   {
     result += "`";
     auto text_begin = it.paragraph().text().begin();
@@ -75,7 +75,7 @@ MarkdownStringifier::MarkdownStringifier(LiquidExporter& exp)
 
 }
 
-std::string MarkdownStringifier::stringify_list(const dom::List& list) const
+std::string MarkdownStringifier::stringify_list(const dex::List& list) const
 {
   // @TODO: handle nested list
 
@@ -83,25 +83,25 @@ std::string MarkdownStringifier::stringify_list(const dom::List& list) const
 
   for (const auto& li : list.items)
   {
-    result += "- " + stringify_listitem(static_cast<dom::ListItem&>(*li)) + "\n";
+    result += "- " + stringify_listitem(static_cast<dex::ListItem&>(*li)) + "\n";
   }
 
   return result;
 }
 
-std::string MarkdownStringifier::stringify_listitem(const dom::ListItem& li) const
+std::string MarkdownStringifier::stringify_listitem(const dex::ListItem& li) const
 {
   return stringify_domcontent(li.content);
 }
 
-std::string MarkdownStringifier::stringify_paragraph(const dom::Paragraph& par) const
+std::string MarkdownStringifier::stringify_paragraph(const dex::Paragraph& par) const
 {
   MarkdownParagraphConverter converter{ par };
   converter.process();
   return std::string(std::move(converter.result));
 }
 
-std::string MarkdownStringifier::stringify_image(const dom::Image& img) const
+std::string MarkdownStringifier::stringify_image(const dex::Image& img) const
 {
   return "![image](" + img.src + ")";
 }

@@ -23,7 +23,7 @@ namespace dex
 
 ParagraphWriter::ParagraphWriter()
 {
-  m_output = std::make_shared<dom::Paragraph>();
+  m_output = std::make_shared<dex::Paragraph>();
 }
 
 ParagraphWriter::~ParagraphWriter()
@@ -64,28 +64,28 @@ void ParagraphWriter::mathshift()
 
     auto data = m_pending_metadata.back();
 
-    if (data->className() != dex::InlineMath::TypeId)
+    if (!data->is<dex::InlineMath>())
       throw std::runtime_error{ "ParagraphWriter::mathshift() mismatch" };
 
     m_pending_metadata.pop_back();
 
-    dom::Paragraph& par = *output();
+    dex::Paragraph& par = *output();
     par.addChar('$');
     DisplayMath::normalize(par.text(), data->range().begin());
     size_t end = par.length();
-    data->range() = dom::ParagraphRange(par, data->range().begin(), end);
+    data->range() = dex::ParagraphRange(par, data->range().begin(), end);
 
-    static_cast<dom::GenericParagraphMetaData<dex::InlineMath>*>(data.get())->value().mlist = mlist;
+    static_cast<dex::GenericParagraphMetaData<dex::InlineMath>*>(data.get())->value().mlist = mlist;
 
     par.addMetaData(data);
   }
   else
   {
-    dom::Paragraph& par = *output();
+    dex::Paragraph& par = *output();
     size_t start = par.length();
-    dom::ParagraphRange range{ par, start, par.length() };
+    dex::ParagraphRange range{ par, start, par.length() };
 
-    auto data = std::make_shared<dom::GenericParagraphMetaData<dex::InlineMath>>(range, dex::InlineMath());
+    auto data = std::make_shared<dex::GenericParagraphMetaData<dex::InlineMath>>(range, dex::InlineMath());
     m_pending_metadata.push_back(data);
 
     par.addChar('$');
@@ -144,42 +144,42 @@ void ParagraphWriter::endtexttt()
 
 void ParagraphWriter::writeLink(std::string url, const std::string& text)
 {
-  dom::Paragraph& par = *output();
+  dex::Paragraph& par = *output();
   size_t start = par.length();
   par.addText(text);
 
-  auto link = std::make_shared<dom::Link>(dom::ParagraphRange(par, start, par.length()), std::move(url));
+  auto link = std::make_shared<dex::Link>(dex::ParagraphRange(par, start, par.length()), std::move(url));
   par.addMetaData(link);
 }
 
 void ParagraphWriter::writeStyledText(std::string style_name, const std::string& text)
 {
-  dom::Paragraph& par = *output();
+  dex::Paragraph& par = *output();
   size_t start = par.length();
   par.addText(text);
 
-  auto style = std::make_shared<dom::TextStyle>(dom::ParagraphRange(par, start, par.length()), std::move(style_name));
+  auto style = std::make_shared<dex::TextStyle>(dex::ParagraphRange(par, start, par.length()), std::move(style_name));
   par.addMetaData(style);
 }
 
 void ParagraphWriter::writeSince(const std::string& version, const std::string& text)
 {
-  dom::Paragraph& par = *output();
+  dex::Paragraph& par = *output();
   size_t start = par.length();
   par.addText(text);
 
-  par.add<dex::Since>(dom::ParagraphRange(par, start, par.length()), version);
+  par.add<dex::Since>(dex::ParagraphRange(par, start, par.length()), version);
 }
 
 void ParagraphWriter::index(std::string key)
 {
-  dom::Paragraph& par = out();
-  par.add<dex::ParIndexEntry>(dom::ParagraphRange(par, par.length(), par.length()), std::move(key));
+  dex::Paragraph& par = out();
+  par.add<dex::ParIndexEntry>(dex::ParagraphRange(par, par.length(), par.length()), std::move(key));
 }
 
 void ParagraphWriter::finish()
 {
-  dom::Paragraph& par = *output();
+  dex::Paragraph& par = *output();
   
   // Removing trailing space, if any
   if (par.length() > 0 && par.text().back() == ' ')
@@ -190,19 +190,19 @@ void ParagraphWriter::finish()
     {
       if (data->range().end() > par.length())
       {
-        const dom::ParagraphRange parrange = data->range();
-        data->range() = dom::ParagraphRange(parrange.paragraph(), parrange.begin(), par.length());
+        const dex::ParagraphRange parrange = data->range();
+        data->range() = dex::ParagraphRange(parrange.paragraph(), parrange.begin(), par.length());
       }
     }
   }
 }
 
-std::shared_ptr<dom::Paragraph> ParagraphWriter::output() const
+std::shared_ptr<dex::Paragraph> ParagraphWriter::output() const
 {
   return m_output;
 }
 
-dom::Paragraph& ParagraphWriter::out()
+dex::Paragraph& ParagraphWriter::out()
 {
   return *m_output;
 }
@@ -210,10 +210,10 @@ dom::Paragraph& ParagraphWriter::out()
 
 void ParagraphWriter::beginStyledText(std::string style)
 {
-  dom::Paragraph& par = *output();
+  dex::Paragraph& par = *output();
   size_t start = par.length();
 
-  auto data = std::make_shared<dom::TextStyle>(dom::ParagraphRange(par, start, par.length()), std::move(style));
+  auto data = std::make_shared<dex::TextStyle>(dex::ParagraphRange(par, start, par.length()), std::move(style));
   m_pending_metadata.push_back(data);
 }
 
@@ -221,14 +221,14 @@ void ParagraphWriter::endStyledText(const char* style)
 {
   auto data = m_pending_metadata.back();
 
-  if (!data->is<dom::TextStyle>() || static_cast<dom::TextStyle*>(data.get())->style() != style)
+  if (!data->is<dex::TextStyle>() || static_cast<dex::TextStyle*>(data.get())->style() != style)
     throw std::runtime_error{ "ParagraphWriter::endStyledText() mismatch" };
 
   m_pending_metadata.pop_back();
 
-  dom::Paragraph& par = *output();
+  dex::Paragraph& par = *output();
   size_t end = par.length();
-  data->range() = dom::ParagraphRange(par, data->range().begin(), end);
+  data->range() = dex::ParagraphRange(par, data->range().begin(), end);
 
   par.addMetaData(data);
 }

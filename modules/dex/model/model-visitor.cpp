@@ -137,28 +137,27 @@ void ProgramVisitor::visit(cxx::Macro& m)
 
 void DocumentVisitor::visitDocument(const dex::Document& doc)
 {
-  for (auto n : doc.childNodes())
+  for (auto n : doc.nodes)
     visitNode(*n);
 }
 
-void DocumentVisitor::visitNode(dom::Node& n)
+void DocumentVisitor::visitNode(dex::DocumentNode& n)
 {
   dispatch(n);
 
-  for (auto child : n.childNodes())
-    visitNode(*child);
+  visitAll(n.childNodes());
 }
 
-void DocumentVisitor::dispatch(dom::Node& n)
+void DocumentVisitor::dispatch(dex::DocumentNode& n)
 {
-  if (n.is<dom::Image>())
-    visit(static_cast<dom::Image&>(n));
-  else if (n.is<dom::List>())
-    visit(static_cast<dom::List&>(n));
-  else if (n.is<dom::ListItem>())
-    visit(static_cast<dom::ListItem&>(n));
-  else if (n.is<dom::Paragraph>())
-    visit(static_cast<dom::Paragraph&>(n));
+  if (n.is<dex::Image>())
+    visit(static_cast<dex::Image&>(n));
+  else if (n.is<dex::List>())
+    visit(static_cast<dex::List&>(n));
+  else if (n.is<dex::ListItem>())
+    visit(static_cast<dex::ListItem&>(n));
+  else if (n.is<dex::Paragraph>())
+    visit(static_cast<dex::Paragraph&>(n));
   else if (n.is<dex::BeginSince>())
     visit(static_cast<dex::BeginSince&>(n));
   else if (n.is<dex::EndSince>())
@@ -183,22 +182,28 @@ void DocumentVisitor::dispatch(dom::Node& n)
     visit(static_cast<dex::Index&>(n));
 }
 
-void DocumentVisitor::visit(dom::Image& img)
+void DocumentVisitor::visitAll(const DomNodeList& nodes)
+{
+  for (auto child : nodes)
+    visitNode(*child);
+}
+
+void DocumentVisitor::visit(dex::Image& img)
 {
 
 }
 
-void DocumentVisitor::visit(dom::List& l)
+void DocumentVisitor::visit(dex::List& l)
 {
 
 }
 
-void DocumentVisitor::visit(dom::ListItem& li)
+void DocumentVisitor::visit(dex::ListItem& li)
 {
 
 }
 
-void DocumentVisitor::visit(dom::Paragraph& par)
+void DocumentVisitor::visit(dex::Paragraph& par)
 {
 
 }

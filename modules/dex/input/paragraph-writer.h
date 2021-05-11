@@ -7,7 +7,7 @@
 
 #include "dex/dex-input.h"
 
-#include <dom/paragraph.h>
+#include "dex/model/document.h"
 
 namespace tex
 {
@@ -54,18 +54,18 @@ public:
 
   void finish();
 
-  std::shared_ptr<dom::Paragraph> output() const;
+  std::shared_ptr<dex::Paragraph> output() const;
 
 protected:
 
-  dom::Paragraph& out();
+  dex::Paragraph& out();
 
   void beginStyledText(std::string style);
   void endStyledText(const char* style);
 
 private:
-  std::shared_ptr<dom::Paragraph> m_output;
-  std::vector<std::shared_ptr<dom::ParagraphMetaData>> m_pending_metadata;
+  std::shared_ptr<dex::Paragraph> m_output;
+  std::vector<std::shared_ptr<dex::ParagraphMetaData>> m_pending_metadata;
   std::unique_ptr<tex::parsing::MathParserFrontend> m_math_parser;
 };
 

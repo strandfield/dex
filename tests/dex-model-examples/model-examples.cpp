@@ -25,9 +25,9 @@
 
 #include <iostream>
 
-static std::shared_ptr<dom::Paragraph> make_par(const std::string& str)
+static std::shared_ptr<dex::Paragraph> make_par(const std::string& str)
 {
-  return std::make_shared<dom::Paragraph>(str);
+  return std::make_shared<dex::Paragraph>(str);
 }
 
 template<typename T, typename...Args>
@@ -51,7 +51,7 @@ std::shared_ptr<dex::Program> prog_with_class()
   auto vector = std::make_shared<cxx::Class>("vector", global);
   auto doc = std::make_shared<dex::ClassDocumentation>();
   doc->brief() = "sequence container that encapsulates dynamic size arrays"; 
-  doc->description = std::make_shared<dom::Document>();
+  doc->description = std::make_shared<dex::Document>();
   doc->description->appendChild(make_par("The elements are stored contiguously, ..."));
   doc->description->appendChild(make_par("The storage of the vector is handled automatically, ..."));
   vector->documentation = doc;
@@ -70,8 +70,8 @@ std::shared_ptr<dex::Model> prog_with_class_image_description()
 
   auto vector = std::make_shared<cxx::Class>("vector", global);
   auto doc = std::make_shared<dex::ClassDocumentation>();
-  auto img = make<dom::Image>("test.jpg");
-  doc->description = std::make_shared<dom::Document>();
+  auto img = make<dex::Image>("test.jpg");
+  doc->description = std::make_shared<dex::Document>();
   doc->description->appendChild(img);
   vector->documentation = doc;
 
@@ -91,14 +91,14 @@ std::shared_ptr<dex::Model> prog_with_class_list_description()
 
   auto vector = std::make_shared<cxx::Class>("vector", global);
   auto doc = std::make_shared<dex::ClassDocumentation>();
-  auto list = make<dom::List>();
-  auto listitem = make<dom::ListItem>();
-  listitem->content.push_back(make<dom::Paragraph>("first item"));
+  auto list = make<dex::List>();
+  auto listitem = make<dex::ListItem>();
+  listitem->content.push_back(make<dex::Paragraph>("first item"));
   list->items.push_back(listitem);
-  listitem = make<dom::ListItem>();
-  listitem->content.push_back(make<dom::Paragraph>("second item"));
+  listitem = make<dex::ListItem>();
+  listitem->content.push_back(make<dex::Paragraph>("second item"));
   list->items.push_back(listitem);
-  doc->description = std::make_shared<dom::Document>();
+  doc->description = std::make_shared<dex::Document>();
   doc->description->appendChild(list);
   vector->documentation = doc;
 
@@ -119,7 +119,7 @@ std::shared_ptr<dex::Program> prog_with_fun()
   doc->brief() = "get value from environment variables";
   doc->returnValue() = "value of environment variable";
   doc->since() = dex::Since{ "C++98" };
-  doc->description = std::make_shared<dom::Document>();
+  doc->description = std::make_shared<dex::Document>();
   doc->description->appendChild(make_par("Searches the environment list provided by the host environment..."));
   doc->description->appendChild(make_par("Modifying the string returned by getenv invokes undefined behavior."));
   getenv->documentation = doc;
@@ -140,7 +140,7 @@ std::shared_ptr<dex::Program> prog_with_var()
   auto variable = std::make_shared<cxx::Variable>(cxx::Type("double"), "pi", global);
   auto doc = std::make_shared<dex::VariableDocumentation>();
   doc->brief() = "the math constant pi";
-  doc->description = std::make_shared<dom::Document>();
+  doc->description = std::make_shared<dex::Document>();
   doc->description->appendChild(make_par("This mathematical constant is roughly equal to 3."));
   variable->documentation = doc;
 
@@ -198,7 +198,7 @@ std::shared_ptr<dex::Model> manual()
       auto chap = make<dex::Sectioning>(dex::Sectioning::Chapter, "Chapter 3");
       part->content.push_back(chap);
 
-      chap->content.push_back(make<dom::Image>("img.jpg"));
+      chap->content.push_back(make<dex::Image>("img.jpg"));
     }
   }
 

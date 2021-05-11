@@ -7,18 +7,24 @@
 namespace dex
 {
 
-const std::string GroupTable::TypeId = "grouptable";
-
-const std::string& GroupTable::className() const
+model::Kind GroupTable::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
-const std::string Sectioning::TypeId = "sectioning";
-
-const std::string& Sectioning::className() const
+model::Kind Sectioning::kind() const
 {
-  return TypeId;
+  return ClassKind;
+}
+
+const DomNodeList& Sectioning::childNodes() const
+{
+  return content;
+}
+
+void Sectioning::appendChild(const DocumentNodePtr& node)
+{
+  content.push_back(node);
 }
 
 GroupTable::GroupTable(std::string gname)
@@ -32,11 +38,9 @@ FrontMatter::FrontMatter()
 
 }
 
-const std::string FrontMatter::TypeId = "FrontMatter";
-
-const std::string& FrontMatter::className() const
+model::Kind FrontMatter::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 MainMatter::MainMatter()
@@ -44,11 +48,9 @@ MainMatter::MainMatter()
 
 }
 
-const std::string MainMatter::TypeId = "MainMatter";
-
-const std::string& MainMatter::className() const
+model::Kind MainMatter::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 BackMatter::BackMatter()
@@ -56,11 +58,9 @@ BackMatter::BackMatter()
 
 }
 
-const std::string BackMatter::TypeId = "BackMatter";
-
-const std::string& BackMatter::className() const
+model::Kind BackMatter::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 Sectioning::Sectioning(Depth d, std::string n)
@@ -68,23 +68,6 @@ Sectioning::Sectioning(Depth d, std::string n)
     name(std::move(n))
 {
 
-}
-
-const dom::NodeList& Sectioning::childNodes() const
-{
-  return content;
-}
-
-void Sectioning::appendChild(std::shared_ptr<Node> n)
-{
-  removeFromParent(n);
-  append(content, n);
-  registerChild(n);
-}
-
-void Sectioning::removeChild(std::shared_ptr<Node> n)
-{
-  remove(content, n);
 }
 
 std::string Sectioning::depth2str(Depth d)
@@ -116,11 +99,9 @@ TableOfContents::TableOfContents()
 
 }
 
-const std::string TableOfContents::TypeId = "TableOfContents";
-
-const std::string& TableOfContents::className() const
+model::Kind TableOfContents::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 Index::Index()
@@ -128,11 +109,9 @@ Index::Index()
 
 }
 
-const std::string Index::TypeId = "Index";
-
-const std::string& Index::className() const
+model::Kind Index::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 Manual::Manual(std::string t)

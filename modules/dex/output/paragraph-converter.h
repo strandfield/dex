@@ -5,7 +5,7 @@
 #ifndef DEX_OUTPUT_PARAGRAPH_EXPORT_H
 #define DEX_OUTPUT_PARAGRAPH_EXPORT_H
 
-#include <dom/paragraph.h>
+#include "dex/model/document.h"
 
 namespace dex
 {
@@ -13,24 +13,24 @@ namespace dex
 class ParagraphConverter
 {
 public:
-  const dom::Paragraph& paragraph;
+  const dex::Paragraph& paragraph;
   std::string result;
 
 public:
-  explicit ParagraphConverter(const dom::Paragraph& par);
+  explicit ParagraphConverter(const dex::Paragraph& par);
 
   void process();
 
 protected:
-  void process(const dom::ParagraphIterator begin, const dom::ParagraphIterator end);
-  void process_style(const dom::ParagraphIterator it, const std::string& style);
-  virtual void process_bold(const dom::ParagraphIterator it);
-  virtual void process_italic(const dom::ParagraphIterator it);
-  virtual void process_typewriter(const dom::ParagraphIterator it);
-  virtual void process_link(const dom::ParagraphIterator it, const std::string& url);
-  virtual void process_math(const dom::ParagraphIterator it);
-  virtual void process_index(const dom::ParagraphIterator it, const std::string& key);
-  void process(const dom::ParagraphIterator it);
+  void process(const dex::ParagraphIterator begin, const dex::ParagraphIterator end);
+  void process_style(const dex::ParagraphIterator it, const std::string& style);
+  virtual void process_bold(const dex::ParagraphIterator it);
+  virtual void process_italic(const dex::ParagraphIterator it);
+  virtual void process_typewriter(const dex::ParagraphIterator it);
+  virtual void process_link(const dex::ParagraphIterator it, const std::string& url);
+  virtual void process_math(const dex::ParagraphIterator it);
+  virtual void process_index(const dex::ParagraphIterator it, const std::string& key);
+  void process(const dex::ParagraphIterator it);
 };
 
 } // namespace dex

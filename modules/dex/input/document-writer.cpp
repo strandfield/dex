@@ -21,12 +21,12 @@
 namespace dex
 {
 
-DocumentWriter::DocumentWriter(std::shared_ptr<dom::Node> out)
+DocumentWriter::DocumentWriter(std::shared_ptr<dex::DocumentNode> out)
   : m_state(State::Idle),
     m_result(out)
 {
   if (!m_result)
-    m_result = std::make_shared<dom::Document>();
+    m_result = std::make_shared<dex::Document>();
 
   pushNode(m_result);
 }
@@ -235,7 +235,7 @@ void DocumentWriter::image(std::string src, std::optional<int> width, std::optio
   if (isWritingParagraph())
     finish();
 
-  auto img = std::make_shared<dom::Image>(std::move(src));
+  auto img = std::make_shared<dex::Image>(std::move(src));
   img->height = height.value_or(img->height);
   img->width = width.value_or(img->width);
   currentNode().appendChild(img);
@@ -256,7 +256,7 @@ void DocumentWriter::list(const std::optional<std::string>& marker, std::optiona
 
   m_state = State::WritingList;
 
-  auto list = std::make_shared<dom::List>();
+  auto list = std::make_shared<dex::List>();
 
   list->marker = marker.value_or("");
   list->ordered = ordered.value_or(false);
@@ -277,12 +277,12 @@ void DocumentWriter::li(std::optional<std::string> marker, std::optional<int> va
     m_state = State::WritingList;
   }
 
-  auto item = std::make_shared<dom::ListItem>();
+  auto item = std::make_shared<dex::ListItem>();
 
   item->marker = marker.value_or("");
   item->value = value.value_or(item->value);
 
-  assert(currentNode().is<dom::List>());
+  assert(currentNode().is<dex::List>());
   currentNode().appendChild(item);
 
   pushNode(item);
@@ -399,7 +399,7 @@ void DocumentWriter::endSinceBlock()
   m_since.reset();
 }
 
-void DocumentWriter::write(const std::shared_ptr<dom::Node>& node)
+void DocumentWriter::write(const std::shared_ptr<dex::DocumentNode>& node)
 {
   if (isWritingParagraph())
     endParagraph();
@@ -407,7 +407,7 @@ void DocumentWriter::write(const std::shared_ptr<dom::Node>& node)
   currentNode().appendChild(node);
 }
 
-void DocumentWriter::setOutput(std::shared_ptr<dom::Node> out)
+void DocumentWriter::setOutput(std::shared_ptr<dex::DocumentNode> out)
 {
   assert(m_nodes.size() == 1);
   m_nodes.clear();
@@ -500,7 +500,7 @@ MathWriter& DocumentWriter::currentMath()
   return *m_math_writer;
 }
 
-void DocumentWriter::pushNode(std::shared_ptr<dom::Node> n)
+void DocumentWriter::pushNode(std::shared_ptr<dex::DocumentNode> n)
 {
   m_nodes.push_back(n);
 }
@@ -510,12 +510,12 @@ void DocumentWriter::popNode()
   m_nodes.pop_back();
 }
 
-dom::Node& DocumentWriter::currentNode()
+dex::DocumentNode& DocumentWriter::currentNode()
 {
   return *m_nodes.back();
 }
 
-std::shared_ptr<dom::Node> DocumentWriter::currentNodeShared()
+std::shared_ptr<dex::DocumentNode> DocumentWriter::currentNodeShared()
 {
   return m_nodes.back();
 }
@@ -528,7 +528,7 @@ void DocumentWriter::adjustState()
   }
   else
   {
-    if(currentNode().is<dom::List>())
+    if(currentNode().is<dex::List>())
       m_state = State::WritingList;
     else
       m_state = State::WritingListItem;

@@ -5,6 +5,8 @@
 #ifndef DEX_MODEL_MODEL_H
 #define DEX_MODEL_MODEL_H
 
+#include "dex/model/model-base.h"
+
 #include "dex/model/class-documentation.h"
 #include "dex/model/enum-documentation.h"
 #include "dex/model/function-documentation.h"
@@ -18,7 +20,7 @@
 namespace dex
 {
 
-class DEX_MODEL_API Model
+class DEX_MODEL_API Model : public model::Object
 {
 public:
   std::vector<std::shared_ptr<dex::Document>> documents;
@@ -27,6 +29,9 @@ public:
 
 public:
   Model() = default;
+
+  static constexpr model::Kind ClassKind = model::Kind::Model;
+  model::Kind kind() const override;
 
   bool empty() const;
 

@@ -7,6 +7,8 @@
 
 #include "dex/dex-model.h"
 
+#include "dex/model/model-base.h"
+
 #include <tex/math/mathlist.h>
 
 #include <string>
@@ -22,7 +24,7 @@ public:
 public:
   InlineMath();
 
-  static const std::string TypeId;
+  static constexpr model::Kind ClassKind = model::Kind::InlineMath;
 };
 
 } // namespace dex

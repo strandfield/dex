@@ -49,18 +49,18 @@ public:
   }
 
   json::Object serialize(dex::Document& doc);
-  json::Object serialize(dom::Node& n);
+  json::Object serialize(dex::DocumentNode& n);
 
-  json::Array serializeArray(const dom::NodeList& nodes);
+  json::Array serializeArray(const DomNodeList& nodes);
 
 private:
 
-  void visitNode(dom::Node& n) override;
+  void visitNode(dex::DocumentNode& n) override;
 
-  void visit(dom::Image& img) override;
-  void visit(dom::List& l) override;
-  void visit(dom::ListItem& li) override;
-  void visit(dom::Paragraph& par) override;
+  void visit(dex::Image& img) override;
+  void visit(dex::List& l) override;
+  void visit(dex::ListItem& li) override;
+  void visit(dex::Paragraph& par) override;
   void visit(dex::BeginSince& bsince) override;
   void visit(dex::EndSince& esince) override;
   void visit(dex::DisplayMath& math) override;
