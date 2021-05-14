@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -19,11 +19,6 @@
 #include <map>
 #include <variant>
 #include <vector>
-
-namespace cxx
-{
-class Class;
-} // namespace cxx
 
 namespace dex
 {
@@ -81,8 +76,8 @@ protected:
 
   void dump(const json::Object& obj, const char* obj_field_name, const Profile::Template& tmplt);
 
-  void dump(const cxx::Class& cla, const json::Object& obj);
-  void dump(const cxx::Namespace& ns, const json::Object& obj);
+  void dump(const dex::Class& cla, const json::Object& obj);
+  void dump(const dex::Namespace& ns, const json::Object& obj);
   void dump(const dex::Document& doc, const json::Object& obj);
 
 protected:

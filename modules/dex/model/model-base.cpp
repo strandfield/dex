@@ -32,6 +32,11 @@ bool Object::isDocumentElement() const
   return false;
 }
 
+bool Object::isProgramEntity() const
+{
+  return false;
+}
+
 std::string Object::className() const
 {
   return model::to_string(kind());
@@ -66,12 +71,17 @@ std::string to_string(Kind k)
   case Kind::CodeBlock: return "CodeBlock";
   case Kind::InlineMath: return "inline-math";
   case Kind::IndexEntry: return "ParIndexEntry";
-  case Kind::Program: return "Program";
-  case Kind::Namespace: return "Namespace";
-  case Kind::Enum: return "Enum";
-  case Kind::Class: return "Class";
-  case Kind::Function: return "Function";
-  case Kind::Variable: return "Variable";
+  case Kind::Program: return "program";
+  case Kind::Namespace: return "namespace";
+  case Kind::Enum: return "enum";
+  case Kind::EnumValue: return "enum-value";
+  case Kind::Class: return "class";
+  case Kind::Function: return "function";
+  case Kind::FunctionParameter: return "function-parameter";
+  case Kind::TemplateParameter: return "template-parameter";
+  case Kind::Variable: return "variable";
+  case Kind::Typedef: return "typedef";
+  case Kind::Macro: return "macro";
   default: return "undefined";
   }
 }

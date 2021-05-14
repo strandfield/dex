@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -93,14 +93,14 @@ json::Array LiquidFilters::filter_by_accessibility(const json::Array& list, cons
 
 std::string LiquidFilters::funsig(const json::Object& json_fun) const
 {
-  auto fun_entity = renderer.modelMapping().get<cxx::Entity>(json_fun);
-  auto fun = std::static_pointer_cast<const cxx::Function>(fun_entity);
+  auto fun_entity = renderer.modelMapping().get<dex::Entity>(json_fun);
+  auto fun = std::static_pointer_cast<const dex::Function>(fun_entity);
   return fun->signature();
 }
 
 json::Array LiquidFilters::related_non_members(const json::Object& json_class) const
 {
-  auto the_class = std::dynamic_pointer_cast<cxx::Class>(renderer.modelMapping().get<cxx::Entity>(json_class));
+  auto the_class = std::dynamic_pointer_cast<dex::Class>(renderer.modelMapping().get<dex::Entity>(json_class));
 
   if (the_class == nullptr)
     return {};

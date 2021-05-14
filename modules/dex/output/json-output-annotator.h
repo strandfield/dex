@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -25,7 +25,7 @@ public:
 
   void annotate(const Model& model);
 
-  virtual std::string get_url(const cxx::Entity& e) const = 0;
+  virtual std::string get_url(const dex::Entity& e) const = 0;
   virtual std::string get_url(const dex::Document& doc) const = 0;
 
 protected:

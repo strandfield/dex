@@ -1,6 +1,7 @@
 {
   "program": {
     "global_namespace": {
+      "documentation": {},
       "entities": [{
           "documentation": {
             "brief": "a 2D point with integer precision"
@@ -30,9 +31,11 @@
           },
           "name": "operator==",
           "parameters": [{
+              "documentation": {},
               "name": "lhs",
               "type": "const Point&"
             }, {
+              "documentation": {},
               "name": "rhs",
               "type": "const Point&"
             }],

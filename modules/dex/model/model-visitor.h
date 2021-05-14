@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -6,29 +6,6 @@
 #define DEX_MODEL_MODELVISITOR_H
 
 #include "dex/model/model.h"
-
-namespace dom
-{
-class Image;
-class List;
-class ListItem;
-class Paragraph;
-} // namespace dom
-
-namespace cxx
-{
-class Entity;
-class Class;
-class Documentation;
-class Enum;
-class EnumValue;
-class Function;
-class FunctionParameter;
-class Macro;
-class Namespace;
-class Typedef;
-class Variable;
-} // namespace cxx
 
 namespace dex
 {
@@ -43,29 +20,41 @@ class Index;
 class MainMatter;
 class TableOfContents;
 
+class Entity;
+class Class;
+class Documentation;
+class Enum;
+class EnumValue;
+class Function;
+class FunctionParameter;
+class Macro;
+class Namespace;
+class Typedef;
+class Variable;
+
 class Program;
 
 class DEX_MODEL_API ProgramVisitor
 {
 public:
 
-  void visit(cxx::Program& prog);
+  void visit(dex::Program& prog);
 
 protected:
-  virtual void visit(cxx::Entity& e);
+  virtual void visit(dex::Entity& e);
 
-  void dispatch(cxx::Entity& e);
+  void dispatch(dex::Entity& e);
 
 protected:
-  virtual void visit(cxx::Namespace& ns);
-  virtual void visit(cxx::Class& cla);
-  virtual void visit(cxx::Enum& en);
-  virtual void visit(cxx::EnumValue& ev);
-  virtual void visit(cxx::Function& f);
-  virtual void visit(cxx::FunctionParameter& fp);
-  virtual void visit(cxx::Variable& v);
-  virtual void visit(cxx::Typedef& t);
-  virtual void visit(cxx::Macro& m);
+  virtual void visit(dex::Namespace& ns);
+  virtual void visit(dex::Class& cla);
+  virtual void visit(dex::Enum& en);
+  virtual void visit(dex::EnumValue& ev);
+  virtual void visit(dex::Function& f);
+  virtual void visit(dex::FunctionParameter& fp);
+  virtual void visit(dex::Variable& v);
+  virtual void visit(dex::Typedef& t);
+  virtual void visit(dex::Macro& m);
 };
 
 class DEX_MODEL_API DocumentVisitor

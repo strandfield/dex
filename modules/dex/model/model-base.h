@@ -48,9 +48,14 @@ enum class Kind
   Program,
   Namespace,
   Enum,
+  EnumValue,
   Class,
   Function,
+  FunctionParameter,
+  TemplateParameter,
   Variable,
+  Typedef,
+  Macro,
 };
 
 class DEX_MODEL_API Object : public std::enable_shared_from_this<Object>
@@ -69,6 +74,8 @@ public:
   virtual bool isDocument() const;
   virtual bool isDocumentNode() const;
   virtual bool isDocumentElement() const;
+
+  virtual bool isProgramEntity() const;
 
   virtual std::string className() const;
 };

@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -16,10 +16,6 @@
 #include "dex/common/settings.h"
 
 #include "dex/model/model.h"
-
-#include <cxx/class.h>
-#include <cxx/namespace.h>
-#include <cxx/program.h>
 
 namespace dex
 {
@@ -49,7 +45,7 @@ public:
     }
   }
 
-  void visit(cxx::Class& cla) override
+  void visit(dex::Class& cla) override
   {
     if (!exporter.profile().class_template.model.nodes().empty())
     {
@@ -61,7 +57,7 @@ public:
     ProgramVisitor::visit(cla);
   }
 
-  void visit(cxx::Namespace& ns) override
+  void visit(dex::Namespace& ns) override
   {
     if (!exporter.profile().namespace_template.model.nodes().empty())
     {
@@ -73,7 +69,7 @@ public:
     ProgramVisitor::visit(ns);
   }
 
-  void visit(cxx::Enum& /* enm */) override
+  void visit(dex::Enum& /* enm */) override
   {
     // @TODO: one page per enum ?
 
@@ -81,7 +77,7 @@ public:
     // ProgramVisitor::visit(enm);
   }
 
-  void visit(cxx::Function& /* fn */) override
+  void visit(dex::Function& /* fn */) override
   {
     // @TODO: one page per function ?
 
@@ -194,12 +190,12 @@ void LiquidExporter::dump(const json::Object& obj, const char* obj_field_name, c
   write(output, (m_output_dir.absolutePath() + "/" + QString::fromStdString(url)).toStdString());
 }
 
-void LiquidExporter::dump(const cxx::Class& /* cla */, const json::Object& obj)
+void LiquidExporter::dump(const dex::Class& /* cla */, const json::Object& obj)
 {
   dump(obj, "class", m_profile.class_template);
 }
 
-void LiquidExporter::dump(const cxx::Namespace& /* ns */, const json::Object& obj)
+void LiquidExporter::dump(const dex::Namespace& /* ns */, const json::Object& obj)
 {
   dump(obj, "namespace", m_profile.namespace_template);
 }

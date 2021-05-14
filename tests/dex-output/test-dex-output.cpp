@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -13,18 +13,6 @@
 
 #include "dex/output/json-export.h"
 #include "dex/output/liquid-exporter.h"
-
-#include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/function.h>
-#include <cxx/namespace.h>
-#include <cxx/program.h>
-#include <cxx/variable.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
 
 #include <json-toolkit/stringify.h>
 
@@ -62,7 +50,7 @@ void TestDexOutput::jsonExport()
 
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 3);
+    QVERIFY(jexport.data().size() == 4);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
     QVERIFY(jexport.data().at("entities").at(0)["name"] == "vector");
@@ -75,7 +63,7 @@ void TestDexOutput::jsonExport()
     json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 3);
+    QVERIFY(jexport.data().size() == 4);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
     QVERIFY(jexport.data().at("entities").at(0)["name"] == "getenv");
@@ -95,7 +83,7 @@ void TestDexOutput::jsonExport()
     json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 3);
+    QVERIFY(jexport.data().size() == 4);
     QVERIFY(jexport.data().at("entities").length() == 1);
     QVERIFY(jexport.data().at("entities").toArray().length() == 1);
     QVERIFY(jexport.data().at("entities").at(0)["name"] == "pi");

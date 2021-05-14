@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -120,10 +120,10 @@ std::string LatexStringifier::stringify_endsince(const dex::EndSince& esince) co
 }
 
 
-std::string LatexStringifier::format_group_item(const std::shared_ptr<cxx::Entity>& e) const
+std::string LatexStringifier::format_group_item(const std::shared_ptr<dex::Entity>& e) const
 {
   std::string result = [&]() -> std::string {
-    if (e->is<cxx::Function>())
+    if (e->is<dex::Function>())
       return e->name + "()";
     else
       return e->name;

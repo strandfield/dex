@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -13,13 +13,6 @@
 #include "dex/model/since.h"
 
 #include "dex/common/logging.h"
-
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph.h>
-#include <dom/paragraph/iterator.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
 
 namespace dex
 {
@@ -124,7 +117,7 @@ std::string MarkdownStringifier::stringify_math(const dex::DisplayMath& math) co
   return result;
 }
 
-std::string MarkdownStringifier::format_group_item(const std::shared_ptr<cxx::Entity>& e) const
+std::string MarkdownStringifier::format_group_item(const std::shared_ptr<dex::Entity>& e) const
 {
   const std::string url = [&]() -> std::string {
     json::Object json_obj = renderer.modelMapping().get(*e).toObject();
@@ -137,7 +130,7 @@ std::string MarkdownStringifier::format_group_item(const std::shared_ptr<cxx::En
   }();
 
   std::string result = [&]() -> std::string {
-    if (e->is<cxx::Function>())
+    if (e->is<dex::Function>())
       return e->name + "()";
     else
       return e->name;

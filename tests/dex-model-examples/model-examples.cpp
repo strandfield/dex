@@ -1,25 +1,11 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
 #include "model-examples.h"
 
+#include "dex/model/program.h"
 #include "dex/model/since.h"
-#include "dex/model/class-documentation.h"
-#include "dex/model/function-documentation.h"
-
-#include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/function.h>
-#include <cxx/namespace.h>
-#include <cxx/program.h>
-#include <cxx/variable.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
 
 #include <json-toolkit/stringify.h>
 
@@ -48,13 +34,11 @@ std::shared_ptr<dex::Program> prog_with_class()
   auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
-  auto vector = std::make_shared<cxx::Class>("vector", global);
-  auto doc = std::make_shared<dex::ClassDocumentation>();
-  doc->brief() = "sequence container that encapsulates dynamic size arrays"; 
-  doc->description = std::make_shared<dex::Document>();
-  doc->description->appendChild(make_par("The elements are stored contiguously, ..."));
-  doc->description->appendChild(make_par("The storage of the vector is handled automatically, ..."));
-  vector->documentation = doc;
+  auto vector = std::make_shared<dex::Class>("vector", global);
+  vector->brief = "sequence container that encapsulates dynamic size arrays";
+  vector->description = std::make_shared<dex::Document>();
+  vector->description->appendChild(make_par("The elements are stored contiguously, ..."));
+  vector->description->appendChild(make_par("The storage of the vector is handled automatically, ..."));
 
   global->entities.push_back(vector);
 
@@ -68,12 +52,10 @@ std::shared_ptr<dex::Model> prog_with_class_image_description()
   auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
-  auto vector = std::make_shared<cxx::Class>("vector", global);
-  auto doc = std::make_shared<dex::ClassDocumentation>();
+  auto vector = std::make_shared<dex::Class>("vector", global);
   auto img = make<dex::Image>("test.jpg");
-  doc->description = std::make_shared<dex::Document>();
-  doc->description->appendChild(img);
-  vector->documentation = doc;
+  vector->description = std::make_shared<dex::Document>();
+  vector->description->appendChild(img);
 
   global->entities.push_back(vector);
 
@@ -89,8 +71,7 @@ std::shared_ptr<dex::Model> prog_with_class_list_description()
   auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
-  auto vector = std::make_shared<cxx::Class>("vector", global);
-  auto doc = std::make_shared<dex::ClassDocumentation>();
+  auto vector = std::make_shared<dex::Class>("vector", global);
   auto list = make<dex::List>();
   auto listitem = make<dex::ListItem>();
   listitem->content.push_back(make<dex::Paragraph>("first item"));
@@ -98,9 +79,8 @@ std::shared_ptr<dex::Model> prog_with_class_list_description()
   listitem = make<dex::ListItem>();
   listitem->content.push_back(make<dex::Paragraph>("second item"));
   list->items.push_back(listitem);
-  doc->description = std::make_shared<dex::Document>();
-  doc->description->appendChild(list);
-  vector->documentation = doc;
+  vector->description = std::make_shared<dex::Document>();
+  vector->description->appendChild(list);
 
   global->entities.push_back(vector);
 
@@ -114,18 +94,16 @@ std::shared_ptr<dex::Program> prog_with_fun()
   auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
-  auto getenv = std::make_shared<cxx::Function>("getenv", global);
-  auto doc = std::make_shared<dex::FunctionDocumentation>();
-  doc->brief() = "get value from environment variables";
-  doc->returnValue() = "value of environment variable";
-  doc->since() = dex::Since{ "C++98" };
-  doc->description = std::make_shared<dex::Document>();
-  doc->description->appendChild(make_par("Searches the environment list provided by the host environment..."));
-  doc->description->appendChild(make_par("Modifying the string returned by getenv invokes undefined behavior."));
-  getenv->documentation = doc;
+  auto getenv = std::make_shared<dex::Function>("getenv", global);
+  getenv->brief = "get value from environment variables";
+  getenv->return_type.brief = "value of environment variable";
+  getenv->since = dex::Since{ "C++98" };
+  getenv->description = std::make_shared<dex::Document>();
+  getenv->description->appendChild(make_par("Searches the environment list provided by the host environment..."));
+  getenv->description->appendChild(make_par("Modifying the string returned by getenv invokes undefined behavior."));
 
-  getenv->parameters.push_back(make<cxx::FunctionParameter>(cxx::Type("std::string"), "str"));
-  getenv->parameters.front()->documentation = make<dex::FunctionParameterDocumentation>("name of the environment variable");
+  getenv->parameters.push_back(make<dex::FunctionParameter>(dex::Type("std::string"), "str"));
+  getenv->parameters.front()->brief = "name of the environment variable";
 
   global->entities.push_back(getenv);
 
@@ -137,12 +115,10 @@ std::shared_ptr<dex::Program> prog_with_var()
   auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
-  auto variable = std::make_shared<cxx::Variable>(cxx::Type("double"), "pi", global);
-  auto doc = std::make_shared<dex::VariableDocumentation>();
-  doc->brief() = "the math constant pi";
-  doc->description = std::make_shared<dex::Document>();
-  doc->description->appendChild(make_par("This mathematical constant is roughly equal to 3."));
-  variable->documentation = doc;
+  auto variable = std::make_shared<dex::Variable>(dex::Type("double"), "pi", global);
+  variable->brief = "the math constant pi";
+  variable->description = std::make_shared<dex::Document>();
+  variable->description->appendChild(make_par("This mathematical constant is roughly equal to 3."));
 
   global->entities.push_back(variable);
 
@@ -154,10 +130,10 @@ std::shared_ptr<dex::Program> prog_with_class_and_fun()
   auto prog = std::make_shared<dex::Program>();
   auto global = prog->globalNamespace();
 
-  auto complex = std::make_shared<cxx::Class>("complex", global);
+  auto complex = std::make_shared<dex::Class>("complex", global);
   global->entities.push_back(complex);
 
-  auto real = std::make_shared<cxx::Function>("real", complex);
+  auto real = std::make_shared<dex::Function>("real", complex);
   complex->members.emplace_back(real);
 
   return prog;

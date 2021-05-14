@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -22,7 +22,7 @@ public:
 
   struct BackwardMaps
   {
-    std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<cxx::Entity>> entities;
+    std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<dex::Entity>> entities;
     std::unordered_map<std::shared_ptr<json::details::Node>, const Document*> documents;
     std::unordered_map<std::shared_ptr<json::details::Node>, dex::DocumentNode*> domnodes;
     std::unordered_map<std::shared_ptr<json::details::Node>, std::shared_ptr<const Group>> groups;
@@ -31,7 +31,7 @@ public:
   BackwardMaps backward_maps;
   std::unordered_map<const void*, json::Json> forward;
 
-  json::Json get(const cxx::Entity& n) const
+  json::Json get(const dex::Entity& n) const
   {
     return forward.at(&n);
   }
@@ -51,7 +51,7 @@ public:
     return forward.at(&g);
   }
 
-  void bind(cxx::Entity& e, const json::Json& o)
+  void bind(dex::Entity& e, const json::Json& o)
   {
     backward_maps.entities[o.impl()] = e.shared_from_this();
     forward[&e] = o;
@@ -86,7 +86,7 @@ public:
 
 protected:
 
-  std::shared_ptr<cxx::Entity> get_impl(const json::Json& obj, get_helper_t<cxx::Entity>) const
+  std::shared_ptr<dex::Entity> get_impl(const json::Json& obj, get_helper_t<dex::Entity>) const
   {
     return backward_maps.entities.at(obj.impl());
   }

@@ -10,11 +10,6 @@
 #include "dex/model/display-math.h"
 #include "dex/model/model.h"
 
-#include <cxx/entity.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
-
 namespace dex
 {
 

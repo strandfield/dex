@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -89,12 +89,12 @@ public:
   }
 
   json::Object serialize(dex::Program& prog);
-  json::Object serialize(cxx::Entity& e);
+  json::Object serialize(dex::Entity& e);
 
-  static std::string path(cxx::Entity& e, dex::Program& prog);
+  static std::string path(dex::Entity& e, dex::Program& prog);
 
 private:
-  json::Array serializeArray(const std::vector<std::shared_ptr<cxx::Entity>>& nodes);
+  json::Array serializeArray(const std::vector<std::shared_ptr<dex::Entity>>& nodes);
 
   template<typename T>
   json::Array serializeArray(const std::vector<std::shared_ptr<T>>& nodes)
@@ -102,26 +102,26 @@ private:
     json::Array res;
 
     for (auto n : nodes)
-      res.push(serialize(static_cast<cxx::Entity&>(*n)));
+      res.push(serialize(static_cast<dex::Entity&>(*n)));
 
     return res;
   }
 
   json::Array serializeRelatedMembers(dex::RelatedNonMembers& rnm, dex::Program& prog);
 
-  void write_documentation(cxx::Entity& e);
+  void write_documentation(dex::Entity& e);
 
-  void visit(cxx::Entity& e) override;
+  void visit(dex::Entity& e) override;
 
-  void visit(cxx::Namespace& ns) override;
-  void visit(cxx::Class& cla) override;
-  void visit(cxx::Enum& en) override;
-  void visit(cxx::EnumValue& ev) override;
-  void visit(cxx::Function& f) override;
-  void visit(cxx::FunctionParameter& fp) override;
-  void visit(cxx::Variable& v) override;
-  void visit(cxx::Typedef& t) override;
-  void visit(cxx::Macro& m) override;
+  void visit(dex::Namespace& ns) override;
+  void visit(dex::Class& cla) override;
+  void visit(dex::Enum& en) override;
+  void visit(dex::EnumValue& ev) override;
+  void visit(dex::Function& f) override;
+  void visit(dex::FunctionParameter& fp) override;
+  void visit(dex::Variable& v) override;
+  void visit(dex::Typedef& t) override;
+  void visit(dex::Macro& m) override;
 };
 
 } // namespace dex

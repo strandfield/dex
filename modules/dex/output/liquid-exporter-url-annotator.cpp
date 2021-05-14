@@ -1,13 +1,10 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
 #include "dex/output/liquid-exporter-url-annotator.h"
 
 #include <dex/model/manual.h>
-
-#include <cxx/class.h>
-#include <cxx/namespace.h>
 
 namespace dex
 {
@@ -19,13 +16,13 @@ LiquidExporterUrlAnnotator::LiquidExporterUrlAnnotator(json::Object& js_object, 
 
 }
 
-std::string LiquidExporterUrlAnnotator::get_url(const cxx::Entity& e) const
+std::string LiquidExporterUrlAnnotator::get_url(const dex::Entity& e) const
 {
-  if (e.is<cxx::Class>())
+  if (e.is<dex::Class>())
   {
     return profile.class_template.outdir + "/" + e.name + "." + profile.class_template.filesuffix;
   }
-  else if (e.is<cxx::Namespace>())
+  else if (e.is<dex::Namespace>())
   {
     if(e.name.empty())
       return profile.namespace_template.outdir + "/global." + profile.namespace_template.filesuffix;

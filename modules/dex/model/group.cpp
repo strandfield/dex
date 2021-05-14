@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -32,7 +32,7 @@ Group::Group(size_t i, std::string n)
 
 }
 
-void Group::insert(std::shared_ptr<cxx::Entity> e)
+void Group::insert(std::shared_ptr<dex::Entity> e)
 {
   content.entities.push_back(e);
 }

@@ -17,7 +17,7 @@ target_include_directories(dex-model PUBLIC "${DOM_PROJECT_DIR}/include")
 target_include_directories(dex-model PUBLIC "${LIBSCRIPT_PROJECT_DIR}/include")
 target_include_directories(dex-model PUBLIC "${LIQUID_PROJECT_DIR}/include")
 target_include_directories(dex-model PUBLIC "${LIQUID_PROJECT_DIR}/json-toolkit/include")
-target_link_libraries(dex-model dom cxxast typeset)
+target_link_libraries(dex-model typeset)
 
 set_target_properties(dex-model PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 set_target_properties(dex-model PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
