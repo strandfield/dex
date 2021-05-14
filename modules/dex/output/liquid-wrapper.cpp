@@ -56,7 +56,7 @@ public:
     else if (propertyName == "since")
       return setval(to_liquid(e.since));
     else if (propertyName == "description")
-      return setval(to_liquid(e.description->nodes));
+      return setval(e.description ? to_liquid(e.description->nodes) : liquid::Value());
     else
       return dispatch(e);
   }
@@ -255,6 +255,11 @@ void* LiquidModel::data()
   return reinterpret_cast<void*>(&model);
 }
 
+bool LiquidModel::is_map() const
+{
+  return true;
+}
+
 std::set<std::string> LiquidModel::propertyNames() const
 {
   return { "program", "documents" };
@@ -289,12 +294,17 @@ LiquidModelObject::LiquidModelObject(std::shared_ptr<model::Object> obj)
 
 std::type_index LiquidModelObject::type_index() const
 {
-  return std::type_index(typeid(std::shared_ptr<model::Object>()));
+  return std::type_index(typeid(std::shared_ptr<model::Object>));
 }
 
 void* LiquidModelObject::data()
 {
   return &object;
+}
+
+bool LiquidModelObject::is_map() const
+{
+  return true;
 }
 
 std::set<std::string> LiquidModelObject::propertyNames() const
@@ -305,7 +315,11 @@ std::set<std::string> LiquidModelObject::propertyNames() const
 
 liquid::Value LiquidModelObject::property(const std::string& name) const
 {
-  if (object->isProgramEntity())
+  if (!object)
+  {
+    return {};
+  }
+  else if (object->isProgramEntity())
   {
     LiquidPropertyVisitorEntity visitor{ name };
     visitor.visit(static_cast<dex::Entity&>(*object));
@@ -313,9 +327,25 @@ liquid::Value LiquidModelObject::property(const std::string& name) const
   }
   else if (object->isDocumentNode())
   {
-    LiquidPropertyVisitorDom visitor{ name };
-    visitor.visitNode(static_cast<dex::DocumentNode&>(*object));
-    return visitor.result;
+    if (object->is<dex::Document>())
+    {
+      dex::Document& doc = static_cast<dex::Document&>(*object);
+
+      if (name == "doctype")
+        return doc.doctype;
+      else if (name == "type")
+        return doc.className();
+      else if (name == "title")
+        return doc.title;
+      else if (name == "content")
+        return to_liquid(doc.nodes);
+    }
+    else
+    {
+      LiquidPropertyVisitorDom visitor{ name };
+      visitor.visitNode(static_cast<dex::DocumentNode&>(*object));
+      return visitor.result;
+    }
   }
   else if (object->is<dex::Program>())
   {
@@ -325,19 +355,6 @@ liquid::Value LiquidModelObject::property(const std::string& name) const
       return to_liquid(prog.global_namespace);
     else if (name == "macros")
       return to_liquid(prog.macros);
-  }
-  else if (object->is<dex::Document>())
-  {
-    dex::Document& doc = static_cast<dex::Document&>(*object);
-
-    if (name == "doctype")
-      return doc.doctype;
-    else if (name == "type")
-      return doc.className();
-    else if (name == "title")
-      return doc.title;
-    else if (name == "content")
-      return to_liquid(doc.nodes);
   }
 
   return {};

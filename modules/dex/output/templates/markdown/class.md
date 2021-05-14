@@ -1,13 +1,13 @@
 
 # {{ class.name }} Class
 
-{% if class.documentation.brief %}
-**Brief:** {{ class.documentation.brief }}
+{% if class.brief %}
+**Brief:** {{ class.brief }}
 {% endif %}
 
 ## Detailed description
 
-{{ class.documentation.description }}
+{{ class.description }}
 
 ## Members documentation
 
@@ -15,22 +15,22 @@
 
 ### {{ f | funsig }}
 
-{% if f.documentation.brief %}
-**Brief:** {{ f.documentation.brief }}
+{% if f.brief %}
+**Brief:** {{ f.brief }}
 {% endif %}
 
 {% if f.parameters and f.parameters.size > 0 %}
 Parameters:
 {% for p in f.parameters %}
-- {{ p.documentation }}
+- {{ p.brief }}
 {% endfor %}
 {% endif %}
 
-{% if f.documentation.returns %}
-**Returns:** {{ f.documentation.returns }}
+{% if f.returns %}
+**Returns:** {{ f.returns }}
 {% endif %}
 
-{{ f.documentation.description }}
+{{ f.description }}
 
 {% endfor %}
 
@@ -42,22 +42,22 @@ Parameters:
 
 ### {{ f | funsig }}
 
-{% if f.documentation.brief %}
-**Brief:** {{ f.documentation.brief }}
+{% if f.brief %}
+**Brief:** {{ f.brief }}
 {% endif %}
 
 {% if f.parameters and f.parameters.size > 0 %}
 Parameters:
 {% for p in f.parameters %}
-- {{ p.documentation }}{% newline %}
+- {{ p.brief }}{% newline %}
 {% endfor %}
 {% endif %}
 
-{% if f.documentation.returns %}
-**Returns:** {{ f.documentation.returns }}
+{% if f.returns %}
+**Returns:** {{ f.returns }}
 {% endif %}
 
-{{ f.documentation.description }}
+{{ f.description }}
 
 {% endfor %}
 

@@ -25,6 +25,7 @@ public:
   std::type_index type_index() const override;
   void* data() override;
 
+  bool is_map() const override;
   std::set<std::string> propertyNames() const override;
   liquid::Value property(const std::string& name) const override;
 };
@@ -40,6 +41,7 @@ public:
   std::type_index type_index() const override;
   void* data() override;
 
+  bool is_map() const override;
   std::set<std::string> propertyNames() const override;
   liquid::Value property(const std::string& name) const override;
 };
@@ -51,7 +53,7 @@ inline liquid::Value to_liquid(std::shared_ptr<Model> m)
 
 inline liquid::Value to_liquid(std::shared_ptr<model::Object> obj)
 {
-  return liquid::Value(std::make_shared<LiquidModelObject>(obj));
+  return obj ? liquid::Value(std::make_shared<LiquidModelObject>(obj)) : liquid::Value();
 }
 
 template<typename T>

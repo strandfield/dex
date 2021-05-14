@@ -5,15 +5,15 @@
 # {{ namespace.name }} namespace
 {% endif %}
 
-{% if namespace.documentation %}
+{% if namespace.brief or namespace.description %}
 
-{% if namespace.documentation.brief %}
-**Brief:** {{ namespace.documentation.brief }}
+{% if namespace.brief %}
+**Brief:** {{ namespace.brief }}
 {% endif %}
 
 ## Detailed description
 
-{{ namespace.documentation.description }}
+{{ namespace.description }}
 
 {% endif %}
 
@@ -23,22 +23,22 @@
 
 ### {{ f | funsig }}
 
-{% if f.documentation.brief %}
-**Brief:** {{ f.documentation.brief }}
+{% if f.brief %}
+**Brief:** {{ f.brief }}
 {% endif %}
 
 {% if f.parameters and f.parameters.size > 0 %}
 Parameters:
 {% for p in f.parameters %}
-- {{ p.documentation }}
+- {{ p.brief }}
 {% endfor %}
 {% endif %}
 
-{% if f.documentation.returns %}
-**Returns:** {{ f.documentation.returns }}
+{% if f.returns %}
+**Returns:** {{ f.returns }}
 {% endif %}
 
-{{ f.documentation.description }}
+{{ f.description }}
 
 {% endfor %}
 

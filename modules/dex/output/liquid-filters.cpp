@@ -63,6 +63,10 @@ liquid::Value LiquidFilters::apply(const std::string& name, const liquid::Value&
   {
     return group_get_manuals(object.toMap());
   }
+  else if (name == "get_url")
+  {
+    return get_url(object);
+  }
 
   return liquid::BuiltinFilters::apply(name, object, args);
 }
@@ -161,6 +165,11 @@ liquid::Array LiquidFilters::group_get_manuals(const liquid::Map& liqgroup) cons
   }
 
   return result;
+}
+
+liquid::Value LiquidFilters::get_url(const liquid::Value& object) const
+{
+  return renderer.get_url(from_liquid(object));
 }
 
 } // namespace dex

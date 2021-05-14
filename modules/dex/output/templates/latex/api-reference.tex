@@ -23,32 +23,32 @@
   
 \chapter{{'{'}}{{ class.name }}{{'}'}}
   
-{% if class.documentation.brief %}
-\textbf{Brief:} {{ class.documentation.brief }}
+{% if class.brief %}
+\textbf{Brief:} {{ class.brief }}
 {% endif %}
 
-{{ class.documentation.description }}
+{{ class.description }}
 
 {% for f in class.members | filter_by_type: 'function' %}
 
 \section{{'{'}}{{ f.name }}{{'}'}}
 
-{% if f.documentation.brief %}
-\textbf{Brief:} {{ f.documentation.brief }}
+{% if f.brief %}
+\textbf{Brief:} {{ f.brief }}
 {% endif %}
 
 {% if f.parameters and f.parameters.size > 0 %}
 Parameters:
 {% for p in f.parameters %}
-- {{ p.documentation }}
+- {{ p.brief }}
 {% endfor %}
 {% endif %}
 
-{% if f.documentation.returns %}
-\textbf{Returns:}  {{ f.documentation.returns }}
+{% if f.returns %}
+\textbf{Returns:}  {{ f.returns }}
 {% endif %}
 
-{{ f.documentation.description }}
+{{ f.description }}
 
 {% endfor %}
   

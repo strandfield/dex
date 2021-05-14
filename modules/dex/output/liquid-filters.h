@@ -37,6 +37,7 @@ protected:
   liquid::Array related_non_members(const liquid::Map& liqclass) const;
   liquid::Array group_get_entities(const liquid::Map& liqgroup) const;
   liquid::Array group_get_manuals(const liquid::Map& liqgroup) const;
+  liquid::Value get_url(const liquid::Value& object) const;
 };
 
 } // namespace dex
