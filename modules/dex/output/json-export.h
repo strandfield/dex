@@ -7,8 +7,6 @@
 
 #include "dex/dex-output.h"
 
-#include "dex/output/json-mapping.h"
-
 #include "dex/model/model-visitor.h"
 
 #include <dom/paragraph.h>
@@ -24,8 +22,6 @@ public:
 public:
   explicit JsonExporter(const Model& m);
 
-  JsonExportMapping mapping;
-
   static json::Object serialize(const Model& model);
   json::Object serialize();
 
@@ -39,11 +35,9 @@ class JsonDocumentSerializer : public DocumentVisitor
 {
 public:
   json::Object result;
-  JsonExportMapping& mapping;
 
 public:
-  JsonDocumentSerializer(JsonExportMapping& map)
-    : mapping(map)
+  JsonDocumentSerializer()
   {
 
   }
@@ -79,11 +73,9 @@ class JsonProgramSerializer : public ProgramVisitor
 {
 public:
   json::Object result;
-  JsonExportMapping& mapping;
 
 public:
-  JsonProgramSerializer(JsonExportMapping& map)
-    : mapping(map)
+  JsonProgramSerializer()
   {
 
   }

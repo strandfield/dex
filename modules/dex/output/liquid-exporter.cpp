@@ -4,8 +4,6 @@
 
 #include "dex/output/liquid-exporter.h"
 
-#include "dex/output/liquid-exporter-url-annotator.h"
-
 #include "dex/output/liquid-filters.h"
 #include "dex/output/liquid-wrapper.h"
 
@@ -25,13 +23,9 @@ class LiquidExporterModelVisitor : public ProgramVisitor
 {
 public:
   LiquidExporter& exporter;
-  json::Object& serializedModel;
-  JsonExportMapping& json_mapping;
 
-  LiquidExporterModelVisitor(LiquidExporter& e, json::Object& m, JsonExportMapping& mapping)
-    : exporter{ e },
-    serializedModel{ m },
-    json_mapping(mapping)
+  LiquidExporterModelVisitor(LiquidExporter& e)
+    : exporter{ e }
   {
   }
 
@@ -142,9 +136,7 @@ void LiquidExporter::render()
   if (model()->empty())
     return;
 
-  annotateModel();
-
-  LiquidExporterModelVisitor visitor{ *this, m_serialized_model, m_model_mapping };
+  LiquidExporterModelVisitor visitor{ *this, };
   visitor.visitModel(*model());
 
   for (const std::pair<std::string, liquid::Template>& file : profile().files)
@@ -160,12 +152,6 @@ void LiquidExporter::render()
 
     write(output, (outputDir().absolutePath() + "/" + QString::fromStdString(file.first)).toStdString());
   }
-}
-
-void LiquidExporter::annotateModel()
-{
-  LiquidExporterUrlAnnotator url_annotator{ m_serialized_model, m_model_mapping, profile() };
-  url_annotator.annotate(*m_model);
 }
 
 std::string LiquidExporter::get_url(const dex::Entity& e) const
@@ -238,11 +224,6 @@ void LiquidExporter::dump(dex::Document& doc)
 void LiquidExporter::setModel(std::shared_ptr<Model> model)
 {
   m_model = model;
-  
-  JsonExporter json_export{ *m_model };
-
-  m_serialized_model = json_export.serialize();
-  m_model_mapping = std::move(json_export.mapping);
 }
 
 std::string LiquidExporter::stringify(const liquid::Value& val)

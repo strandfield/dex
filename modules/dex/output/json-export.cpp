@@ -82,7 +82,7 @@ json::Object JsonExporter::serialize()
 
   if (model.program())
   {
-    JsonProgramSerializer progserializer{ mapping };
+    JsonProgramSerializer progserializer{ };
     result["program"] = progserializer.serialize(*model.program());
   }
 
@@ -92,7 +92,7 @@ json::Object JsonExporter::serialize()
 
     for (size_t i(0); i < model.documents.size(); ++i)
     {
-      JsonDocumentSerializer docserializer{ mapping };
+      JsonDocumentSerializer docserializer{ };
       docs.push(docserializer.serialize(*model.documents.at(i)));
     }
 
@@ -123,7 +123,7 @@ json::Object JsonExporter::serializeGroup(const Group& group)
   {
     json::Array ets;
 
-    JsonProgramSerializer progser{ mapping };
+    JsonProgramSerializer progser{ };
 
     for (auto e : group.content.entities)
     {
@@ -148,8 +148,6 @@ json::Object JsonExporter::serializeGroup(const Group& group)
     res["documents"] = docs;
   }
 
-  mapping.bind(group, res);
-
   return res;
 }
 
@@ -159,8 +157,6 @@ json::Object JsonDocumentSerializer::serialize(dex::Document& doc)
   result["title"] = doc.title;
   result["doctype"] = doc.doctype;
   result["content"] = serializeArray(doc.childNodes());
-
-  mapping.bind(doc, result);
 
   return result;
 }
@@ -190,7 +186,6 @@ void JsonDocumentSerializer::visitNode(dex::DocumentNode& n)
 {
   result["type"] = n.className();
   dispatch(n);
-  mapping.bind(n, result);
 }
 
 
@@ -432,7 +427,7 @@ void JsonProgramSerializer::write_documentation(dex::Entity& e)
 
   if (e.description && !e.description->childNodes().empty())
   {
-    JsonDocumentSerializer jsonserializer{ mapping };
+    JsonDocumentSerializer jsonserializer{ };
     jsondoc["description"] = jsonserializer.serializeArray(e.description->childNodes());
   }
 
@@ -448,8 +443,6 @@ void JsonProgramSerializer::visit(dex::Entity& e)
   write_documentation(e);
 
   dispatch(e);
-
-  mapping.bind(e, result);
 }
 
 void JsonProgramSerializer::visit(dex::Namespace& ns)

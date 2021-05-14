@@ -119,15 +119,7 @@ std::string MarkdownStringifier::stringify_math(const dex::DisplayMath& math) co
 
 std::string MarkdownStringifier::format_group_item(const std::shared_ptr<dex::Entity>& e) const
 {
-  const std::string url = [&]() -> std::string {
-    json::Object json_obj = renderer.modelMapping().get(*e).toObject();
-    auto it = json_obj.data().find("url");
-
-    if (it != json_obj.data().end())
-      return json_obj["url"].toString();
-    else
-      return "";
-  }();
+  const std::string url = renderer.get_url(*e);
 
   std::string result = [&]() -> std::string {
     if (e->is<dex::Function>())

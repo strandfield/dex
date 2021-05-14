@@ -64,12 +64,7 @@ public:
 
   void setModel(std::shared_ptr<Model> model);
   std::shared_ptr<Model> model() const;
-  json::Object serializedModel() const;
-  const JsonExportMapping& modelMapping() const;
 
-protected:
-
-  void annotateModel();
   std::string get_url(const dex::Entity& e) const;
   std::string get_url(const dex::Document& doc) const;
   std::string get_url(const std::shared_ptr<model::Object>& obj) const;
@@ -97,8 +92,6 @@ protected:
 private:
   QDir m_output_dir;
   std::shared_ptr<Model> m_model;
-  json::Object m_serialized_model;
-  JsonExportMapping m_model_mapping;
   Profile m_profile;
   liquid::Map m_user_variables;
   std::map<std::string, std::shared_ptr<LiquidStringifier>> m_stringifiers;
@@ -119,16 +112,6 @@ inline const LiquidExporterProfile& LiquidExporter::profile() const
 inline std::shared_ptr<Model> LiquidExporter::model() const
 {
   return m_model;
-}
-
-inline json::Object LiquidExporter::serializedModel() const
-{
-  return m_serialized_model;
-}
-
-inline const JsonExportMapping& LiquidExporter::modelMapping() const
-{
-  return m_model_mapping;
 }
 
 } // namespace dex
