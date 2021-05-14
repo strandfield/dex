@@ -7,6 +7,8 @@
 
 #include "dex/dex-model.h"
 
+#include "dex/model/model-base.h"
+
 #include <json-toolkit/json.h>
 
 #include <unordered_map>
@@ -33,7 +35,7 @@ public:
   void multiInsert(const std::vector<std::string>& groupnames, T elem);
 };
 
-class DEX_MODEL_API Group : public std::enable_shared_from_this<Group>
+class DEX_MODEL_API Group : public model::Object
 {
 public:
   size_t index;
@@ -52,6 +54,9 @@ public:
 
 public:
   Group(size_t index, std::string n);
+
+  static constexpr model::Kind ClassKind = model::Kind::Group;
+  model::Kind kind() const override;
 };
 
 template<typename T>

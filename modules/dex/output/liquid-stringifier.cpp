@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -24,16 +24,14 @@ LiquidStringifier::~LiquidStringifier()
 
 }
 
-std::string LiquidStringifier::stringify(const json::Json& val) const
+std::string LiquidStringifier::stringify(const liquid::Value& val) const
 {
-  if (!val.isObject() && !val.isArray())
+  if (!val.isMap() && !val.isArray())
     return liquid::Renderer::defaultStringify(val);
   else if (val.isArray())
     return stringify_array(val.toArray());
 
-  json::Object obj = val.toObject();
-
-  auto dom_node = renderer.modelMapping().get<dex::DocumentNode>(val);
+  auto dom_node = liquid_cast<dex::DocumentNode>(val);
 
   if (dom_node)
     return stringify_domnode(*dom_node);
@@ -91,12 +89,13 @@ std::string LiquidStringifier::stringify_domcontent(const dex::DomNodeList& cont
   return result;
 }
 
-std::string LiquidStringifier::stringify_array(const json::Array& list) const
+std::string LiquidStringifier::stringify_array(const liquid::Array& list) const
 {
   std::string result;
 
-  for (const auto& val : list.data())
+  for (size_t i(0); i < list.length(); ++i)
   {
+    liquid::Value val = list.at(i);
     result += stringify(val);
     result += "\n\n";
   }

@@ -39,9 +39,9 @@ class DEX_MODEL_API ProgramVisitor
 public:
 
   void visit(dex::Program& prog);
+  virtual void visit(dex::Entity& e);
 
 protected:
-  virtual void visit(dex::Entity& e);
 
   void dispatch(dex::Entity& e);
 
@@ -63,12 +63,10 @@ public:
 
   void visitDocument(const dex::Document& doc);
 
-protected:
   virtual void visitNode(dex::DocumentNode& n);
 
-  void dispatch(dex::DocumentNode& n);
-
 protected:
+  void dispatch(dex::DocumentNode& n);
   void visitAll(const DomNodeList& nodes);
 
 protected:

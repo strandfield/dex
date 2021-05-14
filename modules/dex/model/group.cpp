@@ -32,6 +32,11 @@ Group::Group(size_t i, std::string n)
 
 }
 
+model::Kind Group::kind() const
+{
+  return ClassKind;
+}
+
 void Group::insert(std::shared_ptr<dex::Entity> e)
 {
   content.entities.push_back(e);

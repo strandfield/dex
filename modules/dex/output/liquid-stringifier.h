@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -8,6 +8,8 @@
 #include "dex/dex-output.h"
 
 #include "dex/model/document.h"
+
+#include "dex/output/liquid-wrapper.h"
 
 #include <json-toolkit/json.h>
 
@@ -41,13 +43,13 @@ public:
   explicit LiquidStringifier(LiquidExporter& exp);
   virtual ~LiquidStringifier();
 
-  std::string stringify(const json::Json& val) const;
+  std::string stringify(const liquid::Value& val) const;
 
 protected:
   virtual std::string stringify_domnode(const dex::DocumentNode& node) const;
   virtual std::string stringify_domcontent(const dex::DomNodeList& content) const;
 
-  virtual std::string stringify_array(const json::Array& list) const;
+  virtual std::string stringify_array(const liquid::Array& list) const;
   virtual std::string stringify_list(const dex::List& list) const = 0;
   virtual std::string stringify_listitem(const dex::ListItem& li) const = 0;
   virtual std::string stringify_paragraph(const dex::Paragraph& par) const = 0;

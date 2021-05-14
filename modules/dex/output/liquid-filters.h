@@ -7,7 +7,7 @@
 
 #include "dex/dex-output.h"
 
-#include <json-toolkit/json.h>
+#include <liquid/value.h>
 
 namespace dex
 {
@@ -27,16 +27,16 @@ public:
   explicit LiquidFilters(LiquidExporter& exp);
   ~LiquidFilters();
 
-  json::Json apply(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) const;
+  liquid::Value apply(const std::string& name, const liquid::Value& object, const std::vector<liquid::Value>& args) const;
 
 protected:
-  static json::Array filter_by_field(const json::Array& list, const std::string& field, const std::string& value);
-  static json::Array filter_by_type(const json::Array& list, const std::string& type);
-  static json::Array filter_by_accessibility(const json::Array& list, const std::string& as);
-  std::string funsig(const json::Object& json_fun) const;
-  json::Array related_non_members(const json::Object& json_class) const;
-  json::Array group_get_entities(const json::Object& json_group) const;
-  json::Array group_get_manuals(const json::Object& json_group) const;
+  static liquid::Array filter_by_field(const liquid::Array& list, const std::string& field, const std::string& value);
+  static liquid::Array filter_by_type(const liquid::Array& list, const std::string& type);
+  static liquid::Array filter_by_accessibility(const liquid::Array& list, const std::string& as);
+  std::string funsig(const liquid::Map& liqfun) const;
+  liquid::Array related_non_members(const liquid::Map& liqclass) const;
+  liquid::Array group_get_entities(const liquid::Map& liqgroup) const;
+  liquid::Array group_get_manuals(const liquid::Map& liqgroup) const;
 };
 
 } // namespace dex

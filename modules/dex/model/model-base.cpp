@@ -47,6 +47,7 @@ std::string to_string(Kind k)
   switch (k)
   {
   case Kind::Model: return "Model";
+  case Kind::Group: return "group";
   case Kind::Document: return "document";
   case Kind::Manual: return "manual";
   case Kind::Page: return "page";

@@ -33,6 +33,8 @@ enum class AccessSpecifier
   PRIVATE,
 };
 
+DEX_MODEL_API std::string to_string(dex::AccessSpecifier as);
+
 class DEX_MODEL_API Entity : public model::Object
 {
 public:
@@ -349,6 +351,8 @@ public:
   bool isDestructor() const;
 
   std::string signature() const;
+
+  std::string specifiersList() const;
 };
 
 inline Function::Function(std::string name, std::shared_ptr<Entity> parent)

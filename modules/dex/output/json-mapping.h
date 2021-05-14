@@ -71,7 +71,7 @@ public:
 
   void bind(const Group& g, const json::Json& o)
   {
-    backward_maps.groups[o.impl()] = g.shared_from_this();
+    backward_maps.groups[o.impl()] = std::static_pointer_cast<const dex::Group>(g.shared_from_this());
     forward[&g] = o;
   }
 
@@ -79,7 +79,7 @@ public:
   struct get_helper_t {};
 
   template<typename T>
-  auto get(const json::Json& obj) const
+  auto getIt(const json::Json& obj) const
   {
     return get_impl(obj, get_helper_t<T>());
   }

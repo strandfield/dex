@@ -9,6 +9,19 @@
 namespace dex
 {
 
+std::string to_string(dex::AccessSpecifier as)
+{
+  switch (as)
+  {
+  case dex::AccessSpecifier::PRIVATE:
+    return "private";
+  case dex::AccessSpecifier::PROTECTED:
+    return "protected";
+  default:
+    return "public";
+  }
+}
+
 std::shared_ptr<Entity> Entity::shared_from_this()
 {
   return std::static_pointer_cast<Entity>(model::Object::shared_from_this());
@@ -284,6 +297,30 @@ std::string Function::signature() const
   return result;
 }
 
+std::string Function::specifiersList() const
+{
+  std::string r;
+
+  if (specifiers & dex::FunctionSpecifier::Inline)
+    r += "inline,";
+  if (specifiers & dex::FunctionSpecifier::Static)
+    r += "static,";
+  if (specifiers & dex::FunctionSpecifier::Constexpr)
+    r += "constexpr,";
+  if (specifiers & dex::FunctionSpecifier::Virtual)
+    r += "virtual,";
+  if (specifiers & dex::FunctionSpecifier::Override)
+    r += "override,";
+  if (specifiers & dex::FunctionSpecifier::Final)
+    r += "final,";
+  if (specifiers & dex::FunctionSpecifier::Const)
+    r += "const,";
+
+  if(!r.empty())
+  r.pop_back();
+
+  return r;
+}
 
 
 model::Kind Class::kind() const

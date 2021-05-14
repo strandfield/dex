@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -21,7 +21,7 @@ void TestParsing::all()
   QString datasets = QString::fromStdString(dex::file_utils::read_all(":/data/datasets.txt"));
   datasets.replace("\r\n", "\n");
 
-  QStringList list = datasets.split("\n", QString::SkipEmptyParts);
+  QStringList list = datasets.split("\n", Qt::SkipEmptyParts);
 
   int num_failure = 0;
 

@@ -19,6 +19,7 @@ namespace model
 enum class Kind
 {
   Model,
+  Group,
   /* Document */
   Document,
   Manual,

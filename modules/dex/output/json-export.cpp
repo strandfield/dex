@@ -12,19 +12,6 @@
 namespace dex
 {
 
-static std::string to_string(dex::AccessSpecifier as)
-{
-  switch (as)
-  {
-  case dex::AccessSpecifier::PRIVATE:
-    return "private";
-  case dex::AccessSpecifier::PROTECTED:
-    return "protected";
-  default:
-    return "public";
-  }
-}
-
 template<typename T>
 void write_if(json::Object& obj, const char* field, T&& val, bool cond)
 {
@@ -507,26 +494,7 @@ void JsonProgramSerializer::visit(dex::Function& f)
 
   if (f.specifiers != 0)
   {
-    std::string specifiers;
-
-    if (f.specifiers & dex::FunctionSpecifier::Inline)
-      specifiers += "inline,";
-    if (f.specifiers & dex::FunctionSpecifier::Static)
-      specifiers += "static,";
-    if (f.specifiers & dex::FunctionSpecifier::Constexpr)
-      specifiers += "constexpr,";
-    if (f.specifiers & dex::FunctionSpecifier::Virtual)
-      specifiers += "virtual,";
-    if (f.specifiers & dex::FunctionSpecifier::Override)
-      specifiers += "override,";
-    if (f.specifiers & dex::FunctionSpecifier::Final)
-      specifiers += "final,";
-    if (f.specifiers & dex::FunctionSpecifier::Const)
-      specifiers += "const,";
-
-    specifiers.pop_back();
-
-    result["specifiers"] = specifiers;
+    result["specifiers"] = f.specifiersList();
   }
 }
 

@@ -5,16 +5,17 @@
 #include "dex/output/liquid-filters.h"
 
 #include "dex/output/liquid-exporter.h"
+#include "dex/output/liquid-wrapper.h"
 
 #include <liquid/filters.h>
 
 namespace dex
 {
 
-static json::Array array_arg(const json::Json& object)
+static liquid::Array array_arg(const liquid::Value& object)
 {
   if (object.isNull())
-    return json::Array();
+    return liquid::Array();
   else if (object.isArray())
     return object.toArray();
   else
@@ -32,100 +33,101 @@ LiquidFilters::~LiquidFilters()
 
 }
 
-json::Json LiquidFilters::apply(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) const
+liquid::Value LiquidFilters::apply(const std::string& name, const liquid::Value& object, const std::vector<liquid::Value>& args) const
 {
   if (name == "filter_by_type")
   {
-    return filter_by_type(array_arg(object), args.front().toString());
+    return filter_by_type(array_arg(object), args.front().as<std::string>());
   }
   else if (name == "filter_by_accessibility")
   {
-    return filter_by_accessibility(array_arg(object), args.front().toString());
+    return filter_by_accessibility(array_arg(object), args.front().as<std::string>());
   }
   else if (name == "filter_by_field")
   {
-    return filter_by_field(array_arg(object), args.front().toString(), args.back().toString());
+    return filter_by_field(array_arg(object), args.front().as<std::string>(), args.back().as<std::string>());
   }
   else if (name == "funsig")
   {
-    return funsig(object.toObject());
+    return funsig(object.toMap());
   }
   else if (name == "related_non_members")
   {
-    return related_non_members(object.toObject());
+    return related_non_members(object.toMap());
   }
   else if (name == "group_get_entities")
   {
-    return group_get_entities(object.toObject());
+    return group_get_entities(object.toMap());
   }
   else if (name == "group_get_manuals")
   {
-    return group_get_manuals(object.toObject());
+    return group_get_manuals(object.toMap());
   }
 
   return liquid::BuiltinFilters::apply(name, object, args);
 }
 
-json::Array LiquidFilters::filter_by_field(const json::Array& list, const std::string& field, const std::string& value)
+liquid::Array LiquidFilters::filter_by_field(const liquid::Array& list, const std::string& field, const std::string& value)
 {
-  json::Array result;
+  liquid::Array result;
 
-  for (const auto& obj : list.data())
+  for (size_t i(0); i < list.length(); ++i)
   {
-    if (obj[field] == value)
+    liquid::Value obj = list.at(i);
+    liquid::Value prop = obj.property(field);
+
+    if (prop.is<std::string>() && prop.as<std::string>() == value)
       result.push(obj);
   }
 
   return result;
 }
 
-json::Array LiquidFilters::filter_by_type(const json::Array& list, const std::string& type)
+liquid::Array LiquidFilters::filter_by_type(const liquid::Array& list, const std::string& type)
 {
   static const std::string field = "type";
   return filter_by_field(list, field, type);
 }
 
-json::Array LiquidFilters::filter_by_accessibility(const json::Array& list, const std::string& as)
+liquid::Array LiquidFilters::filter_by_accessibility(const liquid::Array& list, const std::string& as)
 {
   static const std::string field = "accessibility";
   return filter_by_field(list, field, as);
 }
 
-std::string LiquidFilters::funsig(const json::Object& json_fun) const
+std::string LiquidFilters::funsig(const liquid::Map& liqfun) const
 {
-  auto fun_entity = renderer.modelMapping().get<dex::Entity>(json_fun);
-  auto fun = std::static_pointer_cast<const dex::Function>(fun_entity);
+  auto fun = liquid_cast<dex::Function>(liqfun);
   return fun->signature();
 }
 
-json::Array LiquidFilters::related_non_members(const json::Object& json_class) const
+liquid::Array LiquidFilters::related_non_members(const liquid::Map& liq_class) const
 {
-  auto the_class = std::dynamic_pointer_cast<dex::Class>(renderer.modelMapping().get<dex::Entity>(json_class));
+  auto the_class = liquid_cast<dex::Class>(liq_class);
 
   if (the_class == nullptr)
     return {};
 
   std::shared_ptr<RelatedNonMembers::Entry> entry = renderer.model()->program()->related.getRelated(the_class);
 
-  json::Array result;
+  liquid::Array result;
 
   if (entry == nullptr)
     return result;
 
   for (auto f : entry->non_members)
   {
-    json::Json f_json = renderer.modelMapping().get(*f);
-    result.push(f_json);
+    result.push(to_liquid(f));
   }
 
   return result;
 }
 
-json::Array LiquidFilters::group_get_entities(const json::Object& json_group) const
+liquid::Array LiquidFilters::group_get_entities(const liquid::Map& liqgroup) const
 {
-  json::Array result;
+  liquid::Array result;
 
-  auto g = renderer.modelMapping().get<Group>(json_group);
+  auto g = liquid_cast<Group>(liqgroup);
 
   if (g == nullptr)
   {
@@ -135,17 +137,17 @@ json::Array LiquidFilters::group_get_entities(const json::Object& json_group) co
 
   for (auto e : g->content.entities)
   {
-    result.push(renderer.modelMapping().get(*e));
+    result.push(to_liquid(e));
   }
 
   return result;
 }
 
-json::Array LiquidFilters::group_get_manuals(const json::Object& json_group) const
+liquid::Array LiquidFilters::group_get_manuals(const liquid::Map& liqgroup) const
 {
-  json::Array result;
+  liquid::Array result;
 
-  auto g = renderer.modelMapping().get<Group>(json_group);
+  auto g = liquid_cast<Group>(liqgroup);
 
   if (g == nullptr)
   {
@@ -155,7 +157,7 @@ json::Array LiquidFilters::group_get_manuals(const json::Object& json_group) con
 
   for (auto doc : g->content.documents)
   {
-    result.push(renderer.modelMapping().get(*doc));
+    result.push(to_liquid(doc));
   }
 
   return result;
