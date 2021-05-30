@@ -4,9 +4,6 @@
 [submodule "dependencies/typeset"]
 	path = dependencies/typeset
 	url = https://github.com/bandicode/typeset.git
-[submodule "dependencies/dynlib"]
-	path = dependencies/dynlib
-	url = https://github.com/bandicode/dynlib.git
 [submodule "dependencies/cpptok"]
 	path = dependencies/cpptok
 	url = https://github.com/bandicode/cpptok
