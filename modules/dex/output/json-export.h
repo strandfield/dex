@@ -9,8 +9,6 @@
 
 #include "dex/model/model-visitor.h"
 
-#include <dom/paragraph.h>
-
 namespace dex
 {
 

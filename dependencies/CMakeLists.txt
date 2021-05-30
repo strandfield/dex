@@ -31,33 +31,6 @@ foreach(_source IN ITEMS ${DYNLIB_HDR_FILES} ${DYNLIB_SRC_FILES})
 endforeach()
 
 ##################################################################
-###### cxxast
-##################################################################
-
-set(BUILD_CXXAST_TESTS OFF CACHE BOOL "whether to build cxxast test")
-
-add_subdirectory(cxxast)
-
-set(CXXAST_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cxxast" CACHE PATH "Provide the directory of the cxxast library")
-
-if ("${CXXAST_PROJECT_DIR}" STREQUAL "")
-  message(FATAL_ERROR "The directory of the cxxast project must be specified")  
-endif()
-
-##################################################################
-###### dom
-##################################################################
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-
-add_subdirectory(dom)
-
-set_target_properties(dom PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-set_target_properties(dom PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "")
-
-##################################################################
 ###### typeset
 ##################################################################
 

@@ -7,10 +7,6 @@
 #include "dex/model/inline-math.h"
 #include "dex/model/paragraph-annotations.h"
 
-#include <dom/paragraph/iterator.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
-
 namespace dex
 {
 

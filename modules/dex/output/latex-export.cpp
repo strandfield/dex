@@ -10,13 +10,6 @@
 #include "dex/model/display-math.h"
 #include "dex/model/since.h"
 
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph.h>
-#include <dom/paragraph/iterator.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
-
 namespace dex
 {
 

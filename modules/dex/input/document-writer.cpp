@@ -12,9 +12,6 @@
 #include "dex/input/paragraph-writer.h"
 #include "dex/input/parser-errors.h"
 
-#include <dom/image.h>
-#include <dom/list.h>
-
 #include <cassert>
 #include <stdexcept>
 

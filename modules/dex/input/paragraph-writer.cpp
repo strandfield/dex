@@ -12,9 +12,6 @@
 
 #include <tex/parsing/mathparserfrontend.h>
 
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
-
 #include <cassert>
 #include <stdexcept>
 
