@@ -7,12 +7,12 @@
 
 #include "dex/dex-model.h"
 
-#include <dom/element.h>
+#include "dex/model/document.h"
 
 namespace dex
 {
 
-class DEX_MODEL_API CodeBlock : public dom::Element
+class DEX_MODEL_API CodeBlock : public DocumentElement
 {
 public:
   std::string lang;
@@ -21,8 +21,8 @@ public:
 public:
   CodeBlock();
 
-  static const std::string TypeId;
-  const std::string& className() const override;
+  static constexpr model::Kind ClassKind = model::Kind::CodeBlock;
+  model::Kind kind() const override;
 
   void normalize();
 };

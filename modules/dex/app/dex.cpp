@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -9,8 +9,6 @@
 #include "dex/common/json-utils.h"
 #include "dex/input/parser-machine.h"
 #include "dex/output/exporter.h"
-
-#include <cxx/libclang.h>
 
 #include <QDir>
 
@@ -50,10 +48,6 @@ int Dex::exec()
   {
     std::cout << Dex::applicationVersion().toStdString() << std::endl;
   }
-  else if (result.status == CommandLineParserResult::ClangVersionRequested)
-  {
-    std::cout << Dex::libClangVersion() << std::endl;
-  }
   else if (result.status == CommandLineParserResult::Work)
   {
     work();
@@ -82,21 +76,6 @@ void Dex::work()
     values = m_cli.values;
 
   process(inputs, output, values);
-}
-
-std::string Dex::libClangVersion() const
-{
-  try
-  {
-    cxx::LibClang libclang;
-    CXVersion ver = libclang.version();
-
-    return std::to_string(ver.Major) + "." + std::to_string(ver.Minor) + "." + std::to_string(ver.Subminor);
-  }
-  catch (const cxx::LibClangError&)
-  {
-    return "libclang could not be found";
-  }
 }
 
 void Dex::process(const QStringList& inputs, QString output, json::Object values)

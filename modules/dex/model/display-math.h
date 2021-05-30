@@ -7,14 +7,14 @@
 
 #include "dex/dex-model.h"
 
-#include <tex/math/mathlist.h>
+#include "dex/model/document.h"
 
-#include <dom/element.h>
+#include <tex/math/mathlist.h>
 
 namespace dex
 {
 
-class DEX_MODEL_API DisplayMath : public dom::Element
+class DEX_MODEL_API DisplayMath : public DocumentElement
 {
 
 public:
@@ -28,8 +28,8 @@ public:
   
   void normalize();
 
-  static const std::string TypeId;
-  const std::string& className() const override;
+  static constexpr model::Kind ClassKind = model::Kind::DisplayMath;
+  model::Kind kind() const override;
 };
 
 } // namespace dex

@@ -7,8 +7,6 @@
 namespace dex
 {
 
-const std::string InlineMath::TypeId = "inline-math";
-
 InlineMath::InlineMath()
 {
 

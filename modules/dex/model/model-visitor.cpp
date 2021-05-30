@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -7,66 +7,54 @@
 #include <dex/model/code-block.h>
 #include <dex/model/display-math.h>
 
-#include <cxx/class.h>
-#include <cxx/enum.h>
-#include <cxx/function.h>
-#include <cxx/macro.h>
-#include <cxx/namespace.h>
-#include <cxx/typedef.h>
-#include <cxx/variable.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph.h>
-
 #include <stdexcept>
 
 namespace dex
 {
 
-void ProgramVisitor::visit(cxx::Program& prog)
+void ProgramVisitor::visit(dex::Program& prog)
 {
-  visit(static_cast<cxx::Entity&>(*prog.globalNamespace()));
+  visit(static_cast<dex::Entity&>(*prog.globalNamespace()));
 
   for (auto m : prog.macros)
     visit(*m);
 }
 
-void ProgramVisitor::visit(cxx::Entity& e)
+void ProgramVisitor::visit(dex::Entity& e)
 {
   dispatch(e);
 }
 
 
-void ProgramVisitor::dispatch(cxx::Entity& e)
+void ProgramVisitor::dispatch(dex::Entity& e)
 {
   switch (e.kind())
   {
-  case cxx::NodeKind::Class:
-    return visit(static_cast<cxx::Class&>(e));
-  case cxx::NodeKind::Enum:
-    return visit(static_cast<cxx::Enum&>(e));
-  case cxx::NodeKind::EnumValue:
-    return visit(static_cast<cxx::EnumValue&>(e));
-  case cxx::NodeKind::Function:
-    return visit(static_cast<cxx::Function&>(e));
-  case cxx::NodeKind::FunctionParameter:
-    return visit(static_cast<cxx::FunctionParameter&>(e));
-  case cxx::NodeKind::Namespace:
-    return visit(static_cast<cxx::Namespace&>(e));
-  case cxx::NodeKind::Typedef:
-    return visit(static_cast<cxx::Typedef&>(e));
-  case cxx::NodeKind::Variable:
-    return visit(static_cast<cxx::Variable&>(e));
-  case cxx::NodeKind::Macro:
-    return visit(static_cast<cxx::Macro&>(e));
+  case model::Kind::Class:
+    return visit(static_cast<dex::Class&>(e));
+  case model::Kind::Enum:
+    return visit(static_cast<dex::Enum&>(e));
+  case model::Kind::EnumValue:
+    return visit(static_cast<dex::EnumValue&>(e));
+  case model::Kind::Function:
+    return visit(static_cast<dex::Function&>(e));
+  case model::Kind::FunctionParameter:
+    return visit(static_cast<dex::FunctionParameter&>(e));
+  case model::Kind::Namespace:
+    return visit(static_cast<dex::Namespace&>(e));
+  case model::Kind::Typedef:
+    return visit(static_cast<dex::Typedef&>(e));
+  case model::Kind::Variable:
+    return visit(static_cast<dex::Variable&>(e));
+  case model::Kind::Macro:
+    return visit(static_cast<dex::Macro&>(e));
   default: 
     break;
   }
 }
 
 
-void ProgramVisitor::visit(cxx::Namespace& ns)
+void ProgramVisitor::visit(dex::Namespace& ns)
 {
   if (!ns.entities.empty())
   {
@@ -77,7 +65,7 @@ void ProgramVisitor::visit(cxx::Namespace& ns)
   }
 }
 
-void ProgramVisitor::visit(cxx::Class& cla)
+void ProgramVisitor::visit(dex::Class& cla)
 {
   if (!cla.members.empty())
   {
@@ -88,7 +76,7 @@ void ProgramVisitor::visit(cxx::Class& cla)
   }
 }
 
-void ProgramVisitor::visit(cxx::Enum& en)
+void ProgramVisitor::visit(dex::Enum& en)
 {
   if (!en.values.empty())
   {
@@ -99,12 +87,12 @@ void ProgramVisitor::visit(cxx::Enum& en)
   }
 }
 
-void ProgramVisitor::visit(cxx::EnumValue& ev)
+void ProgramVisitor::visit(dex::EnumValue& ev)
 {
 
 }
 
-void ProgramVisitor::visit(cxx::Function& f)
+void ProgramVisitor::visit(dex::Function& f)
 {
   if (!f.parameters.empty())
   {
@@ -115,50 +103,49 @@ void ProgramVisitor::visit(cxx::Function& f)
   }
 }
 
-void ProgramVisitor::visit(cxx::FunctionParameter& fp)
+void ProgramVisitor::visit(dex::FunctionParameter& fp)
 {
 
 }
 
-void ProgramVisitor::visit(cxx::Variable& v)
+void ProgramVisitor::visit(dex::Variable& v)
 {
 
 }
 
-void ProgramVisitor::visit(cxx::Typedef& t)
+void ProgramVisitor::visit(dex::Typedef& t)
 {
 
 }
 
-void ProgramVisitor::visit(cxx::Macro& m)
+void ProgramVisitor::visit(dex::Macro& m)
 {
 
 }
 
 void DocumentVisitor::visitDocument(const dex::Document& doc)
 {
-  for (auto n : doc.childNodes())
+  for (auto n : doc.nodes)
     visitNode(*n);
 }
 
-void DocumentVisitor::visitNode(dom::Node& n)
+void DocumentVisitor::visitNode(dex::DocumentNode& n)
 {
   dispatch(n);
 
-  for (auto child : n.childNodes())
-    visitNode(*child);
+  visitAll(n.childNodes());
 }
 
-void DocumentVisitor::dispatch(dom::Node& n)
+void DocumentVisitor::dispatch(dex::DocumentNode& n)
 {
-  if (n.is<dom::Image>())
-    visit(static_cast<dom::Image&>(n));
-  else if (n.is<dom::List>())
-    visit(static_cast<dom::List&>(n));
-  else if (n.is<dom::ListItem>())
-    visit(static_cast<dom::ListItem&>(n));
-  else if (n.is<dom::Paragraph>())
-    visit(static_cast<dom::Paragraph&>(n));
+  if (n.is<dex::Image>())
+    visit(static_cast<dex::Image&>(n));
+  else if (n.is<dex::List>())
+    visit(static_cast<dex::List&>(n));
+  else if (n.is<dex::ListItem>())
+    visit(static_cast<dex::ListItem&>(n));
+  else if (n.is<dex::Paragraph>())
+    visit(static_cast<dex::Paragraph&>(n));
   else if (n.is<dex::BeginSince>())
     visit(static_cast<dex::BeginSince&>(n));
   else if (n.is<dex::EndSince>())
@@ -183,22 +170,28 @@ void DocumentVisitor::dispatch(dom::Node& n)
     visit(static_cast<dex::Index&>(n));
 }
 
-void DocumentVisitor::visit(dom::Image& img)
+void DocumentVisitor::visitAll(const DomNodeList& nodes)
+{
+  for (auto child : nodes)
+    visitNode(*child);
+}
+
+void DocumentVisitor::visit(dex::Image& img)
 {
 
 }
 
-void DocumentVisitor::visit(dom::List& l)
+void DocumentVisitor::visit(dex::List& l)
 {
 
 }
 
-void DocumentVisitor::visit(dom::ListItem& li)
+void DocumentVisitor::visit(dex::ListItem& li)
 {
 
 }
 
-void DocumentVisitor::visit(dom::Paragraph& par)
+void DocumentVisitor::visit(dex::Paragraph& par)
 {
 
 }

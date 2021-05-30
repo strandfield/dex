@@ -7,13 +7,15 @@ Welcome !
 This is {{ project.name }}!
 {% endif %}
 
+{% if model.program %}
+
 ## Namespaces
 
 {% assign ns_list = model.program.global_namespace.entities | filter_by_type: 'namespace' %}
 
 - [global namespace](namespaces/global.md)
 {% for ns in ns_list %}
-- [{{ ns.name }}]({{ns.url}})
+- [{{ ns.name }}]({{ ns | get_url }})
 {% endfor %}
 
 {% assign classes = model.program.global_namespace.entities | filter_by_type: 'class' %}
@@ -22,7 +24,9 @@ This is {{ project.name }}!
 ## Classes
 
 {% for c in classes %}
-- [{{ c.name }}]({{c.url}})
+- [{{ c.name }}]({{ c | get_url }})
 {% endfor %}
+
+{% endif %}
 
 {% endif %}

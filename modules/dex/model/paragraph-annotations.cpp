@@ -7,8 +7,6 @@
 namespace dex
 {
 
-const std::string ParIndexEntry::TypeId = "ParIndexEntry";
-
 ParIndexEntry::ParIndexEntry(std::string k)
   : key(std::move(k))
 {

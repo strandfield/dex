@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -9,70 +9,8 @@
 #include "dex/model/paragraph-annotations.h"
 #include "dex/model/since.h"
 
-#include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/enum.h>
-#include <cxx/function.h>
-#include <cxx/macro.h>
-#include <cxx/namespace.h>
-#include <cxx/program.h>
-#include <cxx/typedef.h>
-#include <cxx/variable.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
-
 namespace dex
 {
-
-static std::string to_string(cxx::AccessSpecifier as)
-{
-  switch (as)
-  {
-  case cxx::AccessSpecifier::PRIVATE:
-    return "private";
-  case cxx::AccessSpecifier::PROTECTED:
-    return "protected";
-  default:
-    return "public";
-  }
-}
-
-static std::string to_string(cxx::NodeKind n)
-{
-  switch (n)
-  {
-  case cxx::NodeKind::Class:
-    return "class";
-  case cxx::NodeKind::Enum:
-    return "enum";
-  case cxx::NodeKind::EnumValue:
-    return "enum-value";
-  case cxx::NodeKind::Function:
-    return "function";
-  case cxx::NodeKind::FunctionParameter:
-    return "function-parameter";
-  case cxx::NodeKind::Macro:
-    return "macro";
-  case cxx::NodeKind::Namespace:
-    return "namespace";
-  case cxx::NodeKind::TemplateParameter:
-    return "template-parameter";
-  case cxx::NodeKind::Typedef:
-    return "typedef";
-  case cxx::NodeKind::Variable:
-    return "variable";
-  case cxx::NodeKind::MultilineComment:
-    return "multiline-comment";
-  case cxx::NodeKind::Documentation:
-    return "documentation";
-  default:
-    assert(false);
-    return "";
-  }
-}
 
 template<typename T>
 void write_if(json::Object& obj, const char* field, T&& val, bool cond)
@@ -81,20 +19,20 @@ void write_if(json::Object& obj, const char* field, T&& val, bool cond)
     obj[field] = std::forward<T>(val);
 }
 
-static void write_location(json::Object& obj, const cxx::SourceLocation& loc)
-{
-  if (loc.file() == nullptr)
-    return;
+//static void write_location(json::Object& obj, const dex::SourceLocation& loc)
+//{
+//  if (loc.file() == nullptr)
+//    return;
+//
+//  json::Object result{};
+//  result["line"] = loc.line();
+//  result["col"] = loc.column();
+//  result["file"] = loc.file()->path();
+//
+//  obj["loc"] = result;
+//}
 
-  json::Object result{};
-  result["line"] = loc.line();
-  result["col"] = loc.column();
-  result["file"] = loc.file()->path();
-
-  obj["loc"] = result;
-}
-
-static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
+static json::Json serialize_par_metadata(const dex::ParagraphMetaData& pmd)
 {
   json::Json result;
 
@@ -106,13 +44,13 @@ static json::Json serialize_par_metadata(const dom::ParagraphMetaData& pmd)
   {
     result["version"] = pmd.get<dex::Since>().version();
   }
-  else if (pmd.is<dom::TextStyle>())
+  else if (pmd.is<dex::TextStyle>())
   {
-    result["style"] = static_cast<const dom::TextStyle&>(pmd).style();
+    result["style"] = static_cast<const dex::TextStyle&>(pmd).style();
   }
-  else if (pmd.is<dom::Link>())
+  else if (pmd.is<dex::Link>())
   {
-    result["url"] = static_cast<const dom::Link&>(pmd).url();
+    result["url"] = static_cast<const dex::Link&>(pmd).url();
   }
   else if (pmd.is<dex::ParIndexEntry>())
   {
@@ -144,7 +82,7 @@ json::Object JsonExporter::serialize()
 
   if (model.program())
   {
-    JsonProgramSerializer progserializer{ mapping };
+    JsonProgramSerializer progserializer{ };
     result["program"] = progserializer.serialize(*model.program());
   }
 
@@ -154,7 +92,7 @@ json::Object JsonExporter::serialize()
 
     for (size_t i(0); i < model.documents.size(); ++i)
     {
-      JsonDocumentSerializer docserializer{ mapping };
+      JsonDocumentSerializer docserializer{ };
       docs.push(docserializer.serialize(*model.documents.at(i)));
     }
 
@@ -185,7 +123,7 @@ json::Object JsonExporter::serializeGroup(const Group& group)
   {
     json::Array ets;
 
-    JsonProgramSerializer progser{ mapping };
+    JsonProgramSerializer progser{ };
 
     for (auto e : group.content.entities)
     {
@@ -210,8 +148,6 @@ json::Object JsonExporter::serializeGroup(const Group& group)
     res["documents"] = docs;
   }
 
-  mapping.bind(group, res);
-
   return res;
 }
 
@@ -222,12 +158,10 @@ json::Object JsonDocumentSerializer::serialize(dex::Document& doc)
   result["doctype"] = doc.doctype;
   result["content"] = serializeArray(doc.childNodes());
 
-  mapping.bind(doc, result);
-
   return result;
 }
 
-json::Object JsonDocumentSerializer::serialize(dom::Node& n)
+json::Object JsonDocumentSerializer::serialize(dex::DocumentNode& n)
 {
   json::Object ret{};
   std::swap(this->result, ret);
@@ -237,7 +171,7 @@ json::Object JsonDocumentSerializer::serialize(dom::Node& n)
   return ret;
 }
 
-json::Array JsonDocumentSerializer::serializeArray(const dom::NodeList& nodes)
+json::Array JsonDocumentSerializer::serializeArray(const DomNodeList& nodes)
 {
   json::Array res;
 
@@ -248,15 +182,14 @@ json::Array JsonDocumentSerializer::serializeArray(const dom::NodeList& nodes)
 }
 
 
-void JsonDocumentSerializer::visitNode(dom::Node& n)
+void JsonDocumentSerializer::visitNode(dex::DocumentNode& n)
 {
   result["type"] = n.className();
   dispatch(n);
-  mapping.bind(n, result);
 }
 
 
-void JsonDocumentSerializer::visit(dom::Image& img)
+void JsonDocumentSerializer::visit(dex::Image& img)
 {
   result["src"] = img.src;
 
@@ -264,7 +197,7 @@ void JsonDocumentSerializer::visit(dom::Image& img)
   write_if(result, "width", img.width, img.width != -1);
 }
 
-void JsonDocumentSerializer::visit(dom::List& l)
+void JsonDocumentSerializer::visit(dex::List& l)
 {
   write_if(result, "marker", l.marker, !l.marker.empty());
 
@@ -275,7 +208,7 @@ void JsonDocumentSerializer::visit(dom::List& l)
   result["items"] = serializeArray(l.childNodes());
 }
 
-void JsonDocumentSerializer::visit(dom::ListItem& li)
+void JsonDocumentSerializer::visit(dex::ListItem& li)
 {
   write_if(result, "marker", li.marker, !li.marker.empty());
   write_if(result, "value", li.value, li.value != -1);
@@ -283,7 +216,7 @@ void JsonDocumentSerializer::visit(dom::ListItem& li)
   result["content"] = serializeArray(li.childNodes());
 }
 
-void JsonDocumentSerializer::visit(dom::Paragraph& par)
+void JsonDocumentSerializer::visit(dex::Paragraph& par)
 {
   result["text"] = par.text();
 
@@ -377,7 +310,7 @@ json::Object JsonProgramSerializer::serialize(dex::Program& prog)
   return result;
 }
 
-json::Object JsonProgramSerializer::serialize(cxx::Entity& e)
+json::Object JsonProgramSerializer::serialize(dex::Entity& e)
 {
   json::Object ret{};
   std::swap(this->result, ret);
@@ -387,7 +320,7 @@ json::Object JsonProgramSerializer::serialize(cxx::Entity& e)
   return ret;
 }
 
-std::string JsonProgramSerializer::path(cxx::Entity& e, dex::Program& prog)
+std::string JsonProgramSerializer::path(dex::Entity& e, dex::Program& prog)
 {
   if (e.shared_from_this() == prog.globalNamespace())
     return "$.program.global_namespace";
@@ -399,15 +332,15 @@ std::string JsonProgramSerializer::path(cxx::Entity& e, dex::Program& prog)
 
   while (parent_entity != nullptr)
   {
-    if (parent_entity->is<cxx::Class>())
+    if (parent_entity->is<dex::Class>())
     {
-      const cxx::Class& parent_class = static_cast<const cxx::Class&>(*parent_entity);
+      const dex::Class& parent_class = static_cast<const dex::Class&>(*parent_entity);
       auto it = std::find(parent_class.members.begin(), parent_class.members.end(), current_entity);
       result.push_back(std::string("members[") + std::to_string(std::distance(parent_class.members.begin(), it)) + "]");
     }
-    else if (parent_entity->is<cxx::Namespace>())
+    else if (parent_entity->is<dex::Namespace>())
     {
-      const auto& parent_namespace = static_cast<const cxx::Namespace&>(*parent_entity);
+      const auto& parent_namespace = static_cast<const dex::Namespace&>(*parent_entity);
       auto it = std::find(parent_namespace.entities.begin(), parent_namespace.entities.end(), current_entity);
       result.push_back(std::string("entities[") + std::to_string(std::distance(parent_namespace.entities.begin(), it)) + "]");
     }
@@ -440,7 +373,7 @@ std::string JsonProgramSerializer::path(cxx::Entity& e, dex::Program& prog)
   }
 }
 
-json::Array JsonProgramSerializer::serializeArray(const std::vector<std::shared_ptr<cxx::Entity>>& nodes)
+json::Array JsonProgramSerializer::serializeArray(const std::vector<std::shared_ptr<dex::Entity>>& nodes)
 {
   json::Array res;
 
@@ -474,61 +407,51 @@ json::Array JsonProgramSerializer::serializeRelatedMembers(dex::RelatedNonMember
   return result;
 }
 
-void JsonProgramSerializer::write_documentation(cxx::Entity& e)
+void JsonProgramSerializer::write_documentation(dex::Entity& e)
 {
-  if (!e.documentation)
-    return;
-
-  auto edoc = std::dynamic_pointer_cast<EntityDocumentation>(e.documentation);
-
-  if (!edoc)
-    return;
-
   json::Object jsondoc{};
 
-  if (edoc->brief().has_value())
-    jsondoc["brief"] = edoc->brief().value();
+  if (e.brief.has_value())
+    jsondoc["brief"] = e.brief.value();
 
-  if (edoc->since().has_value())
-    jsondoc["since"] = edoc->since().value().version();
+  if (e.since.has_value())
+    jsondoc["since"] = e.since.value().version();
 
-  if (edoc->is<FunctionDocumentation>())
+  if (e.is<dex::Function>())
   {
-    const auto& fndoc = static_cast<const FunctionDocumentation&>(*edoc);
+    const auto& fn = static_cast<const dex::Function&>(e);
 
-    if (fndoc.returnValue().has_value())
-      jsondoc["returns"] = fndoc.returnValue().value();
+    if (fn.return_type.brief.has_value())
+      jsondoc["returns"] = fn.return_type.brief.value();
   }
 
-  if (edoc->description && !edoc->description->childNodes().empty())
+  if (e.description && !e.description->childNodes().empty())
   {
-    JsonDocumentSerializer jsonserializer{ mapping };
-    jsondoc["description"] = jsonserializer.serializeArray(edoc->description->childNodes());
+    JsonDocumentSerializer jsonserializer{ };
+    jsondoc["description"] = jsonserializer.serializeArray(e.description->childNodes());
   }
 
   result["documentation"] = jsondoc;
 }
 
-void JsonProgramSerializer::visit(cxx::Entity& e)
+void JsonProgramSerializer::visit(dex::Entity& e)
 {
   result["name"] = e.name;
   result["type"] = to_string(e.kind());
 
-  write_location(result, e.location);
+  //write_location(result, e.location);
   write_documentation(e);
 
   dispatch(e);
-
-  mapping.bind(e, result);
 }
 
-void JsonProgramSerializer::visit(cxx::Namespace& ns)
+void JsonProgramSerializer::visit(dex::Namespace& ns)
 {
   if(!ns.entities.empty())
     result["entities"] = serializeArray(ns.entities);
 }
 
-void JsonProgramSerializer::visit(cxx::Class& cla)
+void JsonProgramSerializer::visit(dex::Class& cla)
 {
   if (!cla.members.empty())
   {
@@ -543,73 +466,54 @@ void JsonProgramSerializer::visit(cxx::Class& cla)
   }
 }
 
-void JsonProgramSerializer::visit(cxx::Enum& en)
+void JsonProgramSerializer::visit(dex::Enum& en)
 {
   result["values"] = serializeArray(en.values);
 }
 
-void JsonProgramSerializer::visit(cxx::EnumValue& ev)
+void JsonProgramSerializer::visit(dex::EnumValue& ev)
 {
   write_if(result, "value", ev.value(), !ev.value().empty());
 }
 
-void JsonProgramSerializer::visit(cxx::Function& f)
+void JsonProgramSerializer::visit(dex::Function& f)
 {
   if (!f.parameters.empty())
   {
     result["parameters"] = serializeArray(f.parameters);
   }
 
-  result["return_type"] = f.return_type.toString();
+  result["return_type"] = f.return_type.type;
 
   if (f.specifiers != 0)
   {
-    std::string specifiers;
-
-    if (f.specifiers & cxx::FunctionSpecifier::Inline)
-      specifiers += "inline,";
-    if (f.specifiers & cxx::FunctionSpecifier::Static)
-      specifiers += "static,";
-    if (f.specifiers & cxx::FunctionSpecifier::Constexpr)
-      specifiers += "constexpr,";
-    if (f.specifiers & cxx::FunctionSpecifier::Virtual)
-      specifiers += "virtual,";
-    if (f.specifiers & cxx::FunctionSpecifier::Override)
-      specifiers += "override,";
-    if (f.specifiers & cxx::FunctionSpecifier::Final)
-      specifiers += "final,";
-    if (f.specifiers & cxx::FunctionSpecifier::Const)
-      specifiers += "const,";
-
-    specifiers.pop_back();
-
-    result["specifiers"] = specifiers;
+    result["specifiers"] = f.specifiersList();
   }
 }
 
-void JsonProgramSerializer::visit(cxx::FunctionParameter& fp)
+void JsonProgramSerializer::visit(dex::FunctionParameter& fp)
 {
-  result["type"] = fp.type.toString();
-  write_if(result, "default_value", fp.default_value.toString(), fp.default_value != cxx::Expression());
+  result["type"] = fp.type;
+  write_if(result, "default_value", fp.default_value, fp.default_value != dex::Expression());
 
-  if (fp.documentation != nullptr)
-    result["documentation"] = static_cast<dex::FunctionParameterDocumentation*>(fp.documentation.get())->brief;
+  if (fp.brief.has_value())
+    result["documentation"] = fp.brief.value();
 }
 
-void JsonProgramSerializer::visit(cxx::Variable& v)
+void JsonProgramSerializer::visit(dex::Variable& v)
 {
-  result["vartype"] = v.type().toString();
-  write_if(result, "default_value", v.defaultValue().toString(), v.defaultValue() != cxx::Expression());
+  result["vartype"] = v.type();
+  write_if(result, "default_value", v.defaultValue(), v.defaultValue() != dex::Expression());
 
   if (v.specifiers() != 0)
   {
     std::string specifiers;
 
-    if (v.specifiers() & cxx::VariableSpecifier::Inline)
+    if (v.specifiers() & dex::VariableSpecifier::Inline)
       specifiers += "inline,";
-    if (v.specifiers() & cxx::VariableSpecifier::Static)
+    if (v.specifiers() & dex::VariableSpecifier::Static)
       specifiers += "static,";
-    if (v.specifiers() & cxx::VariableSpecifier::Constexpr)
+    if (v.specifiers() & dex::VariableSpecifier::Constexpr)
       specifiers += "constexpr,";
 
     specifiers.pop_back();
@@ -618,12 +522,12 @@ void JsonProgramSerializer::visit(cxx::Variable& v)
   }
 }
 
-void JsonProgramSerializer::visit(cxx::Typedef& t)
+void JsonProgramSerializer::visit(dex::Typedef& t)
 {
-  result["typedef"] = t.type.toString();
+  result["typedef"] = t.type;
 }
 
-void JsonProgramSerializer::visit(cxx::Macro& m)
+void JsonProgramSerializer::visit(dex::Macro& m)
 {
   json::Array params;
 

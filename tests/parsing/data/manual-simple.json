@@ -80,6 +80,7 @@
     }],
   "program": {
     "global_namespace": {
+      "documentation": {},
       "name": "",
       "type": "namespace"
     }

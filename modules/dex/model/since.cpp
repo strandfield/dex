@@ -7,10 +7,6 @@
 namespace dex
 {
 
-const std::string Since::TypeId = "since";
-const std::string BeginSince::TypeId = "BeginSince";
-const std::string EndSince::TypeId = "EndSince";
-
 Since::Since(std::string version)
   : m_version(std::move(version))
 {
@@ -28,9 +24,9 @@ BeginSince::BeginSince(std::string v)
 
 }
 
-const std::string& BeginSince::className() const
+model::Kind BeginSince::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 EndSince::EndSince(std::shared_ptr<BeginSince> bsince)
@@ -39,9 +35,9 @@ EndSince::EndSince(std::shared_ptr<BeginSince> bsince)
 
 }
 
-const std::string& EndSince::className() const
+model::Kind EndSince::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 } // namespace dex

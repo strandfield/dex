@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -13,11 +13,11 @@ static json::Object values_to_json(QStringList all_values)
 {
   dex::SettingsMap result;
 
-  QStringList values = all_values.join(";").split(";", QString::SkipEmptyParts);
+  QStringList values = all_values.join(";").split(";", Qt::SkipEmptyParts);
 
   for (QString key_value_pair : values)
   {
-    QStringList key_value = key_value_pair.split('=', QString::SkipEmptyParts);
+    QStringList key_value = key_value_pair.split('=', Qt::SkipEmptyParts);
 
     if (key_value.size() == 2)
     {
@@ -32,8 +32,6 @@ CommandLineParser::CommandLineParser()
 {
   addHelpOption();
   addVersionOption();
-
-  addOption({ "clang-version", "Prints the version of clang if available."});
 
   addOption({ "i", "Input (file / directory)", "input" });
   addOption({ "o", "Output", "output" });
@@ -58,10 +56,6 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
   else if (isSet("version"))
   {
     result.status = CommandLineParserResult::VersionRequested;
-  }
-  else if (isSet("clang-version"))
-  {
-    result.status = CommandLineParserResult::ClangVersionRequested;
   }
   else
   {

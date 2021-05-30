@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -14,8 +14,6 @@
 
 #include "dex/common/logging.h"
 #include "dex/common/string-utils.h"
-
-#include <cxx/parsers/restricted-parser.h>
 
 namespace dex
 {
@@ -523,7 +521,7 @@ void ParserFrontend::ingroup(const FunctionCall& call)
 
   if (m_mode == Mode::Program)
   {
-    std::shared_ptr<cxx::Entity> cxxe = m_prog_parser->currentEntity();
+    std::shared_ptr<dex::Entity> cxxe = m_prog_parser->currentEntity();
     m_machine.output()->groups.multiInsert(groups, cxxe);
   }
   else if (m_mode == Mode::Manual)

@@ -1,15 +1,11 @@
-// Copyright (C) 2019-2020 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
 #ifndef DEX_MODEL_MODEL_H
 #define DEX_MODEL_MODEL_H
 
-#include "dex/model/class-documentation.h"
-#include "dex/model/enum-documentation.h"
-#include "dex/model/function-documentation.h"
-#include "dex/model/namespace-documentation.h"
-#include "dex/model/variable-documentation.h"
+#include "dex/model/model-base.h"
 
 #include "dex/model/group.h"
 #include "dex/model/manual.h"
@@ -18,7 +14,7 @@
 namespace dex
 {
 
-class DEX_MODEL_API Model
+class DEX_MODEL_API Model : public model::Object
 {
 public:
   std::vector<std::shared_ptr<dex::Document>> documents;
@@ -27,6 +23,9 @@ public:
 
 public:
   Model() = default;
+
+  static constexpr model::Kind ClassKind = model::Kind::Model;
+  model::Kind kind() const override;
 
   bool empty() const;
 

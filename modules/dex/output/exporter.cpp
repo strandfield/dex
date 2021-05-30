@@ -86,6 +86,37 @@ void Exporter::copyProfiles()
   cp("latex");
 }
 
+static liquid::Value json_to_liquid(const json::Json& js)
+{
+  if (js.isInteger())
+    return js.toInt();
+  else if (js.isBoolean())
+    return js.toBool();
+  else if (js.isNumber())
+    return js.toNumber();
+  else if (js.isString())
+    return js.toString();
+
+  if (js.isObject())
+  {
+    liquid::Map r = {};
+
+    for (const auto& entry : js.toObject().data())
+      r[entry.first] = json_to_liquid(entry.second);
+
+    return r;
+  }
+  else
+  {
+    liquid::Array r = {};
+
+    for (const auto& entry : js.toArray().data())
+      r.push(json_to_liquid(entry));
+
+    return r;
+  }
+}
+
 void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& name, const json::Object& values)
 {
   QFileInfo info{ name };
@@ -133,7 +164,7 @@ void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& 
       prof.load(QDir{ profile_dir });
 
       exporter.setProfile(std::move(prof));
-      exporter.setVariables(values);
+      exporter.setVariables(json_to_liquid(values).toMap());
       exporter.setOutputDir(info.suffix().isEmpty() ? name : info.dir());
       exporter.setModel(model);
 

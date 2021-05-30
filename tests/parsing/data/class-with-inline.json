@@ -1,6 +1,7 @@
 {
   "program": {
     "global_namespace": {
+      "documentation": {},
       "entities": [{
           "documentation": {
             "brief": "provides a date",

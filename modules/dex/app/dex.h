@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -29,8 +29,6 @@ public:
   int exec();
 
 protected:
-  std::string libClangVersion() const;
-
   void process(const QStringList& inputs, QString output, json::Object values);
 
   void work();

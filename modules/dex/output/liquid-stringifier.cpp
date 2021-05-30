@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -9,11 +9,6 @@
 #include "dex/model/code-block.h"
 #include "dex/model/display-math.h"
 #include "dex/model/model.h"
-
-#include <cxx/entity.h>
-
-#include <dom/image.h>
-#include <dom/list.h>
 
 namespace dex
 {
@@ -29,16 +24,14 @@ LiquidStringifier::~LiquidStringifier()
 
 }
 
-std::string LiquidStringifier::stringify(const json::Json& val) const
+std::string LiquidStringifier::stringify(const liquid::Value& val) const
 {
-  if (!val.isObject() && !val.isArray())
+  if (!val.isMap() && !val.isArray())
     return liquid::Renderer::defaultStringify(val);
   else if (val.isArray())
     return stringify_array(val.toArray());
 
-  json::Object obj = val.toObject();
-
-  auto dom_node = renderer.modelMapping().get<dom::Node>(val);
+  auto dom_node = liquid_cast<dex::DocumentNode>(val);
 
   if (dom_node)
     return stringify_domnode(*dom_node);
@@ -47,16 +40,16 @@ std::string LiquidStringifier::stringify(const json::Json& val) const
   return {};
 }
 
-std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
+std::string LiquidStringifier::stringify_domnode(const dex::DocumentNode& node) const
 {
-  if (node.is<dom::Paragraph>())
-    return stringify_paragraph(static_cast<const dom::Paragraph&>(node));
-  else if (node.is<dom::List>())
-    return stringify_list(static_cast<const dom::List&>(node));
-  else if (node.is<dom::ListItem>())
-    return stringify_listitem(static_cast<const dom::ListItem&>(node));
-  else if (node.is<dom::Image>())
-    return stringify_image(static_cast<const dom::Image&>(node));
+  if (node.is<dex::Paragraph>())
+    return stringify_paragraph(static_cast<const dex::Paragraph&>(node));
+  else if (node.is<dex::List>())
+    return stringify_list(static_cast<const dex::List&>(node));
+  else if (node.is<dex::ListItem>())
+    return stringify_listitem(static_cast<const dex::ListItem&>(node));
+  else if (node.is<dex::Image>())
+    return stringify_image(static_cast<const dex::Image&>(node));
   else if (node.is<dex::BeginSince>())
     return stringify_beginsince(static_cast<const dex::BeginSince&>(node));
   else if (node.is<dex::EndSince>())
@@ -84,7 +77,7 @@ std::string LiquidStringifier::stringify_domnode(const dom::Node& node) const
   return {};
 }
 
-std::string LiquidStringifier::stringify_domcontent(const dom::NodeList& content) const
+std::string LiquidStringifier::stringify_domcontent(const dex::DomNodeList& content) const
 {
   std::string result;
 
@@ -96,12 +89,13 @@ std::string LiquidStringifier::stringify_domcontent(const dom::NodeList& content
   return result;
 }
 
-std::string LiquidStringifier::stringify_array(const json::Array& list) const
+std::string LiquidStringifier::stringify_array(const liquid::Array& list) const
 {
   std::string result;
 
-  for (const auto& val : list.data())
+  for (size_t i(0); i < list.length(); ++i)
   {
+    liquid::Value val = list.at(i);
     result += stringify(val);
     result += "\n\n";
   }

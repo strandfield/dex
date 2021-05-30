@@ -5,42 +5,22 @@
 #include "dex/input/program-parser.h"
 
 #include "dex/input/paragraph-writer.h"
+#include "dex/input/cpp-parser.h"
 #include "dex/input/parser-errors.h"
 
-#include "dex/model/class-documentation.h"
-#include "dex/model/enum-documentation.h"
-#include "dex/model/function-documentation.h"
-#include "dex/model/namespace-documentation.h"
-#include "dex/model/typedef-documentation.h"
-#include "dex/model/macro-documentation.h"
-#include "dex/model/variable-documentation.h"
+#include "dex/model/program.h"
 
 #include "dex/common/logging.h"
-
-#include <cxx/class.h>
-#include <cxx/documentation.h>
-#include <cxx/enum.h>
-#include <cxx/function.h>
-#include <cxx/name.h>
-#include <cxx/namespace.h>
-#include <cxx/variable.h>
-
-#include <cxx/parsers/restricted-parser.h>
 
 namespace dex
 {
 
-static EntityDocumentation& doc(const std::shared_ptr<cxx::Documentation>& d)
-{
-  return *static_cast<EntityDocumentation*>(d.get());
-}
-
 template<typename T>
-std::shared_ptr<T> find(const cxx::Entity& e, const std::string& name)
+std::shared_ptr<T> find(const dex::Entity& e, const std::string& name)
 {
-  if (e.kind() == cxx::NodeKind::Class)
+  if (e.kind() == model::Kind::Class)
   {
-    const cxx::Class& cla = static_cast<const cxx::Class&>(e);
+    const dex::Class& cla = static_cast<const dex::Class&>(e);
 
     for (auto m : cla.members)
     {
@@ -48,9 +28,9 @@ std::shared_ptr<T> find(const cxx::Entity& e, const std::string& name)
         return std::dynamic_pointer_cast<T>(m);
     }
   }
-  else if (e.kind() == cxx::NodeKind::Namespace)
+  else if (e.kind() == model::Kind::Namespace)
   {
-    const cxx::Namespace& ns = static_cast<const cxx::Namespace&>(e);
+    const dex::Namespace& ns = static_cast<const dex::Namespace&>(e);
 
     for (auto child : ns.entities)
     {
@@ -68,17 +48,15 @@ ProgramParser::Frame::Frame(FrameType ft)
 
 }
 
-ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent)
+ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<dex::Entity> cxxent)
   : state::Frame<FrameType>(ft)
 {
   node = cxxent;
 
-  auto entdoc = std::static_pointer_cast<EntityDocumentation>(cxxent->documentation);
+  if(!cxxent->description)
+    cxxent->description = std::make_shared<dex::Document>();
 
-  if (!entdoc->description)
-    entdoc->description = std::make_shared<dom::Document>();
-
-  writer = std::make_shared<DocumentWriter>(entdoc->description);
+  writer = std::make_shared<DocumentWriter>(cxxent->description);
 }
 
 ProgramParser::ProgramParser(std::shared_ptr<dex::Program> prog)
@@ -93,9 +71,9 @@ ProgramParser::State& ProgramParser::state()
   return m_state;
 }
 
-std::shared_ptr<cxx::Entity> ProgramParser::currentEntity() const
+std::shared_ptr<dex::Entity> ProgramParser::currentEntity() const
 {
-  return std::static_pointer_cast<cxx::Entity>(m_state.current().node);
+  return m_state.current().node;
 }
 
 std::shared_ptr<DocumentWriter> ProgramParser::contentWriter()
@@ -105,19 +83,18 @@ std::shared_ptr<DocumentWriter> ProgramParser::contentWriter()
 
 void ProgramParser::class_(std::string name)
 {
-  if (currentFrame().node->is<cxx::Function>())
+  if (currentFrame().node->is<dex::Function>())
     throw BadCall{ "ProgramParser::class()", "\\class cannot be used inside \\fn" };
-  else if (currentFrame().node->is<cxx::Enum>())
+  else if (currentFrame().node->is<dex::Enum>())
     throw BadCall{ "ProgramParser::class()", "\\class cannot be used inside \\enum" };
 
-  auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+  auto parent = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
 
-  auto the_class = find<cxx::Class>(*static_cast<cxx::Entity*>(currentFrame().node.get()), name);
+  auto the_class = find<dex::Class>(*static_cast<dex::Entity*>(currentFrame().node.get()), name);
 
   if (the_class == nullptr)
   {
-    the_class = std::make_shared<cxx::Class>(std::move(name), parent);
-    the_class->documentation = std::make_shared<ClassDocumentation>();
+    the_class = std::make_shared<dex::Class>(std::move(name), parent);
     // TODO: set source location
 
     appendChild(the_class);
@@ -129,7 +106,7 @@ void ProgramParser::class_(std::string name)
 
 void ProgramParser::endclass()
 {
-  if (!currentFrame().node->is<cxx::Class>())
+  if (!currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::endclass()", "\\endclass but no \\class" };
 
   exitFrame();
@@ -138,12 +115,12 @@ void ProgramParser::endclass()
 
 void ProgramParser::fn(std::string signature)
 {
-  if (currentFrame().node->is<cxx::Function>())
+  if (currentFrame().node->is<dex::Function>())
     throw BadCall{ "ProgramParser::fn()", "\\fn cannot be nested" };
-  else if (currentFrame().node->is<cxx::Enum>())
+  else if (currentFrame().node->is<dex::Enum>())
     throw BadCall{ "ProgramParser::fn()", "\\fn cannot be used inside \\enum" };
 
-  auto parent = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+  auto parent = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
 
   while (signature.back() == ' ')
     signature.pop_back();
@@ -151,19 +128,18 @@ void ProgramParser::fn(std::string signature)
   if (signature.back() != ';')
     signature.push_back(';');
 
-  std::shared_ptr<cxx::Function> the_fn = [&]() {
+  std::shared_ptr<dex::Function> the_fn = [&]() {
     try
     {
-      return cxx::parsers::RestrictedParser::parseFunctionSignature(signature);
+      return dex::CppParser::parseFunctionSignature(signature);
     }
     catch (...)
     {
       LOG_INFO << "could not parse function signature '" << signature << "'";
-      return std::make_shared<cxx::Function>(signature, parent);
+      return std::make_shared<dex::Function>(signature, parent);
     }
   }();
 
-  the_fn->documentation = std::make_shared<FunctionDocumentation>();
   // TODO: set source location
 
   appendChild(the_fn);
@@ -173,7 +149,7 @@ void ProgramParser::fn(std::string signature)
 
 void ProgramParser::endfn()
 {
-  if (!currentFrame().node->is<cxx::Function>())
+  if (!currentFrame().node->is<dex::Function>())
     throw BadCall{ "ProgramParser::endfn()", "\\endfn but no \\fn" };
 
   exitFrame();
@@ -181,17 +157,16 @@ void ProgramParser::endfn()
 
 void ProgramParser::namespace_(std::string name)
 {
-  if (!currentFrame().node->is<cxx::Namespace>())
+  if (!currentFrame().node->is<dex::Namespace>())
     throw BadCall{ "ProgramParser::namespace()", "\\namespace can only be used inside \\namespace" };
 
-  auto parent_ns = std::dynamic_pointer_cast<cxx::Namespace>(currentFrame().node);
+  auto parent_ns = std::dynamic_pointer_cast<dex::Namespace>(currentFrame().node);
 
-  auto the_namespace = find<cxx::Namespace>(*static_cast<cxx::Entity*>(currentFrame().node.get()), name);
+  auto the_namespace = find<dex::Namespace>(*static_cast<dex::Entity*>(currentFrame().node.get()), name);
 
   if (the_namespace == nullptr)
   {
-    the_namespace = std::make_shared<cxx::Namespace>(std::move(name), parent_ns);
-    the_namespace->documentation = std::make_shared<NamespaceDocumentation>();
+    the_namespace = std::make_shared<dex::Namespace>(std::move(name), parent_ns);
     // TODO: set source location
 
     appendChild(parent_ns, the_namespace);
@@ -203,31 +178,30 @@ void ProgramParser::namespace_(std::string name)
 
 void ProgramParser::endnamespace()
 {
-  if (!currentFrame().node->is<cxx::Namespace>())
+  if (!currentFrame().node->is<dex::Namespace>())
     throw BadCall{ "ProgramParser::endnamespace()", "\\endnamespace but no \\namespace" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::enum_(std::string name)
 {
-  if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
+  if (!currentFrame().node->is<dex::Namespace>() && !currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::enum()", "\\enum must be inside of \\namespace or \\class" };
 
-  auto parent_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  auto parent_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 
-  auto new_enum = std::make_shared<cxx::Enum>(std::move(name), parent_entity);
-  new_enum->documentation = std::make_shared<EnumDocumentation>();
+  auto new_enum = std::make_shared<dex::Enum>(std::move(name), parent_entity);
 
-  if (parent_entity->is<cxx::Namespace>())
+  if (parent_entity->is<dex::Namespace>())
   {
-    const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
+    const auto ns = std::static_pointer_cast<dex::Namespace>(parent_entity);
     ns->entities.push_back(new_enum);
   }
   else
   {
-    const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
+    const auto cla = std::static_pointer_cast<dex::Class>(parent_entity);
     cla->members.push_back(new_enum);
   }
 
@@ -237,11 +211,11 @@ void ProgramParser::enum_(std::string name)
 
 void ProgramParser::endenum()
 {
-  if (!currentFrame().node->is<cxx::Enum>())
+  if (!currentFrame().node->is<dex::Enum>())
     throw BadCall{ "ProgramParser::endenum()", "\\endenum but no \\enum" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::value(std::string name)
@@ -249,18 +223,17 @@ void ProgramParser::value(std::string name)
   if (currentFrame().type == FrameType::EnumValue)
     exitFrame();
 
-  if (!currentFrame().node->is<cxx::Enum>())
+  if (!currentFrame().node->is<dex::Enum>())
   {
-    if (m_lastblock_entity->node_kind() != cxx::NodeKind::Enum)
+    if (m_lastblock_entity->kind() != model::Kind::Enum)
       throw BadCall{ "ProgramParser::value()", "\\value must be near \\enum" };
 
     m_state.enter<FrameType::Enum>(m_lastblock_entity);
   }
 
-  const auto en = std::static_pointer_cast<cxx::Enum>(currentFrame().node);
+  const auto en = std::static_pointer_cast<dex::Enum>(currentFrame().node);
 
-  auto enum_value = std::make_shared<cxx::EnumValue>(std::move(name), en);
-  enum_value->documentation = std::make_shared<EnumValueDocumentation>();
+  auto enum_value = std::make_shared<dex::EnumValue>(std::move(name), en);
 
   en->values.push_back(enum_value);
 
@@ -279,10 +252,10 @@ void ProgramParser::endenumvalue()
 
 void ProgramParser::variable(std::string decl)
 {
-  if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
+  if (!currentFrame().node->is<dex::Namespace>() && !currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::variable()", "\\variable must be inside \\namespace or \\class" };
 
-  auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+  auto parent_entity = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
 
   while (decl.back() == ' ')
     decl.pop_back();
@@ -290,28 +263,26 @@ void ProgramParser::variable(std::string decl)
   if (decl.back() != ';')
     decl.push_back(';');
 
-  std::shared_ptr<cxx::Variable> the_var = [&]() {
+  std::shared_ptr<dex::Variable> the_var = [&]() {
     try
     {
-      return cxx::parsers::RestrictedParser::parseVariable(decl);
+      return dex::CppParser::parseVariable(decl);
     }
     catch (...)
     {
       LOG_INFO << "could not parse variable declaration '" << decl << "'";
-      return std::make_shared<cxx::Variable>(cxx::Type::Auto, decl, parent_entity);
+      return std::make_shared<dex::Variable>("auto", decl, parent_entity);
     }
   }();
 
-  the_var->documentation = std::make_shared<VariableDocumentation>();
-
-  if (parent_entity->is<cxx::Namespace>())
+  if (parent_entity->is<dex::Namespace>())
   {
-    const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
+    const auto ns = std::static_pointer_cast<dex::Namespace>(parent_entity);
     ns->entities.push_back(the_var);
   }
   else
   {
-    const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
+    const auto cla = std::static_pointer_cast<dex::Class>(parent_entity);
     cla->members.push_back(the_var);
   }
 
@@ -321,19 +292,19 @@ void ProgramParser::variable(std::string decl)
 
 void ProgramParser::endvariable()
 {
-  if (!currentFrame().node->is<cxx::Variable>())
+  if (!currentFrame().node->is<dex::Variable>())
     throw BadCall{ "ProgramParser::endvariable()", "\\endvariable but no \\variable" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::typedef_(std::string decl)
 {
-  if (!currentFrame().node->is<cxx::Namespace>() && !currentFrame().node->is<cxx::Class>())
+  if (!currentFrame().node->is<dex::Namespace>() && !currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::typedef()", "\\typedef must be inside \\namespace or \\class" };
 
-  auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+  auto parent_entity = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
 
   while (decl.back() == ' ')
     decl.pop_back();
@@ -343,28 +314,26 @@ void ProgramParser::typedef_(std::string decl)
   
   decl = "typedef " + decl;
 
-  std::shared_ptr<cxx::Typedef> the_typedef = [&]() {
+  std::shared_ptr<dex::Typedef> the_typedef = [&]() {
     try
     {
-      return cxx::parsers::RestrictedParser::parseTypedef(decl);
+      return dex::CppParser::parseTypedef(decl);
     }
     catch (...)
     {
       LOG_INFO << "could not parse variable declaration '" << decl << "'";
-      return std::make_shared<cxx::Typedef>(cxx::Type::Auto, decl, parent_entity);
+      return std::make_shared<dex::Typedef>("auto", decl, parent_entity);
     }
   }();
 
-  the_typedef->documentation = std::make_shared<TypedefDocumentation>();
-
-  if (parent_entity->is<cxx::Namespace>())
+  if (parent_entity->is<dex::Namespace>())
   {
-    const auto ns = std::static_pointer_cast<cxx::Namespace>(parent_entity);
+    const auto ns = std::static_pointer_cast<dex::Namespace>(parent_entity);
     ns->entities.push_back(the_typedef);
   }
   else
   {
-    const auto cla = std::static_pointer_cast<cxx::Class>(parent_entity);
+    const auto cla = std::static_pointer_cast<dex::Class>(parent_entity);
     cla->members.push_back(the_typedef);
   }
 
@@ -374,27 +343,27 @@ void ProgramParser::typedef_(std::string decl)
 
 void ProgramParser::endtypedef()
 {
-  if (!currentFrame().node->is<cxx::Typedef>())
+  if (!currentFrame().node->is<dex::Typedef>())
     throw BadCall{ "ProgramParser::endtypedef()", "\\endtypedef but no \\typedef" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::macro(std::string decl)
 {
-  if (!currentFrame().node->is<cxx::Namespace>())
+  if (!currentFrame().node->is<dex::Namespace>())
     throw BadCall{ "ProgramParser::typedef()", "\\macro must be inside \\namespace" };
 
-  auto parent_entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
+  auto parent_entity = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
 
   while (decl.back() == ' ')
     decl.pop_back();
 
-  std::shared_ptr<cxx::Macro> the_macro = [&]() {
+  std::shared_ptr<dex::Macro> the_macro = [&]() {
     try
     {
-      return cxx::parsers::RestrictedParser::parseMacro(decl);
+      return dex::CppParser::parseMacro(decl);
     }
     catch (...)
     {
@@ -404,8 +373,6 @@ void ProgramParser::macro(std::string decl)
     }
   }();
 
-  the_macro->documentation = std::make_shared<MacroDocumentation>();
-
   m_program->macros.push_back(the_macro);
 
   m_state.enter<FrameType::Macro>(the_macro);
@@ -414,23 +381,23 @@ void ProgramParser::macro(std::string decl)
 
 void ProgramParser::endmacro()
 {
-  if (!currentFrame().node->is<cxx::Macro>())
+  if (!currentFrame().node->is<dex::Macro>())
     throw BadCall{ "ProgramParser::macro()", "\\endmacro but no \\macro" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
+  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::brief(std::string brieftext)
 {
-  auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  doc(entity->documentation).brief() = std::move(brieftext);
+  auto entity = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
+  entity->brief = std::move(brieftext);
 }
 
 void ProgramParser::since(std::string version)
 {
-  auto entity = std::dynamic_pointer_cast<cxx::Entity>(currentFrame().node);
-  doc(entity->documentation).since() = dex::Since{ version };
+  auto entity = std::dynamic_pointer_cast<dex::Entity>(currentFrame().node);
+  entity->since = dex::Since{ version };
 }
 
 void ProgramParser::param(std::string des)
@@ -440,14 +407,13 @@ void ProgramParser::param(std::string des)
   if (f.type != FrameType::Function)
     throw BadCall{ "ProgramParser::param()", "\\param must inside \\fn" };
 
-  auto fun = std::static_pointer_cast<cxx::Function>(currentFrame().node);
-  auto param_doc = std::make_shared<dex::FunctionParameterDocumentation>(std::move(des));
+  auto fun = std::static_pointer_cast<dex::Function>(currentFrame().node);
 
   for (size_t i(0); fun->parameters.size(); ++i)
   {
-    if (fun->parameters.at(i)->documentation == nullptr)
+    if (!fun->parameters.at(i)->brief.has_value())
     {
-      fun->parameters.at(i)->documentation = param_doc;
+      fun->parameters.at(i)->brief = des;
       return;
     }
   }
@@ -462,9 +428,8 @@ void ProgramParser::returns(std::string des)
   if (f.type != FrameType::Function)
     throw BadCall{ "ProgramParser::returns()", "\\returns must inside \\fn" };
 
-  auto entity = std::static_pointer_cast<cxx::Entity>(currentFrame().node);
-  auto doc = std::static_pointer_cast<FunctionDocumentation>(entity->documentation);
-  doc->returnValue() = std::move(des);
+  auto entity = std::static_pointer_cast<dex::Function>(currentFrame().node);
+  entity->return_type.brief = std::move(des);
 }
 
 void ProgramParser::nonmember()
@@ -474,12 +439,12 @@ void ProgramParser::nonmember()
   if (f.type != FrameType::Function)
     throw BadCall{ "ProgramParser::nonmember()", "\\nonmember must be inside \\fn" };
 
-  auto func = std::static_pointer_cast<cxx::Function>(currentFrame().node);
+  auto func = std::static_pointer_cast<dex::Function>(currentFrame().node);
 
-  if(!func->parent()->is<cxx::Class>())
+  if(!func->parent()->is<dex::Class>())
     throw BadCall{ "ProgramParser::nonmember()", "\\nonmember cannot be used for \\fn outside of \\class" };
 
-  auto the_class = std::static_pointer_cast<cxx::Class>(func->parent());
+  auto the_class = std::static_pointer_cast<dex::Class>(func->parent());
 
   // perform the re-parenting
   the_class->members.pop_back();
@@ -495,16 +460,16 @@ void ProgramParser::relates(const std::string& class_name)
   if (f.type != FrameType::Function)
     throw BadCall{ "ProgramParser::relates()", "\\relates must be inside \\fn" };
 
-  auto func = std::static_pointer_cast<cxx::Function>(currentFrame().node);
+  auto func = std::static_pointer_cast<dex::Function>(currentFrame().node);
 
-  std::shared_ptr<cxx::Entity> parent = func->parent();
+  std::shared_ptr<dex::Entity> parent = func->parent();
 
-  auto the_class = m_program->resolve(cxx::Name::fromSimpleIdentifier(class_name), parent);
+  auto the_class = m_program->resolve(class_name, parent);
 
-  if(!the_class || !the_class->is<cxx::Class>())
+  if(!the_class || !the_class->is<dex::Class>())
     throw BadCall{ "ProgramParser::relates()", "\\relates must specifiy a known class name" };
 
-  m_program->related.relates(func, std::static_pointer_cast<cxx::Class>(the_class));
+  m_program->related.relates(func, std::static_pointer_cast<dex::Class>(the_class));
 }
 
 void ProgramParser::beginFile()
@@ -527,11 +492,11 @@ void ProgramParser::beginBlock()
 
 void ProgramParser::endBlock()
 {
-  auto is_terminal_node = [](const std::shared_ptr<cxx::Node>& node) -> bool{
-    return node->node_kind() == cxx::NodeKind::Enum || node->node_kind() == cxx::NodeKind::Function
-      || node->node_kind() == cxx::NodeKind::Variable
-      || node->node_kind() == cxx::NodeKind::Typedef
-      || node->node_kind() == cxx::NodeKind::Macro;
+  auto is_terminal_node = [](const std::shared_ptr<dex::Entity>& node) -> bool{
+    return node->kind() == model::Kind::Enum || node->kind() == model::Kind::Function
+      || node->kind() == model::Kind::Variable
+      || node->kind() == model::Kind::Typedef
+      || node->kind() == model::Kind::Macro;
   };
 
   while (is_terminal_node(m_state.current().node))
@@ -549,38 +514,38 @@ void ProgramParser::exitFrame()
 {
   Frame& f = m_state.current();
 
-  if (f.node->isEntity())
+  if (f.node->isProgramEntity())
   {
-    auto ent = std::static_pointer_cast<cxx::Entity>(f.node);
+    auto ent = std::static_pointer_cast<dex::Entity>(f.node);
     f.writer->finish();
   }
 
   m_state.leave();
 }
 
-void ProgramParser::appendChild(std::shared_ptr<cxx::Entity> e)
+void ProgramParser::appendChild(std::shared_ptr<dex::Entity> e)
 {
   appendChild(currentFrame().node, e);
 }
 
-void ProgramParser::appendChild(std::shared_ptr<cxx::Node> parent, std::shared_ptr<cxx::Entity> child)
+void ProgramParser::appendChild(std::shared_ptr<dex::Entity> parent, std::shared_ptr<dex::Entity> child)
 {
   switch (parent->kind())
   {
-  case cxx::NodeKind::Namespace:
-    parent->get<cxx::Namespace::Entities>().push_back(child);
+  case model::Kind::Namespace:
+    static_cast<dex::Namespace&>(*parent).entities.push_back(child);
     break;
-  case cxx::NodeKind::Class:
-    parent->get<cxx::Class::Members>().push_back(child);
+  case model::Kind::Class:
+    static_cast<dex::Class&>(*parent).members.push_back(child);
     break;
-  case cxx::NodeKind::Enum:
-    parent->get<cxx::Enum::Values>().push_back(std::static_pointer_cast<cxx::EnumValue>(child));
+  case model::Kind::Enum:
+    static_cast<dex::Enum&>(*parent).values.push_back(std::static_pointer_cast<dex::EnumValue>(child));
     break;
   default:
     throw std::runtime_error("ProgramParser::appendChild() failed");
   }
   
-  child->weak_parent = std::static_pointer_cast<cxx::Entity>(parent);
+  child->weak_parent = std::static_pointer_cast<dex::Entity>(parent);
 }
 
 } // namespace dex

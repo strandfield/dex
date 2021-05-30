@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -14,13 +14,6 @@
 
 #include "dex/common/logging.h"
 
-#include <dom/image.h>
-#include <dom/list.h>
-#include <dom/paragraph.h>
-#include <dom/paragraph/iterator.h>
-#include <dom/paragraph/link.h>
-#include <dom/paragraph/textstyle.h>
-
 namespace dex
 {
 
@@ -30,28 +23,28 @@ public:
 
   using ParagraphConverter::ParagraphConverter;
 
-  void process_bold(const dom::ParagraphIterator it) override
+  void process_bold(const dex::ParagraphIterator it) override
   {
     result += "**";
     process(it);
     result += "**";
   }
 
-  void process_italic(const dom::ParagraphIterator it) override
+  void process_italic(const dex::ParagraphIterator it) override
   {
     result += "*";
     process(it);
     result += "*";
   }
 
-  void process_typewriter(const dom::ParagraphIterator it) override
+  void process_typewriter(const dex::ParagraphIterator it) override
   {
     result += "`";
     process(it);
     result += "`";
   }
 
-  void process_link(const dom::ParagraphIterator it, const std::string& url) override
+  void process_link(const dex::ParagraphIterator it, const std::string& url) override
   {
     result += "[";
     process(it);
@@ -60,7 +53,7 @@ public:
     result += ")";
   }
 
-  void process_math(const dom::ParagraphIterator it) override
+  void process_math(const dex::ParagraphIterator it) override
   {
     result += "`";
     auto text_begin = it.paragraph().text().begin();
@@ -75,7 +68,7 @@ MarkdownStringifier::MarkdownStringifier(LiquidExporter& exp)
 
 }
 
-std::string MarkdownStringifier::stringify_list(const dom::List& list) const
+std::string MarkdownStringifier::stringify_list(const dex::List& list) const
 {
   // @TODO: handle nested list
 
@@ -83,25 +76,25 @@ std::string MarkdownStringifier::stringify_list(const dom::List& list) const
 
   for (const auto& li : list.items)
   {
-    result += "- " + stringify_listitem(static_cast<dom::ListItem&>(*li)) + "\n";
+    result += "- " + stringify_listitem(static_cast<dex::ListItem&>(*li)) + "\n";
   }
 
   return result;
 }
 
-std::string MarkdownStringifier::stringify_listitem(const dom::ListItem& li) const
+std::string MarkdownStringifier::stringify_listitem(const dex::ListItem& li) const
 {
   return stringify_domcontent(li.content);
 }
 
-std::string MarkdownStringifier::stringify_paragraph(const dom::Paragraph& par) const
+std::string MarkdownStringifier::stringify_paragraph(const dex::Paragraph& par) const
 {
   MarkdownParagraphConverter converter{ par };
   converter.process();
   return std::string(std::move(converter.result));
 }
 
-std::string MarkdownStringifier::stringify_image(const dom::Image& img) const
+std::string MarkdownStringifier::stringify_image(const dex::Image& img) const
 {
   return "![image](" + img.src + ")";
 }
@@ -124,20 +117,12 @@ std::string MarkdownStringifier::stringify_math(const dex::DisplayMath& math) co
   return result;
 }
 
-std::string MarkdownStringifier::format_group_item(const std::shared_ptr<cxx::Entity>& e) const
+std::string MarkdownStringifier::format_group_item(const std::shared_ptr<dex::Entity>& e) const
 {
-  const std::string url = [&]() -> std::string {
-    json::Object json_obj = renderer.modelMapping().get(*e).toObject();
-    auto it = json_obj.data().find("url");
-
-    if (it != json_obj.data().end())
-      return json_obj["url"].toString();
-    else
-      return "";
-  }();
+  const std::string url = renderer.get_url(*e);
 
   std::string result = [&]() -> std::string {
-    if (e->is<cxx::Function>())
+    if (e->is<dex::Function>())
       return e->name + "()";
     else
       return e->name;

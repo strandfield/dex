@@ -6,6 +6,7 @@
     }],
   "program": {
     "global_namespace": {
+      "documentation": {},
       "entities": [{
           "documentation": {
             "brief": "Specifies the direction of text handling.",

@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -12,8 +12,6 @@
 #include "dex/model/program.h"
 
 #include "dex/common/state.h"
-
-#include <cxx/namespace.h>
 
 namespace dex
 {
@@ -43,9 +41,9 @@ public:
     ~Frame() = default;
 
     explicit Frame(FrameType ft);
-    Frame(FrameType ft, std::shared_ptr<cxx::Entity> cxxent);
+    Frame(FrameType ft, std::shared_ptr<Entity> cxxent);
 
-    std::shared_ptr<cxx::Node> node;
+    std::shared_ptr<Entity> node;
     std::shared_ptr<DocumentWriter> writer;
   };
 
@@ -53,7 +51,7 @@ public:
   
   State& state();
 
-  std::shared_ptr<cxx::Entity> currentEntity() const;
+  std::shared_ptr<Entity> currentEntity() const;
   
   // @TODO: rework these, they may not belong here
   void beginFile();
@@ -99,13 +97,13 @@ public:
 protected:
   Frame& currentFrame();
   void exitFrame();
-  void appendChild(std::shared_ptr<cxx::Entity> e);
-  static void appendChild(std::shared_ptr<cxx::Node> parent, std::shared_ptr<cxx::Entity> child);
+  void appendChild(std::shared_ptr<Entity> e);
+  static void appendChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child);
 
 private:
   State m_state;
   std::shared_ptr<dex::Program> m_program;
-  std::shared_ptr<cxx::Entity> m_lastblock_entity;
+  std::shared_ptr<Entity> m_lastblock_entity;
 };
 
 } // namespace dex

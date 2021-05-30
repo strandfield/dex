@@ -7,7 +7,7 @@
 
 #include "dex/dex-model.h"
 
-#include <dom/element.h>
+#include "dex/model/document.h"
 
 namespace dex
 {
@@ -20,12 +20,12 @@ private:
 public:
   Since(std::string version);
 
-  static const std::string TypeId;
+  static constexpr model::Kind ClassKind = model::Kind::Since;
 
   const std::string& version() const;
 };
 
-class DEX_MODEL_API BeginSince : public dom::Element
+class DEX_MODEL_API BeginSince : public DocumentElement
 {
 public:
   std::string version;
@@ -33,11 +33,11 @@ public:
 public:
   explicit BeginSince(std::string v);
 
-  static const std::string TypeId;
-  const std::string& className() const override;
+  static constexpr model::Kind ClassKind = model::Kind::BeginSince;
+  model::Kind kind() const override;
 };
 
-class DEX_MODEL_API EndSince : public dom::Element
+class DEX_MODEL_API EndSince : public DocumentElement
 {
 public:
   std::weak_ptr<BeginSince> beginsince;
@@ -45,8 +45,8 @@ public:
 public:
   explicit EndSince(std::shared_ptr<BeginSince> bsince);
 
-  static const std::string TypeId;
-  const std::string& className() const override;
+  static constexpr model::Kind ClassKind = model::Kind::EndSince;
+  model::Kind kind() const override;
 };
 
 } // namespace dex

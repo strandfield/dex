@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -7,7 +7,7 @@
 
 #include "dex/dex-model.h"
 
-#include <cxx/entity.h>
+#include "dex/model/model-base.h"
 
 #include <json-toolkit/json.h>
 
@@ -18,6 +18,7 @@ namespace dex
 {
 
 class Document;
+class Entity;
 
 class Group;
 
@@ -34,7 +35,7 @@ public:
   void multiInsert(const std::vector<std::string>& groupnames, T elem);
 };
 
-class DEX_MODEL_API Group : public std::enable_shared_from_this<Group>
+class DEX_MODEL_API Group : public model::Object
 {
 public:
   size_t index;
@@ -42,17 +43,20 @@ public:
 
   struct Content
   {
-    std::vector<std::shared_ptr<cxx::Entity>> entities;
+    std::vector<std::shared_ptr<dex::Entity>> entities;
     std::vector<std::shared_ptr<dex::Document>> documents;
   };
 
   Content content;
 
-  void insert(std::shared_ptr<cxx::Entity> e);
+  void insert(std::shared_ptr<dex::Entity> e);
   void insert(std::shared_ptr<dex::Document> doc);
 
 public:
   Group(size_t index, std::string n);
+
+  static constexpr model::Kind ClassKind = model::Kind::Group;
+  model::Kind kind() const override;
 };
 
 template<typename T>

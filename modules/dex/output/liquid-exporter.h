@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -19,11 +19,6 @@
 #include <map>
 #include <variant>
 #include <vector>
-
-namespace cxx
-{
-class Class;
-} // namespace cxx
 
 namespace dex
 {
@@ -59,8 +54,8 @@ public:
   QDir outputDir() const;
   void setOutputDir(const QDir& dir);
 
-  void setVariables(json::Object obj);
-  const json::Object& variables() const;
+  void setVariables(liquid::Map obj);
+  const liquid::Map& variables() const;
 
   void render();
 
@@ -69,40 +64,36 @@ public:
 
   void setModel(std::shared_ptr<Model> model);
   std::shared_ptr<Model> model() const;
-  json::Object serializedModel() const;
-  const JsonExportMapping& modelMapping() const;
 
-protected:
-
-  void annotateModel();
+  std::string get_url(const dex::Entity& e) const;
+  std::string get_url(const dex::Document& doc) const;
+  std::string get_url(const std::shared_ptr<model::Object>& obj) const;
 
 protected:
   friend class LiquidExporterModelVisitor;
 
-  void dump(const json::Object& obj, const char* obj_field_name, const Profile::Template& tmplt);
+  void dump(const std::shared_ptr<model::Object>& obj, const char* obj_field_name, const Profile::Template& tmplt);
 
-  void dump(const cxx::Class& cla, const json::Object& obj);
-  void dump(const cxx::Namespace& ns, const json::Object& obj);
-  void dump(const dex::Document& doc, const json::Object& obj);
+  void dump(dex::Class& cla);
+  void dump(dex::Namespace& ns);
+  void dump(dex::Document& doc);
 
 protected:
-  std::string stringify(const json::Json& val) override;
-  json::Json applyFilter(const std::string& name, const json::Json& object, const std::vector<json::Json>& args) override;
+  std::string stringify(const liquid::Value& val) override;
+  liquid::Value applyFilter(const std::string& name, const liquid::Value& object, const std::vector<liquid::Value>& args) override;
 
 protected:
 
   void selectStringifier(const std::string& filesuffix);
-  void setupContext(json::Object& context);
+  void setupContext(liquid::Map& context);
   void postProcess(std::string& output);
   void write(const std::string& data, const std::string& filepath);
 
 private:
   QDir m_output_dir;
   std::shared_ptr<Model> m_model;
-  json::Object m_serialized_model;
-  JsonExportMapping m_model_mapping;
   Profile m_profile;
-  json::Object m_user_variables;
+  liquid::Map m_user_variables;
   std::map<std::string, std::shared_ptr<LiquidStringifier>> m_stringifiers;
   std::shared_ptr<LiquidStringifier> m_stringifier;
   std::unique_ptr<LiquidFilters> m_filters;
@@ -121,16 +112,6 @@ inline const LiquidExporterProfile& LiquidExporter::profile() const
 inline std::shared_ptr<Model> LiquidExporter::model() const
 {
   return m_model;
-}
-
-inline json::Object LiquidExporter::serializedModel() const
-{
-  return m_serialized_model;
-}
-
-inline const JsonExportMapping& LiquidExporter::modelMapping() const
-{
-  return m_model_mapping;
 }
 
 } // namespace dex

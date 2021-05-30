@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 Vincent Chambrin
+// Copyright (C) 2019-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -8,13 +8,12 @@
 #include "dex/dex-input.h"
 
 #include "dex/model/model.h"
+#include "dex/model/program.h"
 
 #include "dex/input/conditional-evaluator.h"
 #include "dex/input/function-caller.h"
 #include "dex/input/parser-frontend.h"
 #include "dex/input/parser-errors.h"
-
-#include <cxx/program.h>
 
 #include <tex/lexer.h>
 #include <tex/parsing/preprocessor.h>

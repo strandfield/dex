@@ -18,7 +18,7 @@ public:
 public:
   ParIndexEntry(std::string k);
 
-  static const std::string TypeId;
+  static constexpr model::Kind ClassKind = model::Kind::IndexEntry;
 };
 
 } // namespace dex

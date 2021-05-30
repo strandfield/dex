@@ -7,11 +7,9 @@
 namespace dex
 {
 
-const std::string CodeBlock::TypeId = "CodeBlock";
-
-const std::string& CodeBlock::className() const
+model::Kind CodeBlock::kind() const
 {
-  return TypeId;
+  return ClassKind;
 }
 
 CodeBlock::CodeBlock()

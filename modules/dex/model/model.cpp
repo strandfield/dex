@@ -9,6 +9,11 @@
 namespace dex
 {
 
+model::Kind Model::kind() const
+{
+  return ClassKind;
+}
+
 bool Model::empty() const
 {
   return m_program == nullptr && documents.empty();
