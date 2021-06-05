@@ -9,6 +9,15 @@
 
 {{ class.description }}
 
+{% assign member_enums = class.members | filter_by_type: 'enum' %}
+
+{% if member_enums.length > 0 %}
+## Enumerations
+{% for enm in member_enums %}
+{% include enum_in_class with enum = enm %}
+{% endfor %}
+{% endif %}
+
 ## Members documentation
 
 {% for f in class.members | filter_by_type: 'function' %}

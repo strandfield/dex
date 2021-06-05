@@ -14,5 +14,6 @@
     <file>templates/markdown/index.md</file>
     <file>templates/markdown/document.md</file>
 	<file>templates/markdown/namespace.md</file>
+	<file>templates/markdown/enum_in_class</file>
   </qresource>
 </RCC>
