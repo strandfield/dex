@@ -17,6 +17,17 @@
 
 {% endif %}
 
+{% assign classes = namespace.entities | filter_by_type: 'class' %}
+{% if classes.length > 0 %}
+## Classes
+
+{% for c in classes %}
+- [{{ c.name }}]({{ c | get_url }})
+{% endfor %}
+
+{% endif %}
+
+
 ## Functions
 
 {% for f in namespace.entities | filter_by_type: 'function' %}
