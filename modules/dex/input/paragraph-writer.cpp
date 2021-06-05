@@ -99,13 +99,17 @@ void ParagraphWriter::alignmenttab()
 
 void ParagraphWriter::superscript()
 {
-  m_math_parser->beginSuperscript();
+  if (m_math_parser)
+    m_math_parser->beginSuperscript();
+
   write('^');
 }
 
 void ParagraphWriter::subscript()
 {
-  m_math_parser->beginSubscript();
+  if (m_math_parser)
+    m_math_parser->beginSubscript();
+
   write('_');
 }
 
