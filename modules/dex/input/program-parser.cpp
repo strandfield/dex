@@ -211,6 +211,9 @@ void ProgramParser::enum_(std::string name)
 
 void ProgramParser::endenum()
 {
+  if (currentFrame().node->is<dex::EnumValue>())
+    exitFrame();
+
   if (!currentFrame().node->is<dex::Enum>())
     throw BadCall{ "ProgramParser::endenum()", "\\endenum but no \\enum" };
 
@@ -493,7 +496,7 @@ void ProgramParser::beginBlock()
 void ProgramParser::endBlock()
 {
   auto is_terminal_node = [](const std::shared_ptr<dex::Entity>& node) -> bool{
-    return node->kind() == model::Kind::Enum || node->kind() == model::Kind::Function
+    return node->kind() == model::Kind::EnumValue || node->kind() == model::Kind::Function
       || node->kind() == model::Kind::Variable
       || node->kind() == model::Kind::Typedef
       || node->kind() == model::Kind::Macro;
