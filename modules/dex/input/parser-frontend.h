@@ -41,6 +41,9 @@ public:
     /* TeX */
     PAR,
     INPUT,
+    LEFTBRACE,
+    RIGHTBRACE,
+    PERCENT,
     /* Entities */
     CLASS,
     ENDCLASS,
