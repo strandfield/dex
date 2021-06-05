@@ -478,7 +478,11 @@ Type CppParser::tryReadFunctionSignature(size_t start)
 {
   std::vector<Type> params;
 
-  const cpptok::Token leftPar = unsafe_read();
+  unsafe_read(); // read '('
+
+  read(cpptok::TokenType::Star);
+  read(cpptok::TokenType::RightPar);
+  read(cpptok::TokenType::LeftPar);
   
   {
     ParserParenView paren_view{ m_buffer, m_view, m_index };
@@ -679,6 +683,7 @@ Name CppParser::readTemplateArguments(const Name base)
 std::shared_ptr<Function> CppParser::parseFunctionSignature()
 {
   int specifiers = FunctionSpecifier::None;
+  FunctionKind::Value category = FunctionKind::None;
 
   while (peek() == cpptok::TokenType::Virtual || peek() == cpptok::TokenType::Static 
     || peek() == cpptok::TokenType::Inline || peek() == cpptok::TokenType::Constexpr
@@ -711,12 +716,41 @@ std::shared_ptr<Function> CppParser::parseFunctionSignature()
     }
   }
 
-  Type return_type = parseType();
-  Name fun_name = parseName();
+  Type return_type;
+  Name fun_name;
+
+  if (peek() == cpptok::TokenType::Tilde)
+  {
+    category = FunctionKind::Destructor;
+    read();
+    fun_name = "~" + parseName();
+  }
+  else if (peek() == cpptok::TokenType::Operator)
+  {
+    category = FunctionKind::ConversionFunction;
+    read();
+    fun_name = "operator " + parseType();
+  }
+  else
+  {
+    return_type = parseType();
+
+    if (peek() == cpptok::TokenType::LeftPar)
+    {
+      fun_name = return_type;
+      return_type = "";
+      category = FunctionKind::Constructor;
+    }
+    else
+    {
+      fun_name = parseName();
+    }
+  }
 
   auto ret = std::make_shared<Function>(fun_name);
   ret->specifiers = specifiers;
   ret->return_type.type = return_type;
+  ret->category = category;
 
   read(cpptok::TokenType::LeftPar);
 
