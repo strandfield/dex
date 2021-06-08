@@ -1,0 +1,13 @@
+
+\manual dex
+
+\def\dex{\c{dex}}
+\def\liquidtag#1{\{\% #1 \%\}}
+\def\liquidobject#1{\{\{ #1 \}\}}
+
+\tableofcontents
+
+\input{man/intro}
+\input{man/cli}
+\input{man/commands}
+\input{man/output}

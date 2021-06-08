@@ -36,10 +36,12 @@ const std::map<std::string, ParserFrontend::CS>& ParserFrontend::csmap()
   static std::map<std::string, CS> static_instance = { 
     /* TeX */
     {Functions::PAR, CS::PAR},
+    {Functions::BACKSLASH, CS::BACKSLASH},
     {Functions::INPUT, CS::INPUT},
     {std::string("{"), CS::LEFTBRACE},
     {std::string("}"), CS::RIGHTBRACE},
     {std::string("%"), CS::PERCENT},
+    {std::string("#"), CS::HASHSIGN},
     /* Program */
     {Functions::CLASS, CS::CLASS},
     {Functions::ENDCLASS, CS::ENDCLASS},
@@ -161,6 +163,8 @@ void ParserFrontend::handle(const FunctionCall& call)
     {
     case CS::PAR:
       return par(call);
+    case CS::BACKSLASH:
+      return write('\\');
     case CS::INPUT:
       return input(call);
     case CS::LEFTBRACE:
@@ -169,6 +173,8 @@ void ParserFrontend::handle(const FunctionCall& call)
       return write('}');
     case CS::PERCENT:
       return write('%');
+    case CS::HASHSIGN:
+      return write('#');
     case CS::ENDFN:
       return cs_endfn();
     case CS::ENDCLASS:

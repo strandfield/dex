@@ -378,6 +378,9 @@ void ParserMachine::input(const std::string& filename)
 
   file.setFile(current.dir().path() + "/" + qt_filename);
 
+  if (file.suffix().isEmpty())
+    file.setFile(file.filePath() + ".dex");
+
   if (!file.exists())
   {
     throw std::runtime_error{ "No such file" };

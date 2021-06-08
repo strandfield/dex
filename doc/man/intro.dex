@@ -1,0 +1,39 @@
+
+\chapter{Introduction}
+
+\dex{} is a C/C++ documentation tool that aims at providing great input 
+flexibility and output customization.
+
+Unlike other tools, \dex{} does not generate documentation by parsing your code,
+but solely through the documentation blocks.
+This makes it possible to create a documentation without any C++ code or a 
+documentation that presents a simplified version of the code.
+
+\dex{} documentation blocks use a doxygen-like style. 
+
+\begin{code}
+/*!
+ * \backslash{}class Dex
+ * \backslash{}the dex engine
+ */
+\end{code}
+
+Within a documentation block, TeX-style control sequences can be used 
+to describe the program that is being documented (namespaces, classes, etc...) 
+and write rich descriptions (math, images, code blocks, ...).
+
+\dex{} supports JSON, LaTeX and Markdown outputs. 
+LaTeX and Markdown outputs can be customized using a Liquid-style template 
+engine.
+
+\begin{code}[md]
+\liquidtag{assign classes = namespace.entities | filter_by_type: 'class'}
+\liquidtag{if classes.length > 0}
+\#\# Classes
+
+\liquidtag{for c in classes}
+- [\liquidobject{c.name}](\liquidobject{c | get_url})
+\liquidtag{endfor}
+
+\liquidtag{endif}
+\end{code}

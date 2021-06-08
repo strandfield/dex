@@ -40,10 +40,12 @@ public:
   {
     /* TeX */
     PAR,
+    BACKSLASH,
     INPUT,
     LEFTBRACE,
     RIGHTBRACE,
     PERCENT,
+    HASHSIGN, 
     /* Entities */
     CLASS,
     ENDCLASS,

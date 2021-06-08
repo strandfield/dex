@@ -19,6 +19,21 @@ public:
 
   using ParagraphConverter::ParagraphConverter;
 
+  void process_text(const std::string& text) override
+  {
+    result.reserve(result.size() + text.size());
+
+    for (char c : text)
+    {
+      if (c == '\\')
+        result += "\\textbackslash{}";
+      else if (c == '{' || c == '}' || c == '#' || c == '%')
+        result.push_back('\\'), result.push_back(c);
+      else
+        result.push_back(c);
+    }
+  }
+
   void process_bold(const dex::ParagraphIterator it) override
   {
     result += "\\textbf{";

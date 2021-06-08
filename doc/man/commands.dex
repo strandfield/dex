@@ -1,0 +1,210 @@
+
+\chapter{Commands}
+
+This chapter discusses the various commands (or control sequences) that can be
+used inside a documentation block.
+
+Commands may take zero or more arguments. 
+When a command takes a single argument, that argument has a range.
+We use \c{<arg>} to denote an argument that spans over a single word and 
+\c{(arg)} for an argument that spans over the line.
+In any case, you can use braces (\{\}) to extend the range of an argument.
+
+Some commands also accept options which are usually written between brackets ([]).
+
+\section{General purpose commands}
+
+\texttt{\backslash{}input} <file>
+
+Inserts the content of \c{file} into the input buffer of \dex. 
+You may omit the file extension ".dex" of the input file.
+
+\texttt{\backslash{}begin} <env> / \texttt{\backslash{}end} <env>
+
+Enters and leave an environment. 
+
+\section{Document commands}
+
+These commands are used to create documents.
+
+\texttt{\backslash{}manual} (title)
+
+Creates a manual with the given title.
+
+\texttt{\backslash{}page} (title)
+
+Creates a page with the given title.
+
+\texttt{\backslash{}frontmatter}
+
+Start the frontmatter of a document.
+
+\texttt{\backslash{}mainmatter}
+
+Start the mainmatter of a document.
+
+\texttt{\backslash{}backmatter}
+
+Start the backmatter of a document.
+
+\texttt{\backslash{}part} (title)
+
+Start a new part of a document.
+
+\texttt{\backslash{}chapter} (title)
+
+Start a new chapter of a document.
+
+\texttt{\backslash{}section} (title)
+
+Start a new section of a document.
+
+\texttt{\backslash{}tableofcontents}
+
+Inserts a table of contents.
+
+\texttt{\backslash{}makeindex}
+
+Creates an index.
+
+\texttt{\backslash{}index} <word>
+
+Adds a word to the index.
+
+\texttt{\backslash{}printindex}
+
+Prints the index.
+
+\section{Program entity commands}
+
+These commands describe what program entity is being documented. 
+Most can be nested to represents a hierarchy of entity.
+
+\texttt{\backslash{}namespace} (name)
+
+Starts the documentation of a namespace.
+The documentation of a namespace ends at the end of the file or when \texttt{\backslash{}endnamespace} 
+is encountered.
+This command can be nested.
+
+\texttt{\backslash{}class} (name)
+
+Starts the documentation of a class.
+The documentation of a class ends at the end of the file or when \texttt{\backslash{}endclass} 
+is encountered. 
+This command can appear within a \texttt{\backslash{}namespace}.
+
+\texttt{\backslash{}fn} (signature)
+
+Indicates that the current block documents a function.
+The documentation for a function ends at the end of the block or when \texttt{\backslash{}endfn} 
+is encountered. 
+This command can appear within a \texttt{\backslash{}namespace} or 
+\texttt{\backslash{}class}.
+
+\texttt{\backslash{}variable} (type name)
+
+Indicates that the current block documents a variable.
+This can either be a data member (inside \texttt{\backslash{}class}) or a global variable 
+(inside \texttt{\backslash{}namespace}).
+The documentation of a variable ends at the end of the block or when \texttt{\backslash{}endvariable} 
+is encountered. 
+
+\texttt{\backslash{}enum} (name)
+
+Starts the documentation of an enumeration.
+The documentation of an enumeration ends at the end of the file or when \texttt{\backslash{}endenum} 
+is encountered. 
+
+\texttt{\backslash{}value} <name>
+
+Indicates that the current block documents a value of an enum.
+This command must appear within an \texttt{\backslash{}enum}. 
+The documentation of an enumerator ends at the end of the block or when \texttt{\backslash{}endvalue} 
+is encountered. 
+
+\texttt{\backslash{}typedef} (type name)
+
+Indicates that the current block documents a typedef.
+The documentation of a typedef ends at the end of the block or when \texttt{\backslash{}endtypedef} 
+is encountered. 
+
+\texttt{\backslash{}macro} (name)
+
+Indicates that the current block documents a macro.
+The documentation of a typedef ends at the end of the block or when \texttt{\backslash{}endmacro} 
+is encountered. 
+
+Along with a detailed description, several attributes can be specified for each C++ entity.
+These are describe next.
+
+\texttt{\backslash{}brief} (short-description)
+
+Specifies a short description for an entity.
+
+\texttt{\backslash{}param} (short-description)
+
+Specifies a short description for the parameter of a function.
+This command should be called for each parameter of the function.
+
+\texttt{\backslash{}returns} (short-description)
+
+Specifies a short description for the return value of a function.
+
+\texttt{\backslash{}since} (version)
+
+Specifies that an entity is available only since a particular version.
+
+\section{Paragraph formating and document elements}
+
+\texttt{\backslash{}b} <word>
+
+Displays a word in bold font.
+Note that this command cannot be nested with any other command.
+
+\texttt{\backslash{}textbf} <word>
+
+Displays text in bold font. Unlike \texttt{\backslash{}b}, this command 
+can be nested with other formatting commands.
+
+\texttt{\backslash{}e} <word>
+
+Displays a word in italic font.
+Note that this command cannot be nested with any other command.
+
+\texttt{\backslash{}textit} <word>
+
+Displays text in italic font. Unlike \texttt{\backslash{}e}, this command 
+can be nested with other formatting commands.
+
+\texttt{\backslash{}c} <word>
+
+Displays a word in typewriter font.
+Note that this command cannot be nested with any other command.
+
+\texttt{\backslash{}texttt} <word>
+
+Displays text in typewriter font. Unlike \texttt{\backslash{}c}, this command 
+can be nested with other formatting commands.
+
+\texttt{\backslash{}texttt} <url> <text>
+
+Inserts an hyperlink with the given url and text.
+
+\texttt{\backslash{}image} <url>
+
+Inserts an image into the document.
+This command ends the current paragraph and is not suitable for inserting an image 
+in the middle of a paragraph.
+
+\texttt{list} environment
+
+This environment allows you to insert a list into the current document.
+
+\texttt{\backslash{}li}
+
+Within the \c{list} environment, starts a new item.
+
+\texttt{code} environment
+
+Provides a code-block.

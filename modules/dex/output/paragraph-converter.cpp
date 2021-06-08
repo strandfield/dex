@@ -27,7 +27,7 @@ void ParagraphConverter::process(const dex::ParagraphIterator begin, const dex::
   {
     if (it.isText())
     {
-      result += it.range().text();
+      process_text(it.range().text());
     }
     else
     {
@@ -68,6 +68,11 @@ void ParagraphConverter::process_style(const dex::ParagraphIterator it, const st
     process(it);
 }
 
+void ParagraphConverter::process_text(const std::string& text)
+{
+  result += text;
+}
+
 void ParagraphConverter::process_bold(const dex::ParagraphIterator it)
 {
   process(it);
@@ -106,7 +111,7 @@ void ParagraphConverter::process(const dex::ParagraphIterator it)
   }
   else
   {
-    result += it.range().text();
+    process_text(it.range().text());
   }
 }
 

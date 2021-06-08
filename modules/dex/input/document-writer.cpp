@@ -139,6 +139,8 @@ void DocumentWriter::superscript()
     return paragraphWriter().superscript();
   case State::WritingMath:
     return currentMath().superscript();
+  case State::WritingCode:
+    return write('^');
   default:
     throw std::runtime_error{ "DocumentWriter::superscript()" };
   }
@@ -152,6 +154,8 @@ void DocumentWriter::subscript()
     return paragraphWriter().subscript();
   case State::WritingMath:
     return currentMath().subscript();
+  case State::WritingCode:
+    return write('_');
   default:
     throw std::runtime_error{ "DocumentWriter::subscript()" };
   }

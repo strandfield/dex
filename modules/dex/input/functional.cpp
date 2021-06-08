@@ -8,6 +8,7 @@ namespace dex
 {
 
 const std::string Functions::PAR = "par";
+const std::string Functions::BACKSLASH = "backslash";
 
 const std::string Functions::INPUT = "@input";
 

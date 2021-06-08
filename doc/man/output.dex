@@ -1,0 +1,43 @@
+
+\chapter{Output}
+
+\dex{} provides output to JSON, LaTeX and Markdown.
+While the JSON output is not customizable, the others use a template engine 
+that allows great flexibility.
+
+\section{liquid template engine}
+
+When \dex{} outputs for the first time, it will write its built-in templates 
+to its AppData directory (e.g. C:/Users/username/AppData/Roaming/dex/profiles on Windows). 
+
+Each template provides a \c{config.ini} file that describes how the output is supposed to 
+be generated.
+
+Here is an example:
+
+\begin{code}[ini]
+[general]
+engine=liquid
+
+[templates]
+class=class.md
+namespace=namespace.md
+document=document.md
+others=enum_in_class
+
+[output]
+class=classes
+namespace=namespaces
+document=documents
+\end{code}
+
+Under the section [templates] we can specify a template for the classes, namespaces and documents.
+These templates will be used respectively for each class, namespace and document that 
+have been created from the inputs.
+
+Under this section, a comma-separated list of other templates can be specified.
+These can be used with the \c{include} tag of the liquid engine.
+
+The [output] section describes where the generated files must be written.
+In the above example, for each class in the program, the \c{class.md} template will be 
+used to generate a file that will be saved in directory called \c{classes}.

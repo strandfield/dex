@@ -56,6 +56,7 @@ struct FunctionCall
 struct DEX_INPUT_API Functions
 {
   static const std::string PAR;
+  static const std::string BACKSLASH;
 
   static const std::string INPUT;
 

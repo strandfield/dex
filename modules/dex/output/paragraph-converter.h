@@ -24,6 +24,7 @@ public:
 protected:
   void process(const dex::ParagraphIterator begin, const dex::ParagraphIterator end);
   void process_style(const dex::ParagraphIterator it, const std::string& style);
+  virtual void process_text(const std::string& text);
   virtual void process_bold(const dex::ParagraphIterator it);
   virtual void process_italic(const dex::ParagraphIterator it);
   virtual void process_typewriter(const dex::ParagraphIterator it);
