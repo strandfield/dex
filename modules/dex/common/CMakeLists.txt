@@ -12,7 +12,7 @@ add_library(dex-common SHARED ${DEXCOMMON_LIBRARY_HDR_FILES} ${DEXCOMMON_LIBRARY
 target_compile_definitions(dex-common PRIVATE -DDEX_COMMON_BUILD_LIB)
 target_include_directories(dex-common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 target_link_libraries(dex-common Qt5::Core)
-target_include_directories(dex-common PUBLIC "${LIQUID_PROJECT_DIR}/json-toolkit/include")
+target_include_directories(dex-common PUBLIC "${JSONTOOLKIT_INCLUDE_DIRS}")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message("GCC compiler: linking to stdc++fs")

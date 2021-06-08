@@ -1,5 +1,21 @@
 
 ##################################################################
+###### json-toolkit
+##################################################################
+
+if(NOT TARGET json-toolkit)
+
+  file(GLOB_RECURSE JSON_HDR_FILES ${CMAKE_CURRENT_SOURCE_DIR}/json-toolkit/include/*.h)
+  add_custom_target(json-toolkit SOURCES ${JSON_HDR_FILES})
+
+  set(JSONTOOLKIT_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/json-toolkit/include" PARENT_SCOPE)
+
+#add_library(json-toolkit INTERFACE)
+#target_sources(json-toolkit INTERFACE ${JSON_HDR_FILES})
+
+endif()
+
+##################################################################
 ###### typeset
 ##################################################################
 

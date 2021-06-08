@@ -16,7 +16,7 @@ add_library(dex-input SHARED ${DEXINPUT_LIBRARY_HDR_FILES} ${DEXINPUT_LIBRARY_SR
 target_compile_definitions(dex-input PRIVATE -DDEX_INPUT_BUILD_LIB)
 target_include_directories(dex-input PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../../modules")
 target_include_directories(dex-input PUBLIC "${LIQUID_PROJECT_DIR}/include")
-target_include_directories(dex-input PUBLIC "${LIQUID_PROJECT_DIR}/json-toolkit/include")
+target_include_directories(dex-input PUBLIC "${JSONTOOLKIT_INCLUDE_DIRS}")
 target_include_directories(dex-input PUBLIC "${TYPESET_PROJECT_DIR}/include")
 target_link_libraries(dex-input Qt5::Core)
 target_link_libraries(dex-input dex-model)

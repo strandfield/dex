@@ -7,3 +7,6 @@
 [submodule "dependencies/cpptok"]
 	path = dependencies/cpptok
 	url = https://github.com/bandicode/cpptok
+[submodule "dependencies/json-toolkit"]
+	path = dependencies/json-toolkit
+	url = https://github.com/bandicode/json-toolkit.git
