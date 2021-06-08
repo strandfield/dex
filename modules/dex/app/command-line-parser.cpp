@@ -13,11 +13,11 @@ static json::Object values_to_json(QStringList all_values)
 {
   dex::SettingsMap result;
 
-  QStringList values = all_values.join(";").split(";", Qt::SkipEmptyParts);
+  QStringList values = all_values.join(";").split(";", QString::SkipEmptyParts);
 
   for (QString key_value_pair : values)
   {
-    QStringList key_value = key_value_pair.split('=', Qt::SkipEmptyParts);
+    QStringList key_value = key_value_pair.split('=', QString::SkipEmptyParts);
 
     if (key_value.size() == 2)
     {

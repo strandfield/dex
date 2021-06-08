@@ -11,6 +11,7 @@
 #include "dex/model/since.h"
 #include "dex/model/document.h"
 
+#include <algorithm>
 #include <optional>
 #include <unordered_map>
 #include <vector>

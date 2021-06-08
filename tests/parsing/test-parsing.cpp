@@ -21,7 +21,7 @@ void TestParsing::all()
   QString datasets = QString::fromStdString(dex::file_utils::read_all(":/data/datasets.txt"));
   datasets.replace("\r\n", "\n");
 
-  QStringList list = datasets.split("\n", Qt::SkipEmptyParts);
+  QStringList list = datasets.split("\n", QString::SkipEmptyParts);
 
   int num_failure = 0;
 

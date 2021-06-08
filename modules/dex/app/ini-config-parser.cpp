@@ -26,7 +26,7 @@ IniOptions parse_ini_config(const QFileInfo& file)
 
   {
     QString inputlist = QString::fromStdString(dex::settings::read<std::string>(settings, "input", ""));
-    result.inputs = inputlist.split(';', Qt::SkipEmptyParts);
+    result.inputs = inputlist.split(';', QString::SkipEmptyParts);
   }
 
   {

@@ -46,6 +46,11 @@ public:
   liquid::Value property(const std::string& name) const override;
 };
 
+inline liquid::Value to_liquid(const std::string& str)
+{
+  return liquid::Value(str);
+}
+
 inline liquid::Value to_liquid(std::shared_ptr<Model> m)
 {
   return liquid::Value(std::make_shared<LiquidModel>(m));
