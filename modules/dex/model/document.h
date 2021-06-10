@@ -49,7 +49,7 @@ public:
 
   std::string className() const override;
 
-  const DomNodeList& childNodes() const;
+  const DomNodeList& childNodes() const override;
   void appendChild(const DocumentNodePtr& node) override;
 };
 
