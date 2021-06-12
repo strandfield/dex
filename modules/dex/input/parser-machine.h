@@ -65,8 +65,16 @@ public:
 
   bool isBlockBased() const;
 
+  struct Position
+  {
+    int offset = -1;
+    int line = 0;
+    int column = 0;
+  };
+
   bool seekBlock();
   bool isInsideBlock() const;
+  Position blockPosition() const;
   bool atBlockEnd() const;
   void seekBlockEnd();
   void exitBlock();
@@ -102,7 +110,7 @@ private:
   std::stack<Document> m_documents;
   std::pair<std::string, std::string> m_block_delimiters;
   bool m_is_block_based = false;
-  bool m_inside_block = false;
+  Position m_block_pos;
 };
 
 class ParserMode;

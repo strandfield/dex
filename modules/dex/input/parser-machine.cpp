@@ -60,7 +60,6 @@ InputStream::InputStream(std::string doc)
   m_documents.push(document);
 
   m_is_block_based = false;
-  m_inside_block = false;
 }
 
 InputStream::InputStream(BlockBasedDocument doc)
@@ -73,7 +72,6 @@ InputStream::InputStream(BlockBasedDocument doc)
   m_documents.push(document);
 
   m_is_block_based = true;
-  m_inside_block = false;
 }
 
 InputStream::InputStream(const QFileInfo& file)
@@ -85,7 +83,6 @@ InputStream::InputStream(const QFileInfo& file)
   m_documents.push(d);
 
   m_is_block_based = file.suffix() != "dex";
-  m_inside_block = false;
 }
 
 void InputStream::setBlockDelimiters(std::string start, std::string end)
@@ -201,18 +198,27 @@ bool InputStream::seekBlock()
     discardSpaces();
 
     if (read(m_block_delimiters.first))
+    {
+      m_block_pos.offset = currentDocument().pos - static_cast<int>(m_block_delimiters.first.size());
+      m_block_pos.line = currentDocument().line;
+      m_block_pos.column = currentDocument().column - static_cast<int>(m_block_delimiters.first.size());
       break;
+    }
 
     readLine();
   }
 
-  m_inside_block = !atEnd();
   return isInsideBlock();
 }
 
 bool InputStream::isInsideBlock() const
 {
-  return m_inside_block;
+  return m_block_pos.offset != -1;
+}
+
+InputStream::Position InputStream::blockPosition() const
+{
+  return m_block_pos;
 }
 
 bool InputStream::atBlockEnd() const
@@ -231,7 +237,7 @@ void InputStream::exitBlock()
   if (atBlockEnd())
   {
     discard(static_cast<int>(m_block_delimiters.second.length()));
-    m_inside_block = false;
+    m_block_pos = Position();
   }
 }
 
@@ -303,7 +309,7 @@ InputStream& InputStream::operator=(std::string str)
   m_documents.push(document);
 
   m_is_block_based = false;
-  m_inside_block = false;
+  m_block_pos = Position();
 
   return *this;
 }
@@ -318,7 +324,7 @@ InputStream& InputStream::operator=(const QFileInfo& file)
   m_documents.push(document);
 
   m_is_block_based = file.suffix() != "dex";
-  m_inside_block = false;
+  m_block_pos = Position();
 
   return *this;
 }
