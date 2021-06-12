@@ -83,6 +83,8 @@ std::shared_ptr<DocumentWriter> ProgramParser::contentWriter()
 
 void ProgramParser::class_(std::string name)
 {
+  exitGhost();
+
   if (currentFrame().node->is<dex::Function>())
     throw BadCall{ "ProgramParser::class()", "\\class cannot be used inside \\fn" };
   else if (currentFrame().node->is<dex::Enum>())
@@ -101,7 +103,6 @@ void ProgramParser::class_(std::string name)
   }
 
   m_state.enter<FrameType::Class>(the_class);
-  m_lastblock_entity = the_class;
 }
 
 void ProgramParser::endclass()
@@ -110,11 +111,12 @@ void ProgramParser::endclass()
     throw BadCall{ "ProgramParser::endclass()", "\\endclass but no \\class" };
 
   exitFrame();
-  m_lastblock_entity = currentEntity();
 }
 
 void ProgramParser::fn(std::string signature)
 {
+  exitGhost();
+
   if (currentFrame().node->is<dex::Function>())
     throw BadCall{ "ProgramParser::fn()", "\\fn cannot be nested" };
   else if (currentFrame().node->is<dex::Enum>())
@@ -157,6 +159,8 @@ void ProgramParser::endfn()
 
 void ProgramParser::namespace_(std::string name)
 {
+  exitGhost();
+
   if (!currentFrame().node->is<dex::Namespace>())
     throw BadCall{ "ProgramParser::namespace()", "\\namespace can only be used inside \\namespace" };
 
@@ -173,7 +177,6 @@ void ProgramParser::namespace_(std::string name)
   }
 
   m_state.enter<FrameType::Namespace>(the_namespace);
-  m_lastblock_entity = the_namespace;
 }
 
 void ProgramParser::endnamespace()
@@ -182,11 +185,12 @@ void ProgramParser::endnamespace()
     throw BadCall{ "ProgramParser::endnamespace()", "\\endnamespace but no \\namespace" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::enum_(std::string name)
 {
+  exitGhost();
+
   if (!currentFrame().node->is<dex::Namespace>() && !currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::enum()", "\\enum must be inside of \\namespace or \\class" };
 
@@ -206,7 +210,6 @@ void ProgramParser::enum_(std::string name)
   }
 
   m_state.enter<FrameType::Enum>(new_enum);
-  m_lastblock_entity = new_enum;
 }
 
 void ProgramParser::endenum()
@@ -218,7 +221,6 @@ void ProgramParser::endenum()
     throw BadCall{ "ProgramParser::endenum()", "\\endenum but no \\enum" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::value(std::string name)
@@ -227,12 +229,7 @@ void ProgramParser::value(std::string name)
     exitFrame();
 
   if (!currentFrame().node->is<dex::Enum>())
-  {
-    if (m_lastblock_entity->kind() != model::Kind::Enum)
-      throw BadCall{ "ProgramParser::value()", "\\value must be near \\enum" };
-
-    m_state.enter<FrameType::Enum>(m_lastblock_entity);
-  }
+    throw BadCall{ "ProgramParser::value()", "\\value must be near \\enum" };
 
   const auto en = std::static_pointer_cast<dex::Enum>(currentFrame().node);
 
@@ -255,6 +252,8 @@ void ProgramParser::endenumvalue()
 
 void ProgramParser::variable(std::string decl)
 {
+  exitGhost();
+
   if (!currentFrame().node->is<dex::Namespace>() && !currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::variable()", "\\variable must be inside \\namespace or \\class" };
 
@@ -290,7 +289,6 @@ void ProgramParser::variable(std::string decl)
   }
 
   m_state.enter<FrameType::Variable>(the_var);
-  m_lastblock_entity = the_var;
 }
 
 void ProgramParser::endvariable()
@@ -299,11 +297,12 @@ void ProgramParser::endvariable()
     throw BadCall{ "ProgramParser::endvariable()", "\\endvariable but no \\variable" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::typedef_(std::string decl)
 {
+  exitGhost();
+
   if (!currentFrame().node->is<dex::Namespace>() && !currentFrame().node->is<dex::Class>())
     throw BadCall{ "ProgramParser::typedef()", "\\typedef must be inside \\namespace or \\class" };
 
@@ -341,7 +340,6 @@ void ProgramParser::typedef_(std::string decl)
   }
 
   m_state.enter<FrameType::Typedef>(the_typedef);
-  m_lastblock_entity = the_typedef;
 }
 
 void ProgramParser::endtypedef()
@@ -350,11 +348,12 @@ void ProgramParser::endtypedef()
     throw BadCall{ "ProgramParser::endtypedef()", "\\endtypedef but no \\typedef" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::macro(std::string decl)
 {
+  exitGhost();
+
   if (!currentFrame().node->is<dex::Namespace>())
     throw BadCall{ "ProgramParser::typedef()", "\\macro must be inside \\namespace" };
 
@@ -379,7 +378,6 @@ void ProgramParser::macro(std::string decl)
   m_program->macros.push_back(the_macro);
 
   m_state.enter<FrameType::Macro>(the_macro);
-  m_lastblock_entity = the_macro;
 }
 
 void ProgramParser::endmacro()
@@ -388,7 +386,6 @@ void ProgramParser::endmacro()
     throw BadCall{ "ProgramParser::macro()", "\\endmacro but no \\macro" };
 
   exitFrame();
-  m_lastblock_entity = std::static_pointer_cast<dex::Entity>(currentFrame().node);
 }
 
 void ProgramParser::brief(std::string brieftext)
@@ -496,7 +493,8 @@ void ProgramParser::beginBlock()
 void ProgramParser::endBlock()
 {
   auto is_terminal_node = [](const std::shared_ptr<dex::Entity>& node) -> bool{
-    return node->kind() == model::Kind::EnumValue || node->kind() == model::Kind::Function
+    return node->kind() == model::Kind::EnumValue 
+      || node->kind() == model::Kind::Function
       || node->kind() == model::Kind::Variable
       || node->kind() == model::Kind::Typedef
       || node->kind() == model::Kind::Macro;
@@ -506,11 +504,24 @@ void ProgramParser::endBlock()
   {
     exitFrame();
   }
+
+  if (m_state.current().node->is<dex::Enum>())
+  {
+    m_state.current().ghost = true;
+  }
 }
 
 ProgramParser::Frame& ProgramParser::currentFrame()
 {
   return m_state.current();
+}
+
+void ProgramParser::exitGhost()
+{
+  while (state().current().ghost)
+  {
+    exitFrame();
+  }
 }
 
 void ProgramParser::exitFrame()

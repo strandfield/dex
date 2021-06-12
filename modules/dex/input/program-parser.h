@@ -45,6 +45,7 @@ public:
 
     std::shared_ptr<Entity> node;
     std::shared_ptr<DocumentWriter> writer;
+    bool ghost = false;
   };
 
   using State = state::State<Frame>;
@@ -96,6 +97,7 @@ public:
 
 protected:
   Frame& currentFrame();
+  void exitGhost();
   void exitFrame();
   void appendChild(std::shared_ptr<Entity> e);
   static void appendChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child);
@@ -103,7 +105,6 @@ protected:
 private:
   State m_state;
   std::shared_ptr<dex::Program> m_program;
-  std::shared_ptr<Entity> m_lastblock_entity;
 };
 
 } // namespace dex
