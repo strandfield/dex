@@ -4,8 +4,10 @@
 
 #include "dex/input/program-parser.h"
 
+#include "dex/input/parser-machine.h"
 #include "dex/input/paragraph-writer.h"
 #include "dex/input/cpp-parser.h"
+#include "dex/input/enum-parser.h"
 #include "dex/input/parser-errors.h"
 
 #include "dex/model/program.h"
@@ -59,11 +61,17 @@ ProgramParser::Frame::Frame(FrameType ft, std::shared_ptr<dex::Entity> cxxent)
   writer = std::make_shared<DocumentWriter>(cxxent->description);
 }
 
-ProgramParser::ProgramParser(std::shared_ptr<dex::Program> prog)
-  : m_program(prog)
+ProgramParser::ProgramParser(ParserMachine& m)
+  : m_machine(m),
+    m_program(m.output()->getOrCreateProgram())
 {
   m_state.enter<FrameType::Idle>();
-  m_state.current().node = prog->globalNamespace();
+  m_state.current().node = m_program->globalNamespace();
+}
+
+ParserMachine& ProgramParser::machine() const
+{
+  return m_machine;
 }
 
 ProgramParser::State& ProgramParser::state()
@@ -209,7 +217,9 @@ void ProgramParser::enum_(std::string name)
     cla->members.push_back(new_enum);
   }
 
-  m_state.enter<FrameType::Enum>(new_enum);
+  state().enter<FrameType::Enum>(new_enum);
+
+  state().current().block_offset = machine().inputStream().blockPosition().offset;
 }
 
 void ProgramParser::endenum()
@@ -219,6 +229,23 @@ void ProgramParser::endenum()
 
   if (!currentFrame().node->is<dex::Enum>())
     throw BadCall{ "ProgramParser::endenum()", "\\endenum but no \\enum" };
+
+  int document_offset = machine().inputStream().blockPosition().offset;
+
+  if (document_offset > currentFrame().block_offset)
+  {
+    // \enum and \endenum appeared in different blocks.
+    // This means that the enum declaration is possibly between the two 
+    // blocks.
+    // Let's try to parse the values.
+
+    const std::string& document_source = machine().inputStream().currentDocument().content;
+    size_t len = static_cast<size_t>(document_offset - currentFrame().block_offset);
+    std::string source = document_source.substr(currentFrame().block_offset, len);
+
+    EnumParser eparser{ std::static_pointer_cast<dex::Enum>(currentFrame().node) };
+    eparser.parse(source);
+  }
 
   exitFrame();
 }

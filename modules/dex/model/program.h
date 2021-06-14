@@ -57,6 +57,9 @@ public:
 
   virtual AccessSpecifier getAccessSpecifier() const;
   virtual void setAccessSpecifier(AccessSpecifier aspec);
+
+  template<typename T>
+  static std::shared_ptr<T> find(const std::string& name, const std::vector<std::shared_ptr<T>>& entities);
 };
 
 inline Entity::Entity(std::string n, std::shared_ptr<Entity> parent)
@@ -71,6 +74,15 @@ inline std::shared_ptr<Entity> Entity::parent() const
   return weak_parent.lock();
 }
 
+template<typename T>
+inline std::shared_ptr<T> Entity::find(const std::string& name, const std::vector<std::shared_ptr<T>>& entities)
+{
+  auto it = std::find_if(entities.begin(), entities.end(), [&name](const std::shared_ptr<T>& e) -> bool {
+    return e->name == name;
+    });
+
+  return it != entities.end() ? *it : nullptr;
+}
 
 
 class DEX_MODEL_API Macro : public Entity
@@ -129,6 +141,8 @@ public:
 
   AccessSpecifier getAccessSpecifier() const override;
   void setAccessSpecifier(AccessSpecifier aspec) override;
+
+  std::shared_ptr<EnumValue> find(const std::string& name) const;
 };
 
 inline Enum::Enum(std::string name, std::shared_ptr<Entity> parent)

@@ -22,7 +22,7 @@ ParserFrontend::ParserFrontend(ParserMachine& machine)
   : m_machine(machine),
     m_mode(Mode::Program)
 {
-  m_prog_parser.reset(new ProgramParser(machine.output()->getOrCreateProgram()));
+  m_prog_parser.reset(new ProgramParser(machine));
 }
 
 ParserFrontend::~ParserFrontend()

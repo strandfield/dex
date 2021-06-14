@@ -16,10 +16,14 @@
 namespace dex
 {
 
-class DEX_INPUT_API ProgramParser
+class ParserMachine;
+
+class ProgramParser
 {
 public:
-  explicit ProgramParser(std::shared_ptr<dex::Program> prog);
+  explicit ProgramParser(ParserMachine& m);
+
+  ParserMachine& machine() const;
 
   enum class FrameType
   {
@@ -46,6 +50,7 @@ public:
     std::shared_ptr<Entity> node;
     std::shared_ptr<DocumentWriter> writer;
     bool ghost = false;
+    int block_offset = -1;
   };
 
   using State = state::State<Frame>;
@@ -103,6 +108,7 @@ protected:
   static void appendChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child);
 
 private:
+  ParserMachine& m_machine;
   State m_state;
   std::shared_ptr<dex::Program> m_program;
 };

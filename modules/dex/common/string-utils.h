@@ -6,6 +6,7 @@
 #define DEX_COMMON_STRINGUTILS_H
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace dex
@@ -52,6 +53,37 @@ public:
 
     return true;
   }
+
+  std::string_view view(std::string::const_iterator begin, std::string::const_iterator end) const
+  {
+    const std::string& str = *str_;
+    size_t offset = std::distance(str.begin(), begin);
+    size_t len = std::distance(begin, end);
+    return std::string_view(str.data() + offset, len);
+  }
+
+  std::vector<std::string_view> split(char sep) const
+  {
+    const std::string& str = *str_;
+
+    std::vector<std::string_view> r;
+
+    auto it = str.begin();
+    auto next = std::find(str.begin(), str.end(), sep);
+
+    while (next != str.end())
+    {
+      r.push_back(view(it, next));
+      it = next + 1;
+      next = std::find(it, str.end(), sep);
+    }
+
+    if (it != next)
+      r.push_back(view(it, next));
+
+    return r;
+  }
+
 };
 
 inline StdStringCRef StdString(const std::string& str)
