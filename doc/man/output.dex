@@ -23,7 +23,6 @@ engine=liquid
 class=class.md
 namespace=namespace.md
 document=document.md
-others=enum_in_class
 
 [output]
 class=classes
@@ -35,9 +34,9 @@ Under the section [templates] we can specify a template for the classes, namespa
 These templates will be used respectively for each class, namespace and document that 
 have been created from the inputs.
 
-Under this section, a comma-separated list of other templates can be specified.
-These can be used with the \c{include} tag of the liquid engine.
-
 The [output] section describes where the generated files must be written.
 In the above example, for each class in the program, the \c{class.md} template will be 
 used to generate a file that will be saved in directory called \c{classes}.
+
+Several templates useable with liquid's \c{include} tag can be placed under a \c{_includes} 
+directory.

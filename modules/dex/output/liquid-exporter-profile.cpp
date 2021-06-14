@@ -72,17 +72,22 @@ protected:
 
   void list_templates()
   {
-    std::string pathlist = dex::settings::read(settings, "templates/others", std::string());
+    QDir dir{ directory.absolutePath() + "/_includes" };
 
-    std::vector<std::string> paths = dex::str_split(pathlist, ',');
+    if (!dir.exists())
+      return;
 
-    for (std::string p : paths)
+    exclude(dir.absolutePath());
+
+    QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
+
+    while (diriterator.hasNext())
     {
-      p = directory.absolutePath().toStdString() + "/" + p;
+      std::string p = diriterator.next().toStdString();
       exclude(p);
       liquid::Template tmplt = open_liquid_template(p);
       tmplt.skipWhitespacesAfterTag();
-      p.erase(p.begin(), p.begin() + profile.profile_path.length() + 1);
+      p.erase(p.begin(), p.begin() + profile.profile_path.length() + 11);
       profile.liquid_templates.emplace_back(std::move(p), std::move(tmplt));
     }
   }
