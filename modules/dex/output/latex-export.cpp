@@ -27,7 +27,7 @@ public:
     {
       if (c == '\\')
         result += "\\textbackslash{}";
-      else if (c == '{' || c == '}' || c == '#' || c == '%')
+      else if (c == '{' || c == '}' || c == '#' || c == '%' || c == '_')
         result.push_back('\\'), result.push_back(c);
       else
         result.push_back(c);
