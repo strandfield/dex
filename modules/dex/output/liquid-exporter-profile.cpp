@@ -55,22 +55,41 @@ protected:
     exclude(filepath.toStdString());
   }
 
-  void read_template(const std::string& name, LiquidExporterProfile::Template& tmplt, std::string default_out)
+  void read_template(const QFileInfo& fileinfo, const std::string& name, LiquidExporterProfile::Template& tmplt, std::string default_out)
   {
-    std::string path = dex::settings::read(settings, "templates/" + name, std::string());
-
-    if (!path.empty())
-    {
-      path = directory.absolutePath().toStdString() + "/" + path;
-      exclude(path);
-      tmplt.model = open_liquid_template(path);
-      tmplt.model.skipWhitespacesAfterTag();
-      tmplt.outdir = dex::settings::read(settings, "output/" + name, std::move(default_out));
-      tmplt.filesuffix = QFileInfo(directory.absolutePath() + "/" + QString::fromStdString(path)).suffix().toStdString();
-    }
+    std::string path = fileinfo.absoluteFilePath().toStdString();
+    tmplt.model = open_liquid_template(path);
+    tmplt.model.skipWhitespacesAfterTag();
+    tmplt.outdir = dex::settings::read(settings, "output/" + name, std::move(default_out));
+    tmplt.filesuffix = fileinfo.suffix().toStdString();
   }
 
   void list_templates()
+  {
+    QDir dir{ directory.absolutePath() + "/_layouts" };
+
+    if (!dir.exists())
+      return;
+
+    exclude(dir.absolutePath());
+
+    QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
+
+    while (diriterator.hasNext())
+    {
+      QFileInfo fileinfo{ diriterator.next() };
+      exclude(fileinfo.absoluteFilePath());
+
+      if (fileinfo.baseName() == "class")
+        read_template(fileinfo, "class", profile.class_template, "classes");
+      else if (fileinfo.baseName() == "namespace")
+        read_template(fileinfo, "namespace", profile.namespace_template, "namespaces");
+      else if (fileinfo.baseName() == "document")
+        read_template(fileinfo, "document", profile.document_template, "documents");
+    }
+  }
+
+  void list_liquid_includes()
   {
     QDir dir{ directory.absolutePath() + "/_includes" };
 
@@ -124,11 +143,8 @@ public:
     exclude(profile_config_file);
     settings = dex::settings::load(profile_config_file);
 
-    read_template("class", profile.class_template, "classes");
-    read_template("namespace", profile.namespace_template, "namespaces");
-    read_template("document", profile.document_template, "documents");
-
     list_templates();
+    list_liquid_includes();
     list_files();
   }
 };

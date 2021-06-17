@@ -8,12 +8,12 @@
     <file>templates/latex/api-reference.tex</file>
     <file>templates/latex/macros.tex</file>
     <file>templates/latex/preamble.tex</file>
-    <file>templates/latex/document.tex</file>
+    <file>templates/latex/_layouts/document.tex</file>
     <file>templates/markdown/config.ini</file>
-    <file>templates/markdown/class.md</file>
-    <file>templates/markdown/index.md</file>
-    <file>templates/markdown/document.md</file>
-	<file>templates/markdown/namespace.md</file>
+	<file>templates/markdown/index.md</file>
+    <file>templates/markdown/_layouts/class.md</file>
+    <file>templates/markdown/_layouts/document.md</file>
+	<file>templates/markdown/_layouts/namespace.md</file>
 	<file>templates/markdown/_includes/enum_in_class</file>
   </qresource>
 </RCC>

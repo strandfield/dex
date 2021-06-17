@@ -19,24 +19,20 @@ Here is an example:
 [general]
 engine=liquid
 
-[templates]
-class=class.md
-namespace=namespace.md
-document=document.md
-
 [output]
 class=classes
 namespace=namespaces
 document=documents
 \end{code}
 
-Under the section [templates] we can specify a template for the classes, namespaces and documents.
-These templates will be used respectively for each class, namespace and document that 
-have been created from the inputs.
-
 The [output] section describes where the generated files must be written.
 In the above example, for each class in the program, the \c{class.md} template will be 
 used to generate a file that will be saved in directory called \c{classes}.
+
+Inside a \c{_layouts} directory, templates named \c class, \c namespace and \c document
+can be provided.
+These templates will be used respectively for each class, namespace and document that 
+have been created from the inputs.
 
 Several templates useable with liquid's \c{include} tag can be placed under a \c{_includes} 
 directory.
