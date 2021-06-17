@@ -25,6 +25,12 @@ Exporter::Exporter()
 
 }
 
+void Exporter::clearProfiles()
+{
+  QString dest = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+  QDir(dest + "/profiles").removeRecursively();
+}
+
 static void recursive_copy(const QString& src, const QString& dest)
 {
   QFileInfo src_file_info{ src };

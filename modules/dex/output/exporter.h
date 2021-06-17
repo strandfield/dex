@@ -21,6 +21,7 @@ class DEX_OUTPUT_API Exporter
 public:
   Exporter();
 
+  static void clearProfiles();
   void copyProfiles();
   void process(const std::shared_ptr<dex::Model>& model, const QString& name, const json::Object& values);
 };

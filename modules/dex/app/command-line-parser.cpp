@@ -36,6 +36,7 @@ CommandLineParser::CommandLineParser()
   addOption({ "i", "Input (file / directory)", "input" });
   addOption({ "o", "Output", "output" });
   addOption({ "value", "Project values for the Liquid-exporter", "variables" });
+  addOption({ "reset-profiles", "Resets the exporter profiles" });
 }
 
 CommandLineParserResult CommandLineParser::parse(const QStringList& args)
@@ -64,6 +65,8 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
     result.output = value("o");
     result.values = values_to_json(values("value"));
   }
+
+  result.reset_profiles = isSet("reset-profiles");
 
   return result;
 }
