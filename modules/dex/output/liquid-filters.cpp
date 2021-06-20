@@ -7,6 +7,8 @@
 #include "dex/output/liquid-exporter.h"
 #include "dex/output/liquid-wrapper.h"
 
+#include "dex/common/string-utils.h"
+
 #include <liquid/filters.h>
 
 #include <algorithm>
@@ -76,6 +78,10 @@ liquid::Value LiquidFilters::apply(const std::string& name, const liquid::Value&
   else if (name == "param_brief_or_name")
   {
     return param_brief_or_name(object, args);
+  }
+  else if (name == "markdown_escape")
+  {
+    return markdown_escape(object, args);
   }
 
   return liquid::BuiltinFilters::apply(name, object, args);
@@ -200,10 +206,24 @@ std::string LiquidFilters::param_brief_or_name(const FunctionParameter& fp)
   return fp.brief.value_or(fp.name);
 }
 
-liquid::Value LiquidFilters::param_brief_or_name(const liquid::Value& object, const std::vector<liquid::Value>& args)
+liquid::Value LiquidFilters::param_brief_or_name(const liquid::Value& object, const std::vector<liquid::Value>& /* args */)
 {
   auto fp = liquid_cast<FunctionParameter>(object);
   return fp ? param_brief_or_name(*fp) : std::string();
+}
+
+std::string LiquidFilters::markdown_escape(const std::string& text)
+{
+  return StdStringCRef(text).replace({
+    {"[](", "\\[]("},
+    {"<", "\\<"},
+    {">>", "\\>>"},
+    });
+}
+
+liquid::Value LiquidFilters::markdown_escape(const liquid::Value& object, const std::vector<liquid::Value>& /* args */)
+{
+  return markdown_escape(object.as<std::string>());
 }
 
 } // namespace dex

@@ -45,6 +45,8 @@ protected:
   static liquid::Value has_any_documented_param(const liquid::Value& object, const std::vector<liquid::Value>& args);
   static std::string param_brief_or_name(const FunctionParameter& fp);
   static liquid::Value param_brief_or_name(const liquid::Value& object, const std::vector<liquid::Value>& args);
+  static std::string markdown_escape(const std::string& text);
+  static liquid::Value markdown_escape(const liquid::Value& object, const std::vector<liquid::Value>& args);
 };
 
 } // namespace dex

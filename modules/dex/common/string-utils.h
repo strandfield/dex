@@ -1,18 +1,22 @@
-// Copyright (C) 2020 Vincent Chambrin
+// Copyright (C) 2020-2021 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
 #ifndef DEX_COMMON_STRINGUTILS_H
 #define DEX_COMMON_STRINGUTILS_H
 
+#include "dex/dex-common.h"
+
+#include <initializer_list>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace dex
 {
 
-class StdStringCRef
+class DEX_COMMON_API StdStringCRef
 {
 public:
   const std::string* str_;
@@ -83,6 +87,8 @@ public:
 
     return r;
   }
+
+  std::string replace(std::initializer_list<std::pair<std::string_view, std::string_view>>&& replacements) const;
 
 };
 

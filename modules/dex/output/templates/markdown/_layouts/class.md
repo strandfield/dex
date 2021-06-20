@@ -29,7 +29,7 @@ parent: "Class reference"
 
 {% for f in class.members | filter_by_type: 'function' %}
 
-### {{ f | funsig }}
+### {{ f | funsig | markdown_escape }}
 
 {% if f.brief %}
 **Brief:** {{ f.brief }}
@@ -56,16 +56,16 @@ Parameters:
 
 {% for f in non_members %}
 
-### {{ f | funsig }}
+### {{ f | funsig | markdown_escape }}
 
 {% if f.brief %}
 **Brief:** {{ f.brief }}
 {% endif %}
 
-{% if f.parameters and f.parameters.size > 0 %}
+{% if f | has_any_documented_param %}
 Parameters:
 {% for p in f.parameters %}
-- {{ p.brief }}{% newline %}
+- {{ p | param_brief_or_name }}{% newline %}
 {% endfor %}
 {% endif %}
 
