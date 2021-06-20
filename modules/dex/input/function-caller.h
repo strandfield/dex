@@ -20,6 +20,11 @@ namespace dex
 
 class ParserMachine;
 
+// @TODO: add a map<std::string, Callback> so 
+// that this class can handle the funcion calls directly.
+// hasPendingCall() would no longer be needed and 
+// the map could be cleared when necessary
+
 class DEX_INPUT_API FunctionCaller
 {
 public:
