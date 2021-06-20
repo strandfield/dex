@@ -454,7 +454,7 @@ Type CppParser::parseType()
       auto fsig = tryReadFunctionSignature(start);
       return fsig;
     }
-    catch (const std::runtime_error&)
+    catch (const CppParserError&)
     {
       seek(save_point);
     }
@@ -528,7 +528,7 @@ Name CppParser::parseName()
     break;
   }
 
-  throw std::runtime_error{ "expected identifier" };
+  throw CppParserError("expected identifier");
 }
 
 Name CppParser::readOperatorName()
@@ -538,7 +538,7 @@ Name CppParser::readOperatorName()
 
   cpptok::Token opkw = read();
   if (atEnd())
-    throw std::runtime_error{ "unexpected end of input" };
+    throw CppParserError("unexpected end of input");
 
   cpptok::Token op = peek();
   if (op.type().value() & cpptok::TokenCategory::OperatorToken)
@@ -551,7 +551,7 @@ Name CppParser::readOperatorName()
     const cpptok::Token rp = read(cpptok::TokenType::RightPar);
 
     if (lp.text().data() + 1 != rp.text().data())
-      throw std::runtime_error{ "unexpected blank space between '(' and ')'" };
+      throw CppParserError("unexpected blank space between '(' and ')'");
 
     return OverloadedOperatorName("()");
   }
@@ -561,14 +561,14 @@ Name CppParser::readOperatorName()
     const cpptok::Token rb = read(cpptok::TokenType::RightBracket);
 
     if (lb.text().data() + 1 != rb.text().data())
-      throw std::runtime_error{ "unexpected blank space between '[' and ']'" };
+      throw CppParserError("unexpected blank space between '[' and ']'");
 
     return OverloadedOperatorName("[]");
   }
   else if (op.type() == cpptok::TokenType::StringLiteral)
   {
     if (op.text().size() != 2)
-      throw std::runtime_error{ "unexpected \"\"" };
+      throw CppParserError("unexpected \"\"");
 
     unsafe_read();
     auto suffix_name = parseName();
@@ -581,13 +581,13 @@ Name CppParser::readOperatorName()
     const std::string str = op.to_string();
 
     if (str.find("\"\"") != 0)
-      throw std::runtime_error{ "unexpected \"\"" };
+      throw CppParserError("unexpected \"\"");
 
     std::string suffix_name{ str.begin() + 2, str.end() };
     return LiteralOperatorName(std::move(suffix_name));
   }
 
-  throw std::runtime_error{ "expected operator symbol" };
+  throw CppParserError("expected operator symbol");
 }
 
 Name CppParser::readUserDefinedName()
@@ -595,7 +595,7 @@ Name CppParser::readUserDefinedName()
   const cpptok::Token base = read();
 
   if (base.type() != cpptok::TokenType::UserDefinedName)
-    throw std::runtime_error{ "expected identifier" };
+    throw CppParserError("expected identifier");
 
   Name ret = Name(base.to_string());
 
@@ -612,7 +612,7 @@ Name CppParser::readUserDefinedName()
     {
       ret = readTemplateArguments(ret);
     }
-    catch (const std::runtime_error&)
+    catch (const CppParserError&)
     {
       seek(savepoint);
       return ret;
@@ -827,7 +827,7 @@ std::shared_ptr<Function> CppParser::parseFunctionSignature()
     }
     else
     {
-      throw std::runtime_error{ "expected = 0" };
+      throw CppParserError("expected = 0");
     }
   }
 
@@ -892,7 +892,7 @@ std::shared_ptr<Typedef> CppParser::parseTypedef()
   cpptok::Token name = read();
 
   if (!name.isIdentifier())
-    throw std::runtime_error{ "Unexpected identifier while parsing typedef" };
+    throw CppParserError("Unexpected identifier while parsing typedef");
 
   auto result = std::make_shared<Typedef>(t, name.to_string());
 
@@ -941,7 +941,7 @@ std::shared_ptr<Macro> CppParser::parseMacro()
     }
     else
     {
-      throw std::runtime_error{ "bad input to parseMacro" };
+      throw CppParserError("bad input to parseMacro");
     }
   }
 
@@ -951,7 +951,7 @@ std::shared_ptr<Macro> CppParser::parseMacro()
 cpptok::Token CppParser::read()
 {
   if (m_index == m_buffer.size())
-    throw std::runtime_error{ "Unexpected end of input" };
+    throw CppParserError("Unexpected end of input");
 
   return unsafe_read();
 }
@@ -965,7 +965,7 @@ cpptok::Token CppParser::unsafe_read()
 cpptok::Token CppParser::peek()
 {
   if (atEnd())
-    throw std::runtime_error{ "Unexpected end of input" };
+    throw CppParserError("Unexpected end of input");
 
   return unsafe_peek();
 }
@@ -986,7 +986,7 @@ cpptok::Token CppParser::read(cpptok::TokenType::Value tokt)
   const cpptok::Token tok = read();
 
   if (tok.type().value() != tokt)
-    throw std::runtime_error{ "unexpected token" };
+    throw CppParserError("unexpected token");
 
   return tok;
 }
@@ -1047,7 +1047,7 @@ TemplateArgument CppParser::parseDelimitedTemplateArgument()
 
     return TemplateArgument{ type };
   }
-  catch (const std::runtime_error & )
+  catch (const CppParserError& )
   {
     return seekEnd(), TemplateArgument{ viewstring() };
   }
@@ -1070,12 +1070,12 @@ std::shared_ptr<TemplateParameter> CppParser::parseDelimitedTemplateParameter()
       return std::make_shared<TemplateParameter>(std::move(name), TemplateTypeParameter());
 
     if (peek() != cpptok::TokenType::Eq)
-      throw std::runtime_error{ "expected '='" };
+      throw CppParserError("expected '='");
 
     Type default_value = parseType();
 
     if(!atEnd())
-      throw std::runtime_error{ "expected end of input" };
+      throw CppParserError("expected end of input");
 
     return std::make_shared<TemplateParameter>(std::move(name), TemplateTypeParameter(default_value));
   }
@@ -1092,7 +1092,7 @@ std::shared_ptr<TemplateParameter> CppParser::parseDelimitedTemplateParameter()
       return std::make_shared<TemplateParameter>(std::move(name), TemplateNonTypeParameter(type));
 
     if (peek() != cpptok::TokenType::Eq)
-      throw std::runtime_error{ "expected '='" };
+      throw CppParserError("expected '='");
 
     unsafe_read();
 
