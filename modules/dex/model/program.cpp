@@ -260,6 +260,8 @@ std::string Function::signature() const
 
     if (this->specifiers & FunctionSpecifier::Delete)
       result += " = delete";
+    else if (this->specifiers & FunctionSpecifier::Default)
+      result += " = default";
 
     return result;
   }
@@ -267,20 +269,30 @@ std::string Function::signature() const
   {
     std::string result;
 
+    if (isVirtual())
+      result += "virtual ";
+
     result += this->name;
     result += "()";
 
     if (this->specifiers & FunctionSpecifier::Delete)
       result += " = delete";
+    else if (this->specifiers & FunctionSpecifier::Default)
+      result += " = default";
 
     return result;
   }
 
   std::string result;
+
+  if (isInline())
+    result += "inline ";
   if (isExplicit())
     result += "explicit ";
   if (isStatic())
     result += "static ";
+  if (isVirtual())
+    result += "virtual ";
 
   result += this->return_type.type;
   result += " " + this->name;
@@ -293,6 +305,10 @@ std::string Function::signature() const
 
   if (this->specifiers & FunctionSpecifier::Delete)
     result += " = delete";
+  else if (this->specifiers & FunctionSpecifier::Default)
+    result += " = default";
+  else if (isVirtualPure())
+    result += " = 0";
 
   return result;
 }
