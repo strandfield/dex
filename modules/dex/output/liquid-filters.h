@@ -12,6 +12,9 @@
 namespace dex
 {
 
+class Function;
+class FunctionParameter;
+
 class DisplayMath;
 class GroupTable;
 class Sectioning;
@@ -38,6 +41,10 @@ protected:
   liquid::Array group_get_entities(const liquid::Map& liqgroup) const;
   liquid::Array group_get_manuals(const liquid::Map& liqgroup) const;
   liquid::Value get_url(const liquid::Value& object) const;
+  static bool has_any_documented_param(const Function& fun);
+  static liquid::Value has_any_documented_param(const liquid::Value& object, const std::vector<liquid::Value>& args);
+  static std::string param_brief_or_name(const FunctionParameter& fp);
+  static liquid::Value param_brief_or_name(const liquid::Value& object, const std::vector<liquid::Value>& args);
 };
 
 } // namespace dex

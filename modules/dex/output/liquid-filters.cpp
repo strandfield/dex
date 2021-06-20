@@ -9,6 +9,8 @@
 
 #include <liquid/filters.h>
 
+#include <algorithm>
+
 namespace dex
 {
 
@@ -66,6 +68,14 @@ liquid::Value LiquidFilters::apply(const std::string& name, const liquid::Value&
   else if (name == "get_url")
   {
     return get_url(object);
+  }
+  else if (name == "has_any_documented_param")
+  {
+    return has_any_documented_param(object, args);
+  }
+  else if (name == "param_brief_or_name")
+  {
+    return param_brief_or_name(object, args);
   }
 
   return liquid::BuiltinFilters::apply(name, object, args);
@@ -170,6 +180,30 @@ liquid::Array LiquidFilters::group_get_manuals(const liquid::Map& liqgroup) cons
 liquid::Value LiquidFilters::get_url(const liquid::Value& object) const
 {
   return renderer.get_url(from_liquid(object));
+}
+
+bool LiquidFilters::has_any_documented_param(const Function& fun)
+{
+  return std::any_of(fun.parameters.begin(), fun.parameters.end(), [](const std::shared_ptr<FunctionParameter>& p) -> bool {
+    return p->brief.has_value();
+    });
+}
+
+liquid::Value LiquidFilters::has_any_documented_param(const liquid::Value& object, const std::vector<liquid::Value>& /* args */)
+{
+  auto fun = liquid_cast<Function>(object);
+  return fun && has_any_documented_param(*fun);
+}
+
+std::string LiquidFilters::param_brief_or_name(const FunctionParameter& fp)
+{
+  return fp.brief.value_or(fp.name);
+}
+
+liquid::Value LiquidFilters::param_brief_or_name(const liquid::Value& object, const std::vector<liquid::Value>& args)
+{
+  auto fp = liquid_cast<FunctionParameter>(object);
+  return fp ? param_brief_or_name(*fp) : std::string();
 }
 
 } // namespace dex
