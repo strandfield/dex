@@ -1,3 +1,10 @@
+{% if markdown and markdown.just_the_docs %}
+---
+layout: default
+title: "{{ class.name }} class"
+parent: "Class reference"
+---
+{% endif %}
 
 # {{ class.name }} Class
 
