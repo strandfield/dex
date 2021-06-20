@@ -43,6 +43,8 @@ public:
   explicit LiquidStringifier(LiquidExporter& exp);
   virtual ~LiquidStringifier();
 
+  virtual void selected();
+
   std::string stringify(const liquid::Value& val) const;
 
 protected:

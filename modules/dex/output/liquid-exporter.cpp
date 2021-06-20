@@ -234,6 +234,7 @@ std::string LiquidExporter::stringify(const liquid::Value& val)
 void LiquidExporter::selectStringifier(const std::string& filesuffix)
 {
   m_stringifier = m_stringifiers[filesuffix];
+  m_stringifier->selected();
 }
 
 void LiquidExporter::setupContext(liquid::Map& context)

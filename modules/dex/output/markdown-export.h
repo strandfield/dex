@@ -15,9 +15,14 @@ class Entity;
 class MarkdownStringifier : public LiquidStringifier
 {
 public:
+  bool just_the_docs = false;
+
+public:
   explicit MarkdownStringifier(LiquidExporter& exp);
 
 protected:
+  void selected() override;
+
   std::string stringify_list(const dex::List& list) const override;
   std::string stringify_listitem(const dex::ListItem& li) const override;
   std::string stringify_paragraph(const dex::Paragraph& par) const override;

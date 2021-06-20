@@ -24,6 +24,11 @@ LiquidStringifier::~LiquidStringifier()
 
 }
 
+void LiquidStringifier::selected()
+{
+
+}
+
 std::string LiquidStringifier::stringify(const liquid::Value& val) const
 {
   if (!val.isMap() && !val.isArray())

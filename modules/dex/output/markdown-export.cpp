@@ -20,8 +20,47 @@ namespace dex
 class MarkdownParagraphConverter : public ParagraphConverter
 {
 public:
+  bool just_the_docs = false;
+
+public:
 
   using ParagraphConverter::ParagraphConverter;
+
+  void process_text(const std::string& text) override
+  {
+    if (just_the_docs)
+    {
+      result.reserve(result.size() + text.size());
+
+      for (size_t i(0); i < text.size(); ++i)
+      {
+        char c = text.at(i);
+        
+        if (c == '{' && i + 1 < text.size())
+        {
+          if (text.at(i + 1) == '{' || text.at(i + 1) == '%')
+          {
+            result += "{% raw %}{";
+            result.push_back(text.at(i + 1));
+            ++i;
+            result += "{% endraw %}";
+          }
+          else
+          {
+            result.push_back(c);
+          }
+        }
+        else
+        {
+          result.push_back(c);
+        }
+      }
+    }
+    else
+    {
+      ParagraphConverter::process_text(text);
+    }
+  }
 
   void process_bold(const dex::ParagraphIterator it) override
   {
@@ -68,6 +107,13 @@ MarkdownStringifier::MarkdownStringifier(LiquidExporter& exp)
 
 }
 
+void MarkdownStringifier::selected()
+{
+  liquid::Value val = renderer.variables().property("markdown").property("just_the_docs");
+  just_the_docs = (val.is<bool>() && val.as<bool>()) 
+    || (val.is<std::string>() && val.as<std::string>() == "true");
+}
+
 std::string MarkdownStringifier::stringify_list(const dex::List& list) const
 {
   // @TODO: handle nested list
@@ -90,6 +136,7 @@ std::string MarkdownStringifier::stringify_listitem(const dex::ListItem& li) con
 std::string MarkdownStringifier::stringify_paragraph(const dex::Paragraph& par) const
 {
   MarkdownParagraphConverter converter{ par };
+  converter.just_the_docs = just_the_docs;
   converter.process();
   return std::string(std::move(converter.result));
 }
