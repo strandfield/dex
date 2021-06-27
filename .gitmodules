@@ -1,12 +1,12 @@
 [submodule "dependencies/liquid"]
 	path = dependencies/liquid
-	url = https://github.com/bandicode/liquid.git
+	url = https://github.com/strandfield/liquid.git
 [submodule "dependencies/typeset"]
 	path = dependencies/typeset
-	url = https://github.com/bandicode/typeset.git
+	url = https://github.com/strandfield/typeset.git
 [submodule "dependencies/cpptok"]
 	path = dependencies/cpptok
-	url = https://github.com/bandicode/cpptok
+	url = https://github.com/strandfield/cpptok.git
 [submodule "dependencies/json-toolkit"]
 	path = dependencies/json-toolkit
-	url = https://github.com/bandicode/json-toolkit.git
+	url = https://github.com/strandfield/json-toolkit.git
