@@ -2,9 +2,9 @@
 
 # `Dex` - C++ documentation & specifications
 
-[![Build Status](https://travis-ci.org/bandicode/dex.svg?branch=master)](https://travis-ci.org/bandicode/dex)
-[![Build status](https://ci.appveyor.com/api/projects/status/5psv3b7db6jrt97m?svg=true)](https://ci.appveyor.com/project/bandicode/dex)
-[![codecov](https://codecov.io/gh/bandicode/dex/branch/master/graph/badge.svg?token=GfrJWRlYwn)](https://codecov.io/gh/bandicode/dex)
+[![Build Status](https://api.travis-ci.com/strandfield/dex.svg?branch=master)](https://travis-ci.com/github/strandfield/dex)
+[![Build status](https://ci.appveyor.com/api/projects/status/5psv3b7db6jrt97m?svg=true)](https://ci.appveyor.com/project/strandfield/dex)
+[![codecov](https://codecov.io/gh/strandfield/dex/branch/master/graph/badge.svg?token=GfrJWRlYwn)](https://codecov.io/gh/strandfield/dex)
 
 > Wellll, whadya know !
 
