@@ -7,6 +7,7 @@
 
 #include "dex/dex-common.h"
 
+#include <algorithm>
 #include <initializer_list>
 #include <string>
 #include <string_view>
