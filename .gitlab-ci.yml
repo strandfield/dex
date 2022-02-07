@@ -1,5 +1,8 @@
 image: localhost:5000/qt-runner:v1
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 build-job:
   stage: build
   script:
