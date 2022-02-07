@@ -16,6 +16,6 @@ build-job:
     - ctest
     - cd ..
     - echo 'cmake --install' does not exists until v3.15
-    - sudo env PATH=$PATH cmake --build . --target install
+    - env PATH=$PATH cmake --build . --target install
     - cd ..
     - dex --version
