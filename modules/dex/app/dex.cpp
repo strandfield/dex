@@ -65,6 +65,11 @@ void Dex::work()
 {
   m_ini = parse_ini_config();
 
+  if (!m_ini.valid)
+  {
+    log::info() << "Could not parse dex.ini config";
+  }
+
   QStringList inputs = m_ini.inputs;
 
   if (!m_cli.inputs.empty())
@@ -89,6 +94,12 @@ void Dex::process(const QStringList& inputs, QString output, json::Object values
 
   if (!inputs.empty())
   {
+    log::info() << "Inputs:";
+    for (const auto& i : inputs)
+    {
+      log::info() << i.toStdString();
+    }
+
     for (const auto& i : inputs)
     {
       try
@@ -128,6 +139,7 @@ void Dex::feed(ParserMachine& parser, const QString& input)
   {
     try
     {
+      log::info() << "Parsing " << info.filePath().toStdString();
       parser.process(info);
     }
     catch (const ParserException& ex)
@@ -162,6 +174,8 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
 
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
 {
+  log::info() << "Writing output to '" << name.toStdString() << "'";
+
   Exporter exporter;
   exporter.copyProfiles();
   exporter.process(model, name, values);
