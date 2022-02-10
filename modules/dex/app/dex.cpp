@@ -63,6 +63,18 @@ int Dex::exec()
 
 void Dex::work()
 {
+  if (m_cli.workdir.has_value())
+  {
+    QString workdir = m_cli.workdir.value();
+    log::info() << "Changing working dir to '" << workdir.toStdString() << "'";
+    
+    if (!QDir::setCurrent(workdir))
+    {
+      log::error() << "Failed to change working dir";
+      return;
+    }
+  }
+
   m_ini = parse_ini_config();
 
   if (!m_ini.valid)
