@@ -10,6 +10,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_compile_options(/wd4251)  
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 ##################################################################
 ###### install config
 ##################################################################
