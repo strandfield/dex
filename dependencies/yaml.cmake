@@ -1,15 +1,23 @@
 
 message("Hello Yaml!")
 
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}")
+  message("Creating ${CMAKE_CURRENT_BINARY_DIR}")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
 set(WORKDIR "${CMAKE_CURRENT_BINARY_DIR}/yaml-cpp")
 
 if(NOT EXISTS "${WORKDIR}")
   message("Cloning yaml-cpp")
+  message("Git executable: ${GIT_EXECUTABLE}")
   execute_process(
     COMMAND             ${GIT_EXECUTABLE} clone https://github.com/jbeder/yaml-cpp.git
     WORKING_DIRECTORY   ${CMAKE_CURRENT_BINARY_DIR}
     RESULT_VARIABLE     git_result
     OUTPUT_VARIABLE     git_output)
+    message("git result: ${git_result}")
+    message("git output: ${git_output}")
   execute_process(
     COMMAND             ${GIT_EXECUTABLE} checkout yaml-cpp-0.7.0
     WORKING_DIRECTORY   ${WORKDIR}
