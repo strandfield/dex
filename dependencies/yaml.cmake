@@ -10,7 +10,12 @@ set(WORKDIR "${CMAKE_CURRENT_BINARY_DIR}/yaml-cpp")
 
 if(NOT EXISTS "${WORKDIR}")
   message("Cloning yaml-cpp")
+  find_package(Git)
+  if(Git_FOUND)
+    message("Git found: ${GIT_EXECUTABLE}")
+  endif()
   message("Git executable: ${GIT_EXECUTABLE}")
+
   execute_process(
     COMMAND             ${GIT_EXECUTABLE} clone https://github.com/jbeder/yaml-cpp.git
     WORKING_DIRECTORY   ${CMAKE_CURRENT_BINARY_DIR}
