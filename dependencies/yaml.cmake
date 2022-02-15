@@ -70,6 +70,8 @@ if (WIN32)
   file(COPY "${WORKDIR}/build/Release/yaml-cpp.dll" "${WORKDIR}/build_Debug/Debug/yaml-cppd.dll" DESTINATION "${WORKDIR}/bin")
   file(COPY "${WORKDIR}/build/Release/yaml-cpp.lib" "${WORKDIR}/build_Debug/Debug/yaml-cppd.lib" DESTINATION "${WORKDIR}/lib")
 else()
+  file(COPY "${WORKDIR}/build/libyaml-cpp.so" "${WORKDIR}/build_Debug/libyaml-cppd.so" DESTINATION "${WORKDIR}/bin")
+  file(COPY "${WORKDIR}/build/libyaml-cpp.so.0.7" "${WORKDIR}/build_Debug/libyaml-cppd.so.0.7" DESTINATION "${WORKDIR}/bin")
   file(COPY "${WORKDIR}/build/libyaml-cpp.so.0.7.0" "${WORKDIR}/build_Debug/libyaml-cppd.so.0.7.0" DESTINATION "${WORKDIR}/bin")
 endif (WIN32)
   
@@ -89,9 +91,9 @@ if (WIN32)
     INTERFACE_INCLUDE_DIRECTORIES ${YAMLCPP_INCLUDE})
 else()
   set_target_properties(YAMLCPP::YAMLCPP PROPERTIES
-    IMPORTED_LOCATION "${YAMLCPP_DIR}/bin/libyaml-cpp.so.0.7.0"
-    IMPORTED_LOCATION_DEBUG "${YAMLCPP_DIR}/bin/libyaml-cpp.so.0.7.0"
-    IMPORTED_LOCATION_RELEASE "${YAMLCPP_DIR}/bin/libyaml-cppd.so.0.7.0"
+    IMPORTED_LOCATION "${YAMLCPP_DIR}/bin/libyaml-cpp.so"
+    IMPORTED_LOCATION_DEBUG "${YAMLCPP_DIR}/bin/libyaml-cppd.so"
+    IMPORTED_LOCATION_RELEASE "${YAMLCPP_DIR}/bin/libyaml-cpp.so"
     INTERFACE_INCLUDE_DIRECTORIES ${YAMLCPP_INCLUDE})
 endif (WIN32)
 
