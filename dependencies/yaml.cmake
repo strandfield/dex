@@ -1,6 +1,4 @@
 
-message("Hello Yaml!")
-
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}")
   message("Creating ${CMAKE_CURRENT_BINARY_DIR}")
   file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")

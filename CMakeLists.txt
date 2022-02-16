@@ -81,7 +81,7 @@ add_subdirectory(tests)
 message("Install RPATH is: ${CMAKE_INSTALL_RPATH}")
 
 install(TARGETS liquid typeset cpptok LIBRARY DESTINATION lib)
-install(TARGETS YAMLCPP::YAMLCPP LIBRARY DESTINATION lib)
+install(DIRECTORY "${YAMLCPP_DIR}/bin/" TYPE LIB)
 install(TARGETS dex-common dex-model dex-input dex-output dex-app LIBRARY DESTINATION lib)
 install(TARGETS dex RUNTIME DESTINATION bin)
 
