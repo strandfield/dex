@@ -10,6 +10,8 @@
 #include "dex/input/parser-machine.h"
 #include "dex/output/exporter.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <QDir>
 
 #include <iostream>
@@ -20,6 +22,9 @@ namespace dex
 Dex::Dex(int& argc, char* argv[])
   : QCoreApplication(argc, argv)
 {
+  YAML::Node yam = YAML::Load("a: 5");
+  Q_ASSERT(yam["a"].as<int>() == 5);
+
   setApplicationName("dex");
   setApplicationVersion("0.0.0");
 
@@ -63,7 +68,24 @@ int Dex::exec()
 
 void Dex::work()
 {
+  if (m_cli.workdir.has_value())
+  {
+    QString workdir = m_cli.workdir.value();
+    log::info() << "Changing working dir to '" << workdir.toStdString() << "'";
+    
+    if (!QDir::setCurrent(workdir))
+    {
+      log::error() << "Failed to change working dir";
+      return;
+    }
+  }
+
   m_ini = parse_ini_config();
+
+  if (!m_ini.valid)
+  {
+    log::info() << "Could not parse dex.ini config";
+  }
 
   QStringList inputs = m_ini.inputs;
 
@@ -89,6 +111,12 @@ void Dex::process(const QStringList& inputs, QString output, json::Object values
 
   if (!inputs.empty())
   {
+    log::info() << "Inputs:";
+    for (const auto& i : inputs)
+    {
+      log::info() << i.toStdString();
+    }
+
     for (const auto& i : inputs)
     {
       try
@@ -128,6 +156,7 @@ void Dex::feed(ParserMachine& parser, const QString& input)
   {
     try
     {
+      log::info() << "Parsing " << info.filePath().toStdString();
       parser.process(info);
     }
     catch (const ParserException& ex)
@@ -162,6 +191,8 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
 
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
 {
+  log::info() << "Writing output to '" << name.toStdString() << "'";
+
   Exporter exporter;
   exporter.copyProfiles();
   exporter.process(model, name, values);

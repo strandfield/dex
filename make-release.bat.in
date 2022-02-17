@@ -1,5 +1,6 @@
 
 set QT_DIR=${Qt5_DIR}\..\..\..
+set YAMLCPP_DIR=${YAMLCPP_DIR}
 
 cd ..
 
@@ -10,5 +11,6 @@ copy "build\Release\*.dll" "release"
 copy "build\Release\dex.exe" "release"
 
 copy "%QT_DIR%\bin\Qt5Core.dll" "release"
+copy "%YAMLCPP_DIR%\bin\yaml-cpp.dll" "release"
 
 cd build

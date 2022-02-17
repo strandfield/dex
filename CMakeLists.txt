@@ -10,6 +10,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_compile_options(/wd4251)  
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 ##################################################################
 ###### install config
 ##################################################################
@@ -79,6 +81,7 @@ add_subdirectory(tests)
 message("Install RPATH is: ${CMAKE_INSTALL_RPATH}")
 
 install(TARGETS liquid typeset cpptok LIBRARY DESTINATION lib)
+install(DIRECTORY "${YAMLCPP_DIR}/bin/" TYPE LIB)
 install(TARGETS dex-common dex-model dex-input dex-output dex-app LIBRARY DESTINATION lib)
 install(TARGETS dex RUNTIME DESTINATION bin)
 

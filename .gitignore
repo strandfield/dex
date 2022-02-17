@@ -1,3 +1,4 @@
 ignore/*
 build/*
 release/*
+examples/**/result/*

@@ -22,6 +22,7 @@ target_link_libraries(dex-input Qt5::Core)
 target_link_libraries(dex-input dex-model)
 target_link_libraries(dex-input dex-common)
 target_link_libraries(dex-input typeset cpptok)
+target_link_libraries(dex-input YAMLCPP::YAMLCPP)
 
 #foreach(_source IN ITEMS ${DEXINPUT_LIBRARY_HDR_FILES} ${DEXINPUT_LIBRARY_SRC_FILES})
 #    get_filename_component(_source_path "${_source}" PATH)

@@ -35,6 +35,7 @@ CommandLineParser::CommandLineParser()
 
   addOption({ "i", "Input (file / directory)", "input" });
   addOption({ "o", "Output", "output" });
+  addOption({ "w", "Working directory", "workdir" });
   addOption({ "value", "Project values for the Liquid-exporter", "variables" });
   addOption({ "reset-profiles", "Resets the exporter profiles" });
 }
@@ -63,6 +64,7 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
     result.status = CommandLineParserResult::Work;
     result.inputs = values("i");
     result.output = value("o");
+    result.workdir= value("w");
     result.values = values_to_json(values("value"));
   }
 
