@@ -16,6 +16,8 @@
 
 #include "dex/model/model.h"
 
+#include <QDirIterator>
+
 namespace dex
 {
 
@@ -139,18 +141,24 @@ void LiquidExporter::render()
   LiquidExporterModelVisitor visitor{ *this, };
   visitor.visitModel(*model());
 
-  for (const std::pair<std::string, liquid::Template>& file : profile().files)
+  QDirIterator diriterator{ m_profile.profile_path.c_str(), QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs };
+
+  while (diriterator.hasNext())
   {
-    liquid::Map context;
-    setupContext(context);
+    diriterator.next();
+    QFileInfo fileinfo = diriterator.fileInfo();
 
-    selectStringifier(QFileInfo(QString::fromStdString(file.first)).suffix().toStdString());
+    if (fileinfo.fileName().startsWith("_"))
+      continue;
 
-    std::string output = liquid::Renderer::render(file.second, context);
-
-    postProcess(output);
-
-    write(output, (outputDir().absolutePath() + "/" + QString::fromStdString(file.first)).toStdString());
+    if (fileinfo.isDir())
+    {
+      renderDirectory(fileinfo.absoluteFilePath());
+    }
+    else
+    {
+      renderFile(fileinfo.absoluteFilePath());
+    }
   }
 }
 
@@ -231,6 +239,66 @@ std::string LiquidExporter::stringify(const liquid::Value& val)
   return m_stringifier->stringify(val);
 }
 
+void LiquidExporter::renderDirectory(const QString& path)
+{
+  QDirIterator diriterator{ m_profile.profile_path.c_str(), QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
+
+  while (diriterator.hasNext())
+  {
+    QString path = diriterator.next();
+    renderFile(path);
+  }
+}
+
+void LiquidExporter::renderFile(const QString& filepath)
+{
+  QFileInfo fileinfo{ filepath };
+
+  QString srcrelpath = QDir(profile().profile_path.c_str()).relativeFilePath(fileinfo.absoluteFilePath());
+  QString destpath = outputDir().absolutePath() + "/" + srcrelpath;
+
+  if (!isSpecialFile(fileinfo))
+  {
+    checkWriteDirectory(destpath.toStdString());
+    QFile::copy(filepath, destpath);
+    return;
+  }
+  
+  TemplateWithFrontMatter tmplt = open_template_with_front_matter(filepath.toStdString());
+  tmplt.model.skipWhitespacesAfterTag();
+
+  // @TODO: use tmplt.frontmatter
+
+  liquid::Map context;
+  setupContext(context);
+
+  selectStringifier(fileinfo.suffix().toStdString());
+
+  std::string output = liquid::Renderer::render(tmplt.model, context);
+
+  postProcess(output);
+
+  write(output, destpath.toStdString());
+}
+
+bool LiquidExporter::isSpecialFile(const QFileInfo& fileinfo) const
+{
+  static const std::set<QString> suffix_whitelist = {
+    "md", "tex", "html", "txt", "css", "js"
+  };
+
+  if (suffix_whitelist.find(fileinfo.suffix()) == suffix_whitelist.end())
+    return false;
+
+  QFile file{ fileinfo.absoluteFilePath() };
+
+  if (!file.open(QIODevice::ReadOnly))
+    return false;
+
+  // Check if file has a front-matter
+  return file.read(3) == "---";
+}
+
 void LiquidExporter::selectStringifier(const std::string& filesuffix)
 {
   m_stringifier = m_stringifiers[filesuffix];
@@ -253,11 +321,8 @@ void LiquidExporter::postProcess(std::string& output)
   LiquidExporter::simplify_empty_lines(output);
 }
 
-void LiquidExporter::write(const std::string& data, const std::string& filepath)
+void LiquidExporter::checkWriteDirectory(const std::string& filepath)
 {
-  if (data.empty())
-    return;
-
   QFileInfo fileinfo{ QString::fromStdString(filepath) };
 
   if (!fileinfo.dir().exists())
@@ -267,11 +332,19 @@ void LiquidExporter::write(const std::string& data, const std::string& filepath)
     if (!success)
       throw IOException{ fileinfo.dir().absolutePath().toStdString(), "could not create directory" };
   }
+}
 
-  QFile file{ fileinfo.absoluteFilePath() };
+void LiquidExporter::write(const std::string& data, const std::string& filepath)
+{
+  if (data.empty())
+    return;
+
+  checkWriteDirectory(filepath);
+
+  QFile file{ filepath.c_str() };
 
   if (!file.open(QIODevice::WriteOnly))
-    throw IOException{ fileinfo.absoluteFilePath().toStdString(), "could not open file for writing" };
+    throw IOException{ filepath, "could not open file for writing" };
 
   file.write(data.data());
 

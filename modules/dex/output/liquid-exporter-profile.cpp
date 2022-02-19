@@ -9,7 +9,10 @@
 #include "dex/common/settings.h"
 #include "dex/common/string-utils.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <QDirIterator>
+#include <QFile>
 #include <QFileInfo>
 
 #include <set>
@@ -17,10 +20,82 @@
 namespace dex
 {
 
-static liquid::Template open_liquid_template(const std::string& path)
+liquid::Template open_liquid_template(const std::string& path)
 {
   std::string tmplt = file_utils::read_all(path);
   return liquid::parse(tmplt);
+}
+
+static json::Json yaml_to_json(const YAML::Node& n)
+{
+  if (n.IsScalar())
+  {
+    const std::string& s = n.Scalar();
+
+    if (s == "true")
+      return true;
+    else if (s == "false")
+      return false;
+    
+    // @TODO: convert int/float ?
+
+    return s;
+  }
+  else if (n.IsSequence())
+  {
+    json::Array vec;
+
+    for (size_t i = 0; i < n.size(); ++i) 
+    {
+      vec.push(yaml_to_json(n[i]));
+    }
+
+    return vec;
+  }
+  else if (n.IsMap())
+  {
+    json::Object obj;
+
+    for (YAML::const_iterator it = n.begin(); it != n.end(); ++it) 
+    {
+      obj[it->first.as<std::string>()] = yaml_to_json(it->second);
+    }
+
+    return obj;
+  }
+  else
+  {
+    return json::null;
+  }
+}
+
+TemplateWithFrontMatter open_template_with_front_matter(const std::string& path)
+{
+  QFile file{ path.c_str() };
+
+  file.open(QIODevice::ReadOnly);
+
+  file.readLine();
+
+  QByteArray frontmatter;
+  QByteArray l = file.readLine();
+
+  while (!l.startsWith("---"))
+  {
+    frontmatter += l;
+    frontmatter += "\n";
+    l = file.readLine();
+  }
+
+  YAML::Node yam = YAML::Load(frontmatter.data());
+  
+  std::string tmplt_content = file.readAll().toStdString();
+
+  TemplateWithFrontMatter result;
+  result.frontmatter = yaml_to_json(yam).toObject();
+  result.model = liquid::parse(tmplt_content);
+
+  return result;
 }
 
 class LiquidExporterProfileLoader

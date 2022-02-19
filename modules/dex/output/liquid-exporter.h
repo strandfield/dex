@@ -84,9 +84,13 @@ protected:
 
 protected:
 
+  void renderDirectory(const QString& path);
+  void renderFile(const QString& filepath);
+  bool isSpecialFile(const QFileInfo& fileinfo) const;
   void selectStringifier(const std::string& filesuffix);
   void setupContext(liquid::Map& context);
   void postProcess(std::string& output);
+  void checkWriteDirectory(const std::string& filepath);
   void write(const std::string& data, const std::string& filepath);
 
 private:

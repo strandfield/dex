@@ -21,6 +21,7 @@ target_link_libraries(dex-output Qt5::Core)
 target_link_libraries(dex-output dex-model)
 target_link_libraries(dex-output dex-common)
 target_link_libraries(dex-output liquid)
+target_link_libraries(dex-output YAMLCPP::YAMLCPP)
 
 set_target_properties(dex-output PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 set_target_properties(dex-output PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")

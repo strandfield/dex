@@ -9,10 +9,22 @@
 
 #include <liquid/renderer.h>
 
+#include <json-toolkit/json.h>
+
 #include <QDir>
 
 namespace dex
 {
+
+liquid::Template open_liquid_template(const std::string& path);
+
+struct TemplateWithFrontMatter
+{
+  json::Object frontmatter;
+  liquid::Template model;
+};
+
+TemplateWithFrontMatter open_template_with_front_matter(const std::string& path);
 
 class DEX_OUTPUT_API LiquidExporterProfile
 {

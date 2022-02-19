@@ -10,8 +10,6 @@
 #include "dex/input/parser-machine.h"
 #include "dex/output/exporter.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <QDir>
 
 #include <iostream>
@@ -22,9 +20,6 @@ namespace dex
 Dex::Dex(int& argc, char* argv[])
   : QCoreApplication(argc, argv)
 {
-  YAML::Node yam = YAML::Load("a: 5");
-  Q_ASSERT(yam["a"].as<int>() == 5);
-
   setApplicationName("dex");
   setApplicationVersion("0.0.0");
 
