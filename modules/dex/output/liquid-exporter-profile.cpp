@@ -62,7 +62,6 @@ public:
   LiquidExporterProfile& profile;
   QDir directory;
   json::Json config;
-  std::set<std::string> exclusions;
 
 public:
   LiquidExporterProfileLoader(LiquidExporterProfile& pro, const QDir& dir, const json::Json& conf)
@@ -74,20 +73,6 @@ public:
   }
 
 protected:
-  bool excluded(const std::string& filepath)
-  {
-    return exclusions.find(filepath) != exclusions.end();
-  }
-
-  void exclude(std::string filepath)
-  {
-    exclusions.insert(std::move(filepath));
-  }
-
-  void exclude(const QString& filepath)
-  {
-    exclude(filepath.toStdString());
-  }
 
   void read_template(const QFileInfo& fileinfo, const std::string& name, LiquidExporterProfile::Template& tmplt, std::string default_out)
   {
@@ -105,14 +90,11 @@ protected:
     if (!dir.exists())
       return;
 
-    exclude(dir.absolutePath());
-
     QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
 
     while (diriterator.hasNext())
     {
       QFileInfo fileinfo{ diriterator.next() };
-      exclude(fileinfo.absoluteFilePath());
 
       if (fileinfo.baseName() == "class")
         read_template(fileinfo, "class", profile.class_template, "classes");
@@ -130,14 +112,11 @@ protected:
     if (!dir.exists())
       return;
 
-    exclude(dir.absolutePath());
-
     QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
 
     while (diriterator.hasNext())
     {
       std::string p = diriterator.next().toStdString();
-      exclude(p);
       liquid::Template tmplt = open_liquid_template(p);
       tmplt.skipWhitespacesAfterTag();
       p.erase(p.begin(), p.begin() + profile.profile_path.length() + 11);
@@ -154,7 +133,6 @@ public:
     profile.profile_path = directory.absolutePath().toStdString();
 
     std::string profile_config_file = directory.absoluteFilePath("_config.yml").toStdString();
-    exclude(profile_config_file);
 
     list_templates();
     list_liquid_includes();
