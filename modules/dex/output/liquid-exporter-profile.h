@@ -42,12 +42,11 @@ public:
   Template class_template;
   Template namespace_template;
   Template document_template;
-  std::vector<std::pair<std::string, liquid::Template>> files;
   std::vector<std::pair<std::string, liquid::Template>> liquid_templates;
 
 public:
 
-  void load(const QDir& dir);
+  void load(const QDir& dir, const json::Json& config);
 
 };
 

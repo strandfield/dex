@@ -130,7 +130,10 @@ void Dex::process(const QStringList& inputs, QString output, json::Object values
   }
 
   if (output.isEmpty())
-    output = "dex-output.json";
+  {
+    log::info() << "No output specified";
+    return;
+  }
 
   write_output(parser.output(), output, values);
 }
@@ -184,13 +187,15 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
   }
 }
 
-void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
+void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)
 {
-  log::info() << "Writing output to '" << name.toStdString() << "'";
+  assert(!outdir.isEmpty());
+
+  log::info() << "Writing output to '" << outdir.toStdString() << "'";
 
   Exporter exporter;
   exporter.copyProfiles();
-  exporter.process(model, name, values);
+  exporter.process(model, outdir, values);
 }
 
 } // namespace dex

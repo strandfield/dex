@@ -52,7 +52,6 @@ public:
   void setProfile(Profile pro);
 
   QDir outputDir() const;
-  void setOutputDir(const QDir& dir);
 
   void setVariables(liquid::Map obj);
   const liquid::Map& variables() const;

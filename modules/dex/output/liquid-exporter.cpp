@@ -106,6 +106,7 @@ LiquidExporter::~LiquidExporter()
 void LiquidExporter::setProfile(Profile pro)
 {
   m_profile = std::move(pro);
+  m_output_dir = QDir(QString::fromStdString(m_profile.profile_path + "/_output"));
   
   templates().clear();
 
@@ -116,11 +117,6 @@ void LiquidExporter::setProfile(Profile pro)
 QDir LiquidExporter::outputDir() const
 {
   return m_output_dir;
-}
-
-void LiquidExporter::setOutputDir(const QDir& dir)
-{
-  m_output_dir = dir;
 }
 
 void LiquidExporter::setVariables(liquid::Map obj)

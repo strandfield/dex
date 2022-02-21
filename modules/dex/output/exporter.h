@@ -23,7 +23,7 @@ public:
 
   static void clearProfiles();
   void copyProfiles();
-  void process(const std::shared_ptr<dex::Model>& model, const QString& name, const json::Object& values);
+  void process(const std::shared_ptr<dex::Model>& model, const QString& outdirpath, const json::Object& values);
 };
 
 } // namespace dex

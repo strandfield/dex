@@ -8,6 +8,7 @@
 #include "dex/common/file-utils.h"
 #include "dex/common/settings.h"
 #include "dex/common/string-utils.h"
+#include "dex/output/config.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -24,49 +25,6 @@ liquid::Template open_liquid_template(const std::string& path)
 {
   std::string tmplt = file_utils::read_all(path);
   return liquid::parse(tmplt);
-}
-
-static json::Json yaml_to_json(const YAML::Node& n)
-{
-  if (n.IsScalar())
-  {
-    const std::string& s = n.Scalar();
-
-    if (s == "true")
-      return true;
-    else if (s == "false")
-      return false;
-    
-    // @TODO: convert int/float ?
-
-    return s;
-  }
-  else if (n.IsSequence())
-  {
-    json::Array vec;
-
-    for (size_t i = 0; i < n.size(); ++i) 
-    {
-      vec.push(yaml_to_json(n[i]));
-    }
-
-    return vec;
-  }
-  else if (n.IsMap())
-  {
-    json::Object obj;
-
-    for (YAML::const_iterator it = n.begin(); it != n.end(); ++it) 
-    {
-      obj[it->first.as<std::string>()] = yaml_to_json(it->second);
-    }
-
-    return obj;
-  }
-  else
-  {
-    return json::null;
-  }
 }
 
 TemplateWithFrontMatter open_template_with_front_matter(const std::string& path)
@@ -103,13 +61,14 @@ class LiquidExporterProfileLoader
 public:
   LiquidExporterProfile& profile;
   QDir directory;
+  json::Json config;
   std::set<std::string> exclusions;
-  SettingsMap settings;
 
 public:
-  LiquidExporterProfileLoader(LiquidExporterProfile& pro, const QDir& dir)
+  LiquidExporterProfileLoader(LiquidExporterProfile& pro, const QDir& dir, const json::Json& conf)
     : profile(pro),
-      directory(dir)
+      directory(dir),
+      config(conf)
   {
 
   }
@@ -135,7 +94,7 @@ protected:
     std::string path = fileinfo.absoluteFilePath().toStdString();
     tmplt.model = open_liquid_template(path);
     tmplt.model.skipWhitespacesAfterTag();
-    tmplt.outdir = dex::settings::read(settings, "output/" + name, std::move(default_out));
+    tmplt.outdir = dex::config::read(config["output"], name, std::move(default_out)).toString();
     tmplt.filesuffix = fileinfo.suffix().toStdString();
   }
 
@@ -186,47 +145,25 @@ protected:
     }
   }
 
-  void list_files()
-  {
-    QDirIterator diriterator{ directory.absolutePath(), QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
-
-    while (diriterator.hasNext())
-    {
-      std::string path = diriterator.next().toStdString();
-
-      if (excluded(path))
-        continue;
-
-      liquid::Template tmplt = open_liquid_template(path);
-      tmplt.skipWhitespacesAfterTag();
-
-      path.erase(path.begin(), path.begin() + profile.profile_path.length() + 1);
-      profile.files.emplace_back(std::move(path), std::move(tmplt));
-    }
-  }
-
 public:
 
   void load()
   {
-    if (!directory.exists("config.ini"))
-      throw std::runtime_error{ "Bad profile directory" };
+    assert(directory.exists("_config.yml"));
 
     profile.profile_path = directory.absolutePath().toStdString();
 
-    std::string profile_config_file = directory.absoluteFilePath("config.ini").toStdString();
+    std::string profile_config_file = directory.absoluteFilePath("_config.yml").toStdString();
     exclude(profile_config_file);
-    settings = dex::settings::load(profile_config_file);
 
     list_templates();
     list_liquid_includes();
-    list_files();
   }
 };
 
-void LiquidExporterProfile::load(const QDir& dir)
+void LiquidExporterProfile::load(const QDir& dir, const json::Json& config)
 {
-  LiquidExporterProfileLoader loader{ *this, dir };
+  LiquidExporterProfileLoader loader{ *this, dir, config };
   loader.load();
 }
 
