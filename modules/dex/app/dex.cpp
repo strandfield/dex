@@ -34,11 +34,6 @@ int Dex::exec()
   m_cli = parser.parse(Dex::arguments());
   auto& result = m_cli;
 
-  if (m_cli.reset_profiles.value_or(false))
-  {
-    Exporter::clearProfiles();
-  }
-
   if (result.status == CommandLineParserResult::ParseError)
   {
     std::cout << result.error.toStdString() << std::endl;
@@ -194,7 +189,6 @@ void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdi
   log::info() << "Writing output to '" << outdir.toStdString() << "'";
 
   Exporter exporter;
-  exporter.copyProfiles();
   exporter.process(model, outdir, values);
 }
 

@@ -27,46 +27,6 @@ Exporter::Exporter()
 
 }
 
-void Exporter::clearProfiles()
-{
-  QString dest = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-  QDir(dest + "/profiles").removeRecursively();
-}
-
-void Exporter::copyProfiles()
-{
-  QString dest = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-  QDir dest_dir{ dest };
-
-  if (!dest_dir.exists())
-  {
-    QDir upper_dir = dest_dir;
-    upper_dir.cdUp();
-    upper_dir.mkpath(dest);
-  }
-
-  dest_dir = QDir(dest + "/profiles");
-
-  if (!dest_dir.exists())
-  {
-    QDir upper_dir = dest_dir;
-    upper_dir.cdUp();
-    upper_dir.mkpath(dest + "/profiles");
-  }
-
-  auto cp = [dest](const QString& src) {
-    if(!QFileInfo::exists(dest + "/profiles/" + src))
-      recursive_copy(":/templates/" + src, dest + "/profiles/" + src);
-  };
-
-  cp("default");
-  cp("json");
-  cp("md");
-  cp("markdown");
-  cp("tex");
-  cp("latex");
-}
-
 static liquid::Value json_to_liquid(const json::Json& js)
 {
   if (js.isInteger())
