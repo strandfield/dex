@@ -8,11 +8,12 @@
 #include "dex/dex-output.h"
 
 #include "dex/output/json-export.h"
-#include "dex/output/liquid-exporter-profile.h"
 
 #include "dex/model/model.h"
 
 #include <liquid/renderer.h>
+
+#include <json-toolkit/json.h>
 
 #include <QDir>
 
@@ -27,6 +28,42 @@ class Model;
 
 class LiquidFilters;
 class LiquidStringifier;
+
+liquid::Template open_liquid_template(const std::string& path);
+
+struct TemplateWithFrontMatter
+{
+  json::Object frontmatter;
+  liquid::Template model;
+};
+
+TemplateWithFrontMatter open_template_with_front_matter(const std::string& path);
+
+// @TODO: maybe rename as profile are no longer a thing
+// maybe use a "cache" in liquid exporter for the templates 
+class DEX_OUTPUT_API LiquidExporterProfile
+{
+public:
+
+  struct Template
+  {
+    liquid::Template model;
+    std::string outdir;
+    std::string filesuffix;
+  };
+
+public:
+  std::string profile_path;
+  Template class_template;
+  Template namespace_template;
+  Template document_template;
+  std::vector<std::pair<std::string, liquid::Template>> liquid_templates;
+
+public:
+
+  void load(const QDir& dir, const json::Json& config);
+
+};
 
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
 {
