@@ -12,7 +12,6 @@
 
 #include "dex/common/errors.h"
 #include "dex/common/json-utils.h"
-#include "dex/common/settings.h"
 
 #include "dex/model/model.h"
 

@@ -26,6 +26,8 @@ struct TemplateWithFrontMatter
 
 TemplateWithFrontMatter open_template_with_front_matter(const std::string& path);
 
+// @TODO: maybe rename as profile are no longer a thing
+// maybe use a "cache" in liquid exporter for the templates 
 class DEX_OUTPUT_API LiquidExporterProfile
 {
 public:

@@ -56,6 +56,7 @@ TemplateWithFrontMatter open_template_with_front_matter(const std::string& path)
   return result;
 }
 
+// @TODO: check wether this class is completely obsolete ?
 class LiquidExporterProfileLoader
 {
 public:

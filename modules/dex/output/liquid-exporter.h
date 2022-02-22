@@ -35,17 +35,6 @@ public:
   LiquidExporter();
   ~LiquidExporter();
 
-  struct Settings
-  {
-    liquid::Template class_template;
-    liquid::Template namespace_template;
-    liquid::Template function_template;
-    std::string class_outdir;
-    std::string namespace_outdir;
-    std::string function_outdir;
-    std::vector<std::pair<std::string, liquid::Template>> files;
-  };
-
   typedef LiquidExporterProfile Profile;
 
   const Profile& profile() const;
