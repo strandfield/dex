@@ -39,45 +39,33 @@ struct TemplateWithFrontMatter
 
 TemplateWithFrontMatter open_template_with_front_matter(const std::string& path);
 
-// @TODO: maybe rename as profile are no longer a thing
-// maybe use a "cache" in liquid exporter for the templates 
-class DEX_OUTPUT_API LiquidExporterProfile
+struct LiquidLayout
 {
-public:
-
-  struct Template
-  {
-    liquid::Template model;
-    std::string outdir;
-    std::string filesuffix;
-  };
-
-public:
-  std::string profile_path;
-  Template class_template;
-  Template namespace_template;
-  Template document_template;
-  std::vector<std::pair<std::string, liquid::Template>> liquid_templates;
-
-public:
-
-  void load(const QDir& dir, const json::Json& config);
-
+  liquid::Template model;
+  std::string outdir;
+  std::string filesuffix;
 };
 
 class DEX_OUTPUT_API LiquidExporter : public liquid::Renderer
 {
 public:
 
-  LiquidExporter();
+  explicit LiquidExporter(std::string folder_path, const json::Json config = json::null);
   ~LiquidExporter();
 
-  typedef LiquidExporterProfile Profile;
+  struct Layouts
+  {
+    LiquidLayout class_template;
+    LiquidLayout namespace_template;
+    LiquidLayout document_template;
+  };
 
-  const Profile& profile() const;
-  void setProfile(Profile pro);
+  const std::string& folderPath() const;
 
+  const std::string& outputPath() const;
   QDir outputDir() const;
+
+  const Layouts& layouts() const;
 
   void setVariables(liquid::Map obj);
   const liquid::Map& variables() const;
@@ -97,7 +85,7 @@ public:
 protected:
   friend class LiquidExporterModelVisitor;
 
-  void dump(const std::shared_ptr<model::Object>& obj, const char* obj_field_name, const Profile::Template& tmplt);
+  void dump(const std::shared_ptr<model::Object>& obj, const char* obj_field_name, const LiquidLayout& layout);
 
   void dump(dex::Class& cla);
   void dump(dex::Namespace& ns);
@@ -109,6 +97,10 @@ protected:
 
 protected:
 
+  void listLayouts();
+  LiquidLayout parseLayout(const QFileInfo& fileinfo, const std::string& name, std::string default_out);
+  void listIncludes();
+
   void renderDirectory(const QString& path);
   void renderFile(const QString& filepath);
   bool isSpecialFile(const QFileInfo& fileinfo) const;
@@ -119,9 +111,11 @@ protected:
   void write(const std::string& data, const std::string& filepath);
 
 private:
-  QDir m_output_dir;
+  std::string m_folder_path;
+  std::string m_output_path;
+  json::Json m_config;
   std::shared_ptr<Model> m_model;
-  Profile m_profile;
+  Layouts m_layouts;
   liquid::Map m_user_variables;
   std::map<std::string, std::shared_ptr<LiquidStringifier>> m_stringifiers;
   std::shared_ptr<LiquidStringifier> m_stringifier;
@@ -132,11 +126,6 @@ private:
 
 namespace dex
 {
-
-inline const LiquidExporterProfile& LiquidExporter::profile() const
-{
-  return m_profile;
-}
 
 inline std::shared_ptr<Model> LiquidExporter::model() const
 {

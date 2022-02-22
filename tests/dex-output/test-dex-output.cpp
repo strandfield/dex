@@ -27,30 +27,32 @@ static std::shared_ptr<dex::Paragraph> make_par(const std::string& str)
   return std::make_shared<dex::Paragraph>(str);
 }
 
+
+std::string get_folder_path()
+{
+  QString dest = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+
+  QDir dest_dir{ dest };
+
+  if (!dest_dir.exists())
+  {
+    QDir upper_dir = dest_dir;
+    upper_dir.cdUp();
+    upper_dir.mkpath(dest);
+  }
+
+  if (!QFileInfo::exists(dest + "/markdown"))
+    dex::recursive_copy(":/test-templates/markdown", dest + "/markdown");
+
+  return dest.toStdString() + "/markdown";
+}
+
 class MarkdownExport : public dex::LiquidExporter
 {
 public:
   explicit MarkdownExport(std::shared_ptr<dex::Model> m)
+    : LiquidExporter(get_folder_path())
   {
-    QString dest = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-
-    QDir dest_dir{ dest };
-
-    if (!dest_dir.exists())
-    {
-      QDir upper_dir = dest_dir;
-      upper_dir.cdUp();
-      upper_dir.mkpath(dest);
-    }
-
-    if (!QFileInfo::exists(dest + "/markdown"))
-      dex::recursive_copy(":/test-templates/markdown", dest + "/markdown");
-
-    json::Json config = dex::read_output_config(dest.toStdString() + "/markdown/_config.yml");
-    dex::LiquidExporterProfile prof;
-    prof.load(QDir(dest + "/markdown"), config);
-    setProfile(std::move(prof));
-
     setModel(m);
   }
 };

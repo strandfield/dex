@@ -86,12 +86,8 @@ void Exporter::process(const std::shared_ptr<dex::Model>& model, const QString& 
   }
   else if (engine == "liquid")
   {
-    dex::LiquidExporter exporter;
+    dex::LiquidExporter exporter{ outdir.absolutePath().toStdString(), config };
 
-    LiquidExporterProfile prof;
-    prof.load(outdir, config);
-
-    exporter.setProfile(std::move(prof));
     exporter.setVariables(json_to_liquid(values).toMap());
     exporter.setModel(model);
 

@@ -65,96 +65,6 @@ TemplateWithFrontMatter open_template_with_front_matter(const std::string& path)
   return result;
 }
 
-// @TODO: check wether this class is completely obsolete ?
-class LiquidExporterProfileLoader
-{
-public:
-  LiquidExporterProfile& profile;
-  QDir directory;
-  json::Json config;
-
-public:
-  LiquidExporterProfileLoader(LiquidExporterProfile& pro, const QDir& dir, const json::Json& conf)
-    : profile(pro),
-    directory(dir),
-    config(conf)
-  {
-
-  }
-
-protected:
-
-  void read_template(const QFileInfo& fileinfo, const std::string& name, LiquidExporterProfile::Template& tmplt, std::string default_out)
-  {
-    std::string path = fileinfo.absoluteFilePath().toStdString();
-    tmplt.model = open_liquid_template(path);
-    tmplt.model.skipWhitespacesAfterTag();
-    tmplt.outdir = dex::config::read(config["output"], name, std::move(default_out)).toString();
-    tmplt.filesuffix = fileinfo.suffix().toStdString();
-  }
-
-  void list_templates()
-  {
-    QDir dir{ directory.absolutePath() + "/_layouts" };
-
-    if (!dir.exists())
-      return;
-
-    QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
-
-    while (diriterator.hasNext())
-    {
-      QFileInfo fileinfo{ diriterator.next() };
-
-      if (fileinfo.baseName() == "class")
-        read_template(fileinfo, "class", profile.class_template, "classes");
-      else if (fileinfo.baseName() == "namespace")
-        read_template(fileinfo, "namespace", profile.namespace_template, "namespaces");
-      else if (fileinfo.baseName() == "document")
-        read_template(fileinfo, "document", profile.document_template, "documents");
-    }
-  }
-
-  void list_liquid_includes()
-  {
-    QDir dir{ directory.absolutePath() + "/_includes" };
-
-    if (!dir.exists())
-      return;
-
-    QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
-
-    while (diriterator.hasNext())
-    {
-      std::string p = diriterator.next().toStdString();
-      liquid::Template tmplt = open_liquid_template(p);
-      tmplt.skipWhitespacesAfterTag();
-      p.erase(p.begin(), p.begin() + profile.profile_path.length() + 11);
-      profile.liquid_templates.emplace_back(std::move(p), std::move(tmplt));
-    }
-  }
-
-public:
-
-  void load()
-  {
-    assert(directory.exists("_config.yml"));
-
-    profile.profile_path = directory.absolutePath().toStdString();
-
-    std::string profile_config_file = directory.absoluteFilePath("_config.yml").toStdString();
-
-    list_templates();
-    list_liquid_includes();
-  }
-};
-
-void LiquidExporterProfile::load(const QDir& dir, const json::Json& config)
-{
-  LiquidExporterProfileLoader loader{ *this, dir, config };
-  loader.load();
-}
-
 class LiquidExporterModelVisitor : public ProgramVisitor
 {
 public:
@@ -178,9 +88,9 @@ public:
 
   void visit(dex::Class& cla) override
   {
-    if (!exporter.profile().class_template.model.nodes().empty())
+    if (!exporter.layouts().class_template.model.nodes().empty())
     {
-      exporter.selectStringifier(exporter.profile().class_template.filesuffix);
+      exporter.selectStringifier(exporter.layouts().class_template.filesuffix);
       exporter.dump(cla);
     }
 
@@ -189,9 +99,9 @@ public:
 
   void visit(dex::Namespace& ns) override
   {
-    if (!exporter.profile().namespace_template.model.nodes().empty())
+    if (!exporter.layouts().namespace_template.model.nodes().empty())
     {
-      exporter.selectStringifier(exporter.profile().namespace_template.filesuffix);
+      exporter.selectStringifier(exporter.layouts().namespace_template.filesuffix);
       exporter.dump(ns);
     }
 
@@ -216,20 +126,32 @@ public:
 
   void visit_document(dex::Document& doc)
   {
-    if (!exporter.profile().document_template.model.nodes().empty())
+    if (!exporter.layouts().document_template.model.nodes().empty())
     {
-      exporter.selectStringifier(exporter.profile().document_template.filesuffix);
+      exporter.selectStringifier(exporter.layouts().document_template.filesuffix);
       exporter.dump(doc);
     }
   }
 };
 
-LiquidExporter::LiquidExporter()
+LiquidExporter::LiquidExporter(std::string folder_path, const json::Json config)
+  : m_folder_path(std::move(folder_path)),
+    m_config(config)
 {
   m_stringifiers["md"] = std::make_shared<MarkdownStringifier>(*this);
   m_stringifiers["tex"] = std::make_shared<LatexStringifier>(*this);
 
   m_filters = std::make_unique<LiquidFilters>(*this);
+
+  m_output_path = m_folder_path + "/_output";
+
+  if (m_config == json::null)
+  {
+    m_config = dex::read_output_config(m_folder_path + "/_config.yml");
+  }
+
+  listLayouts();
+  listIncludes();
 }
 
 LiquidExporter::~LiquidExporter()
@@ -237,20 +159,24 @@ LiquidExporter::~LiquidExporter()
 
 }
 
-void LiquidExporter::setProfile(Profile pro)
+const std::string& LiquidExporter::folderPath() const
 {
-  m_profile = std::move(pro);
-  m_output_dir = QDir(QString::fromStdString(m_profile.profile_path + "/_output"));
-  
-  templates().clear();
+  return m_folder_path;
+}
 
-  for (const std::pair<std::string, liquid::Template>& tmplts : m_profile.liquid_templates)
-    templates()[tmplts.first] = tmplts.second;
+const std::string& LiquidExporter::outputPath() const
+{
+  return m_output_path;
 }
 
 QDir LiquidExporter::outputDir() const
 {
-  return m_output_dir;
+  return QDir(outputPath().c_str());
+}
+
+const LiquidExporter::Layouts& LiquidExporter::layouts() const
+{
+  return m_layouts;
 }
 
 void LiquidExporter::setVariables(liquid::Map obj)
@@ -271,7 +197,7 @@ void LiquidExporter::render()
   LiquidExporterModelVisitor visitor{ *this, };
   visitor.visitModel(*model());
 
-  QDirIterator diriterator{ m_profile.profile_path.c_str(), QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs };
+  QDirIterator diriterator{ folderPath().c_str(), QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs };
 
   while (diriterator.hasNext())
   {
@@ -296,14 +222,14 @@ std::string LiquidExporter::get_url(const dex::Entity& e) const
 {
   if (e.is<dex::Class>())
   {
-    return profile().class_template.outdir + "/" + e.name + "." + profile().class_template.filesuffix;
+    return m_layouts.class_template.outdir + "/" + e.name + "." + m_layouts.class_template.filesuffix;
   }
   else if (e.is<dex::Namespace>())
   {
     if (e.name.empty())
-      return profile().namespace_template.outdir + "/global." + profile().namespace_template.filesuffix;
+      return m_layouts.namespace_template.outdir + "/global." + m_layouts.namespace_template.filesuffix;
     else
-      return profile().namespace_template.outdir + "/" + e.name + "." + profile().namespace_template.filesuffix;
+      return m_layouts.namespace_template.outdir + "/" + e.name + "." + m_layouts.namespace_template.filesuffix;
   }
 
   return "";
@@ -312,7 +238,7 @@ std::string LiquidExporter::get_url(const dex::Entity& e) const
 std::string LiquidExporter::get_url(const dex::Document& doc) const
 {
   // @TODO: remove spaces and illegal characters
-  return profile().document_template.outdir + "/" + doc.title + "." + profile().document_template.filesuffix;
+  return m_layouts.document_template.outdir + "/" + doc.title + "." + m_layouts.document_template.filesuffix;
 }
 
 std::string LiquidExporter::get_url(const std::shared_ptr<model::Object>& obj) const
@@ -325,7 +251,7 @@ std::string LiquidExporter::get_url(const std::shared_ptr<model::Object>& obj) c
     return {};
 }
 
-void LiquidExporter::dump(const std::shared_ptr<model::Object>& obj, const char* obj_field_name, const Profile::Template& tmplt)
+void LiquidExporter::dump(const std::shared_ptr<model::Object>& obj, const char* obj_field_name, const LiquidLayout& layout)
 {
   const std::string url = get_url(obj);
 
@@ -337,26 +263,26 @@ void LiquidExporter::dump(const std::shared_ptr<model::Object>& obj, const char*
   context[obj_field_name] = to_liquid(obj);
   context["url"] = url;
 
-  std::string output = liquid::Renderer::render(tmplt.model, context);
+  std::string output = liquid::Renderer::render(layout.model, context);
 
   postProcess(output);
 
-  write(output, (m_output_dir.absolutePath() + "/" + QString::fromStdString(url)).toStdString());
+  write(output, outputPath() + "/" + url);
 }
 
 void LiquidExporter::dump(dex::Class& cla)
 {
-  dump(cla.shared_from_this(), "class", m_profile.class_template);
+  dump(cla.shared_from_this(), "class", m_layouts.class_template);
 }
 
 void LiquidExporter::dump(dex::Namespace& ns)
 {
-  dump(ns.shared_from_this(), "namespace", m_profile.namespace_template);
+  dump(ns.shared_from_this(), "namespace", m_layouts.namespace_template);
 }
 
 void LiquidExporter::dump(dex::Document& doc)
 {
-  dump(doc.shared_from_this(), "document", m_profile.document_template);
+  dump(doc.shared_from_this(), "document", m_layouts.document_template);
 }
 
 void LiquidExporter::setModel(std::shared_ptr<Model> model)
@@ -369,9 +295,61 @@ std::string LiquidExporter::stringify(const liquid::Value& val)
   return m_stringifier->stringify(val);
 }
 
-void LiquidExporter::renderDirectory(const QString& path)
+void LiquidExporter::listLayouts()
 {
-  QDirIterator diriterator{ m_profile.profile_path.c_str(), QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
+  QDir dir{ QString::fromStdString(folderPath()) + "/_layouts" };
+
+  if (!dir.exists())
+    return;
+
+  QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
+
+  while (diriterator.hasNext())
+  {
+    QFileInfo fileinfo{ diriterator.next() };
+
+    if (fileinfo.baseName() == "class")
+      m_layouts.class_template = parseLayout(fileinfo, "class", "classes");
+    else if (fileinfo.baseName() == "namespace")
+      m_layouts.namespace_template = parseLayout(fileinfo, "namespace", "namespaces");
+    else if (fileinfo.baseName() == "document")
+      m_layouts.document_template = parseLayout(fileinfo, "document", "documents");
+  }
+}
+
+LiquidLayout LiquidExporter::parseLayout(const QFileInfo& fileinfo, const std::string& name, std::string default_out)
+{
+  LiquidLayout result;
+  std::string path = fileinfo.absoluteFilePath().toStdString();
+  result.model = open_liquid_template(path);
+  result.model.skipWhitespacesAfterTag();
+  result.outdir = dex::config::read(m_config["output"], name, std::move(default_out)).toString();
+  result.filesuffix = fileinfo.suffix().toStdString();
+  return result;
+}
+
+void LiquidExporter::listIncludes()
+{
+  QDir dir{ QString::fromStdString(folderPath()) +"/_includes" };
+
+  if (!dir.exists())
+    return;
+
+  QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
+
+  while (diriterator.hasNext())
+  {
+    std::string p = diriterator.next().toStdString();
+    liquid::Template tmplt = open_liquid_template(p);
+    tmplt.skipWhitespacesAfterTag();
+    p.erase(p.begin(), p.begin() + folderPath().size() + 11);
+    templates()[p] = std::move(tmplt);
+  }
+}
+
+void LiquidExporter::renderDirectory(const QString& dirpath)
+{
+  QDirIterator diriterator{ dirpath, QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
 
   while (diriterator.hasNext())
   {
@@ -384,7 +362,7 @@ void LiquidExporter::renderFile(const QString& filepath)
 {
   QFileInfo fileinfo{ filepath };
 
-  QString srcrelpath = QDir(profile().profile_path.c_str()).relativeFilePath(fileinfo.absoluteFilePath());
+  QString srcrelpath = QDir(folderPath().c_str()).relativeFilePath(fileinfo.absoluteFilePath());
   QString destpath = outputDir().absolutePath() + "/" + srcrelpath;
 
   if (!isSpecialFile(fileinfo))
