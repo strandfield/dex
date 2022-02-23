@@ -30,6 +30,37 @@
 namespace dex
 {
 
+liquid::Value json_to_liquid(const json::Json& js)
+{
+  if (js.isInteger())
+    return js.toInt();
+  else if (js.isBoolean())
+    return js.toBool();
+  else if (js.isNumber())
+    return js.toNumber();
+  else if (js.isString())
+    return js.toString();
+
+  if (js.isObject())
+  {
+    liquid::Map r = {};
+
+    for (const auto& entry : js.toObject().data())
+      r[entry.first] = json_to_liquid(entry.second);
+
+    return r;
+  }
+  else
+  {
+    liquid::Array r = {};
+
+    for (const auto& entry : js.toArray().data())
+      r.push(json_to_liquid(entry));
+
+    return r;
+  }
+}
+
 liquid::Template open_liquid_template(const std::string& path)
 {
   std::string tmplt = file_utils::read_all(path);
@@ -177,6 +208,11 @@ QDir LiquidExporter::outputDir() const
 const LiquidExporter::Layouts& LiquidExporter::layouts() const
 {
   return m_layouts;
+}
+
+void LiquidExporter::setVariables(const json::Object& obj)
+{
+  setVariables(json_to_liquid(obj).toMap());
 }
 
 void LiquidExporter::setVariables(liquid::Map obj)

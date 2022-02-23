@@ -29,6 +29,8 @@ class Model;
 class LiquidFilters;
 class LiquidStringifier;
 
+liquid::Value json_to_liquid(const json::Json& js);
+
 liquid::Template open_liquid_template(const std::string& path);
 
 struct TemplateWithFrontMatter
@@ -67,6 +69,7 @@ public:
 
   const Layouts& layouts() const;
 
+  void setVariables(const json::Object& obj);
   void setVariables(liquid::Map obj);
   const liquid::Map& variables() const;
 

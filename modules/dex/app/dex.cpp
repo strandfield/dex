@@ -188,8 +188,7 @@ void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdi
 
   log::info() << "Writing output to '" << outdir.toStdString() << "'";
 
-  Exporter exporter;
-  exporter.process(model, outdir, values);
+  dex::run_exporter(model, outdir, values);
 }
 
 } // namespace dex
