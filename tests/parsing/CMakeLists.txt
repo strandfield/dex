@@ -14,5 +14,5 @@ endif()
 add_test(NAME TEST_parsing COMMAND TEST_parsing)
 
 if (WIN32)
-  set_tests_properties(TEST_parsing PROPERTIES ENVIRONMENT "PATH=${YAMLCPP_DIR}/bin;${Qt5_DIR}/../../../bin;%PATH%")
+  set_tests_properties(TEST_parsing PROPERTIES ENVIRONMENT "PATH=${YAMLCPP_DIR}/bin\;${Qt5_DIR}/../../../bin")
 endif()
