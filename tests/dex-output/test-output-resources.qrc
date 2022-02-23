@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>test-templates/markdown/_config.yml</file>
+        <file>test-templates/markdown/index.md</file>
+        <file>test-templates/markdown/_layouts/class.md</file>
+        <file>test-templates/markdown/_layouts/document.md</file>
+        <file>test-templates/markdown/_layouts/namespace.md</file>
+        <file>test-templates/markdown/_includes/enum_in_class</file>
+    </qresource>
+</RCC>

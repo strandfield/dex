@@ -11,10 +11,14 @@
 #include "dex/common/file-utils.h"
 #include "dex/common/json-utils.h"
 
+#include "dex/output/config.h"
+#include "dex/output/dir-copy.h"
 #include "dex/output/json-export.h"
 #include "dex/output/liquid-exporter.h"
 
 #include <json-toolkit/stringify.h>
+
+#include <QStandardPaths>
 
 #include <iostream>
 
@@ -23,17 +27,32 @@ static std::shared_ptr<dex::Paragraph> make_par(const std::string& str)
   return std::make_shared<dex::Paragraph>(str);
 }
 
+
+std::string get_folder_path()
+{
+  QString dest = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+
+  QDir dest_dir{ dest };
+
+  if (!dest_dir.exists())
+  {
+    QDir upper_dir = dest_dir;
+    upper_dir.cdUp();
+    upper_dir.mkpath(dest);
+  }
+
+  if (!QFileInfo::exists(dest + "/markdown"))
+    dex::recursive_copy(":/test-templates/markdown", dest + "/markdown");
+
+  return dest.toStdString() + "/markdown";
+}
+
 class MarkdownExport : public dex::LiquidExporter
 {
 public:
   explicit MarkdownExport(std::shared_ptr<dex::Model> m)
+    : LiquidExporter(get_folder_path())
   {
-    dex::LiquidExporterProfile prof;
-    prof.load(QDir{ ":/templates/markdown" });
-    setProfile(std::move(prof));
-
-    setOutputDir(QDir::current());
-
     setModel(m);
   }
 };
@@ -132,7 +151,7 @@ void TestDexOutput::markdownExport()
     MarkdownExport md_export{ model };
     md_export.render();
 
-    std::string content = dex::file_utils::read_all("classes/vector.md");
+    std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n**Brief:** sequence container that encapsulates dynamic size arrays\n\n"
@@ -149,7 +168,7 @@ void TestDexOutput::markdownExport()
     MarkdownExport md_export{ model };
     md_export.render();
 
-    std::string content = dex::file_utils::read_all("classes/vector.md");
+    std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n"
@@ -165,7 +184,7 @@ void TestDexOutput::markdownExport()
     MarkdownExport md_export{ model };
     md_export.render();
 
-    std::string content = dex::file_utils::read_all("classes/vector.md");
+    std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n"
@@ -183,7 +202,7 @@ void TestDexOutput::markdownExportManual()
   MarkdownExport md_export{ model };
   md_export.render();
 
-  std::string content = dex::file_utils::read_all("documents/The manual.md");
+  std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/documents/The manual.md");
 
   const std::string expected =
     "\n"

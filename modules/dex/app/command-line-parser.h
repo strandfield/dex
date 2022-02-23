@@ -32,7 +32,6 @@ struct CommandLineParserResult
   QStringList inputs;
   QString output;
   json::Object values;
-  std::optional<bool> reset_profiles;
 };
 
 class DEX_APP_API CommandLineParser : protected QCommandLineParser

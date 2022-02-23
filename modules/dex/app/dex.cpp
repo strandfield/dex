@@ -10,8 +10,6 @@
 #include "dex/input/parser-machine.h"
 #include "dex/output/exporter.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <QDir>
 
 #include <iostream>
@@ -22,9 +20,6 @@ namespace dex
 Dex::Dex(int& argc, char* argv[])
   : QCoreApplication(argc, argv)
 {
-  YAML::Node yam = YAML::Load("a: 5");
-  Q_ASSERT(yam["a"].as<int>() == 5);
-
   setApplicationName("dex");
   setApplicationVersion("0.0.0");
 
@@ -38,11 +33,6 @@ int Dex::exec()
   CommandLineParser parser;
   m_cli = parser.parse(Dex::arguments());
   auto& result = m_cli;
-
-  if (m_cli.reset_profiles.value_or(false))
-  {
-    Exporter::clearProfiles();
-  }
 
   if (result.status == CommandLineParserResult::ParseError)
   {
@@ -135,7 +125,10 @@ void Dex::process(const QStringList& inputs, QString output, json::Object values
   }
 
   if (output.isEmpty())
-    output = "dex-output.json";
+  {
+    log::info() << "No output specified";
+    return;
+  }
 
   write_output(parser.output(), output, values);
 }
@@ -189,13 +182,13 @@ void Dex::feed(ParserMachine& parser, const QDir& input)
   }
 }
 
-void Dex::write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values)
+void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)
 {
-  log::info() << "Writing output to '" << name.toStdString() << "'";
+  assert(!outdir.isEmpty());
 
-  Exporter exporter;
-  exporter.copyProfiles();
-  exporter.process(model, name, values);
+  log::info() << "Writing output to '" << outdir.toStdString() << "'";
+
+  dex::run_exporter(model, outdir, values);
 }
 
 } // namespace dex
