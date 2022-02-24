@@ -29,9 +29,6 @@ struct CommandLineParserResult
   Status status = HelpRequested;
   QString error;
   std::optional<QString> workdir;
-  QStringList inputs;
-  QString output;
-  json::Object values;
 };
 
 class DEX_APP_API CommandLineParser : protected QCommandLineParser

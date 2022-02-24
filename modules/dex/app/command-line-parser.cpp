@@ -9,34 +9,12 @@
 namespace dex
 {
 
-static json::Object values_to_json(QStringList all_values)
-{
-  dex::SettingsMap result;
-
-  QStringList values = all_values.join(";").split(";", QString::SkipEmptyParts);
-
-  for (QString key_value_pair : values)
-  {
-    QStringList key_value = key_value_pair.split('=', QString::SkipEmptyParts);
-
-    if (key_value.size() == 2)
-    {
-      result[key_value.front().toStdString()] = key_value.back().toStdString();
-    }
-  }
-
-  return build_json(result);
-}
-
 CommandLineParser::CommandLineParser()
 {
   addHelpOption();
   addVersionOption();
 
-  addOption({ "i", "Input (file / directory)", "input" });
-  addOption({ "o", "Output", "output" });
   addOption({ "w", "Working directory", "workdir" });
-  addOption({ "value", "Project values for the Liquid-exporter", "variables" });
 }
 
 CommandLineParserResult CommandLineParser::parse(const QStringList& args)
@@ -61,10 +39,7 @@ CommandLineParserResult CommandLineParser::parse(const QStringList& args)
   else
   {
     result.status = CommandLineParserResult::Work;
-    result.inputs = values("i");
-    result.output = value("o");
     result.workdir= value("w");
-    result.values = values_to_json(values("value"));
   }
 
   return result;

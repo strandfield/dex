@@ -77,22 +77,7 @@ void Dex::work()
     log::info() << "Could not parse dex.yml config";
   }
 
-  QStringList inputs = m_config.inputs;
-
-  if (!m_cli.inputs.empty())
-    inputs = m_cli.inputs;
-
-  QString output = m_config.output;
-
-  if (!m_cli.output.isEmpty())
-    output = m_cli.output;
-
-  json::Object values = m_config.variables;
-
-  if (!m_cli.values.data().empty())
-    values = m_cli.values;
-
-  process(inputs, output, values);
+  process(m_config.inputs, m_config.output, m_config.variables);
 }
 
 void Dex::process(const QStringList& inputs, QString output, json::Object values)
