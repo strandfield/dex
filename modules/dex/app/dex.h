@@ -8,7 +8,7 @@
 #include "dex/dex-app.h"
 
 #include "dex/app/command-line-parser.h"
-#include "dex/app/ini-config-parser.h"
+#include "dex/app/dex-config.h"
 
 #include "dex/model/model.h"
 
@@ -41,7 +41,7 @@ protected:
 private:
   QStringList m_suffixes;
   CommandLineParserResult m_cli;
-  IniOptions m_ini;
+  Config m_config;
 };
 
 } // namespace dex

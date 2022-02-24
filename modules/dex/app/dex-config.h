@@ -2,8 +2,8 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#ifndef DEX_APP_INICONFIGPARSER_H
-#define DEX_APP_INICONFIGPARSER_H
+#ifndef DEX_APP_CONFIG_H
+#define DEX_APP_CONFIG_H
 
 #include "dex/dex-app.h"
 
@@ -16,8 +16,7 @@ class QFileInfo;
 namespace dex
 {
 
-// @TODO: replace by yml
-struct IniOptions
+struct Config
 {
   bool valid = false;
   QStringList inputs;
@@ -25,9 +24,9 @@ struct IniOptions
   json::Object variables;
 };
 
-DEX_APP_API IniOptions parse_ini_config(const QFileInfo& file);
-DEX_APP_API IniOptions parse_ini_config();
+DEX_APP_API Config parse_config(const QFileInfo& file);
+DEX_APP_API Config parse_config();
 
 } // namespace dex
 
-#endif // DEX_APP_INICONFIGPARSER_H
+#endif // DEX_APP_CONFIG_H

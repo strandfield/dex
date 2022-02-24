@@ -1,0 +1,6 @@
+
+input: math.h
+output: doc
+variables:
+  project:
+    name: CppMath

@@ -1,0 +1,6 @@
+
+input: manual.h
+output: doc
+variables:
+  project:
+    name: Simple Manual
