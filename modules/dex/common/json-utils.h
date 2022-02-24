@@ -5,7 +5,7 @@
 #ifndef DEX_COMMON_JSONUTILS_H
 #define DEX_COMMON_JSONUTILS_H
 
-#include "dex/common/settings.h"
+#include "dex/dex-common.h"
 
 #include <json-toolkit/json.h>
 
