@@ -11,6 +11,5 @@ public:
   TestDexCommon() = default;
 
 private Q_SLOTS:
-  void jsonBuilder();
   void jsonPathAnnotator();
 };

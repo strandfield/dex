@@ -17,7 +17,6 @@ namespace dex
 {
 
 DEX_COMMON_API json::Json make_json_value(const SettingsValue& v);
-DEX_COMMON_API json::Object build_json(const SettingsMap& map);
 
 // @TODO: move to json-toolkit
 class DEX_COMMON_API JsonPathAnnotator

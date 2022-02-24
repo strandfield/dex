@@ -78,20 +78,6 @@ json::Json make_json_value(const SettingsValue& v)
     return std::get<std::string>(v);
 }
 
-json::Object build_json(const SettingsMap& map)
-{
-  json::Object result;
-
-  for (const auto& entry : map)
-  {
-    std::string key = "$." + entry.first;
-    std::vector<std::variant<size_t, std::string>> path = parse_path(key);
-    write_path(result, path, make_json_value(entry.second));
-  }
-
-  return result;
-}
-
 struct RAIIJsonPathAnnotatorContext
 {
   std::vector<std::variant<size_t, std::string>>* stack;
