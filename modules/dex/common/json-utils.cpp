@@ -66,18 +66,6 @@ inline void write_path(json::Json& obj, const std::vector<std::variant<size_t, s
   result[std::get<std::string>(path.back())] = val;
 }
 
-json::Json make_json_value(const SettingsValue& v)
-{
-  if (std::holds_alternative<bool>(v))
-    return std::get<bool>(v);
-  else if (std::holds_alternative<int>(v))
-    return std::get<int>(v);
-  else if (std::holds_alternative<double>(v))
-    return std::get<double>(v);
-  else
-    return std::get<std::string>(v);
-}
-
 struct RAIIJsonPathAnnotatorContext
 {
   std::vector<std::variant<size_t, std::string>>* stack;

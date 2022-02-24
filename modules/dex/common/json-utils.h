@@ -16,8 +16,6 @@
 namespace dex
 {
 
-DEX_COMMON_API json::Json make_json_value(const SettingsValue& v);
-
 // @TODO: move to json-toolkit
 class DEX_COMMON_API JsonPathAnnotator
 {
