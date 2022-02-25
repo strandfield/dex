@@ -5,7 +5,7 @@
 #ifndef DEX_COMMON_JSONUTILS_H
 #define DEX_COMMON_JSONUTILS_H
 
-#include "dex/common/settings.h"
+#include "dex/dex-common.h"
 
 #include <json-toolkit/json.h>
 
@@ -15,9 +15,6 @@
 
 namespace dex
 {
-
-DEX_COMMON_API json::Json make_json_value(const SettingsValue& v);
-DEX_COMMON_API json::Object build_json(const SettingsMap& map);
 
 // @TODO: move to json-toolkit
 class DEX_COMMON_API JsonPathAnnotator

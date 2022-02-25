@@ -70,29 +70,14 @@ void Dex::work()
     }
   }
 
-  m_ini = parse_ini_config();
+  m_config = dex::parse_config();
 
-  if (!m_ini.valid)
+  if (!m_config.valid)
   {
-    log::info() << "Could not parse dex.ini config";
+    log::info() << "Could not parse dex.yml config";
   }
 
-  QStringList inputs = m_ini.inputs;
-
-  if (!m_cli.inputs.empty())
-    inputs = m_cli.inputs;
-
-  QString output = m_ini.output;
-
-  if (!m_cli.output.isEmpty())
-    output = m_cli.output;
-
-  json::Object values = m_ini.variables;
-
-  if (!m_cli.values.data().empty())
-    values = m_cli.values;
-
-  process(inputs, output, values);
+  process(m_config.inputs, m_config.output, m_config.variables);
 }
 
 void Dex::process(const QStringList& inputs, QString output, json::Object values)

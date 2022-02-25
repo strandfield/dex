@@ -15,7 +15,6 @@
 
 #include "dex/common/errors.h"
 #include "dex/common/file-utils.h"
-#include "dex/common/settings.h"
 #include "dex/common/string-utils.h"
 
 #include <yaml-cpp/yaml.h>

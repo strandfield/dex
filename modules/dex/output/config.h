@@ -22,6 +22,7 @@ namespace dex
 DEX_OUTPUT_API json::Json yaml_to_json(const YAML::Node& n);
 
 DEX_OUTPUT_API json::Json read_output_config(const std::filesystem::path& p);
+DEX_OUTPUT_API json::Json parse_yaml_config(const std::filesystem::path& p);
 
 namespace config
 {

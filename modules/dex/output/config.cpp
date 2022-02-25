@@ -54,6 +54,11 @@ json::Json yaml_to_json(const YAML::Node& n)
 
 json::Json read_output_config(const std::filesystem::path& p)
 {
+  return parse_yaml_config(p);
+}
+
+json::Json parse_yaml_config(const std::filesystem::path& p)
+{
   YAML::Node n = YAML::LoadFile(p.string());
   return yaml_to_json(n);
 }

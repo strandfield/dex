@@ -11,20 +11,6 @@
 
 #include <iostream>
 
-void TestDexCommon::jsonBuilder()
-{
-  dex::SettingsMap values;
-  values["project.name"] = std::string("dex");
-  values["author.planet"] = std::string("Coruscant");
-  values["current_year"] = 1984;
-
-  json::Json val = dex::build_json(values);
-
-  QVERIFY(val["project"]["name"] == "dex");
-  QVERIFY(val["author"]["planet"] == "Coruscant");
-  QVERIFY(val["current_year"] == 1984);
-}
-
 void TestDexCommon::jsonPathAnnotator()
 {
   json::Object root;
