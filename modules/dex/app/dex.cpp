@@ -41,8 +41,6 @@ int version_patch()
 Dex::Dex(const QStringList& arguments)
   : m_arguments(arguments)
 {
-  m_suffixes << "cxx" << "cpp" << "h" << "hpp";
-
   dex::log::install_message_handler(&dex::app_message_handler);
 }
 
@@ -100,7 +98,7 @@ void Dex::work()
 
 void Dex::process(const QStringList& inputs, QString output, json::Object values)
 {
-  std::shared_ptr<Model> model = dex::parse_inputs(inputs, m_suffixes);
+  std::shared_ptr<Model> model = dex::parse_inputs(inputs, m_config.suffixes);
 
   write_output(model, output, values);
 }

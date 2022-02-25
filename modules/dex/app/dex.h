@@ -18,8 +18,6 @@ class QDir;
 namespace dex
 {
 
-class ParserMachine;
-
 class DEX_APP_API Dex
 {
 public:
@@ -36,7 +34,6 @@ protected:
   
 private:
   QStringList m_arguments;
-  QStringList m_suffixes;
   CommandLineParserResult m_cli;
   Config m_config;
 };

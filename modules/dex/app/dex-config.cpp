@@ -48,6 +48,9 @@ Config parse_config(const QFileInfo& file)
 
   result.variables = conf["variables"].toObject();
 
+  if (result.suffixes.isEmpty())
+    result.suffixes << "cxx" << "cpp" << "h" << "hpp";
+
   // @TODO: detect unused fields in conf
 
   return result;
