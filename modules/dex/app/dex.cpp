@@ -17,12 +17,30 @@
 namespace dex
 {
 
-Dex::Dex(int& argc, char* argv[])
-  : QCoreApplication(argc, argv)
+const char* versionstr()
 {
-  setApplicationName("dex");
-  setApplicationVersion("0.0.0");
+  return DEX_VERSION_STR;
+}
 
+int version_major()
+{
+  return DEX_VERSION_MAJOR;
+}
+
+int version_minor()
+{
+  return DEX_VERSION_MINOR;
+}
+
+int version_patch()
+{
+  return DEX_VERSION_PATCH;
+}
+
+
+Dex::Dex(const QStringList& arguments)
+  : m_arguments(arguments)
+{
   m_suffixes << "cxx" << "cpp" << "h" << "hpp";
 
   dex::log::install_message_handler(&dex::app_message_handler);
@@ -31,7 +49,7 @@ Dex::Dex(int& argc, char* argv[])
 int Dex::exec()
 {
   CommandLineParser parser;
-  m_cli = parser.parse(Dex::arguments());
+  m_cli = parser.parse(m_arguments);
   auto& result = m_cli;
 
   if (result.status == CommandLineParserResult::ParseError)
@@ -46,7 +64,7 @@ int Dex::exec()
   }
   else if (result.status == CommandLineParserResult::VersionRequested)
   {
-    std::cout << Dex::applicationVersion().toStdString() << std::endl;
+    std::cout << dex::versionstr() << std::endl;
   }
   else if (result.status == CommandLineParserResult::Work)
   {
@@ -80,6 +98,9 @@ void Dex::work()
   process(m_config.inputs, m_config.output, m_config.variables);
 }
 
+// @TODO: split into two functions:
+// one that takes the 'inputs' and produce a Model
+// one that takes the model and the output directory
 void Dex::process(const QStringList& inputs, QString output, json::Object values)
 {
   dex::ParserMachine parser;

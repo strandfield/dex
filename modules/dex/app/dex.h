@@ -9,10 +9,9 @@
 
 #include "dex/app/command-line-parser.h"
 #include "dex/app/dex-config.h"
+#include "dex/app/version.h"
 
 #include "dex/model/model.h"
-
-#include <QCoreApplication>
 
 class QDir;
 
@@ -21,10 +20,10 @@ namespace dex
 
 class ParserMachine;
 
-class DEX_APP_API Dex : public QCoreApplication
+class DEX_APP_API Dex
 {
 public:
-  Dex(int& argc, char* argv[]);
+  explicit Dex(const QStringList& arguments);
 
   int exec();
 
@@ -39,6 +38,7 @@ protected:
   void write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values);
   
 private:
+  QStringList m_arguments;
   QStringList m_suffixes;
   CommandLineParserResult m_cli;
   Config m_config;

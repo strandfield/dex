@@ -4,8 +4,14 @@
 
 #include "dex/app/dex.h"
 
+#include <QCoreApplication>
+
 int main(int argc, char *argv[])
 {
-  dex::Dex app(argc, argv);
-  return app.exec();
+  QCoreApplication qapp{ argc, argv };
+  qapp.setApplicationName("dex");
+  qapp.setApplicationVersion(dex::versionstr());
+
+  dex::Dex dexapp{ qapp.arguments() };
+  return dexapp.exec();
 }
