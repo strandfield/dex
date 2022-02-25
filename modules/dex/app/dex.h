@@ -32,9 +32,6 @@ protected:
 
   void work();
 
-  void feed(ParserMachine& parser, const QString& input);
-  void feed(ParserMachine& parser, const QDir& input);
-
   void write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values);
   
 private:

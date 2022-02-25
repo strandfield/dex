@@ -5,9 +5,9 @@
 #include "dex/app/dex.h"
 
 #include "dex/app/message-handler.h"
+#include "dex/app/parsing.h"
 
 #include "dex/common/json-utils.h"
-#include "dex/input/parser-machine.h"
 #include "dex/output/exporter.h"
 
 #include <QDir>
@@ -98,94 +98,11 @@ void Dex::work()
   process(m_config.inputs, m_config.output, m_config.variables);
 }
 
-// @TODO: split into two functions:
-// one that takes the 'inputs' and produce a Model
-// one that takes the model and the output directory
 void Dex::process(const QStringList& inputs, QString output, json::Object values)
 {
-  dex::ParserMachine parser;
+  std::shared_ptr<Model> model = dex::parse_inputs(inputs, m_suffixes);
 
-  if (!inputs.empty())
-  {
-    log::info() << "Inputs:";
-    for (const auto& i : inputs)
-    {
-      log::info() << i.toStdString();
-    }
-
-    for (const auto& i : inputs)
-    {
-      try
-      {
-        feed(parser, i);
-      }
-      catch (const IOException& ex)
-      {
-        LOG_ERROR << ex;
-      }
-    }
-  }
-  else
-  {
-    feed(parser, QDir::current());
-  }
-
-  if (output.isEmpty())
-  {
-    log::info() << "No output specified";
-    return;
-  }
-
-  write_output(parser.output(), output, values);
-}
-
-void Dex::feed(ParserMachine& parser, const QString& input)
-{
-  QFileInfo info{ input };
-
-  if (!info.exists())
-    throw IOException{ input.toStdString(), "input file does not exist" };
-
-  if (info.isDir())
-  {
-    QDir dir{ info.absoluteFilePath() };
-    feed(parser, dir);
-  }
-  else
-  {
-    try
-    {
-      log::info() << "Parsing " << info.filePath().toStdString();
-      parser.process(info);
-    }
-    catch (const ParserException& ex)
-    {
-      LOG_ERROR << ex;
-
-      const bool success = parser.recover();
-
-      if (!success)
-        parser.reset();
-    }
-  }
-}
-
-void Dex::feed(ParserMachine& parser, const QDir& input)
-{
-  QFileInfoList entries = input.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
-  for (const auto& e : entries)
-  {
-    if (e.isDir())
-    {
-      feed(parser, QDir{ e.absoluteFilePath() });
-    }
-    else
-    {
-      if (m_suffixes.contains(e.suffix()))
-        feed(parser, e.absoluteFilePath());
-    }
-  }
+  write_output(model, output, values);
 }
 
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)
