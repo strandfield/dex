@@ -13,6 +13,8 @@ public:
 private Q_SLOTS:
   void jsonExport();
   void jsonExportManual();
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
   void markdownExport();
   void markdownExportManual();
+#endif // DEX_EXPORTER_LIQUID_ENABLED
 };
