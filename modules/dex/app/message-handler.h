@@ -12,7 +12,7 @@
 namespace dex
 {
 
-void app_message_handler(log::Severity, Logger&, const json::Json&);
+DEX_APP_API void app_message_handler(log::Severity, Logger&, const json::Json&);
 
 } // namespace dex
 

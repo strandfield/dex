@@ -13,7 +13,9 @@
 
 #include "dex/model/model.h"
 
-class QDir;
+#include <QDir>
+
+#include <optional>
 
 namespace dex
 {
@@ -21,21 +23,29 @@ namespace dex
 class DEX_APP_API Dex
 {
 public:
-  explicit Dex(const QStringList& arguments);
+  explicit Dex(const QStringList& arguments); // @TODO: replace by CommandLineOptions parameter ?
+  explicit Dex(const QDir& workdir);
+
+  QDir workingDir() const;
+  const Config& config() const;
 
   int exec();
 
+  void readConfig();
+  void parseInputs();
+  void writeOutput();
+
 protected:
-  void process(const QStringList& inputs, QString output, json::Object values);
 
   void work();
 
   void write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values);
   
 private:
-  QStringList m_arguments;
-  CommandLineParserResult m_cli;
+  QDir m_workdir;
+  std::optional<CommandLineParserResult> m_cli;
   Config m_config;
+  std::shared_ptr<Model> m_model;
 };
 
 } // namespace dex

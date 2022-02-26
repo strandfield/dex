@@ -39,32 +39,49 @@ int version_patch()
 
 
 Dex::Dex(const QStringList& arguments)
-  : m_arguments(arguments)
 {
-  dex::log::install_message_handler(&dex::app_message_handler);
+  CommandLineParser parser;
+  m_cli = parser.parse(arguments);
+  auto& result = m_cli;
+
+  // @TODO: throw if not CommandLineParserResult::Work ?
+
+}
+
+Dex::Dex(const QDir& workdir)
+  : m_workdir(workdir)
+{
+
 }
 
 int Dex::exec()
 {
-  CommandLineParser parser;
-  m_cli = parser.parse(m_arguments);
-  auto& result = m_cli;
+  if (m_cli.has_value())
+  {
+    auto& result = *m_cli;
 
-  if (result.status == CommandLineParserResult::ParseError)
-  {
-    std::cout << result.error.toStdString() << std::endl;
-    return 1;
+    // @TODO: should action other than work be moved outside of this class
+    if (result.status == CommandLineParserResult::ParseError)
+    {
+      std::cout << result.error.toStdString() << std::endl;
+      return 1;
+    }
+
+    if (result.status == CommandLineParserResult::HelpRequested)
+    {
+      CommandLineParser parser;
+      std::cout << parser.help().toStdString() << std::endl;
+    }
+    else if (result.status == CommandLineParserResult::VersionRequested)
+    {
+      std::cout << dex::versionstr() << std::endl;
+    }
+    else if (result.status == CommandLineParserResult::Work)
+    {
+      work();
+    }
   }
-  
-  if (result.status == CommandLineParserResult::HelpRequested)
-  {
-    std::cout << parser.help().toStdString() << std::endl;
-  }
-  else if (result.status == CommandLineParserResult::VersionRequested)
-  {
-    std::cout << dex::versionstr() << std::endl;
-  }
-  else if (result.status == CommandLineParserResult::Work)
+  else if(workingDir().exists())
   {
     work();
   }
@@ -72,11 +89,36 @@ int Dex::exec()
   return 0;
 }
 
+QDir Dex::workingDir() const
+{
+  return m_workdir;
+}
+
+const Config& Dex::config() const
+{
+  return m_config;
+}
+
+void Dex::readConfig()
+{
+  m_config = dex::parse_config();
+}
+
+void Dex::parseInputs()
+{
+  m_model = dex::parse_inputs(m_config.inputs, m_config.suffixes);
+}
+
+void Dex::writeOutput()
+{
+  write_output(m_model, m_config.output, m_config.variables);
+}
+
 void Dex::work()
 {
-  if (m_cli.workdir.has_value())
+  if (m_cli.has_value() && m_cli.value().workdir.has_value())
   {
-    QString workdir = m_cli.workdir.value();
+    QString workdir = m_cli.value().workdir.value();
     log::info() << "Changing working dir to '" << workdir.toStdString() << "'";
     
     if (!QDir::setCurrent(workdir))
@@ -86,21 +128,15 @@ void Dex::work()
     }
   }
 
-  m_config = dex::parse_config();
+  readConfig();
 
   if (!m_config.valid)
   {
     log::info() << "Could not parse dex.yml config";
   }
 
-  process(m_config.inputs, m_config.output, m_config.variables);
-}
-
-void Dex::process(const QStringList& inputs, QString output, json::Object values)
-{
-  std::shared_ptr<Model> model = dex::parse_inputs(inputs, m_config.suffixes);
-
-  write_output(model, output, values);
+  parseInputs();
+  writeOutput();
 }
 
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)
