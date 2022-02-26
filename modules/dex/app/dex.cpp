@@ -5,9 +5,9 @@
 #include "dex/app/dex.h"
 
 #include "dex/app/message-handler.h"
+#include "dex/app/parsing.h"
 
 #include "dex/common/json-utils.h"
-#include "dex/input/parser-machine.h"
 #include "dex/output/exporter.h"
 
 #include <QDir>
@@ -17,154 +17,106 @@
 namespace dex
 {
 
-Dex::Dex(int& argc, char* argv[])
-  : QCoreApplication(argc, argv)
+const char* versionstr()
 {
-  setApplicationName("dex");
-  setApplicationVersion("0.0.0");
+  return DEX_VERSION_STR;
+}
 
-  m_suffixes << "cxx" << "cpp" << "h" << "hpp";
+int version_major()
+{
+  return DEX_VERSION_MAJOR;
+}
 
-  dex::log::install_message_handler(&dex::app_message_handler);
+int version_minor()
+{
+  return DEX_VERSION_MINOR;
+}
+
+int version_patch()
+{
+  return DEX_VERSION_PATCH;
+}
+
+
+Dex::Dex(const CommandLineParserResult& arguments)
+  : m_workdir(QDir::current())
+{
+  if (arguments.workdir.has_value())
+    m_workdir = QDir(arguments.workdir.value());
+}
+
+Dex::Dex(const QDir& workdir)
+  : m_workdir(workdir)
+{
+
 }
 
 int Dex::exec()
 {
-  CommandLineParser parser;
-  m_cli = parser.parse(Dex::arguments());
-  auto& result = m_cli;
-
-  if (result.status == CommandLineParserResult::ParseError)
-  {
-    std::cout << result.error.toStdString() << std::endl;
-    return 1;
-  }
-  
-  if (result.status == CommandLineParserResult::HelpRequested)
-  {
-    std::cout << parser.help().toStdString() << std::endl;
-  }
-  else if (result.status == CommandLineParserResult::VersionRequested)
-  {
-    std::cout << Dex::applicationVersion().toStdString() << std::endl;
-  }
-  else if (result.status == CommandLineParserResult::Work)
+  if(workingDir().exists())
   {
     work();
+    return 0;
   }
+  else
+  {
+    log::error() << "Working directory " << workingDir().absolutePath().toStdString() << " does not exist";
+    return 1;
+  }
+}
 
-  return 0;
+QDir Dex::workingDir() const
+{
+  return m_workdir;
+}
+
+const Config& Dex::config() const
+{
+  return m_config;
+}
+
+std::shared_ptr<Model> Dex::model() const
+{
+  return m_model;
+}
+
+void Dex::readConfig()
+{
+  m_config = dex::parse_config();
+}
+
+void Dex::parseInputs()
+{
+  m_model = dex::parse_inputs(m_config.inputs, m_config.suffixes);
+}
+
+void Dex::writeOutput()
+{
+  write_output(m_model, m_config.output, m_config.variables);
 }
 
 void Dex::work()
 {
-  if (m_cli.workdir.has_value())
+  if (QDir::current() != workingDir())
   {
-    QString workdir = m_cli.workdir.value();
-    log::info() << "Changing working dir to '" << workdir.toStdString() << "'";
-    
-    if (!QDir::setCurrent(workdir))
+    log::info() << "Changing working dir to '" << workingDir().absolutePath().toStdString() << "'";
+
+    if (!QDir::setCurrent(workingDir().absolutePath()))
     {
       log::error() << "Failed to change working dir";
       return;
     }
   }
 
-  m_config = dex::parse_config();
+  readConfig();
 
   if (!m_config.valid)
   {
     log::info() << "Could not parse dex.yml config";
   }
 
-  process(m_config.inputs, m_config.output, m_config.variables);
-}
-
-void Dex::process(const QStringList& inputs, QString output, json::Object values)
-{
-  dex::ParserMachine parser;
-
-  if (!inputs.empty())
-  {
-    log::info() << "Inputs:";
-    for (const auto& i : inputs)
-    {
-      log::info() << i.toStdString();
-    }
-
-    for (const auto& i : inputs)
-    {
-      try
-      {
-        feed(parser, i);
-      }
-      catch (const IOException& ex)
-      {
-        LOG_ERROR << ex;
-      }
-    }
-  }
-  else
-  {
-    feed(parser, QDir::current());
-  }
-
-  if (output.isEmpty())
-  {
-    log::info() << "No output specified";
-    return;
-  }
-
-  write_output(parser.output(), output, values);
-}
-
-void Dex::feed(ParserMachine& parser, const QString& input)
-{
-  QFileInfo info{ input };
-
-  if (!info.exists())
-    throw IOException{ input.toStdString(), "input file does not exist" };
-
-  if (info.isDir())
-  {
-    QDir dir{ info.absoluteFilePath() };
-    feed(parser, dir);
-  }
-  else
-  {
-    try
-    {
-      log::info() << "Parsing " << info.filePath().toStdString();
-      parser.process(info);
-    }
-    catch (const ParserException& ex)
-    {
-      LOG_ERROR << ex;
-
-      const bool success = parser.recover();
-
-      if (!success)
-        parser.reset();
-    }
-  }
-}
-
-void Dex::feed(ParserMachine& parser, const QDir& input)
-{
-  QFileInfoList entries = input.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
-  for (const auto& e : entries)
-  {
-    if (e.isDir())
-    {
-      feed(parser, QDir{ e.absoluteFilePath() });
-    }
-    else
-    {
-      if (m_suffixes.contains(e.suffix()))
-        feed(parser, e.absoluteFilePath());
-    }
-  }
+  parseInputs();
+  writeOutput();
 }
 
 void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)

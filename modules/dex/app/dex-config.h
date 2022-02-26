@@ -20,6 +20,7 @@ struct Config
 {
   bool valid = false;
   QStringList inputs;
+  QStringList suffixes;
   QString output;
   json::Object variables;
 };
