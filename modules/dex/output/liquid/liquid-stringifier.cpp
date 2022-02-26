@@ -2,9 +2,9 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/liquid-stringifier.h"
+#include "dex/output/liquid/liquid-stringifier.h"
 
-#include "dex/output/liquid-exporter.h"
+#include "dex/output/liquid/liquid-exporter.h"
 
 #include "dex/model/code-block.h"
 #include "dex/model/display-math.h"

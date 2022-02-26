@@ -13,7 +13,7 @@
 #include "dex/output/config.h"
 #include "dex/output/dir-copy.h"
 #include "dex/output/json-export.h"
-#include "dex/output/liquid-exporter.h"
+#include "dex/output/liquid/liquid-exporter.h"
 
 #include <json-toolkit/json.h>
 #include <json-toolkit/stringify.h>

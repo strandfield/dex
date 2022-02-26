@@ -2,10 +2,10 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/liquid-filters.h"
+#include "dex/output/liquid/liquid-filters.h"
 
-#include "dex/output/liquid-exporter.h"
-#include "dex/output/liquid-wrapper.h"
+#include "dex/output/liquid/liquid-exporter.h"
+#include "dex/output/liquid/liquid-wrapper.h"
 
 #include "dex/common/string-utils.h"
 

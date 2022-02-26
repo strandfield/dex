@@ -2,9 +2,9 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/markdown-export.h"
+#include "dex/output/liquid/markdown-export.h"
 
-#include "dex/output/liquid-exporter.h"
+#include "dex/output/liquid/liquid-exporter.h"
 #include "dex/output/paragraph-converter.h"
 
 #include "dex/model/code-block.h"

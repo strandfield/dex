@@ -9,7 +9,7 @@
 
 #include "dex/model/document.h"
 
-#include "dex/output/liquid-wrapper.h"
+#include "dex/output/liquid/liquid-wrapper.h"
 
 #include <json-toolkit/json.h>
 
