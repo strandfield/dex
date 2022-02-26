@@ -5,7 +5,7 @@
 #include "dex/output/exporter.h"
 
 #include "dex/output/config.h"
-#include "dex/output/json-export.h"
+#include "dex/output/json/json-export.h"
 #include "dex/output/liquid/liquid-exporter.h"
 
 #include "dex/common/errors.h"

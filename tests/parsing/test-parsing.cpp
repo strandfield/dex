@@ -8,7 +8,7 @@
 
 #include "dex/input/parser-machine.h"
 
-#include "dex/output/json-export.h"
+#include "dex/output/json/json-export.h"
 
 #include <json-toolkit/stringify.h>
 
