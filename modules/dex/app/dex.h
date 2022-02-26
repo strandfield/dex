@@ -15,19 +15,18 @@
 
 #include <QDir>
 
-#include <optional>
-
 namespace dex
 {
 
 class DEX_APP_API Dex
 {
 public:
-  explicit Dex(const QStringList& arguments); // @TODO: replace by CommandLineOptions parameter ?
+  explicit Dex(const CommandLineParserResult& arguments);
   explicit Dex(const QDir& workdir);
 
   QDir workingDir() const;
   const Config& config() const;
+  std::shared_ptr<Model> model() const;
 
   int exec();
 
@@ -43,7 +42,6 @@ protected:
   
 private:
   QDir m_workdir;
-  std::optional<CommandLineParserResult> m_cli;
   Config m_config;
   std::shared_ptr<Model> m_model;
 };

@@ -38,14 +38,11 @@ int version_patch()
 }
 
 
-Dex::Dex(const QStringList& arguments)
+Dex::Dex(const CommandLineParserResult& arguments)
+  : m_workdir(QDir::current())
 {
-  CommandLineParser parser;
-  m_cli = parser.parse(arguments);
-  auto& result = m_cli;
-
-  // @TODO: throw if not CommandLineParserResult::Work ?
-
+  if (arguments.workdir.has_value())
+    m_workdir = QDir(arguments.workdir.value());
 }
 
 Dex::Dex(const QDir& workdir)
@@ -56,37 +53,16 @@ Dex::Dex(const QDir& workdir)
 
 int Dex::exec()
 {
-  if (m_cli.has_value())
-  {
-    auto& result = *m_cli;
-
-    // @TODO: should action other than work be moved outside of this class
-    if (result.status == CommandLineParserResult::ParseError)
-    {
-      std::cout << result.error.toStdString() << std::endl;
-      return 1;
-    }
-
-    if (result.status == CommandLineParserResult::HelpRequested)
-    {
-      CommandLineParser parser;
-      std::cout << parser.help().toStdString() << std::endl;
-    }
-    else if (result.status == CommandLineParserResult::VersionRequested)
-    {
-      std::cout << dex::versionstr() << std::endl;
-    }
-    else if (result.status == CommandLineParserResult::Work)
-    {
-      work();
-    }
-  }
-  else if(workingDir().exists())
+  if(workingDir().exists())
   {
     work();
+    return 0;
   }
-
-  return 0;
+  else
+  {
+    log::error() << "Working directory " << workingDir().absolutePath().toStdString() << " does not exist";
+    return 1;
+  }
 }
 
 QDir Dex::workingDir() const
@@ -97,6 +73,11 @@ QDir Dex::workingDir() const
 const Config& Dex::config() const
 {
   return m_config;
+}
+
+std::shared_ptr<Model> Dex::model() const
+{
+  return m_model;
 }
 
 void Dex::readConfig()
@@ -116,12 +97,11 @@ void Dex::writeOutput()
 
 void Dex::work()
 {
-  if (m_cli.has_value() && m_cli.value().workdir.has_value())
+  if (QDir::current() != workingDir())
   {
-    QString workdir = m_cli.value().workdir.value();
-    log::info() << "Changing working dir to '" << workdir.toStdString() << "'";
-    
-    if (!QDir::setCurrent(workdir))
+    log::info() << "Changing working dir to '" << workingDir().absolutePath().toStdString() << "'";
+
+    if (!QDir::setCurrent(workingDir().absolutePath()))
     {
       log::error() << "Failed to change working dir";
       return;
