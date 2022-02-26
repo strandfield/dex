@@ -4,8 +4,9 @@
 
 #include "dex/app/dex-config.h"
 
-#include "dex/common/json-utils.h"
 #include "dex/output/config.h"
+
+#include <json-toolkit/json.h>
 
 #include <QFileInfo>
 

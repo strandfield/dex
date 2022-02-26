@@ -4,7 +4,7 @@
 
 #include "dex/app/command-line-parser.h"
 
-#include "dex/common/json-utils.h"
+#include <json-toolkit/json.h>
 
 namespace dex
 {
