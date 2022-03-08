@@ -2,7 +2,7 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/latex-export.h"
+#include "dex/output/liquid/latex-export.h"
 
 #include "dex/output/paragraph-converter.h"
 

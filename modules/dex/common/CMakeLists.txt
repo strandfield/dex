@@ -13,6 +13,7 @@ target_compile_definitions(dex-common PRIVATE -DDEX_COMMON_BUILD_LIB)
 target_include_directories(dex-common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 target_link_libraries(dex-common Qt5::Core)
 target_include_directories(dex-common PUBLIC "${JSONTOOLKIT_INCLUDE_DIRS}")
+target_link_libraries(dex-common YAMLCPP::YAMLCPP)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message("GCC compiler: linking to stdc++fs")

@@ -9,13 +9,16 @@
 #include "dex/model/since.h"
 
 #include "dex/common/file-utils.h"
-#include "dex/common/json-utils.h"
 
 #include "dex/output/config.h"
 #include "dex/output/dir-copy.h"
-#include "dex/output/json-export.h"
-#include "dex/output/liquid-exporter.h"
+#include "dex/output/json/json-export.h"
 
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
+#include "dex/output/liquid/liquid-exporter.h"
+#endif // DEX_EXPORTER_LIQUID_ENABLED
+
+#include <json-toolkit/json.h>
 #include <json-toolkit/stringify.h>
 
 #include <QStandardPaths>
@@ -47,6 +50,8 @@ std::string get_folder_path()
   return dest.toStdString() + "/markdown";
 }
 
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
+
 class MarkdownExport : public dex::LiquidExporter
 {
 public:
@@ -56,6 +61,8 @@ public:
     setModel(m);
   }
 };
+
+#endif // DEX_EXPORTER_LIQUID_ENABLED
 
 void TestDexOutput::jsonExport()
 {
@@ -142,6 +149,8 @@ void TestDexOutput::jsonExportManual()
   QVERIFY(jexport["text"].toString() == "Hello World!");
 }
 
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
+
 void TestDexOutput::markdownExport()
 {
   {
@@ -195,6 +204,10 @@ void TestDexOutput::markdownExport()
   }
 }
 
+#endif // DEX_EXPORTER_LIQUID_ENABLED
+
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
+
 void TestDexOutput::markdownExportManual()
 {
   auto model = dex::examples::manual();
@@ -229,3 +242,5 @@ void TestDexOutput::markdownExportManual()
 
   QVERIFY(content == expected);
 }
+
+#endif // DEX_EXPORTER_LIQUID_ENABLED

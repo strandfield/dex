@@ -7,8 +7,6 @@
 
 #include "dex/dex-output.h"
 
-#include "dex/output/json-export.h"
-
 #include "dex/model/model.h"
 
 #include <liquid/renderer.h>

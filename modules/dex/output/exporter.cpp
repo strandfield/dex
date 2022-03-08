@@ -5,10 +5,14 @@
 #include "dex/output/exporter.h"
 
 #include "dex/output/config.h"
-#include "dex/output/json-export.h"
-#include "dex/output/liquid-exporter.h"
+#include "dex/output/json/json-export.h"
+
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
+#include "dex/output/liquid/liquid-exporter.h"
+#endif // DEX_EXPORTER_LIQUID_ENABLED
 
 #include "dex/common/errors.h"
+#include "dex/common/logging.h"
 
 #include <json-toolkit/stringify.h>
 
@@ -45,6 +49,7 @@ void run_exporter(const std::shared_ptr<dex::Model>& model, const QString& outdi
   }
   else if (engine == "liquid")
   {
+#ifdef DEX_EXPORTER_LIQUID_ENABLED
     dex::LiquidExporter exporter{ outdir.absolutePath().toStdString(), config };
 
     exporter.setVariables(values);
@@ -53,6 +58,10 @@ void run_exporter(const std::shared_ptr<dex::Model>& model, const QString& outdi
     exporter.render();
 
     return;
+#else
+    log::error() << "dex wasn't compiled with liquid support";
+#endif // DEX_EXPORTER_LIQUID_ENABLED
+
   }
   else
   {

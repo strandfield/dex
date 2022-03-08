@@ -2,7 +2,7 @@
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "dex/output/liquid-wrapper.h"
+#include "dex/output/liquid/liquid-wrapper.h"
 
 #include "dex/model/code-block.h"
 #include "dex/model/display-math.h"

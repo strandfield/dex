@@ -6,8 +6,9 @@
 
 #include "dex/app/message-handler.h"
 
-#include "dex/common/json-utils.h"
 #include "dex/input/parser-machine.h"
+
+#include <json-toolkit/json.h>
 
 #include <QDir>
 
