@@ -1,9 +1,9 @@
 
-set(CMAKE_AUTORCC ON)
+configure_file("dex-parsing-resources.h.in" "dex-parsing-resources.h")
 
-add_executable(TEST_parsing "main.cpp" "test-parsing.cpp" "test-parsing.h" "test-parsing-resources.qrc")
+add_executable(TEST_parsing "main.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../catch.hpp" "${CMAKE_CURRENT_BINARY_DIR}/dex-parsing-resources.h" "test-parsing.cpp")
+target_include_directories(TEST_parsing PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/.."  "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(TEST_parsing dex-input dex-output)
-target_link_libraries(TEST_parsing Qt5::Core Qt5::Test)
 
 if (WIN32)
   set_target_properties(TEST_parsing PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")

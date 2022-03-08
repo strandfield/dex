@@ -1,8 +1,8 @@
-// Copyright (C) 2019-2021 Vincent Chambrin
+// Copyright (C) 2019-2022 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "test-dex-output.h"
+#include "dex-output-resources.h"
 
 #include "model-examples.h"
 
@@ -22,6 +22,8 @@
 #include <json-toolkit/stringify.h>
 
 #include <QStandardPaths>
+
+#include "catch.hpp"
 
 #include <iostream>
 
@@ -45,7 +47,7 @@ std::string get_folder_path()
   }
 
   if (!QFileInfo::exists(dest + "/markdown"))
-    dex::recursive_copy(":/test-templates/markdown", dest + "/markdown");
+    dex::recursive_copy(QString(dex_output_resources_path()) + "/test-templates/markdown", dest + "/markdown");
 
   return dest.toStdString() + "/markdown";
 }
@@ -64,7 +66,7 @@ public:
 
 #endif // DEX_EXPORTER_LIQUID_ENABLED
 
-void TestDexOutput::jsonExport()
+TEST_CASE("Test JSON export of a program", "[output]")
 {
   {
     auto model = std::make_shared<dex::Model>();
@@ -72,14 +74,14 @@ void TestDexOutput::jsonExport()
 
     json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
 
-    QVERIFY(jexport.data().size() == 1);
+    REQUIRE(jexport.data().size() == 1);
 
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 4);
-    QVERIFY(jexport.data().at("entities").length() == 1);
-    QVERIFY(jexport.data().at("entities").toArray().length() == 1);
-    QVERIFY(jexport.data().at("entities").at(0)["name"] == "vector");
+    REQUIRE(jexport.data().size() == 4);
+    REQUIRE(jexport.data().at("entities").length() == 1);
+    REQUIRE(jexport.data().at("entities").toArray().length() == 1);
+    REQUIRE(jexport.data().at("entities").at(0)["name"] == "vector");
   }
   
   {
@@ -89,17 +91,17 @@ void TestDexOutput::jsonExport()
     json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 4);
-    QVERIFY(jexport.data().at("entities").length() == 1);
-    QVERIFY(jexport.data().at("entities").toArray().length() == 1);
-    QVERIFY(jexport.data().at("entities").at(0)["name"] == "getenv");
+    REQUIRE(jexport.data().size() == 4);
+    REQUIRE(jexport.data().at("entities").length() == 1);
+    REQUIRE(jexport.data().at("entities").toArray().length() == 1);
+    REQUIRE(jexport.data().at("entities").at(0)["name"] == "getenv");
 
     jexport = jexport.data().at("entities").at(0).toObject();
-    QVERIFY(jexport["parameters"].at(0)["documentation"] == "name of the environment variable");
+    REQUIRE(jexport["parameters"].at(0)["documentation"] == "name of the environment variable");
 
     jexport = jexport["documentation"].toObject();
-    QVERIFY(jexport["since"] == "C++98");
-    QVERIFY(jexport["returns"] == "value of environment variable");
+    REQUIRE(jexport["since"] == "C++98");
+    REQUIRE(jexport["returns"] == "value of environment variable");
   }
 
   {
@@ -109,18 +111,18 @@ void TestDexOutput::jsonExport()
     json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
     jexport = jexport["program"]["global_namespace"].toObject();
 
-    QVERIFY(jexport.data().size() == 4);
-    QVERIFY(jexport.data().at("entities").length() == 1);
-    QVERIFY(jexport.data().at("entities").toArray().length() == 1);
-    QVERIFY(jexport.data().at("entities").at(0)["name"] == "pi");
-    QVERIFY(jexport.data().at("entities").at(0)["vartype"] == "double");
+    REQUIRE(jexport.data().size() == 4);
+    REQUIRE(jexport.data().at("entities").length() == 1);
+    REQUIRE(jexport.data().at("entities").toArray().length() == 1);
+    REQUIRE(jexport.data().at("entities").at(0)["name"] == "pi");
+    REQUIRE(jexport.data().at("entities").at(0)["vartype"] == "double");
 
     jexport = jexport.data().at("entities").at(0)["documentation"].toObject();
-    QVERIFY(jexport["description"].at(0)["text"] == "This mathematical constant is roughly equal to 3.");
+    REQUIRE(jexport["description"].at(0)["text"] == "This mathematical constant is roughly equal to 3.");
   }
 }
 
-void TestDexOutput::jsonExportManual()
+TEST_CASE("Test JSON export of a manual", "[output]")
 {
   auto model = std::make_shared<dex::Model>();
   auto man = std::make_shared<dex::Manual>("The manual");
@@ -133,25 +135,25 @@ void TestDexOutput::jsonExportManual()
 
   json::Object jexport = dex::JsonExporter::serialize(*model).toObject();
 
-  QVERIFY(jexport.data().size() == 1);
+  REQUIRE(jexport.data().size() == 1);
 
   jexport = jexport["documents"][0].toObject();
 
-  QVERIFY(jexport.data().at("title").toString() == "The manual");
-  QVERIFY(jexport.data().at("content").toArray().length() == 1);
+  REQUIRE(jexport.data().at("title").toString() == "The manual");
+  REQUIRE(jexport.data().at("content").toArray().length() == 1);
 
   jexport = jexport["content"][0].toObject();
-  QVERIFY(jexport.data().at("depth").toString() == "part");
-  QVERIFY(jexport.data().at("name").toString() == "Part 1");
+  REQUIRE(jexport.data().at("depth").toString() == "part");
+  REQUIRE(jexport.data().at("name").toString() == "Part 1");
 
-  QVERIFY(jexport.data().at("content").toArray().length() == 1);
+  REQUIRE(jexport.data().at("content").toArray().length() == 1);
   jexport = jexport["content"][0].toObject();
-  QVERIFY(jexport["text"].toString() == "Hello World!");
+  REQUIRE(jexport["text"].toString() == "Hello World!");
 }
 
 #ifdef DEX_EXPORTER_LIQUID_ENABLED
 
-void TestDexOutput::markdownExport()
+TEST_CASE("Test Markdown export", "[output]")
 {
   {
     auto model = std::make_shared<dex::Model>();
@@ -168,7 +170,7 @@ void TestDexOutput::markdownExport()
       "The storage of the vector is handled automatically, ...\n\n"
       "## Members documentation\n\n";
 
-    QVERIFY(content == expected);
+    REQUIRE(content == expected);
   }
 
   {
@@ -184,7 +186,7 @@ void TestDexOutput::markdownExport()
       "## Detailed description\n\n![image](test.jpg)\n\n"
       "## Members documentation\n\n";
 
-    QVERIFY(content == expected);
+    REQUIRE(content == expected);
   }
 
   {
@@ -200,7 +202,7 @@ void TestDexOutput::markdownExport()
       "## Detailed description\n\n- first item\n- second item\n\n"
       "## Members documentation\n\n";
 
-    QVERIFY(content == expected);
+    REQUIRE(content == expected);
   }
 }
 
@@ -208,7 +210,7 @@ void TestDexOutput::markdownExport()
 
 #ifdef DEX_EXPORTER_LIQUID_ENABLED
 
-void TestDexOutput::markdownExportManual()
+TEST_CASE("Test Markdown export manual", "[output]")
 {
   auto model = dex::examples::manual();
 
@@ -240,7 +242,7 @@ void TestDexOutput::markdownExportManual()
     "![image](img.jpg)\n"
     "\n";
 
-  QVERIFY(content == expected);
+  REQUIRE(content == expected);
 }
 
 #endif // DEX_EXPORTER_LIQUID_ENABLED

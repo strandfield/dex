@@ -1,0 +1,5 @@
+
+inline const char* dex_parsing_resources_path()
+{
+  return "${CMAKE_CURRENT_SOURCE_DIR}/";
+}

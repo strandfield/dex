@@ -1,9 +1,9 @@
 
-set(CMAKE_AUTORCC ON)
+configure_file("dex-output-resources.h.in" "dex-output-resources.h")
 
-add_executable(TEST_dex_output "main.cpp" "test-dex-output.cpp" "test-dex-output.h" "test-output-resources.qrc")
+add_executable(TEST_dex_output "main.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../catch.hpp" "test-dex-output.cpp"  "${CMAKE_CURRENT_BINARY_DIR}/dex-output-resources.h")
+target_include_directories(TEST_dex_output PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/.."  "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(TEST_dex_output dex-output dex-model-examples)
-target_link_libraries(TEST_dex_output Qt5::Test)
 
 target_include_directories(TEST_dex_output PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../dex-model-examples")
 
