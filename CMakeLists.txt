@@ -54,7 +54,7 @@ add_subdirectory(dependencies)
 ##################################################################
 
 set(CMAKE_AUTOMOC ON)
-find_package(Qt5 COMPONENTS Core Gui Test)
+find_package(Qt5 COMPONENTS Core Gui)
 
 ##################################################################
 ###### modules

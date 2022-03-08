@@ -2,7 +2,6 @@
 add_executable(TEST_dex_input "main.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../catch.hpp" "test-dex-input.cpp")
 target_include_directories(TEST_dex_input PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_link_libraries(TEST_dex_input dex-input)
-target_link_libraries(TEST_dex_input Qt5::Test)
 
 if (WIN32)
   set_target_properties(TEST_dex_input PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
