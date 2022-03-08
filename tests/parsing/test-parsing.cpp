@@ -1,8 +1,8 @@
-// Copyright (C) 2020-2021 Vincent Chambrin
+// Copyright (C) 2020-2022 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
-#include "test-parsing.h"
+#include "dex-parsing-resources.h"
 
 #include "dex/common/file-utils.h"
 
@@ -14,11 +14,13 @@
 
 #include <QString>
 
+#include "catch.hpp"
+
 #include <iostream>
 
-void TestParsing::all()
+TEST_CASE("Parse test dataset", "[parsing]")
 {
-  QString datasets = QString::fromStdString(dex::file_utils::read_all(":/data/datasets.txt"));
+  QString datasets = QString::fromStdString(dex::file_utils::read_all(std::string(dex_parsing_resources_path()) + "datasets.txt"));
   datasets.replace("\r\n", "\n");
 
   QStringList list = datasets.split("\n", QString::SkipEmptyParts);
@@ -56,5 +58,5 @@ void TestParsing::all()
     }
   }
 
-  QVERIFY(num_failure == 0);
+  REQUIRE(num_failure == 0);
 }
