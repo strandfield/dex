@@ -38,4 +38,9 @@ void recursive_copy(const QString& src, const QString& dest)
   }
 }
 
+void recursive_copy(const std::filesystem::path& src, const std::filesystem::path& dest)
+{
+  recursive_copy(QString(src.string().c_str()), QString(dest.string().c_str()));
+}
+
 } // namespace dex

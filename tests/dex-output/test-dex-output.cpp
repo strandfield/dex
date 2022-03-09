@@ -21,10 +21,9 @@
 #include <json-toolkit/json.h>
 #include <json-toolkit/stringify.h>
 
-#include <QStandardPaths>
-
 #include "catch.hpp"
 
+#include <filesystem>
 #include <iostream>
 
 static std::shared_ptr<dex::Paragraph> make_par(const std::string& str)
@@ -35,21 +34,13 @@ static std::shared_ptr<dex::Paragraph> make_par(const std::string& str)
 
 std::string get_folder_path()
 {
-  QString dest = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+  std::filesystem::path dest = std::filesystem::temp_directory_path();
+  dest = dest / "dex-test-markdown";
 
-  QDir dest_dir{ dest };
+  if (!std::filesystem::exists(dest))
+    dex::recursive_copy(std::filesystem::path(dex_output_resources_path()) / "test-templates" / "markdown", dest);
 
-  if (!dest_dir.exists())
-  {
-    QDir upper_dir = dest_dir;
-    upper_dir.cdUp();
-    upper_dir.mkpath(dest);
-  }
-
-  if (!QFileInfo::exists(dest + "/markdown"))
-    dex::recursive_copy(QString(dex_output_resources_path()) + "/test-templates/markdown", dest + "/markdown");
-
-  return dest.toStdString() + "/markdown";
+  return dest.string();
 }
 
 #ifdef DEX_EXPORTER_LIQUID_ENABLED
@@ -61,6 +52,11 @@ public:
     : LiquidExporter(get_folder_path())
   {
     setModel(m);
+  }
+
+  ~MarkdownExport()
+  {
+    std::filesystem::remove_all(folderPath());
   }
 };
 

@@ -9,10 +9,13 @@
 
 #include <QString>
 
+#include <filesystem>
+
 namespace dex
 {
 
 DEX_OUTPUT_API void recursive_copy(const QString& src, const QString& dest);
+DEX_OUTPUT_API void recursive_copy(const std::filesystem::path& src, const std::filesystem::path& dest);
 
 } // namespace dex
 
