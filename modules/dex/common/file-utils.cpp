@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Vincent Chambrin
+// Copyright (C) 2019-2022 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -35,6 +35,17 @@ std::string read_all(const std::filesystem::path& p)
     file.open(QIODevice::ReadOnly);
     return file.readAll().toStdString();
   }
+}
+
+void write_file(const std::filesystem::path& p, const std::string& data)
+{
+  std::ofstream file{ p.string(), std::ios::out | std::ios::trunc };
+  file.write(data.c_str(), data.size());
+}
+
+void remove(const std::filesystem::path& p)
+{
+  std::filesystem::remove(p);
 }
 
 void crlf2lf(std::string& str)

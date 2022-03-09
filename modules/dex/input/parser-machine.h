@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021 Vincent Chambrin
+// Copyright (C) 2019-2022 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -20,6 +20,7 @@
 
 #include <QFileInfo>
 
+#include <filesystem>
 #include <stack>
 #include <string_view>
 
@@ -136,6 +137,7 @@ public:
   State state() const;
 
   void process(const QFileInfo& file);
+  void process(const std::filesystem::path& filepath);
 
   void input(const std::string& filename);
   InputStream& inputStream();
