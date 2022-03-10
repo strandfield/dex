@@ -93,7 +93,7 @@ void Dex::parseInputs()
 
 void Dex::writeOutput()
 {
-  write_output(m_model, m_config.output, m_config.variables);
+  write_output(m_model, m_config.output.toStdString(), m_config.variables);
 }
 
 void Dex::work()
@@ -120,11 +120,11 @@ void Dex::work()
   writeOutput();
 }
 
-void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)
+void Dex::write_output(const std::shared_ptr<Model>& model, const std::filesystem::path& outdir, json::Object values)
 {
-  assert(!outdir.isEmpty());
+  assert(!outdir.string().empty());
 
-  log::info() << "Writing output to '" << outdir.toStdString() << "'";
+  log::info() << "Writing output to '" << outdir.string() << "'";
 
   dex::run_exporter(model, outdir, values);
 }

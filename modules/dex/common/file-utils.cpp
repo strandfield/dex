@@ -4,6 +4,8 @@
 
 #include "dex/common/file-utils.h"
 
+#include "dex/common/errors.h"
+
 #include <QFile>
 
 #include <fstream>
@@ -40,6 +42,10 @@ std::string read_all(const std::filesystem::path& p)
 void write_file(const std::filesystem::path& p, const std::string& data)
 {
   std::ofstream file{ p.string(), std::ios::out | std::ios::trunc };
+  
+  if(!file.good())
+    throw IOException{ p.string(), "could not open file for writing" };
+
   file.write(data.c_str(), data.size());
 }
 

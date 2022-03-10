@@ -15,6 +15,8 @@
 
 #include <QDir>
 
+#include <filesystem>
+
 namespace dex
 {
 
@@ -38,7 +40,7 @@ protected:
 
   void work();
 
-  void write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values);
+  void write_output(const std::shared_ptr<Model>& model, const std::filesystem::path& outdir, json::Object values);
   
 private:
   QDir m_workdir;

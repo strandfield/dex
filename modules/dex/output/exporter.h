@@ -11,12 +11,12 @@
 
 #include <json-toolkit/json.h>
 
-#include <QString>
+#include <filesystem>
 
 namespace dex
 {
 
-DEX_OUTPUT_API void run_exporter(const std::shared_ptr<dex::Model>& model, const QString& outdirpath, const json::Object& values);
+DEX_OUTPUT_API void run_exporter(const std::shared_ptr<dex::Model>& model, const std::filesystem::path& outdirpath, const json::Object& values);
 
 } // namespace dex
 

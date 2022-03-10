@@ -12,23 +12,20 @@
 #endif // DEX_EXPORTER_LIQUID_ENABLED
 
 #include "dex/common/errors.h"
+#include "dex/common/file-utils.h"
 #include "dex/common/logging.h"
 
 #include <json-toolkit/stringify.h>
 
-#include <QDir>
-
 namespace dex
 {
 
-void run_exporter(const std::shared_ptr<dex::Model>& model, const QString& outdirpath, const json::Object& values)
+void run_exporter(const std::shared_ptr<dex::Model>& model, const std::filesystem::path& outdirpath, const json::Object& values)
 {
-  QDir outdir{ outdirpath };
+  if (!std::filesystem::exists(outdirpath))
+    throw std::runtime_error("No such directory " + outdirpath.string());
 
-  if (!outdir.exists())
-    throw std::runtime_error("No such directory " + outdirpath.toStdString());
-
-  std::string profile_config_file = outdir.absoluteFilePath("_config.yml").toStdString();
+  std::filesystem::path profile_config_file = outdirpath / "_config.yml";
   json::Json config = dex::read_output_config(profile_config_file);
   std::string engine = config["engine"].toString();
 
@@ -36,21 +33,16 @@ void run_exporter(const std::shared_ptr<dex::Model>& model, const QString& outdi
   {
     auto obj = dex::JsonExporter::serialize(*model);
 
-    outdir.mkpath("_output");
+    std::filesystem::create_directory(outdirpath / "_output");
 
-    QFile file{ outdirpath + "/_output/dex.json" };
-
-    if (!file.open(QIODevice::WriteOnly))
-      throw IOException{ file.fileName().toStdString(), "could not open file for writing" };
-
-    file.write(QByteArray::fromStdString(json::stringify(obj)));
+    dex::file_utils::write_file(outdirpath / "_output" / "dex.json", json::stringify(obj));
 
     return;
   }
   else if (engine == "liquid")
   {
 #ifdef DEX_EXPORTER_LIQUID_ENABLED
-    dex::LiquidExporter exporter{ outdir.absolutePath().toStdString(), config };
+    dex::LiquidExporter exporter{ outdirpath.string(), config };
 
     exporter.setVariables(values);
     exporter.setModel(model);
