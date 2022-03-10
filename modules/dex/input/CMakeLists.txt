@@ -5,14 +5,12 @@ find_package(Qt5Core)
 ###### dex-input library
 ##################################################################
 
-set(CMAKE_AUTORCC ON)
-
 file(GLOB_RECURSE DEXINPUT_LIBRARY_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 file(GLOB_RECURSE DEXINPUT_LIBRARY_HDR_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
 list(FILTER DEXINPUT_LIBRARY_SRC_FILES EXCLUDE REGEX "main.cpp")
 
-add_library(dex-input SHARED ${DEXINPUT_LIBRARY_HDR_FILES} ${DEXINPUT_LIBRARY_SRC_FILES} "resources.qrc")
+add_library(dex-input SHARED ${DEXINPUT_LIBRARY_HDR_FILES} ${DEXINPUT_LIBRARY_SRC_FILES})
 target_compile_definitions(dex-input PRIVATE -DDEX_INPUT_BUILD_LIB)
 target_include_directories(dex-input PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../../modules")
 target_include_directories(dex-input PUBLIC "${LIQUID_PROJECT_DIR}/include")
