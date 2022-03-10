@@ -16,7 +16,6 @@ namespace dex
 namespace file_utils
 {
 
-DEX_COMMON_API bool is_embed_resource(const std::filesystem::path& p);
 DEX_COMMON_API std::string read_all(const std::filesystem::path& p);
 DEX_COMMON_API void write_file(const std::filesystem::path& p, const std::string& data);
 DEX_COMMON_API void remove(const std::filesystem::path& p);
