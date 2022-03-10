@@ -158,7 +158,7 @@ TEST_CASE("Test Markdown export", "[output]")
     MarkdownExport md_export{ model };
     md_export.render();
 
-    std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/classes/vector.md");
+    std::string content = dex::file_utils::read_all(md_export.outputDir() / "classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n**Brief:** sequence container that encapsulates dynamic size arrays\n\n"
@@ -175,7 +175,7 @@ TEST_CASE("Test Markdown export", "[output]")
     MarkdownExport md_export{ model };
     md_export.render();
 
-    std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/classes/vector.md");
+    std::string content = dex::file_utils::read_all(md_export.outputDir() / "classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n"
@@ -191,7 +191,7 @@ TEST_CASE("Test Markdown export", "[output]")
     MarkdownExport md_export{ model };
     md_export.render();
 
-    std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/classes/vector.md");
+    std::string content = dex::file_utils::read_all(md_export.outputDir() / "classes/vector.md");
 
     const std::string expected =
       "\n# vector Class\n\n"
@@ -213,7 +213,7 @@ TEST_CASE("Test Markdown export manual", "[output]")
   MarkdownExport md_export{ model };
   md_export.render();
 
-  std::string content = dex::file_utils::read_all(md_export.outputDir().absolutePath().toStdString() + "/documents/The manual.md");
+  std::string content = dex::file_utils::read_all(md_export.outputDir() / "documents/The manual.md");
 
   const std::string expected =
     "\n"
