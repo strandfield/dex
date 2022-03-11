@@ -88,21 +88,12 @@ void Dex::readConfig()
 
 void Dex::parseInputs()
 {
-  auto convert = [](const QStringList& list) -> std::set<std::string> {
-    std::set<std::string> r;
-
-    for (QString s : list)
-      r.insert(s.toStdString());
-
-    return r;
-  };
-
-  m_model = dex::parse_inputs(convert(m_config.inputs), convert(m_config.suffixes));
+  m_model = dex::parse_inputs(m_config.inputs, m_config.suffixes);
 }
 
 void Dex::writeOutput()
 {
-  write_output(m_model, m_config.output.toStdString(), m_config.variables);
+  write_output(m_model, m_config.output, m_config.variables);
 }
 
 void Dex::work()

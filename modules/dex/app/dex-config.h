@@ -9,9 +9,9 @@
 
 #include <json-toolkit/json.h>
 
-#include <QStringList>
-
-class QFileInfo;
+#include <filesystem>
+#include <set>
+#include <string>
 
 namespace dex
 {
@@ -19,13 +19,13 @@ namespace dex
 struct Config
 {
   bool valid = false;
-  QStringList inputs;
-  QStringList suffixes;
-  QString output;
+  std::set<std::string> inputs;
+  std::set<std::string> suffixes;
+  std::string output;
   json::Object variables;
 };
 
-DEX_APP_API Config parse_config(const QFileInfo& file);
+DEX_APP_API Config parse_config(const std::filesystem::path& file);
 DEX_APP_API Config parse_config();
 
 } // namespace dex
