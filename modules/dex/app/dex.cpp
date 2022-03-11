@@ -41,7 +41,7 @@ Dex::Dex(const CommandLineParserResult& arguments)
   : m_workdir(std::filesystem::current_path())
 {
   if (arguments.workdir.has_value())
-    m_workdir = arguments.workdir.value().toStdString();
+    m_workdir = arguments.workdir.value();
 }
 
 Dex::Dex(const std::filesystem::path& workdir)

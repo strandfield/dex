@@ -17,17 +17,17 @@ int main(int argc, char *argv[])
   qapp.setApplicationVersion(dex::versionstr());
 
   dex::CommandLineParser parser;
-  dex::CommandLineParserResult cli = parser.parse(qapp.arguments());
+  dex::CommandLineParserResult cli = parser.parse(argc, argv);
 
   if (cli.status == dex::CommandLineParserResult::ParseError)
   {
-    std::cout << cli.error.toStdString() << std::endl;
+    std::cout << cli.error << std::endl;
     return 1;
   }
 
   if (cli.status == dex::CommandLineParserResult::HelpRequested)
   {
-    std::cout << parser.help().toStdString() << std::endl;
+    std::cout << parser.help() << std::endl;
     return 0;
   }
   else if (cli.status == dex::CommandLineParserResult::VersionRequested)

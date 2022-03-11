@@ -9,9 +9,8 @@
 
 #include <json-toolkit/json.h>
 
-#include <QCommandLineParser>
-
 #include <optional>
+#include <string>
 
 namespace dex
 {
@@ -27,18 +26,18 @@ struct CommandLineParserResult
   };
 
   Status status = HelpRequested;
-  QString error;
-  std::optional<QString> workdir;
+  std::string error;
+  std::optional<std::string> workdir;
 };
 
-class DEX_APP_API CommandLineParser : protected QCommandLineParser
+class DEX_APP_API CommandLineParser
 {
 public:
   CommandLineParser();
 
-  CommandLineParserResult parse(const QStringList& args);
+  CommandLineParserResult parse(int argc, char* argv[]);
 
-  QString help() const;
+  std::string help() const;
 
 };
 

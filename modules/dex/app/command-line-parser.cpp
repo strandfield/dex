@@ -11,43 +11,57 @@ namespace dex
 
 CommandLineParser::CommandLineParser()
 {
-  addHelpOption();
-  addVersionOption();
 
-  addOption({ "w", "Working directory", "workdir" });
 }
 
-CommandLineParserResult CommandLineParser::parse(const QStringList& args)
+CommandLineParserResult CommandLineParser::parse(int argc, char* argv[])
 {
-  const bool success = QCommandLineParser::parse(args);
-
   CommandLineParserResult result;
 
-  if (!success)
+  for (int i(1); i < argc; )
   {
-    result.status = CommandLineParserResult::ParseError;
-    result.error = QCommandLineParser::errorText();
-  }
-  else if (isSet("help"))
-  {
-    result.status = CommandLineParserResult::HelpRequested;
-  }
-  else if (isSet("version"))
-  {
-    result.status = CommandLineParserResult::VersionRequested;
-  }
-  else
-  {
-    result.status = CommandLineParserResult::Work;
-    result.workdir= value("w");
+    std::string opt = std::string(argv[i]);
+
+    if (opt == "-?" || opt == "--help" || opt == "-h")
+    {
+      result.status = CommandLineParserResult::HelpRequested;
+      ++i;
+    }
+    else if (opt == "-w")
+    {
+      result.status = CommandLineParserResult::Work;
+      ++i;
+      result.workdir = std::string(argv[i]);
+      ++i;
+    }
+    else if (opt == "-v" || opt == "--version")
+    {
+      result.status = CommandLineParserResult::VersionRequested;
+      ++i;
+    }
+    else
+    {
+      result.status = CommandLineParserResult::ParseError;
+      result.error = "Unknown option: " + opt;
+      return result;
+    }
   }
 
   return result;
 }
 
-QString CommandLineParser::help() const
+std::string CommandLineParser::help() const
 {
-  return QCommandLineParser::helpText();
+  std::string help;
+
+  help += "Usage: dex [options]\n";
+  help += "\n";
+  help += "Options:\n";
+  help += "  -?, -h, --help  Displays help on commandline options.\n";
+  help += "  -v, --version   Displays version information.\n";
+  help += "  -w <workdir>    Working directory\n";
+
+  return help;
 }
 
 } // namespace dex
