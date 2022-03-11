@@ -43,7 +43,7 @@ void feed_machine(ParsingContext& context, const QString& input)
     try
     {
       log::info() << "Parsing " << info.filePath().toStdString();
-      context.machine.process(info);
+      context.machine.process(info.absoluteFilePath().toStdString());
     }
     catch (const ParserException& ex)
     {

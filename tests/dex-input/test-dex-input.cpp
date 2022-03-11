@@ -385,8 +385,6 @@ TEST_CASE("Testing 'fn' block", "[input]")
   REQUIRE(paragraph->text() == "Searches the environment list provided by the host environment...");
   paragraph = std::static_pointer_cast<dex::Paragraph>(getenv->description->childNodes().back());
   REQUIRE(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior.");
-
-  QFile::remove("test.cpp");
 }
 
 TEST_CASE("Testing 'enum' block", "[input]")

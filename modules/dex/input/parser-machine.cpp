@@ -9,11 +9,6 @@
 
 #include "dex/common/file-utils.h"
 
-#include <QDir>
-#include <QFile>
-
-#include <QDebug>
-
 namespace dex
 {
 
@@ -74,21 +69,26 @@ InputStream::InputStream(BlockBasedDocument doc)
   m_is_block_based = true;
 }
 
-InputStream::InputStream(const QFileInfo& file)
+InputStream::InputStream(const std::filesystem::path& file)
   : m_block_delimiters{ "/*!", "*/" }
 {
   Document d;
-  d.content = file_utils::read_all(file.absoluteFilePath().toStdString());
-  d.file_path = file.filePath().toStdString();
+  d.content = file_utils::read_all(file);
+  d.file_path = file;
   m_documents.push(d);
 
-  m_is_block_based = file.suffix() != "dex";
+  m_is_block_based = file.extension() != ".dex";
 }
 
 void InputStream::setBlockDelimiters(std::string start, std::string end)
 {
   m_block_delimiters.first = std::move(start);
   m_block_delimiters.second = std::move(end);
+}
+
+void InputStream::inject(const char* content)
+{
+  inject(std::string(content));
 }
 
 void InputStream::inject(std::string content)
@@ -98,11 +98,11 @@ void InputStream::inject(std::string content)
   m_documents.push(d);
 }
 
-void InputStream::inject(const QFileInfo& file)
+void InputStream::inject(const std::filesystem::path& file)
 {
   Document d;
-  d.content = file_utils::read_all(file.absoluteFilePath().toStdString());
-  d.file_path = file.filePath().toStdString();
+  d.content = file_utils::read_all(file);
+  d.file_path = file;
   m_documents.push(d);
 }
 
@@ -314,16 +314,16 @@ InputStream& InputStream::operator=(std::string str)
   return *this;
 }
 
-InputStream& InputStream::operator=(const QFileInfo& file)
+InputStream& InputStream::operator=(const std::filesystem::path& file)
 {
   m_documents = std::stack<Document>();
 
   Document document;
-  document.content = file_utils::read_all(file.absoluteFilePath().toStdString());
-  document.file_path = file.filePath().toStdString();
+  document.content = file_utils::read_all(file);
+  document.file_path = file;
   m_documents.push(document);
 
-  m_is_block_based = file.suffix() != "dex";
+  m_is_block_based = file.extension() != ".dex";
   m_block_pos = Position();
 
   return *this;
@@ -360,11 +360,6 @@ ParserMachine::State ParserMachine::state() const
   return m_state;
 }
 
-void ParserMachine::process(const QFileInfo& file)
-{
-  processFile(file.absoluteFilePath().toStdString());
-}
-
 void ParserMachine::process(const std::filesystem::path& filepath)
 {
   processFile(filepath.string());
@@ -372,32 +367,25 @@ void ParserMachine::process(const std::filesystem::path& filepath)
 
 void ParserMachine::input(const std::string& filename)
 {
-  QString qt_filename = QString::fromStdString(filename);
+  std::filesystem::path path{ filename };
 
-  QFileInfo file{ qt_filename };
+  if (!path.has_extension())
+    path.replace_extension(".dex");
 
-  if (file.suffix().isEmpty())
-    file.setFile(file.filePath() + ".dex");
-
-  if (file.exists())
+  if (std::filesystem::exists(path))
   {
-    m_inputstream.inject(file);
+    m_inputstream.inject(path);
     return;
   }
 
-  QFileInfo current{ QString::fromStdString(m_inputstream.currentDocument().file_path) };
+  path = m_inputstream.currentDocument().file_path.parent_path() / path;
 
-  file.setFile(current.dir().path() + "/" + qt_filename);
-
-  if (file.suffix().isEmpty())
-    file.setFile(file.filePath() + ".dex");
-
-  if (!file.exists())
+  if (!std::filesystem::exists(path))
   {
     throw std::runtime_error{ "No such file" };
   }
 
-  m_inputstream.inject(file);
+  m_inputstream.inject(path);
 }
 
 InputStream& ParserMachine::inputStream()
@@ -620,7 +608,7 @@ void ParserMachine::advance()
   catch (ParserException& ex)
   {
     const InputStream::Document& doc = m_inputstream.currentDocument();
-    ex.setSourceLocation(doc.file_path, doc.line, doc.column);
+    ex.setSourceLocation(doc.file_path.string(), doc.line, doc.column);
     throw;
   }
 }
@@ -680,11 +668,9 @@ const std::shared_ptr<Model>& ParserMachine::output() const
   return m_model;
 }
 
-void ParserMachine::processFile(const std::string& path)
+void ParserMachine::processFile(const std::filesystem::path& path)
 {
-  QString qt_path = QString::fromStdString(path);
-
-  m_inputstream = QFileInfo{ qt_path };
+  m_inputstream = path;
 
   m_state = State::BeginFile;
   resume();
