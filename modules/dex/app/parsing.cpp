@@ -10,8 +10,6 @@
 
 #include <json-toolkit/json.h>
 
-#include <QDir>
-
 #include <iostream>
 
 namespace dex
@@ -20,30 +18,37 @@ namespace dex
 struct ParsingContext
 {
   dex::ParserMachine machine;
-  QStringList suffixes;
+  std::set<std::string> suffixes;
 };
 
-void feed_machine(ParsingContext& context, const QString& input);
-void feed_machine(ParsingContext& context, const QDir& input);
-
-void feed_machine(ParsingContext& context, const QString& input)
+void feed_machine(ParsingContext& context, const std::filesystem::path& path)
 {
-  QFileInfo info{ input };
+  if (!std::filesystem::exists(path))
+    throw IOException{ path.string(), "input file does not exist" };
 
-  if (!info.exists())
-    throw IOException{ input.toStdString(), "input file does not exist" };
-
-  if (info.isDir())
+  if (std::filesystem::is_directory(path))
   {
-    QDir dir{ info.absoluteFilePath() };
-    feed_machine(context, dir);
+    for (const std::filesystem::directory_entry& e : std::filesystem::directory_iterator(path))
+    {
+      if (e.is_directory())
+      {
+        feed_machine(context, e.path());
+      }
+      else if(e.is_regular_file())
+      {
+        auto it = context.suffixes.find(e.path().extension().string().substr(1));
+
+        if (it != context.suffixes.end())
+          feed_machine(context, e.path());
+      }
+    }
   }
   else
   {
     try
     {
-      log::info() << "Parsing " << info.filePath().toStdString();
-      context.machine.process(info.absoluteFilePath().toStdString());
+      log::info() << "Parsing " << path.string();
+      context.machine.process(path);
     }
     catch (const ParserException& ex)
     {
@@ -57,25 +62,7 @@ void feed_machine(ParsingContext& context, const QString& input)
   }
 }
 
-void feed_machine(ParsingContext& context, const QDir& input)
-{
-  QFileInfoList entries = input.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
-  for (const auto& e : entries)
-  {
-    if (e.isDir())
-    {
-      feed_machine(context, QDir{ e.absoluteFilePath() });
-    }
-    else
-    {
-      if (context.suffixes.contains(e.suffix()))
-        feed_machine(context, e.absoluteFilePath());
-    }
-  }
-}
-
-std::shared_ptr<Model> parse_inputs(const QStringList& inputs, const QStringList& suffixes)
+std::shared_ptr<Model> parse_inputs(const std::set<std::string>& inputs, const std::set<std::string>& suffixes)
 {
   ParsingContext context;
   context.suffixes = suffixes;
@@ -85,7 +72,7 @@ std::shared_ptr<Model> parse_inputs(const QStringList& inputs, const QStringList
     log::info() << "Inputs:";
     for (const auto& i : inputs)
     {
-      log::info() << i.toStdString();
+      log::info() << i;
     }
 
     for (const auto& i : inputs)
@@ -102,7 +89,7 @@ std::shared_ptr<Model> parse_inputs(const QStringList& inputs, const QStringList
   }
   else
   {
-    feed_machine(context, QDir::current());
+    feed_machine(context, std::filesystem::current_path());
   }
 
   return context.machine.output();

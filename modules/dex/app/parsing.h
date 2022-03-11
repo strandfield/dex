@@ -9,16 +9,14 @@
 
 #include "dex/model/model.h"
 
-#include <QStringList>
-
 #include <memory>
-
-class QDir;
+#include <set>
+#include <string>
 
 namespace dex
 {
 
-DEX_APP_API std::shared_ptr<Model> parse_inputs(const QStringList& inputs, const QStringList& suffixes);
+DEX_APP_API std::shared_ptr<Model> parse_inputs(const std::set<std::string>& inputs, const std::set<std::string>& suffixes);
 
 } // namespace dex
 
