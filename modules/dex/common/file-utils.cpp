@@ -23,6 +23,14 @@ std::string read_all(const std::filesystem::path& p)
   return buffer.str();
 }
 
+std::string read(std::ifstream& stream, size_t n)
+{
+  std::string result;
+  result.resize(n + 1);
+  stream.read(result.data(), n);
+  return result;
+}
+
 void write_file(const std::filesystem::path& p, const std::string& data)
 {
   std::ofstream file{ p.string(), std::ios::out | std::ios::trunc };

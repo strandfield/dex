@@ -19,10 +19,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
-
 #include <fstream>
 #include <set>
 
@@ -438,13 +434,11 @@ bool LiquidExporter::isSpecialFile(const std::filesystem::path& fileinfo) const
   if (suffix_whitelist.find(fileinfo.extension().string()) == suffix_whitelist.end())
     return false;
 
-  QFile file{ fileinfo.string().c_str() };
-
-  if (!file.open(QIODevice::ReadOnly))
-    return false;
+  std::ifstream file{ fileinfo.string() };
+  std::string head = dex::file_utils::read(file, 3);
 
   // Check if file has a front-matter
-  return file.read(3) == "---";
+  return head == "---";
 }
 
 void LiquidExporter::selectStringifier(const std::string& filesuffix)
