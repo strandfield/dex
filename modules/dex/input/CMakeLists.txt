@@ -1,6 +1,4 @@
 
-find_package(Qt5Core)
-
 ##################################################################
 ###### dex-input library
 ##################################################################
@@ -16,7 +14,6 @@ target_include_directories(dex-input PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../.
 target_include_directories(dex-input PUBLIC "${LIQUID_PROJECT_DIR}/include")
 target_include_directories(dex-input PUBLIC "${JSONTOOLKIT_INCLUDE_DIRS}")
 target_include_directories(dex-input PUBLIC "${TYPESET_PROJECT_DIR}/include")
-target_link_libraries(dex-input Qt5::Core)
 target_link_libraries(dex-input dex-model)
 target_link_libraries(dex-input dex-common)
 target_link_libraries(dex-input typeset cpptok)
