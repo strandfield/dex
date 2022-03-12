@@ -18,5 +18,18 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_link_libraries(dex-common stdc++fs)
 endif()
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+
+  if (CLANG_VERSION_STRING VERSION_GREATER_EQUAL 9.0)
+    message("Clang version greater than 9.0, no need to link to c++fs")
+  else()
+    message("Clang compiler: linking to c++fs")
+    target_link_libraries(dex-common c++fs)
+  endif()
+    
+  message("See https://releases.llvm.org/10.0.0/projects/libcxx/docs/UsingLibcxx.html#using-filesystem for information about using #include<filesystem> with clang")
+
+endif()
+
 set_target_properties(dex-common PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 set_target_properties(dex-common PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
