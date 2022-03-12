@@ -13,7 +13,7 @@
 
 #include "dex/model/model.h"
 
-#include <QDir>
+#include <filesystem>
 
 namespace dex
 {
@@ -22,9 +22,9 @@ class DEX_APP_API Dex
 {
 public:
   explicit Dex(const CommandLineParserResult& arguments);
-  explicit Dex(const QDir& workdir);
+  explicit Dex(const std::filesystem::path& workdir);
 
-  QDir workingDir() const;
+  std::filesystem::path workingDir() const;
   const Config& config() const;
   std::shared_ptr<Model> model() const;
 
@@ -38,10 +38,10 @@ protected:
 
   void work();
 
-  void write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values);
+  void write_output(const std::shared_ptr<Model>& model, const std::filesystem::path& outdir, json::Object values);
   
 private:
-  QDir m_workdir;
+  std::filesystem::path m_workdir;
   Config m_config;
   std::shared_ptr<Model> m_model;
 };

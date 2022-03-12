@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021 Vincent Chambrin
+// Copyright (C) 2019-2022 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
 
@@ -18,8 +18,7 @@
 #include <tex/lexer.h>
 #include <tex/parsing/preprocessor.h>
 
-#include <QFileInfo>
-
+#include <filesystem>
 #include <stack>
 #include <string_view>
 
@@ -43,13 +42,14 @@ public:
   InputStream();
   InputStream(std::string doc);
   InputStream(BlockBasedDocument doc);
-  explicit InputStream(const QFileInfo& file);
+  explicit InputStream(const std::filesystem::path& file);
   InputStream(const InputStream &) = default;
 
   void setBlockDelimiters(std::string start, std::string end);
 
+  void inject(const char* content);
   void inject(std::string content);
-  void inject(const QFileInfo& file);
+  void inject(const std::filesystem::path& file);
 
   char peekChar() const;
   inline char nextChar() const { return peekChar(); }
@@ -85,7 +85,7 @@ public:
     int line = 0;
     int column = 0;
     std::string content;
-    std::string file_path;
+    std::filesystem::path file_path;
 
     inline int length() const { return static_cast<int>(content.length()); }
   };
@@ -100,7 +100,7 @@ public:
   inline int stackSize() const { return static_cast<int>(m_documents.size()); }
 
   InputStream& operator=(std::string str);
-  InputStream& operator=(const QFileInfo& file);
+  InputStream& operator=(const std::filesystem::path& file);
 
 protected:
   void beginLineInBlock();
@@ -135,7 +135,7 @@ public:
 
   State state() const;
 
-  void process(const QFileInfo& file);
+  void process(const std::filesystem::path& filepath);
 
   void input(const std::string& filename);
   InputStream& inputStream();
@@ -160,7 +160,7 @@ public:
 
 protected:
 
-  void processFile(const std::string& path);
+  void processFile(const std::filesystem::path& path);
 
   void beginFile();
   void endFile();

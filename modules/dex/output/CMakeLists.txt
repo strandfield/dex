@@ -1,11 +1,7 @@
 
-find_package(Qt5Core)
-
 ##################################################################
 ###### dex-output library
 ##################################################################
-
-set(CMAKE_AUTORCC ON)
 
 file(GLOB DEXOUTPUT_LIBRARY_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 file(GLOB DEXOUTPUT_LIBRARY_HDR_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
@@ -34,7 +30,6 @@ add_library(dex-output SHARED ${DEXOUTPUT_LIBRARY_HDR_FILES} ${DEXOUTPUT_LIBRARY
 target_compile_definitions(dex-output PRIVATE -DDEX_OUTPUT_BUILD_LIB)
 target_include_directories(dex-output PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 target_include_directories(dex-output PUBLIC "${JSONTOOLKIT_INCLUDE_DIRS}")
-target_link_libraries(dex-output Qt5::Core)
 target_link_libraries(dex-output dex-model)
 target_link_libraries(dex-output dex-common)
 

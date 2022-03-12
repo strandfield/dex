@@ -11,8 +11,6 @@
 
 #include <json-toolkit/json.h>
 
-#include <QDir>
-
 #include <iostream>
 
 namespace dex
@@ -40,13 +38,13 @@ int version_patch()
 
 
 Dex::Dex(const CommandLineParserResult& arguments)
-  : m_workdir(QDir::current())
+  : m_workdir(std::filesystem::current_path())
 {
   if (arguments.workdir.has_value())
-    m_workdir = QDir(arguments.workdir.value());
+    m_workdir = arguments.workdir.value();
 }
 
-Dex::Dex(const QDir& workdir)
+Dex::Dex(const std::filesystem::path& workdir)
   : m_workdir(workdir)
 {
 
@@ -54,19 +52,19 @@ Dex::Dex(const QDir& workdir)
 
 int Dex::exec()
 {
-  if(workingDir().exists())
+  if(std::filesystem::exists(workingDir()))
   {
     work();
     return 0;
   }
   else
   {
-    log::error() << "Working directory " << workingDir().absolutePath().toStdString() << " does not exist";
+    log::error() << "Working directory " << workingDir().string() << " does not exist";
     return 1;
   }
 }
 
-QDir Dex::workingDir() const
+std::filesystem::path Dex::workingDir() const
 {
   return m_workdir;
 }
@@ -98,11 +96,15 @@ void Dex::writeOutput()
 
 void Dex::work()
 {
-  if (QDir::current() != workingDir())
+  if (std::filesystem::current_path() != workingDir())
   {
-    log::info() << "Changing working dir to '" << workingDir().absolutePath().toStdString() << "'";
+    log::info() << "Changing working dir to '" << workingDir().string() << "'";
 
-    if (!QDir::setCurrent(workingDir().absolutePath()))
+    try
+    {
+      std::filesystem::current_path(workingDir());
+    }
+    catch(...)
     {
       log::error() << "Failed to change working dir";
       return;
@@ -120,11 +122,11 @@ void Dex::work()
   writeOutput();
 }
 
-void Dex::write_output(const std::shared_ptr<Model>& model, const QString& outdir, json::Object values)
+void Dex::write_output(const std::shared_ptr<Model>& model, const std::filesystem::path& outdir, json::Object values)
 {
-  assert(!outdir.isEmpty());
+  assert(!outdir.string().empty());
 
-  log::info() << "Writing output to '" << outdir.toStdString() << "'";
+  log::info() << "Writing output to '" << outdir.string() << "'";
 
   dex::run_exporter(model, outdir, values);
 }

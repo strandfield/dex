@@ -6,19 +6,15 @@
 
 #include "dex/output/config.h"
 
-#include <json-toolkit/json.h>
-
-#include <QFileInfo>
-
 namespace dex
 {
 
-Config parse_config(const QFileInfo& file)
+Config parse_config(const std::filesystem::path& file)
 {
-  if (!file.exists())
+  if (!std::filesystem::exists(file))
     return {};
 
-  json::Json conf = dex::parse_yaml_config(file.absoluteFilePath().toStdString());
+  json::Json conf = dex::parse_yaml_config(file);
 
   Config result;
   result.valid = true;
@@ -27,7 +23,7 @@ Config parse_config(const QFileInfo& file)
 
   if (in.isString())
   {
-    result.inputs.append(QString::fromStdString(in.toString()));
+    result.inputs.insert(in.toString());
   }
   else if (in.isArray())
   {
@@ -38,19 +34,18 @@ Config parse_config(const QFileInfo& file)
       const std::string& entry = list.at(i).toString();
 
       if (!entry.empty())
-        result.inputs.append(QString::fromStdString(entry));
+        result.inputs.insert(entry);
     }
   }
 
   {
-    std::string str = dex::config::read(conf, "output", "").toString();
-    result.output = QString::fromStdString(str);
+    result.output = dex::config::read(conf, "output", "").toString();
   }
 
   result.variables = conf["variables"].toObject();
 
-  if (result.suffixes.isEmpty())
-    result.suffixes << "cxx" << "cpp" << "h" << "hpp";
+  if (result.suffixes.empty())
+    result.suffixes.insert({ "cxx", "cpp" , "h" , "hpp" });
 
   // @TODO: detect unused fields in conf
 
@@ -59,8 +54,7 @@ Config parse_config(const QFileInfo& file)
 
 Config parse_config()
 {
-  QFileInfo info{ "dex.yml" };
-  return parse_config(info);
+  return parse_config("dex.yml");
 }
 
 } // namespace dex

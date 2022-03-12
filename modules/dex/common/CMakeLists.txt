@@ -1,6 +1,4 @@
 
-find_package(Qt5Core)
-
 ##################################################################
 ###### dex-common library
 ##################################################################
@@ -11,7 +9,6 @@ file(GLOB_RECURSE DEXCOMMON_LIBRARY_HDR_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 add_library(dex-common SHARED ${DEXCOMMON_LIBRARY_HDR_FILES} ${DEXCOMMON_LIBRARY_SRC_FILES})
 target_compile_definitions(dex-common PRIVATE -DDEX_COMMON_BUILD_LIB)
 target_include_directories(dex-common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-target_link_libraries(dex-common Qt5::Core)
 target_include_directories(dex-common PUBLIC "${JSONTOOLKIT_INCLUDE_DIRS}")
 target_link_libraries(dex-common YAMLCPP::YAMLCPP)
 

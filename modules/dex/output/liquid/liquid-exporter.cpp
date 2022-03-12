@@ -19,10 +19,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
-
+#include <fstream>
 #include <set>
 
 
@@ -60,33 +57,39 @@ liquid::Value json_to_liquid(const json::Json& js)
   }
 }
 
-liquid::Template open_liquid_template(const std::string& path)
+liquid::Template open_liquid_template(const std::filesystem::path& path)
 {
   std::string tmplt = file_utils::read_all(path);
   return liquid::parse(tmplt);
 }
 
-TemplateWithFrontMatter open_template_with_front_matter(const std::string& path)
+TemplateWithFrontMatter open_template_with_front_matter(const std::filesystem::path& path)
 {
-  QFile file{ path.c_str() };
+  std::ifstream file{ path.string(), std::ios::in };
 
-  file.open(QIODevice::ReadOnly);
+  std::string l;
+  std::getline(file, l);
 
-  file.readLine();
+  std::string frontmatter;
+  std::getline(file, l);
 
-  QByteArray frontmatter;
-  QByteArray l = file.readLine();
-
-  while (!l.startsWith("---"))
+  while (!dex::StdStringCRef(l).starts_with("---"))
   {
     frontmatter += l;
     frontmatter += "\n";
-    l = file.readLine();
+    std::getline(file, l);
   }
 
   YAML::Node yam = YAML::Load(frontmatter.data());
 
-  std::string tmplt_content = file.readAll().toStdString();
+  std::string tmplt_content;
+
+  while (!file.eof())
+  {
+    std::getline(file, l);
+    tmplt_content += l;
+    tmplt_content += '\n';
+  }
 
   TemplateWithFrontMatter result;
   result.frontmatter = yaml_to_json(yam).toObject();
@@ -199,9 +202,9 @@ const std::string& LiquidExporter::outputPath() const
   return m_output_path;
 }
 
-QDir LiquidExporter::outputDir() const
+std::filesystem::path LiquidExporter::outputDir() const
 {
-  return QDir(outputPath().c_str());
+  return  std::filesystem::path(outputPath());
 }
 
 const LiquidExporter::Layouts& LiquidExporter::layouts() const
@@ -232,23 +235,20 @@ void LiquidExporter::render()
   LiquidExporterModelVisitor visitor{ *this, };
   visitor.visitModel(*model());
 
-  QDirIterator diriterator{ folderPath().c_str(), QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs };
+  std::filesystem::directory_iterator diriterator{ folderPath() };
 
-  while (diriterator.hasNext())
+  for (const std::filesystem::directory_entry& entry : diriterator)
   {
-    diriterator.next();
-    QFileInfo fileinfo = diriterator.fileInfo();
-
-    if (fileinfo.fileName().startsWith("_"))
+    if (dex::StdStringCRef(entry.path().filename().string()).starts_with("_"))
       continue;
 
-    if (fileinfo.isDir())
+    if (entry.is_directory())
     {
-      renderDirectory(fileinfo.absoluteFilePath());
+      renderDirectory(entry.path());
     }
-    else
+    else if(entry.is_regular_file())
     {
-      renderFile(fileinfo.absoluteFilePath());
+      renderFile(entry.path());
     }
   }
 }
@@ -332,82 +332,83 @@ std::string LiquidExporter::stringify(const liquid::Value& val)
 
 void LiquidExporter::listLayouts()
 {
-  QDir dir{ QString::fromStdString(folderPath()) + "/_layouts" };
+  std::filesystem::path dir = std::filesystem::path(folderPath()) / "_layouts";
 
-  if (!dir.exists())
+  if (!std::filesystem::exists(dir))
     return;
 
-  QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
+  std::filesystem::directory_iterator diriterator{ dir };
 
-  while (diriterator.hasNext())
+  for (const std::filesystem::directory_entry& entry : diriterator)
   {
-    QFileInfo fileinfo{ diriterator.next() };
+    std::filesystem::path p = entry.path();
 
-    if (fileinfo.baseName() == "class")
-      m_layouts.class_template = parseLayout(fileinfo, "class", "classes");
-    else if (fileinfo.baseName() == "namespace")
-      m_layouts.namespace_template = parseLayout(fileinfo, "namespace", "namespaces");
-    else if (fileinfo.baseName() == "document")
-      m_layouts.document_template = parseLayout(fileinfo, "document", "documents");
+    if (p.stem() == "class")
+      m_layouts.class_template = parseLayout(p, "class", "classes");
+    else if (p.stem() == "namespace")
+      m_layouts.namespace_template = parseLayout(p, "namespace", "namespaces");
+    else if (p.stem() == "document")
+      m_layouts.document_template = parseLayout(p, "document", "documents");
   }
 }
 
-LiquidLayout LiquidExporter::parseLayout(const QFileInfo& fileinfo, const std::string& name, std::string default_out)
+LiquidLayout LiquidExporter::parseLayout(const std::filesystem::path& fileinfo, const std::string& name, std::string default_out)
 {
   LiquidLayout result;
-  std::string path = fileinfo.absoluteFilePath().toStdString();
+  std::string path = fileinfo.string();
   result.model = open_liquid_template(path);
   result.model.skipWhitespacesAfterTag();
   result.outdir = dex::config::read(m_config["output"], name, std::move(default_out)).toString();
-  result.filesuffix = fileinfo.suffix().toStdString();
+  result.filesuffix = fileinfo.extension().string();
+  if (!result.filesuffix.empty())
+    result.filesuffix = std::string(result.filesuffix.begin() + 1, result.filesuffix.end());
   return result;
 }
 
 void LiquidExporter::listIncludes()
 {
-  QDir dir{ QString::fromStdString(folderPath()) +"/_includes" };
+  std::filesystem::path dir = std::filesystem::path(folderPath()) / "_includes";
 
-  if (!dir.exists())
+  if (!std::filesystem::exists(dir))
     return;
 
-  QDirIterator diriterator{ dir.absolutePath(), QDir::NoDotAndDotDot | QDir::Files };
+  std::filesystem::directory_iterator diriterator{ dir };
 
-  while (diriterator.hasNext())
+  for (const std::filesystem::directory_entry& entry : diriterator)
   {
-    std::string p = diriterator.next().toStdString();
+    std::filesystem::path p = entry.path();
     liquid::Template tmplt = open_liquid_template(p);
     tmplt.skipWhitespacesAfterTag();
-    p.erase(p.begin(), p.begin() + folderPath().size() + 11);
-    templates()[p] = std::move(tmplt);
+    std::string p_str = p.string();
+    p_str.erase(p_str.begin(), p_str.begin() + folderPath().size() + 11);
+    templates()[p_str] = std::move(tmplt);
   }
 }
 
-void LiquidExporter::renderDirectory(const QString& dirpath)
+void LiquidExporter::renderDirectory(const std::filesystem::path& dirpath)
 {
-  QDirIterator diriterator{ dirpath, QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories };
+  std::filesystem::recursive_directory_iterator diriterator{ dirpath };
 
-  while (diriterator.hasNext())
+  for (const std::filesystem::directory_entry& entry : diriterator)
   {
-    QString path = diriterator.next();
-    renderFile(path);
+    if (entry.is_regular_file())
+      renderFile(entry.path());
   }
 }
 
-void LiquidExporter::renderFile(const QString& filepath)
+void LiquidExporter::renderFile(const std::filesystem::path& filepath)
 {
-  QFileInfo fileinfo{ filepath };
+  std::filesystem::path srcrelpath = std::filesystem::relative(filepath, folderPath());
+  std::filesystem::path destpath = outputDir() / srcrelpath;
 
-  QString srcrelpath = QDir(folderPath().c_str()).relativeFilePath(fileinfo.absoluteFilePath());
-  QString destpath = outputDir().absolutePath() + "/" + srcrelpath;
-
-  if (!isSpecialFile(fileinfo))
+  if (!isSpecialFile(filepath))
   {
-    checkWriteDirectory(destpath.toStdString());
-    QFile::copy(filepath, destpath);
+    checkWriteDirectory(destpath.string());
+    std::filesystem::copy_file(filepath, destpath);
     return;
   }
   
-  TemplateWithFrontMatter tmplt = open_template_with_front_matter(filepath.toStdString());
+  TemplateWithFrontMatter tmplt = open_template_with_front_matter(filepath);
   tmplt.model.skipWhitespacesAfterTag();
 
   // @TODO: use tmplt.frontmatter
@@ -415,31 +416,29 @@ void LiquidExporter::renderFile(const QString& filepath)
   liquid::Map context;
   setupContext(context);
 
-  selectStringifier(fileinfo.suffix().toStdString());
+  selectStringifier(filepath.extension().string().substr(1));
 
   std::string output = liquid::Renderer::render(tmplt.model, context);
 
   postProcess(output);
 
-  write(output, destpath.toStdString());
+  write(output, destpath);
 }
 
-bool LiquidExporter::isSpecialFile(const QFileInfo& fileinfo) const
+bool LiquidExporter::isSpecialFile(const std::filesystem::path& fileinfo) const
 {
-  static const std::set<QString> suffix_whitelist = {
-    "md", "tex", "html", "txt", "css", "js"
+  static const std::set<std::string> suffix_whitelist = {
+    ".md", ".tex", ".html", ".txt", ".css", ".js"
   };
 
-  if (suffix_whitelist.find(fileinfo.suffix()) == suffix_whitelist.end())
+  if (suffix_whitelist.find(fileinfo.extension().string()) == suffix_whitelist.end())
     return false;
 
-  QFile file{ fileinfo.absoluteFilePath() };
-
-  if (!file.open(QIODevice::ReadOnly))
-    return false;
+  std::ifstream file{ fileinfo.string() };
+  std::string head = dex::file_utils::read(file, 3);
 
   // Check if file has a front-matter
-  return file.read(3) == "---";
+  return head == "---";
 }
 
 void LiquidExporter::selectStringifier(const std::string& filesuffix)
@@ -464,34 +463,27 @@ void LiquidExporter::postProcess(std::string& output)
   LiquidExporter::simplify_empty_lines(output);
 }
 
-void LiquidExporter::checkWriteDirectory(const std::string& filepath)
+void LiquidExporter::checkWriteDirectory(const std::filesystem::path& filepath)
 {
-  QFileInfo fileinfo{ QString::fromStdString(filepath) };
+  auto parent_path = filepath.parent_path();
 
-  if (!fileinfo.dir().exists())
+  if (!std::filesystem::exists(parent_path))
   {
-    const bool success = QDir().mkpath(fileinfo.dir().absolutePath());
+    bool success = std::filesystem::create_directories(parent_path);
 
     if (!success)
-      throw IOException{ fileinfo.dir().absolutePath().toStdString(), "could not create directory" };
+      throw IOException{ parent_path.string(), "could not create directory" };
   }
 }
 
-void LiquidExporter::write(const std::string& data, const std::string& filepath)
+void LiquidExporter::write(const std::string& data, const std::filesystem::path& filepath)
 {
   if (data.empty())
     return;
 
   checkWriteDirectory(filepath);
 
-  QFile file{ filepath.c_str() };
-
-  if (!file.open(QIODevice::WriteOnly))
-    throw IOException{ filepath, "could not open file for writing" };
-
-  file.write(data.data());
-
-  file.close();
+  dex::file_utils::write_file(filepath, data);
 }
 
 void LiquidExporter::trim_right(std::string& str)

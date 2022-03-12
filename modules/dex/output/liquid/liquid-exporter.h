@@ -13,8 +13,7 @@
 
 #include <json-toolkit/json.h>
 
-#include <QDir>
-
+#include <filesystem>
 #include <map>
 #include <variant>
 #include <vector>
@@ -29,7 +28,7 @@ class LiquidStringifier;
 
 liquid::Value json_to_liquid(const json::Json& js);
 
-liquid::Template open_liquid_template(const std::string& path);
+liquid::Template open_liquid_template(const std::filesystem::path& path);
 
 struct TemplateWithFrontMatter
 {
@@ -37,7 +36,7 @@ struct TemplateWithFrontMatter
   liquid::Template model;
 };
 
-TemplateWithFrontMatter open_template_with_front_matter(const std::string& path);
+TemplateWithFrontMatter open_template_with_front_matter(const std::filesystem::path& path);
 
 struct LiquidLayout
 {
@@ -63,7 +62,7 @@ public:
   const std::string& folderPath() const;
 
   const std::string& outputPath() const;
-  QDir outputDir() const;
+  std::filesystem::path outputDir() const;
 
   const Layouts& layouts() const;
 
@@ -99,17 +98,17 @@ protected:
 protected:
 
   void listLayouts();
-  LiquidLayout parseLayout(const QFileInfo& fileinfo, const std::string& name, std::string default_out);
+  LiquidLayout parseLayout(const std::filesystem::path& fileinfo, const std::string& name, std::string default_out);
   void listIncludes();
 
-  void renderDirectory(const QString& path);
-  void renderFile(const QString& filepath);
-  bool isSpecialFile(const QFileInfo& fileinfo) const;
+  void renderDirectory(const std::filesystem::path& path);
+  void renderFile(const std::filesystem::path& filepath);
+  bool isSpecialFile(const std::filesystem::path& fileinfo) const;
   void selectStringifier(const std::string& filesuffix);
   void setupContext(liquid::Map& context);
   void postProcess(std::string& output);
-  void checkWriteDirectory(const std::string& filepath);
-  void write(const std::string& data, const std::string& filepath);
+  void checkWriteDirectory(const std::filesystem::path& filepath);
+  void write(const std::string& data, const std::filesystem::path& filepath);
 
 private:
   std::string m_folder_path;

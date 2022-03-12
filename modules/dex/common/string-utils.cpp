@@ -9,6 +9,35 @@
 namespace dex
 {
 
+inline static bool replace_at(std::string& result, const std::string& str, size_t& index, const std::string& pattern, const std::string& replacement)
+{
+  if (pattern.size() <= (str.size() - index)
+    && std::strncmp(str.data() + index, pattern.data(), pattern.size()) == 0)
+  {
+    result.insert(result.end(), replacement.begin(), replacement.end());
+    index += pattern.size();
+    return true;
+  }
+
+  return false;
+}
+
+std::string StdStringCRef::replace(const std::string& str, const std::string& replacement) const
+{
+  const std::string& self = *str_;
+
+  std::string r;
+  r.reserve(self.size());
+
+  for (size_t i(0); i < self.size();)
+  {
+    if (!replace_at(r, self, i, str, replacement))
+      r.push_back(self.at(i++));
+  }
+
+  return r;
+}
+
 inline static bool replace_at(std::string& result, const std::string& str, size_t& index, std::initializer_list<std::pair<std::string_view, std::string_view>>& replacements)
 {
   for (const std::pair<std::string_view, std::string_view>& repl : replacements)

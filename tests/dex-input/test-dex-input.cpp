@@ -11,9 +11,9 @@
 #include "dex/input/conditional-evaluator.h"
 #include "dex/input/document-writer.h"
 
-#include "catch.hpp"
+#include "dex/common/file-utils.h"
 
-#include <QFile>
+#include "catch.hpp"
 
 tex::parsing::Token tok(std::string str)
 {
@@ -232,10 +232,7 @@ TEST_CASE("Lists can be inserted in a document", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  REQUIRE(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\class vector\n"
     " *\n"
@@ -249,11 +246,9 @@ TEST_CASE("Lists can be inserted in a document", "[input]")
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
-
-  QFile::remove("test.cpp");
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
@@ -282,10 +277,7 @@ TEST_CASE("Images can be inserted in a document", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  REQUIRE(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\class vector\n"
     " *\n"
@@ -295,11 +287,9 @@ TEST_CASE("Images can be inserted in a document", "[input]")
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
-
-  QFile::remove("test.cpp");
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
@@ -326,10 +316,7 @@ TEST_CASE("Testing 'class' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  REQUIRE(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "// The following block is recognized by dex\n"
     "/*!\n"
     " * \\class vector\n"
@@ -339,9 +326,9 @@ TEST_CASE("Testing 'class' block", "[input]")
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
@@ -354,18 +341,13 @@ TEST_CASE("Testing 'class' block", "[input]")
   REQUIRE(vec->description->childNodes().front()->is<dex::Paragraph>());
   auto paragraph = std::static_pointer_cast<dex::Paragraph>(vec->description->childNodes().front());
   REQUIRE(paragraph->text() == "The elements are stored contiguously, ...");
-
-  QFile::remove("test.cpp");
 }
 
 TEST_CASE("Testing 'fn' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  REQUIRE(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "// The following block is recognized by dex\n"
     "/*!\n"
     " * \\fn char* getenv(const char* env_var);\n"
@@ -380,9 +362,9 @@ TEST_CASE("Testing 'fn' block", "[input]")
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
@@ -403,18 +385,13 @@ TEST_CASE("Testing 'fn' block", "[input]")
   REQUIRE(paragraph->text() == "Searches the environment list provided by the host environment...");
   paragraph = std::static_pointer_cast<dex::Paragraph>(getenv->description->childNodes().back());
   REQUIRE(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior.");
-
-  QFile::remove("test.cpp");
 }
 
 TEST_CASE("Testing 'enum' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  REQUIRE(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\enum Corner\n"
     " * \\brief describes a corner\n"
@@ -428,11 +405,9 @@ TEST_CASE("Testing 'enum' block", "[input]")
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
-
-  QFile::remove("test.cpp");
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
@@ -466,10 +441,7 @@ TEST_CASE("Testing 'variable' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  REQUIRE(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\variable std::string name = \"dex\";\n"
     " * \\brief the name of the program\n"
@@ -478,9 +450,9 @@ TEST_CASE("Testing 'variable' block", "[input]")
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
@@ -495,17 +467,12 @@ TEST_CASE("Testing 'variable' block", "[input]")
   REQUIRE(variable->description->childNodes().front()->is<dex::Paragraph>());
   auto paragraph = std::static_pointer_cast<dex::Paragraph>(variable->description->childNodes().front());
   REQUIRE(paragraph->text() == "Stores the name of the program.");
-
-  QFile::remove("test.cpp");
 }
 
 TEST_CASE("Testing 'manual' block", "[input]")
 {
   {
-    QFile file{ "test.dex" };
-    REQUIRE(file.open(QIODevice::WriteOnly));
-
-    file.write(
+    dex::file_utils::write_file("test.dex",
       "\n"
       "\\manual Manual's title\n"
       "\n"
@@ -517,27 +484,20 @@ TEST_CASE("Testing 'manual' block", "[input]")
       "This is the content of the second chapter.\n"
       "\n"
     );
-
-    file.close();
   }
 
   {
-    QFile file{ "toast.dex" };
-    REQUIRE(file.open(QIODevice::WriteOnly));
-
-    file.write(
+    dex::file_utils::write_file("toast.dex",
       "\\chapter First chapter\n"
       "This is the content of the first chapter.\n"
     );
-
-    file.close();
   }
 
   dex::ParserMachine parser;
-  parser.process(QFileInfo{ "test.dex" });
+  parser.process(std::filesystem::path("test.dex"));
 
-  QFile::remove("test.dex");
-  QFile::remove("toast.dex");
+  dex::file_utils::remove("test.dex");
+  dex::file_utils::remove("toast.dex");
 
   REQUIRE(parser.output()->documents.size() == 1);
 
