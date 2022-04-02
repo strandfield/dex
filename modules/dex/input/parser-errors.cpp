@@ -36,7 +36,7 @@ void ParserException::setSourceLocation(std::string path, int line, int col)
   line_ = line;
   column_ = col;
 
-  what_ = path + ":" + std::to_string(line) + ":" + std::to_string(col) + ": " + what_;
+  what_ = filepath_ + ":" + std::to_string(line) + ":" + std::to_string(col) + ": " + what_;
 }
 
 UnexpectedControlSequence::UnexpectedControlSequence(std::string cs)

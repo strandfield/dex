@@ -636,6 +636,7 @@ bool ParserMachine::recover()
   m_preprocessor.output.clear();
   m_condeval.output().clear();
   m_caller.output().clear();
+  m_caller.clearPendingCall();
   m_processor.recover();
 
   return true;

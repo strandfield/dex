@@ -59,6 +59,15 @@ void feed_machine(ParsingContext& context, const std::filesystem::path& path)
       if (!success)
         context.machine.reset();
     }
+    catch (const std::runtime_error& ex)
+    {
+      LOG_ERROR << ex.what();
+
+      const bool success = context.machine.recover();
+
+      if (!success)
+        context.machine.reset();
+    }
   }
 }
 

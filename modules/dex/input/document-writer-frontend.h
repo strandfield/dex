@@ -46,6 +46,9 @@ protected:
   void inlinecode(const FunctionCall& c);
   void begintexttt(const FunctionCall& c);
   void endtexttt(const FunctionCall& c);
+  void inlineargref(const FunctionCall& c);
+  void inlinetyperef(const FunctionCall& c);
+  void inlinemethodref(const FunctionCall& c);
   void since(const FunctionCall& c);
   void beginsince(const FunctionCall& c);
   void endsince(const FunctionCall& c);

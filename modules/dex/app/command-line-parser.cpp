@@ -47,6 +47,11 @@ CommandLineParserResult CommandLineParser::parse(int argc, char* argv[])
     }
   }
 
+  if (argc == 1)
+  {
+    result.status = CommandLineParserResult::Work;
+  }
+
   return result;
 }
 

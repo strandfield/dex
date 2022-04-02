@@ -64,6 +64,10 @@ const std::string Functions::INLINECODE = "@c";
 const std::string Functions::BEGINTEXTTT = "@begintexttt";
 const std::string Functions::ENDTEXTTT = "@endtexttt";
 
+const std::string Functions::INLINE_ARG_REF = "@inlineargref";
+const std::string Functions::INLINE_TYPE_REF = "@inlinetyperef";
+const std::string Functions::INLINE_METHOD_REF = "@inlinemethodref";
+
 const std::string Functions::HREF = "@href";
 
 const std::string Functions::IMAGE = "@image";

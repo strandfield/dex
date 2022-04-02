@@ -67,6 +67,18 @@ const char* dex_fmt_content = R"(
   \@begintexttt #1\@endtexttt
 }
 
+\def\a{%
+  \p@rseword\c@ll\@inlineargref
+}
+
+\def\t{%
+  \p@rseword\c@ll\@inlinetyperef
+}
+
+\def\m{%
+  \p@rseword\c@ll\@inlinemethodref
+}
+
 \def\href{%
   \p@rseword\p@rseword\c@ll\@href
 }
@@ -139,6 +151,8 @@ const char* dex_fmt_content = R"(
 \def\fn{%
   \p@rseline\c@ll\functi@n
 }
+
+\def\fun{\fn}
 
 \def\variable{%
   \p@rseline\c@ll\v@ri@ble

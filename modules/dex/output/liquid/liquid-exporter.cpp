@@ -232,6 +232,9 @@ void LiquidExporter::render()
   if (model()->empty())
     return;
 
+  if (std::filesystem::exists(outputDir()))
+    std::filesystem::remove_all(outputDir());
+
   LiquidExporterModelVisitor visitor{ *this, };
   visitor.visitModel(*model());
 
