@@ -26,7 +26,7 @@ std::string read_all(const std::filesystem::path& p)
 std::string read(std::ifstream& stream, size_t n)
 {
   std::string result;
-  result.resize(n + 1);
+  result.resize(n);
   stream.read(result.data(), n);
   return result;
 }
