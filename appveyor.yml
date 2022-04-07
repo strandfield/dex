@@ -25,6 +25,7 @@ install:
   - appveyor-retry miktexsetup_standalone.exe --local-package-repository=C:\miktex-repository --package-set=essential download
   - miktexsetup_standalone.exe --local-package-repository=C:\miktex-repository --package-set=essential --shared install
   - refreshenv
+  - pdflatex --version
 
 before_build:
   - mkdir build
@@ -47,6 +48,7 @@ after_build:
   - cd ..
   - release\dex.exe 
   - cd doc\_output
+  - dir
   - pdflatex dex.tex
   - pdflatex dex.tex
   - cd ..\..
