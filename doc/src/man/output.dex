@@ -1,0 +1,21 @@
+
+\chapter{Output}
+
+\dex{} provides output to JSON, LaTeX and Markdown.
+While the JSON output is not customizable, the others use a template engine 
+that allows great flexibility.
+
+\section{liquid template engine}
+
+The template engine uses a source directory to produce 
+the output.
+At the root of the directory, a \c{_config.yml} file must 
+be present to describe the parameters of the liquid engine.
+
+Inside a \c{_layouts} directory, templates named \c class, \c namespace and \c document
+can be provided.
+These templates will be used respectively for each class, namespace and document that 
+have been created from the inputs.
+
+Several templates useable with liquid's \c{include} tag can be placed under a \c{_includes} 
+directory.

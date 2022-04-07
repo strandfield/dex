@@ -1,0 +1,7 @@
+
+input: 
+  - doc/src/manual.dex
+output: doc
+variables:
+  project:
+    name: dex

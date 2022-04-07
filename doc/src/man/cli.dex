@@ -1,0 +1,27 @@
+
+\chapter{CLI}
+
+This chapter describes the command line interface of \dex.
+
+The version of \dex{} can be retrieved with the \c{--version} option (short \c{-v}).
+
+\begin{code}
+dex -v
+\end{code}
+
+A short help is available with \c{-?}, \c{-h} or \c{--help}.
+
+\begin{code}
+dex -h
+\end{code}
+
+Otherwise the program is usually invoked with the following syntax.
+
+\begin{code}
+dex [-w <workdir>]
+\end{code}
+
+The optional \c{-w} options can be used to specify a working directory 
+different from the current working directory.
+
+\dex{} working directory must contain a \texttt{dex.yml} file.
