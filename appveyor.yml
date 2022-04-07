@@ -17,6 +17,14 @@ init:
 
 install:
   - git submodule update --init --recursive
+  # Setup LaTeX, see https://tex.stackexchange.com/questions/411864/canonical-way-to-use-miktex-via-appveyor
+  # Static url: https://github.com/MiKTeX/miktex/issues/321#issuecomment-496286866
+  # The setup is small enough, and does not need to be cached
+  - appveyor-retry appveyor DownloadFile  https://miktex.org/download/win/miktexsetup-x64.zip
+  - 7z e miktexsetup-x64.zip
+  - appveyor-retry miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential download
+  - miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential --shared install
+  - refreshenv
 
 before_build:
   - mkdir build
@@ -29,12 +37,19 @@ build_script:
 artifacts:
   - path: release\dex-setup.exe
     name: dex-setup.exe
-
+  - path: doc\_output\dex.pdf
+    name: dex.pdf
+    
 after_build:
   - make-release.bat
   - cd ..\release
   - dex --version
   - cd ..
+  - release\dex.exe 
+  - cd doc\_output
+  - pdflatex dex.tex
+  - pdflatex dex.tex
+  - cd ..\..
   - set "PATH=C:\Program Files (x86)\NSIS;%PATH%"
   - create-installer.bat
   - cd build
