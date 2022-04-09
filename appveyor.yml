@@ -49,7 +49,7 @@ after_build:
   - release\dex.exe 
   - cd doc\_output
   - dir
-  - cmd: pdflatex dex.tex
+  - cmd: pdflatex -enable-installer -interaction=nonstopmode dex.tex
   - cmd: pdflatex dex.tex
   - cd ..\..
   - set "PATH=C:\Program Files (x86)\NSIS;%PATH%"
