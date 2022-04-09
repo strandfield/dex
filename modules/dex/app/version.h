@@ -5,9 +5,9 @@
 #ifndef DEX_APP_VERSION_H
 #define DEX_APP_VERSION_H
 
-#define DEX_VERSION_STR "0.0.0"
+#define DEX_VERSION_STR "0.1.0"
 #define DEX_VERSION_MAJOR 0
-#define DEX_VERSION_MINOR 0
+#define DEX_VERSION_MINOR 1
 #define DEX_VERSION_PATCH 0
 
 #include "dex/dex-app.h"
