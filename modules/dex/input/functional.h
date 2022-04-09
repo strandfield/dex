@@ -110,6 +110,10 @@ struct DEX_INPUT_API Functions
   static const std::string BEGINTEXTTT;
   static const std::string ENDTEXTTT;
 
+  static const std::string INLINE_ARG_REF;
+  static const std::string INLINE_TYPE_REF;
+  static const std::string INLINE_METHOD_REF;
+
   static const std::string HREF;
 
   static const std::string IMAGE;

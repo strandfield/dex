@@ -125,20 +125,6 @@ std::shared_ptr<dex::Program> prog_with_var()
   return prog;
 }
 
-std::shared_ptr<dex::Program> prog_with_class_and_fun()
-{
-  auto prog = std::make_shared<dex::Program>();
-  auto global = prog->globalNamespace();
-
-  auto complex = std::make_shared<dex::Class>("complex", global);
-  global->entities.push_back(complex);
-
-  auto real = std::make_shared<dex::Function>("real", complex);
-  complex->members.emplace_back(real);
-
-  return prog;
-}
-
 std::shared_ptr<dex::Model> manual()
 {
   auto model = make<dex::Model>();

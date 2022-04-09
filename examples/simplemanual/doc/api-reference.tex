@@ -1,0 +1,61 @@
+---
+layout: none
+---
+\documentclass[10pt,a4paper]{memoir}
+
+\include{preamble}
+
+\begin{document}
+
+\frontmatter
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+\mainmatter
+
+{% for e in model.program.global_namespace.entities %}
+
+  {% if e.type == 'class' %}
+  
+  {% assign class = e %}
+  
+\chapter{{'{'}}{{ class.name }}{{'}'}}
+  
+{% if class.brief %}
+\textbf{Brief:} {{ class.brief }}
+{% endif %}
+
+{{ class.description }}
+
+{% for f in class.members | filter_by_type: 'function' %}
+
+\section{{'{'}}{{ f.name }}{{'}'}}
+
+{% if f.brief %}
+\textbf{Brief:} {{ f.brief }}
+{% endif %}
+
+{% if f.parameters and f.parameters.size > 0 %}
+Parameters:
+{% for p in f.parameters %}
+- {{ p.brief }}
+{% endfor %}
+{% endif %}
+
+{% if f.returns %}
+\textbf{Returns:}  {{ f.returns }}
+{% endif %}
+
+{{ f.description }}
+
+{% endfor %}
+  
+  {% endif %}
+
+{% endfor %}
+
+\end{document}

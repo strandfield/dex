@@ -1,8 +1,6 @@
-// Copyright (C) 2019-2021 Vincent Chambrin
+// Copyright (C) 2019-2022 Vincent Chambrin
 // This file is part of the 'dex' project
 // For conditions of distribution and use, see copyright notice in LICENSE
-
-#include "test-dex-input.h"
 
 #include "dex/model/model.h"
 
@@ -13,7 +11,9 @@
 #include "dex/input/conditional-evaluator.h"
 #include "dex/input/document-writer.h"
 
-#include <QFile>
+#include "dex/common/file-utils.h"
+
+#include "catch.hpp"
 
 tex::parsing::Token tok(std::string str)
 {
@@ -59,7 +59,7 @@ void write_cs(dex::FunctionCaller& parser, const std::string& cs, const Str& ...
   write_cs(parser, strs...);
 }
 
-void TestDexInput::argumentParsing()
+TEST_CASE("Argument parsing works", "[input]")
 {
   dex::ParserMachine machine;
   dex::FunctionCaller parser{ machine };
@@ -67,24 +67,24 @@ void TestDexInput::argumentParsing()
   write_cs(parser, "p@rseint", "c@ll", "f@@");
   write_chars(parser, "123 ");
 
-  QVERIFY(parser.hasPendingCall());
-  QVERIFY(parser.call().function == "f@@");
-  QVERIFY(parser.call().arguments.size() == 1);
-  QVERIFY(std::holds_alternative<int>(parser.call().arguments.front()));
-  QVERIFY(std::get<int>(parser.call().arguments.front()) == 123);
+  REQUIRE(parser.hasPendingCall());
+  REQUIRE(parser.call().function == "f@@");
+  REQUIRE(parser.call().arguments.size() == 1);
+  REQUIRE(std::holds_alternative<int>(parser.call().arguments.front()));
+  REQUIRE(std::get<int>(parser.call().arguments.front()) == 123);
 
   parser.clearPendingCall();
     
   write_cs(parser, "p@rsebool", "p@rseword", "c@ll", "b@r");
   write_chars(parser, "1 hello ");
 
-  QVERIFY(parser.hasPendingCall());
-  QVERIFY(parser.call().function == "b@r");
-  QVERIFY(parser.call().arguments.size() == 2);
-  QVERIFY(std::holds_alternative<bool>(parser.call().arguments.front()));
-  QVERIFY(std::get<bool>(parser.call().arguments.front()));
-  QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.back()));
-  QVERIFY(std::get<std::string>(parser.call().arguments.back()) == "hello");
+  REQUIRE(parser.hasPendingCall());
+  REQUIRE(parser.call().function == "b@r");
+  REQUIRE(parser.call().arguments.size() == 2);
+  REQUIRE(std::holds_alternative<bool>(parser.call().arguments.front()));
+  REQUIRE(std::get<bool>(parser.call().arguments.front()));
+  REQUIRE(std::holds_alternative<std::string>(parser.call().arguments.back()));
+  REQUIRE(std::get<std::string>(parser.call().arguments.back()) == "hello");
 
   parser.clearPendingCall();
 
@@ -92,48 +92,48 @@ void TestDexInput::argumentParsing()
   write_chars(parser, "there General Kenobi!");
   parser.write(tex::parsing::CharacterToken{ '\n', tex::parsing::CharCategory::Active });
 
-  QVERIFY(parser.hasPendingCall());
-  QVERIFY(parser.call().function == "p@r@m");
-  QVERIFY(parser.call().arguments.size() == 2);
-  QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.front()));
-  QVERIFY(std::get<std::string>(parser.call().arguments.front()) == "there");
-  QVERIFY(std::holds_alternative<std::string>(parser.call().arguments.back()));
-  QVERIFY(std::get<std::string>(parser.call().arguments.back()) == "General Kenobi!");
+  REQUIRE(parser.hasPendingCall());
+  REQUIRE(parser.call().function == "p@r@m");
+  REQUIRE(parser.call().arguments.size() == 2);
+  REQUIRE(std::holds_alternative<std::string>(parser.call().arguments.front()));
+  REQUIRE(std::get<std::string>(parser.call().arguments.front()) == "there");
+  REQUIRE(std::holds_alternative<std::string>(parser.call().arguments.back()));
+  REQUIRE(std::get<std::string>(parser.call().arguments.back()) == "General Kenobi!");
 
   parser.clearPendingCall();
 
   write_cs(parser, "p@rseoptions", "c@ll", "@pts");
   write_chars(parser, "[standalone, key=value]");
 
-  QVERIFY(parser.hasPendingCall());
-  QVERIFY(parser.call().function == "@pts");
-  QVERIFY(parser.call().arguments.empty());
-  QVERIFY(parser.call().options.size() == 2);
-  QVERIFY(std::get<std::string>(parser.call().options.at("")) == "standalone");
-  QVERIFY(std::get<std::string>(parser.call().options.at("key")) == "value");
+  REQUIRE(parser.hasPendingCall());
+  REQUIRE(parser.call().function == "@pts");
+  REQUIRE(parser.call().arguments.empty());
+  REQUIRE(parser.call().options.size() == 2);
+  REQUIRE(std::get<std::string>(parser.call().options.at("")) == "standalone");
+  REQUIRE(std::get<std::string>(parser.call().options.at("key")) == "value");
 
   parser.clearPendingCall();
 
   write_cs(parser, "p@rseword", "c@ll", "im@ge");
   write_chars(parser, "{test-image.jpg}");
 
-  QVERIFY(parser.hasPendingCall());
-  QVERIFY(parser.call().function == "im@ge");
-  QVERIFY(parser.call().arguments.size() == 1);
-  QVERIFY(std::get<std::string>(parser.call().arguments.at(0)) == "test-image.jpg");
+  REQUIRE(parser.hasPendingCall());
+  REQUIRE(parser.call().function == "im@ge");
+  REQUIRE(parser.call().arguments.size() == 1);
+  REQUIRE(std::get<std::string>(parser.call().arguments.at(0)) == "test-image.jpg");
 
   parser.clearPendingCall();
 
   write_cs(parser, "p@rseline", "c@ll", "foo");
   write_chars_lexer(parser, "{This one extends after\n the end of the line}");
 
-  QVERIFY(parser.hasPendingCall());
-  QVERIFY(parser.call().function == "foo");
-  QVERIFY(parser.call().arguments.size() == 1);
-  QVERIFY(std::get<std::string>(parser.call().arguments.at(0)) == "This one extends after the end of the line");
+  REQUIRE(parser.hasPendingCall());
+  REQUIRE(parser.call().function == "foo");
+  REQUIRE(parser.call().arguments.size() == 1);
+  REQUIRE(std::get<std::string>(parser.call().arguments.at(0)) == "This one extends after the end of the line");
 }
 
-void TestDexInput::conditionalEvaluator()
+TEST_CASE("Conditions are correctly evaluated", "[input]")
 {
   dex::InputStream istream;
   tex::parsing::Lexer lexer;
@@ -143,28 +143,28 @@ void TestDexInput::conditionalEvaluator()
   istream.inject("{[");
 
   parser.write(tok('a'));
-  QVERIFY(parser.output().size() == 1);
+  REQUIRE(parser.output().size() == 1);
   parser.write(tok("c@ll"));
-  QVERIFY(parser.output().size() == 2);
+  REQUIRE(parser.output().size() == 2);
 
   parser.write(tok("testleftbr@ce"));
-  QVERIFY(parser.output().size() == 2);
-  QVERIFY(preproc.br);
+  REQUIRE(parser.output().size() == 2);
+  REQUIRE(preproc.br);
 
-  QVERIFY(istream.readChar() == '{');
+  REQUIRE(istream.readChar() == '{');
 
   parser.write(tok("testnextch@r"));
   parser.write(tok(']'));
-  QVERIFY(parser.output().size() == 2);
-  QVERIFY(!preproc.br);
+  REQUIRE(parser.output().size() == 2);
+  REQUIRE(!preproc.br);
 
   parser.write(tok("testnextch@r"));
   parser.write(tok('['));
-  QVERIFY(parser.output().size() == 2);
-  QVERIFY(preproc.br);
+  REQUIRE(parser.output().size() == 2);
+  REQUIRE(preproc.br);
 }
 
-void TestDexInput::documentWriterParagraph()
+TEST_CASE("Paragraphs can be written", "[input]")
 {
   dex::DocumentWriter writer;
 
@@ -180,25 +180,25 @@ void TestDexInput::documentWriterParagraph()
   writer.paragraphWriter().writeLink("#more", "...");
   writer.endSinceBlock();
 
-  QVERIFY(writer.output()->childNodes().size() == 4);
+  REQUIRE(writer.output()->childNodes().size() == 4);
 
-  QVERIFY(writer.output()->childNodes().at(0)->is<dex::Paragraph>());
-  QVERIFY(writer.output()->childNodes().at(2)->is<dex::Paragraph>());
+  REQUIRE(writer.output()->childNodes().at(0)->is<dex::Paragraph>());
+  REQUIRE(writer.output()->childNodes().at(2)->is<dex::Paragraph>());
 
   auto par = std::static_pointer_cast<dex::Paragraph>(writer.output()->childNodes().at(0));
-  QVERIFY(par->text() == "std::vector is a sequence container that encapsulates dynamic size arrays.");
-  QVERIFY(par->metadata().size() == 1);
-  QVERIFY(par->metadata().front()->is<dex::TextStyle>());
-  QVERIFY(std::static_pointer_cast<dex::TextStyle>(par->metadata().front())->style() == "code");
+  REQUIRE(par->text() == "std::vector is a sequence container that encapsulates dynamic size arrays.");
+  REQUIRE(par->metadata().size() == 1);
+  REQUIRE(par->metadata().front()->is<dex::TextStyle>());
+  REQUIRE(std::static_pointer_cast<dex::TextStyle>(par->metadata().front())->style() == "code");
 
   par = std::static_pointer_cast<dex::Paragraph>(writer.output()->childNodes().at(2));
-  QVERIFY(par->text() == "The elements are stored contiguously, ...");
-  QVERIFY(par->metadata().size() == 1);
-  QVERIFY(par->metadata().back()->is<dex::Link>());
-  QVERIFY(par->metadata().back()->range().text() == "...");
+  REQUIRE(par->text() == "The elements are stored contiguously, ...");
+  REQUIRE(par->metadata().size() == 1);
+  REQUIRE(par->metadata().back()->is<dex::Link>());
+  REQUIRE(par->metadata().back()->range().text() == "...");
 }
 
-void TestDexInput::documentWriterList()
+TEST_CASE("Lists can be created", "[input]")
 {
   dex::DocumentWriter writer;
 
@@ -209,77 +209,30 @@ void TestDexInput::documentWriterList()
   writer.write("Number 2");
   writer.endlist();
 
-  QVERIFY(writer.output()->childNodes().size() == 1);
-  QVERIFY(writer.output()->childNodes().at(0)->is<dex::List>());
+  REQUIRE(writer.output()->childNodes().size() == 1);
+  REQUIRE(writer.output()->childNodes().at(0)->is<dex::List>());
 
   auto list = std::static_pointer_cast<dex::List>(writer.output()->childNodes().at(0));
 
-  QVERIFY(list->items.size() == 2);
+  REQUIRE(list->items.size() == 2);
 
-  QVERIFY(list->items.front()->childNodes().size() == 1);
-  QVERIFY(list->items.back()->childNodes().size() == 1);
+  REQUIRE(list->items.front()->childNodes().size() == 1);
+  REQUIRE(list->items.back()->childNodes().size() == 1);
 
-  QVERIFY(list->items.front()->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(list->items.front()->childNodes().front()->is<dex::Paragraph>());
 
   auto par = std::static_pointer_cast<dex::Paragraph>(list->items.front()->childNodes().front());
-  QVERIFY(par->text() == "List item number 1");
+  REQUIRE(par->text() == "List item number 1");
 
   par = std::static_pointer_cast<dex::Paragraph>(list->items.back()->childNodes().front());
-  QVERIFY(par->text() == "Number 2");
+  REQUIRE(par->text() == "Number 2");
 }
 
-void TestDexInput::parserMachineImage()
+TEST_CASE("Lists can be inserted in a document", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
-
-  file.write(
-    "/*!\n"
-    " * \\class vector\n"
-    " *\n"
-    " * This is a first paragraph.\n"
-    " * \\image[width=66]{test.png}\n"
-    " * This is a second paragraph.\n"
-    " */\n"
-  );
-
-  file.close();
-
-  parser.process(QFileInfo{ "test.cpp" });
-
-  QFile::remove("test.cpp");
-
-  std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
-
-  QVERIFY(ns->entities.size() > 0);
-  QVERIFY(ns->entities.front()->is<dex::Class>());
-  auto vec = std::static_pointer_cast<dex::Class>(ns->entities.front());
-  QVERIFY(vec->description->childNodes().size() == 3);
-
-  QVERIFY(vec->description->childNodes().at(0)->is<dex::Paragraph>());
-  auto par = std::static_pointer_cast<dex::Paragraph>(vec->description->childNodes().at(0));
-  QVERIFY(par->text() == "This is a first paragraph.");
-
-  QVERIFY(vec->description->childNodes().at(1)->is<dex::Image>());
-  auto img = std::static_pointer_cast<dex::Image>(vec->description->childNodes().at(1));
-  QVERIFY(img->src == "test.png");
-  QVERIFY(img->width == 66);
-
-  QVERIFY(vec->description->childNodes().at(2)->is<dex::Paragraph>());
-  par = std::static_pointer_cast<dex::Paragraph>(vec->description->childNodes().at(2));
-  QVERIFY(par->text() == "This is a second paragraph.");
-}
-
-void TestDexInput::parserMachineList()
-{
-  dex::ParserMachine parser;
-
-  QFile file{ "test.cpp" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\class vector\n"
     " *\n"
@@ -293,43 +246,77 @@ void TestDexInput::parserMachineList()
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
-
-  QFile::remove("test.cpp");
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities.size() > 0);
-  QVERIFY(ns->entities.front()->is<dex::Class>());
+  REQUIRE(ns->entities.size() > 0);
+  REQUIRE(ns->entities.front()->is<dex::Class>());
   auto vec = std::static_pointer_cast<dex::Class>(ns->entities.front());
-  QVERIFY(vec->description->childNodes().size() == 1);
-  QVERIFY(vec->description->childNodes().front()->is<dex::List>());
+  REQUIRE(vec->description->childNodes().size() == 1);
+  REQUIRE(vec->description->childNodes().front()->is<dex::List>());
 
   auto lst = std::static_pointer_cast<dex::List>(vec->description->childNodes().front());
-  
-  QVERIFY(lst->items.size() == 2);
-  QVERIFY(lst->items.back()->childNodes().size() == 2);
-  QVERIFY(lst->items.back()->childNodes().back()->is<dex::List>());
+
+  REQUIRE(lst->items.size() == 2);
+  REQUIRE(lst->items.back()->childNodes().size() == 2);
+  REQUIRE(lst->items.back()->childNodes().back()->is<dex::List>());
 
   lst = std::static_pointer_cast<dex::List>(lst->items.back()->childNodes().back());
-  QVERIFY(lst->items.size() == 1);
-  QVERIFY(lst->items.front()->childNodes().size() == 1);
-  QVERIFY(lst->items.front()->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(lst->items.size() == 1);
+  REQUIRE(lst->items.front()->childNodes().size() == 1);
+  REQUIRE(lst->items.front()->childNodes().front()->is<dex::Paragraph>());
 
   auto par = std::static_pointer_cast<dex::Paragraph>(lst->items.front()->childNodes().front());
-  QVERIFY(par->text() == "nested item");
+  REQUIRE(par->text() == "nested item");
 }
 
-void TestDexInput::parserMachineClass()
+TEST_CASE("Images can be inserted in a document", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
+  dex::file_utils::write_file("test.cpp",
+    "/*!\n"
+    " * \\class vector\n"
+    " *\n"
+    " * This is a first paragraph.\n"
+    " * \\image[width=66]{test.png}\n"
+    " * This is a second paragraph.\n"
+    " */\n"
+  );
 
-  file.write(
+  parser.process(std::filesystem::path("test.cpp"));
+
+  dex::file_utils::remove("test.cpp");
+
+  std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
+
+  REQUIRE(ns->entities.size() > 0);
+  REQUIRE(ns->entities.front()->is<dex::Class>());
+  auto vec = std::static_pointer_cast<dex::Class>(ns->entities.front());
+  REQUIRE(vec->description->childNodes().size() == 3);
+
+  REQUIRE(vec->description->childNodes().at(0)->is<dex::Paragraph>());
+  auto par = std::static_pointer_cast<dex::Paragraph>(vec->description->childNodes().at(0));
+  REQUIRE(par->text() == "This is a first paragraph.");
+
+  REQUIRE(vec->description->childNodes().at(1)->is<dex::Image>());
+  auto img = std::static_pointer_cast<dex::Image>(vec->description->childNodes().at(1));
+  REQUIRE(img->src == "test.png");
+  REQUIRE(img->width == 66);
+
+  REQUIRE(vec->description->childNodes().at(2)->is<dex::Paragraph>());
+  par = std::static_pointer_cast<dex::Paragraph>(vec->description->childNodes().at(2));
+  REQUIRE(par->text() == "This is a second paragraph.");
+}
+
+TEST_CASE("Testing 'class' block", "[input]")
+{
+  dex::ParserMachine parser;
+
+  dex::file_utils::write_file("test.cpp",
     "// The following block is recognized by dex\n"
     "/*!\n"
     " * \\class vector\n"
@@ -339,33 +326,28 @@ void TestDexInput::parserMachineClass()
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities.size() > 0);
-  QVERIFY(ns->entities.front()->is<dex::Class>());
+  REQUIRE(ns->entities.size() > 0);
+  REQUIRE(ns->entities.front()->is<dex::Class>());
   auto vec = std::static_pointer_cast<dex::Class>(ns->entities.front());
-  QVERIFY(vec->name == "vector");
-  QVERIFY(vec->brief.value() == "sequence container that encapsulates dynamic size arrays");
-  QVERIFY(vec->description->childNodes().size() == 1);
-  QVERIFY(vec->description->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(vec->name == "vector");
+  REQUIRE(vec->brief.value() == "sequence container that encapsulates dynamic size arrays");
+  REQUIRE(vec->description->childNodes().size() == 1);
+  REQUIRE(vec->description->childNodes().front()->is<dex::Paragraph>());
   auto paragraph = std::static_pointer_cast<dex::Paragraph>(vec->description->childNodes().front());
-  QVERIFY(paragraph->text() == "The elements are stored contiguously, ...");
-
-  QFile::remove("test.cpp");
+  REQUIRE(paragraph->text() == "The elements are stored contiguously, ...");
 }
 
-void TestDexInput::parserMachineFunction()
+TEST_CASE("Testing 'fn' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "// The following block is recognized by dex\n"
     "/*!\n"
     " * \\fn char* getenv(const char* env_var);\n"
@@ -380,41 +362,36 @@ void TestDexInput::parserMachineFunction()
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities.size() > 0);
-  QVERIFY(ns->entities.front()->is<dex::Function>());
+  REQUIRE(ns->entities.size() > 0);
+  REQUIRE(ns->entities.front()->is<dex::Function>());
   auto getenv = std::static_pointer_cast<dex::Function>(ns->entities.front());
-  QVERIFY(getenv->name == "getenv");
-  QVERIFY(getenv->brief.value() == "get value from environment variables");
-  QVERIFY(getenv->since.value().version() == "C++98");
-  QVERIFY(getenv->parameters.size() == 1);
+  REQUIRE(getenv->name == "getenv");
+  REQUIRE(getenv->brief.value() == "get value from environment variables");
+  REQUIRE(getenv->since.value().version() == "C++98");
+  REQUIRE(getenv->parameters.size() == 1);
   auto funparam = getenv->parameters.front();
-  QVERIFY(funparam->brief == "name of the environment variable");
-  QVERIFY(getenv->return_type.brief.value_or("") == "value of environment variable");
-  QVERIFY(getenv->description->childNodes().size() == 2);
-  QVERIFY(getenv->description->childNodes().front()->is<dex::Paragraph>());
-  QVERIFY(getenv->description->childNodes().back()->is<dex::Paragraph>());
+  REQUIRE(funparam->brief == "name of the environment variable");
+  REQUIRE(getenv->return_type.brief.value_or("") == "value of environment variable");
+  REQUIRE(getenv->description->childNodes().size() == 2);
+  REQUIRE(getenv->description->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(getenv->description->childNodes().back()->is<dex::Paragraph>());
   auto paragraph = std::static_pointer_cast<dex::Paragraph>(getenv->description->childNodes().front());
-  QVERIFY(paragraph->text() == "Searches the environment list provided by the host environment...");
+  REQUIRE(paragraph->text() == "Searches the environment list provided by the host environment...");
   paragraph = std::static_pointer_cast<dex::Paragraph>(getenv->description->childNodes().back());
-  QVERIFY(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior.");
-
-  QFile::remove("test.cpp");
+  REQUIRE(paragraph->text() == "Modifying the string returned by getenv invokes undefined behavior.");
 }
 
-void TestDexInput::parserMachineEnum()
+TEST_CASE("Testing 'enum' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\enum Corner\n"
     " * \\brief describes a corner\n"
@@ -428,48 +405,43 @@ void TestDexInput::parserMachineEnum()
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
-
-  QFile::remove("test.cpp");
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities.size() > 0);
-  QVERIFY(ns->entities.front()->is<dex::Enum>());
+  REQUIRE(ns->entities.size() > 0);
+  REQUIRE(ns->entities.front()->is<dex::Enum>());
   auto corner = std::static_pointer_cast<dex::Enum>(ns->entities.front());
-  QVERIFY(corner->name == "Corner");
-  QVERIFY(corner->values.size() == 4);
-  QVERIFY(corner->brief.value() == "describes a corner");
-  QVERIFY(corner->description->childNodes().size() == 1);
-  QVERIFY(corner->description->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(corner->name == "Corner");
+  REQUIRE(corner->values.size() == 4);
+  REQUIRE(corner->brief.value() == "describes a corner");
+  REQUIRE(corner->description->childNodes().size() == 1);
+  REQUIRE(corner->description->childNodes().front()->is<dex::Paragraph>());
   auto paragraph = std::static_pointer_cast<dex::Paragraph>(corner->description->childNodes().front());
-  QVERIFY(paragraph->text() == "This is not that useful.");
+  REQUIRE(paragraph->text() == "This is not that useful.");
 
   auto top_left = corner->values.at(0);
-  QVERIFY(top_left->name == "TopLeft");
-  QVERIFY(top_left->description->childNodes().size() == 1);
-  QVERIFY(top_left->description->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(top_left->name == "TopLeft");
+  REQUIRE(top_left->description->childNodes().size() == 1);
+  REQUIRE(top_left->description->childNodes().front()->is<dex::Paragraph>());
   paragraph = std::static_pointer_cast<dex::Paragraph>(top_left->description->childNodes().front());
-  QVERIFY(paragraph->text() == "the top left corner");
+  REQUIRE(paragraph->text() == "the top left corner");
 
   auto bottom_right = corner->values.at(3);
-  QVERIFY(bottom_right->name == "BottomRight");
-  QVERIFY(bottom_right->description->childNodes().size() == 1);
-  QVERIFY(bottom_right->description->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(bottom_right->name == "BottomRight");
+  REQUIRE(bottom_right->description->childNodes().size() == 1);
+  REQUIRE(bottom_right->description->childNodes().front()->is<dex::Paragraph>());
   paragraph = std::static_pointer_cast<dex::Paragraph>(bottom_right->description->childNodes().front());
-  QVERIFY(paragraph->text() == "the bottom right corner");
+  REQUIRE(paragraph->text() == "the bottom right corner");
 }
 
-void TestDexInput::parserMachineVariable()
+TEST_CASE("Testing 'variable' block", "[input]")
 {
   dex::ParserMachine parser;
 
-  QFile file{ "test.cpp" };
-  QVERIFY(file.open(QIODevice::WriteOnly));
-
-  file.write(
+  dex::file_utils::write_file("test.cpp",
     "/*!\n"
     " * \\variable std::string name = \"dex\";\n"
     " * \\brief the name of the program\n"
@@ -478,34 +450,29 @@ void TestDexInput::parserMachineVariable()
     " */\n"
   );
 
-  file.close();
+  parser.process(std::filesystem::path("test.cpp"));
 
-  parser.process(QFileInfo{ "test.cpp" });
+  dex::file_utils::remove("test.cpp");
 
   std::shared_ptr<dex::Namespace> ns = parser.output()->program()->globalNamespace();
 
-  QVERIFY(ns->entities.size() > 0);
-  QVERIFY(ns->entities.front()->is<dex::Variable>());
+  REQUIRE(ns->entities.size() > 0);
+  REQUIRE(ns->entities.front()->is<dex::Variable>());
   auto variable = std::static_pointer_cast<dex::Variable>(ns->entities.front());
-  QVERIFY(variable->name == "name");
-  QVERIFY(variable->brief.value() == "the name of the program");
-  QVERIFY(variable->since.value().version() == "2020");
+  REQUIRE(variable->name == "name");
+  REQUIRE(variable->brief.value() == "the name of the program");
+  REQUIRE(variable->since.value().version() == "2020");
  
-  QVERIFY(variable->description->childNodes().size() == 1);
-  QVERIFY(variable->description->childNodes().front()->is<dex::Paragraph>());
+  REQUIRE(variable->description->childNodes().size() == 1);
+  REQUIRE(variable->description->childNodes().front()->is<dex::Paragraph>());
   auto paragraph = std::static_pointer_cast<dex::Paragraph>(variable->description->childNodes().front());
-  QVERIFY(paragraph->text() == "Stores the name of the program.");
-
-  QFile::remove("test.cpp");
+  REQUIRE(paragraph->text() == "Stores the name of the program.");
 }
 
-void TestDexInput::parserMachineManual()
+TEST_CASE("Testing 'manual' block", "[input]")
 {
   {
-    QFile file{ "test.dex" };
-    QVERIFY(file.open(QIODevice::WriteOnly));
-
-    file.write(
+    dex::file_utils::write_file("test.dex",
       "\n"
       "\\manual Manual's title\n"
       "\n"
@@ -517,58 +484,51 @@ void TestDexInput::parserMachineManual()
       "This is the content of the second chapter.\n"
       "\n"
     );
-
-    file.close();
   }
 
   {
-    QFile file{ "toast.dex" };
-    QVERIFY(file.open(QIODevice::WriteOnly));
-
-    file.write(
+    dex::file_utils::write_file("toast.dex",
       "\\chapter First chapter\n"
       "This is the content of the first chapter.\n"
     );
-
-    file.close();
   }
 
   dex::ParserMachine parser;
-  parser.process(QFileInfo{ "test.dex" });
+  parser.process(std::filesystem::path("test.dex"));
 
-  QFile::remove("test.dex");
-  QFile::remove("toast.dex");
+  dex::file_utils::remove("test.dex");
+  dex::file_utils::remove("toast.dex");
 
-  QVERIFY(parser.output()->documents.size() == 1);
+  REQUIRE(parser.output()->documents.size() == 1);
 
   std::shared_ptr<dex::Document> man = parser.output()->documents.front();
 
-  QVERIFY(man->childNodes().size() == 1);
-  QVERIFY(man->childNodes().front()->is<dex::Sectioning>());
+  REQUIRE(man->childNodes().size() == 1);
+  REQUIRE(man->childNodes().front()->is<dex::Sectioning>());
 
   auto part = std::dynamic_pointer_cast<dex::Sectioning>(man->childNodes().front());
-  QVERIFY(part->depth == dex::Sectioning::Part);
-  QVERIFY(part->content.size() == 2);
+  REQUIRE(part->depth == dex::Sectioning::Part);
+  REQUIRE(part->content.size() == 2);
 
   auto first_chapter = std::dynamic_pointer_cast<dex::Sectioning>(part->content.front());
-  QVERIFY(first_chapter != nullptr && first_chapter->depth == dex::Sectioning::Chapter);
+  REQUIRE((first_chapter != nullptr && first_chapter->depth == dex::Sectioning::Chapter));
 
   {
-    QVERIFY(first_chapter->name == "First chapter");
-    QVERIFY(first_chapter->content.size() == 1);
+    REQUIRE(first_chapter->name == "First chapter");
+    REQUIRE(first_chapter->content.size() == 1);
 
     auto par = std::dynamic_pointer_cast<dex::Paragraph>(first_chapter->content.front());
-    QVERIFY(par != nullptr && par->text() == "This is the content of the first chapter.");
+    REQUIRE((par != nullptr && par->text() == "This is the content of the first chapter."));
   }
 
   auto second_chapter = std::dynamic_pointer_cast<dex::Sectioning>(part->content.back());
-  QVERIFY(second_chapter != nullptr && second_chapter->depth == dex::Sectioning::Chapter);
+  REQUIRE((second_chapter != nullptr && second_chapter->depth == dex::Sectioning::Chapter));
 
   {
-    QVERIFY(second_chapter->name == "Second chapter");
-    QVERIFY(second_chapter->content.size() == 1);
+    REQUIRE(second_chapter->name == "Second chapter");
+    REQUIRE(second_chapter->content.size() == 1);
 
     auto par = std::dynamic_pointer_cast<dex::Paragraph>(second_chapter->content.front());
-    QVERIFY(par != nullptr && par->text() == "This is the content of the second chapter.");
+    REQUIRE((par != nullptr && par->text() == "This is the content of the second chapter."));
   }
 }

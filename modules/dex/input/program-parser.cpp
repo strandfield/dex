@@ -436,7 +436,7 @@ void ProgramParser::param(std::string des)
 
   auto fun = std::static_pointer_cast<dex::Function>(currentFrame().node);
 
-  for (size_t i(0); fun->parameters.size(); ++i)
+  for (size_t i(0); i < fun->parameters.size(); ++i)
   {
     if (!fun->parameters.at(i)->brief.has_value())
     {

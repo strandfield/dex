@@ -8,40 +8,42 @@
 #include "dex/dex-app.h"
 
 #include "dex/app/command-line-parser.h"
-#include "dex/app/ini-config-parser.h"
+#include "dex/app/dex-config.h"
+#include "dex/app/version.h"
 
 #include "dex/model/model.h"
 
-#include <QCoreApplication>
-
-class QDir;
+#include <filesystem>
 
 namespace dex
 {
 
-class ParserMachine;
-
-class DEX_APP_API Dex : public QCoreApplication
+class DEX_APP_API Dex
 {
 public:
-  Dex(int& argc, char* argv[]);
+  explicit Dex(const CommandLineParserResult& arguments);
+  explicit Dex(const std::filesystem::path& workdir);
+
+  std::filesystem::path workingDir() const;
+  const Config& config() const;
+  std::shared_ptr<Model> model() const;
 
   int exec();
 
+  void readConfig();
+  void parseInputs();
+  void writeOutput();
+
 protected:
-  void process(const QStringList& inputs, QString output, json::Object values);
 
   void work();
 
-  void feed(ParserMachine& parser, const QString& input);
-  void feed(ParserMachine& parser, const QDir& input);
-
-  void write_output(const std::shared_ptr<Model>& model, const QString& name, json::Object values);
+  void write_output(const std::shared_ptr<Model>& model, const std::filesystem::path& outdir, json::Object values);
   
 private:
-  QStringList m_suffixes;
-  CommandLineParserResult m_cli;
-  IniOptions m_ini;
+  std::filesystem::path m_workdir;
+  Config m_config;
+  std::shared_ptr<Model> m_model;
 };
 
 } // namespace dex

@@ -89,8 +89,8 @@ public:
     return r;
   }
 
+  std::string replace(const std::string& str, const std::string& replacement) const;
   std::string replace(std::initializer_list<std::pair<std::string_view, std::string_view>>&& replacements) const;
-
 };
 
 inline StdStringCRef StdString(const std::string& str)

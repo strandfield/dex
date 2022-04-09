@@ -10,6 +10,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_compile_options(/wd4251)  
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 ##################################################################
 ###### install config
 ##################################################################
@@ -24,9 +26,15 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ###### C++17 clang (Travis CI)
 ##################################################################
 
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#  message("Building with clang")
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+#endif()
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  message("Building with clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+  EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
+  string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
+  message("Clang version: ${CLANG_VERSION_STRING}")
 endif()
 
 ##################################################################
@@ -46,13 +54,6 @@ endif()
 ##################################################################
 
 add_subdirectory(dependencies)
-
-##################################################################
-###### Qt
-##################################################################
-
-set(CMAKE_AUTOMOC ON)
-find_package(Qt5 COMPONENTS Core Gui Test)
 
 ##################################################################
 ###### modules
@@ -79,6 +80,7 @@ add_subdirectory(tests)
 message("Install RPATH is: ${CMAKE_INSTALL_RPATH}")
 
 install(TARGETS liquid typeset cpptok LIBRARY DESTINATION lib)
+install(DIRECTORY "${YAMLCPP_DIR}/bin/" TYPE LIB)
 install(TARGETS dex-common dex-model dex-input dex-output dex-app LIBRARY DESTINATION lib)
 install(TARGETS dex RUNTIME DESTINATION bin)
 

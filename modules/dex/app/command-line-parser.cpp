@@ -4,76 +4,69 @@
 
 #include "dex/app/command-line-parser.h"
 
-#include "dex/common/json-utils.h"
+#include <json-toolkit/json.h>
 
 namespace dex
 {
 
-static json::Object values_to_json(QStringList all_values)
+CommandLineParser::CommandLineParser()
 {
-  dex::SettingsMap result;
 
-  QStringList values = all_values.join(";").split(";", QString::SkipEmptyParts);
+}
 
-  for (QString key_value_pair : values)
+CommandLineParserResult CommandLineParser::parse(int argc, char* argv[])
+{
+  CommandLineParserResult result;
+
+  for (int i(1); i < argc; )
   {
-    QStringList key_value = key_value_pair.split('=', QString::SkipEmptyParts);
+    std::string opt = std::string(argv[i]);
 
-    if (key_value.size() == 2)
+    if (opt == "-?" || opt == "--help" || opt == "-h")
     {
-      result[key_value.front().toStdString()] = key_value.back().toStdString();
+      result.status = CommandLineParserResult::HelpRequested;
+      ++i;
+    }
+    else if (opt == "-w")
+    {
+      result.status = CommandLineParserResult::Work;
+      ++i;
+      result.workdir = std::string(argv[i]);
+      ++i;
+    }
+    else if (opt == "-v" || opt == "--version")
+    {
+      result.status = CommandLineParserResult::VersionRequested;
+      ++i;
+    }
+    else
+    {
+      result.status = CommandLineParserResult::ParseError;
+      result.error = "Unknown option: " + opt;
+      return result;
     }
   }
 
-  return build_json(result);
-}
-
-CommandLineParser::CommandLineParser()
-{
-  addHelpOption();
-  addVersionOption();
-
-  addOption({ "i", "Input (file / directory)", "input" });
-  addOption({ "o", "Output", "output" });
-  addOption({ "value", "Project values for the Liquid-exporter", "variables" });
-  addOption({ "reset-profiles", "Resets the exporter profiles" });
-}
-
-CommandLineParserResult CommandLineParser::parse(const QStringList& args)
-{
-  const bool success = QCommandLineParser::parse(args);
-
-  CommandLineParserResult result;
-
-  if (!success)
-  {
-    result.status = CommandLineParserResult::ParseError;
-    result.error = QCommandLineParser::errorText();
-  }
-  else if (isSet("help"))
-  {
-    result.status = CommandLineParserResult::HelpRequested;
-  }
-  else if (isSet("version"))
-  {
-    result.status = CommandLineParserResult::VersionRequested;
-  }
-  else
+  if (argc == 1)
   {
     result.status = CommandLineParserResult::Work;
-    result.inputs = values("i");
-    result.output = value("o");
-    result.values = values_to_json(values("value"));
   }
-
-  result.reset_profiles = isSet("reset-profiles");
 
   return result;
 }
 
-QString CommandLineParser::help() const
+std::string CommandLineParser::help() const
 {
-  return QCommandLineParser::helpText();
+  std::string help;
+
+  help += "Usage: dex [options]\n";
+  help += "\n";
+  help += "Options:\n";
+  help += "  -?, -h, --help  Displays help on commandline options.\n";
+  help += "  -v, --version   Displays version information.\n";
+  help += "  -w <workdir>    Working directory\n";
+
+  return help;
 }
 
 } // namespace dex

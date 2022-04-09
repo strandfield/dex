@@ -1,0 +1,4 @@
+engine: liquid
+
+output:
+  document: ""

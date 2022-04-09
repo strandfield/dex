@@ -1,3 +1,7 @@
 ignore/*
 build/*
 release/*
+examples/**/result/*
+examples/**/_output/*
+tests/catch.hpp
+doc/_output

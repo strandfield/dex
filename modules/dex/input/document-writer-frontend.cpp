@@ -49,6 +49,9 @@ bool DocumentWriterFrontend::handle(const FunctionCall& call)
     {Functions::INLINECODE, &DocumentWriterFrontend::inlinecode},
     {Functions::BEGINTEXTTT, &DocumentWriterFrontend::begintexttt},
     {Functions::ENDTEXTTT, &DocumentWriterFrontend::endtexttt},
+    {Functions::INLINE_ARG_REF, &DocumentWriterFrontend::inlineargref},
+    {Functions::INLINE_TYPE_REF, &DocumentWriterFrontend::inlinetyperef},
+    {Functions::INLINE_METHOD_REF, &DocumentWriterFrontend::inlinemethodref},
     {Functions::SINCE, &DocumentWriterFrontend::since},
     {Functions::BEGINSINCE, &DocumentWriterFrontend::beginsince},
     {Functions::ENDSINCE, &DocumentWriterFrontend::endsince},
@@ -143,6 +146,32 @@ void DocumentWriterFrontend::begintexttt(const FunctionCall& c)
 void DocumentWriterFrontend::endtexttt(const FunctionCall& c)
 {
   m_writer->endtexttt();
+}
+
+void DocumentWriterFrontend::inlineargref(const FunctionCall& c)
+{
+  // @TODO: handle inline arg refs
+  const std::string& word = c.arg<std::string>(0);
+  m_writer->write(word);
+}
+
+void DocumentWriterFrontend::inlinetyperef(const FunctionCall& c)
+{
+  // @TODO: handle inline type refs
+  const std::string& word = c.arg<std::string>(0);
+  m_writer->write(word);
+}
+
+void DocumentWriterFrontend::inlinemethodref(const FunctionCall& c)
+{
+  // @TODO: handle inline method refs
+
+  const std::string& word = c.arg<std::string>(0);
+
+  m_writer->write(word);
+
+  if(word.back() != ')')
+    m_writer->write("()");
 }
 
 void DocumentWriterFrontend::since(const FunctionCall& c)
