@@ -14,7 +14,7 @@ documentation that presents a simplified version of the code.
 \begin{code}
 /*!
  * \backslash{}class Dex
- * \backslash{}the dex engine
+ * \backslash{}brief the dex engine
  */
 \end{code}
 
